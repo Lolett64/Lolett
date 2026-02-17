@@ -8,6 +8,8 @@ import { getProductsByCategory } from '@/data/products';
 import { getCategoryBySlug, getCategoriesByGender } from '@/data/categories';
 import { ProductSorting } from '@/components/product/ProductSorting';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+
 interface PageProps {
   params: Promise<{
     gender: string;
@@ -23,9 +25,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Catégorie non trouvée' };
   }
 
+  const genderLabel = gender === 'homme' ? 'Homme' : 'Femme';
+  const title = `${category.label} ${genderLabel} — LOLETT`;
+  const canonicalUrl = `${BASE_URL}/shop/${gender}/${categorySlug}`;
+
   return {
-    title: category.seoTitle,
+    title,
     description: category.seoDescription,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description: category.seoDescription,
+      url: canonicalUrl,
+      type: 'website',
+    },
   };
 }
 

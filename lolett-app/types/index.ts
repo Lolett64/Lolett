@@ -62,12 +62,16 @@ export interface FavoriteItem {
 
 export interface Order {
   id: string;
+  orderNumber: string;
   items: OrderItem[];
   customer: CustomerInfo;
   total: number;
   shipping: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
+  status: 'pending' | 'confirmed' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'expired';
+  paymentProvider?: 'stripe' | 'paypal';
+  paymentId?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface OrderItem {

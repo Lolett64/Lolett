@@ -57,10 +57,26 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
           </span>
         </div>
 
-        {isCart && !isFreeShipping && (
-          <p className="text-lolett-gray-500 bg-lolett-yellow/20 rounded-lg p-3 text-sm">
-            Plus que {amountUntilFreeShipping.toFixed(2)} € pour la livraison offerte
-          </p>
+        {isCart && (
+          <div
+            className={`rounded-lg p-3 text-sm ${
+              isFreeShipping
+                ? 'bg-green-50 text-green-700'
+                : 'bg-lolett-yellow/20 text-lolett-gray-600'
+            }`}
+          >
+            {isFreeShipping ? (
+              <span className="font-medium">Livraison offerte — profites-en bien.</span>
+            ) : (
+              <span>
+                Plus que{' '}
+                <span className="font-semibold text-lolett-gray-900">
+                  {amountUntilFreeShipping.toFixed(2)} €
+                </span>{' '}
+                pour la livraison offerte !
+              </span>
+            )}
+          </div>
         )}
 
         <Separator />

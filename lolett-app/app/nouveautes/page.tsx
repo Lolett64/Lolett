@@ -4,10 +4,21 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { getNewProducts } from '@/data/products';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+
 export const metadata: Metadata = {
-  title: 'Nouveautés',
+  title: 'Nouveautés — LOLETT',
   description:
     'Découvrez les dernières pièces LOLETT. Fraîchement débarquées, prêtes à illuminer votre été.',
+  alternates: {
+    canonical: `${BASE_URL}/nouveautes`,
+  },
+  openGraph: {
+    title: 'Nouveautés — LOLETT',
+    description: 'Les dernières pièces de la collection. À peine arrivées, déjà indispensables.',
+    url: `${BASE_URL}/nouveautes`,
+    type: 'website',
+  },
 };
 
 export default function NouveautesPage() {

@@ -10,11 +10,17 @@ import { ProductSorting } from '@/components/product/ProductSorting';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 export const metadata: Metadata = {
-  title: 'Collection Femme',
+  title: 'Sélection Femme — LOLETT',
   description:
-    'Découvrez la collection femme LOLETT. Robes fluides, tops en lin, accessoires solaires.',
+    'Découvrez la sélection femme LOLETT. Robes fluides, tops en lin, accessoires solaires — l\'art de vivre à la méditerranéenne. Livraison offerte dès 100 €.',
   alternates: {
     canonical: `${BASE_URL}/shop/femme`,
+  },
+  openGraph: {
+    title: 'Sélection Femme — LOLETT',
+    description: 'Robes fluides, tops en lin. L\'art de vivre à la méditerranéenne.',
+    url: `${BASE_URL}/shop/femme`,
+    type: 'website',
   },
 };
 

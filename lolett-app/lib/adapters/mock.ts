@@ -116,12 +116,14 @@ export class MockOrderRepository implements OrderRepository {
     total: number;
     shipping: number;
   }): Promise<Order> {
+    const orderNumber =
+      'LOL-' +
+      Date.now().toString(36).toUpperCase() +
+      '-' +
+      Math.random().toString(36).substring(2, 6).toUpperCase();
     const order: Order = {
-      id:
-        'LOL-' +
-        Date.now().toString(36).toUpperCase() +
-        '-' +
-        Math.random().toString(36).substring(2, 6).toUpperCase(),
+      id: orderNumber,
+      orderNumber,
       items: orderData.items,
       customer: orderData.customer,
       total: orderData.total,

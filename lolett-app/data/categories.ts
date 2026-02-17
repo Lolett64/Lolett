@@ -1,59 +1,86 @@
 import type { Category } from '@/types';
 
 export const categories: Category[] = [
+  // Homme
   {
     id: 'cat-001',
     gender: 'homme',
-    slug: 'chemises',
-    label: 'Chemises',
-    seoTitle: 'Chemises Homme | LOLETT',
+    slug: 'hauts',
+    label: 'Hauts',
+    seoTitle: 'Hauts Homme — LOLETT',
     seoDescription:
-      'Découvrez notre collection de chemises homme. Style méditerranéen, qualité premium.',
+      'T-shirts, polos et chemises homme. Des hauts qui font le style, signés LOLETT.',
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'cat-002',
     gender: 'homme',
-    slug: 'pantalons',
-    label: 'Pantalons',
-    seoTitle: 'Pantalons Homme | LOLETT',
-    seoDescription: 'Pantalons homme LOLETT. Coupe parfaite pour un été stylé.',
+    slug: 'bas',
+    label: 'Bas',
+    seoTitle: 'Bas Homme — LOLETT',
+    seoDescription:
+      'Pantalons, shorts et joggers homme. Coupe parfaite pour un look LOLETT.',
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'cat-003',
     gender: 'homme',
-    slug: 'accessoires',
-    label: 'Accessoires',
-    seoTitle: 'Accessoires Homme | LOLETT',
-    seoDescription: 'Accessoires homme pour compléter votre look LOLETT.',
+    slug: 'chaussures',
+    label: 'Chaussures',
+    seoTitle: 'Chaussures Homme — LOLETT',
+    seoDescription:
+      'Sneakers et chaussures homme. Le bon pied pour sortir en style.',
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'cat-004',
-    gender: 'femme',
-    slug: 'robes',
-    label: 'Robes',
-    seoTitle: 'Robes Femme | LOLETT',
-    seoDescription: 'Robes femme LOLETT. Élégance méditerranéenne pour toutes les occasions.',
+    gender: 'homme',
+    slug: 'accessoires',
+    label: 'Accessoires',
+    seoTitle: 'Accessoires Homme — LOLETT',
+    seoDescription:
+      'Casquettes, sacs et accessoires homme. Le detail qui fait toute la difference.',
     createdAt: '2024-01-01T00:00:00Z',
   },
+  // Femme
   {
     id: 'cat-005',
     gender: 'femme',
-    slug: 'tops',
-    label: 'Tops',
-    seoTitle: 'Tops Femme | LOLETT',
-    seoDescription: 'Tops et blouses femme. Collection LOLETT inspirée du Sud.',
+    slug: 'hauts',
+    label: 'Hauts',
+    seoTitle: 'Hauts Femme — LOLETT',
+    seoDescription:
+      'Tops, blouses et chemisiers femme. Collection LOLETT qui fait tourner les tetes.',
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'cat-006',
     gender: 'femme',
+    slug: 'bas',
+    label: 'Bas',
+    seoTitle: 'Bas Femme — LOLETT',
+    seoDescription:
+      'Jupes, pantalons et shorts femme. Style LOLETT pour toutes les occasions.',
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'cat-007',
+    gender: 'femme',
+    slug: 'chaussures',
+    label: 'Chaussures',
+    seoTitle: 'Chaussures Femme — LOLETT',
+    seoDescription:
+      'Sneakers, sandales et chaussures femme. LOLETT te met sur ton 31.',
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'cat-008',
+    gender: 'femme',
     slug: 'accessoires',
     label: 'Accessoires',
-    seoTitle: 'Accessoires Femme | LOLETT',
-    seoDescription: 'Accessoires femme pour sublimer votre style LOLETT.',
+    seoTitle: 'Accessoires Femme — LOLETT',
+    seoDescription:
+      'Bijoux, sacs et accessoires femme. Le petit plus qui change tout.',
     createdAt: '2024-01-01T00:00:00Z',
   },
 ];

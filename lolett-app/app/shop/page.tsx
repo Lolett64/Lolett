@@ -1,9 +1,27 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { Button } from '@/components/ui/button';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+
+export const metadata: Metadata = {
+  title: 'La Boutique — LOLETT',
+  description:
+    'Explore les collections LOLETT pour homme et femme. Mode méditerranéenne, looks complets, livraison offerte dès 100 €.',
+  alternates: {
+    canonical: `${BASE_URL}/shop`,
+  },
+  openGraph: {
+    title: 'La Boutique — LOLETT',
+    description: 'Pour lui, pour elle. Pensé au Sud, porté partout.',
+    url: `${BASE_URL}/shop`,
+    type: 'website',
+  },
+};
 
 export default function ShopPage() {
   return (

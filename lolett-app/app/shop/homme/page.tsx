@@ -10,11 +10,17 @@ import { ProductSorting } from '@/components/product/ProductSorting';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 export const metadata: Metadata = {
-  title: 'Collection Homme',
+  title: 'Sélection Homme — LOLETT',
   description:
-    'Découvrez la collection homme LOLETT. Lin, coton, style méditerranéen pour un été parfait.',
+    'Découvrez la sélection homme LOLETT. Lin léger, coton premium, looks complets pensés pour le Sud. Livraison offerte dès 100 €.',
   alternates: {
     canonical: `${BASE_URL}/shop/homme`,
+  },
+  openGraph: {
+    title: 'Sélection Homme — LOLETT',
+    description: 'Lin léger, coton premium. Tout ce qu\'il faut pour un été au Sud.',
+    url: `${BASE_URL}/shop/homme`,
+    type: 'website',
   },
 };
 

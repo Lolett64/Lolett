@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { products } from '@/data/products';
+import { categories } from '@/data/categories';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lolett.fr';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -46,6 +46,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // Category pages
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${BASE_URL}/shop/${cat.gender}/${cat.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
   // Product pages
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${BASE_URL}/produit/${product.slug}`,
@@ -54,5 +62,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...productPages];
+  return [...staticPages, ...categoryPages, ...productPages];
 }

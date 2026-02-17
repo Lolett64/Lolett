@@ -25,21 +25,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const productUrl = `${BASE_URL}/produit/${product.slug}`;
 
+  const title = `${product.name} — LOLETT`;
+
   return {
-    title: product.name,
+    title,
     description: product.description,
     alternates: {
       canonical: productUrl,
     },
     openGraph: {
-      title: `${product.name} | LOLETT`,
+      title,
       description: product.description,
       url: productUrl,
       type: 'website',
       images: product.images.map((img) => ({
         url: img,
         alt: product.name,
+        width: 800,
+        height: 1000,
       })),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: product.description,
+      images: product.images[0] ? [product.images[0]] : undefined,
     },
   };
 }
