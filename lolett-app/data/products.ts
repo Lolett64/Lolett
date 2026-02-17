@@ -196,7 +196,7 @@ export const products: Product[] = [
     categorySlug: 'robes',
     price: 89,
     images: [
-      'https://images.unsplash.com/photo-1583496661160-fb5886a0uj7f?w=800&q=80',
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80',
       'https://images.unsplash.com/photo-1577900232427-18219b9166a0?w=800&q=80',
     ],
     description:

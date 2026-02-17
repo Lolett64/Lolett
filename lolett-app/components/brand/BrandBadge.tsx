@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 interface BrandBadgeProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'accent' | 'new' | 'lowStock';
+  variant?: 'primary' | 'accent' | 'new' | 'lowStock' | 'soldOut';
   className?: string;
 }
 
@@ -12,6 +12,7 @@ export function BrandBadge({ children, variant = 'primary', className }: BrandBa
     accent: 'bg-lolett-yellow text-lolett-gray-900',
     new: 'bg-lolett-blue text-white',
     lowStock: 'bg-orange-500 text-white',
+    soldOut: 'bg-lolett-gray-900 text-white',
   };
 
   return (

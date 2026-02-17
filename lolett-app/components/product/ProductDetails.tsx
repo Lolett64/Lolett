@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { Bell } from 'lucide-react';
 import type { Product, Size } from '@/types';
 import { useCartStore } from '@/features/cart';
 import { STOCK } from '@/lib/constants';
+import { MICROCOPY, getRandomMicrocopy } from '@/lib/microcopy';
+import { Button } from '@/components/ui/button';
 import { ProductGallery } from './ProductGallery';
 import { ColorSelector } from './ColorSelector';
 import { SizeSelector } from './SizeSelector';
@@ -27,6 +30,15 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
   const isLowStock = product.stock > 0 && product.stock <= STOCK.LOW_THRESHOLD;
   const isOutOfStock = product.stock === 0;
+
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [notifySubmitted, setNotifySubmitted] = useState(false);
+
+  const isAccessory = product.categorySlug === 'accessoires';
+  const randomMicrocopy = useMemo(
+    () => getRandomMicrocopy(isAccessory ? 'accessories' : 'general'),
+    [isAccessory]
+  );
 
   const handleAddToCart = () => {
     if (!selectedSize || isOutOfStock) return;
@@ -63,8 +75,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
         <div className="bg-lolett-gray-100 mt-6 rounded-xl p-3 sm:mt-8 sm:p-4">
           <p className="text-lolett-gray-700 text-sm">
-            <span className="text-lolett-blue font-medium">Validé par LOLETT.</span> Tu peux y aller
-            tranquille.
+            <span className="text-lolett-blue font-medium">{MICROCOPY.productValidated}</span>
+          </p>
+          <p className="text-lolett-gray-500 mt-1 text-xs italic">
+            {randomMicrocopy}
           </p>
         </div>
 
@@ -89,7 +103,46 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {/* Stock status */}
         <div className="mt-6">
           {isOutOfStock ? (
-            <p className="text-sm font-medium text-red-600">Rupture de stock</p>
+            <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold text-orange-700">
+                <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-orange-500" />
+                Victime de son succès
+              </p>
+              <p className="text-lolett-gray-600 mt-1 text-xs">
+                Cet article est temporairement indisponible.
+              </p>
+
+              {/* Notify me form */}
+              {notifySubmitted ? (
+                <p className="mt-3 text-sm font-medium text-green-700">
+                  On te prévient dès qu&apos;il revient !
+                </p>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (notifyEmail) setNotifySubmitted(true);
+                  }}
+                  className="mt-3 flex gap-2"
+                >
+                  <input
+                    type="email"
+                    required
+                    value={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.value)}
+                    placeholder="ton@email.com"
+                    className="border-lolett-gray-300 placeholder:text-lolett-gray-400 min-w-0 flex-1 rounded-full border bg-white px-4 py-2.5 text-sm transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+                  />
+                  <Button
+                    type="submit"
+                    className="flex-shrink-0 rounded-full bg-orange-600 px-4 text-sm text-white hover:bg-orange-700"
+                  >
+                    <Bell className="mr-1.5 h-3.5 w-3.5" />
+                    M&apos;avertir
+                  </Button>
+                </form>
+              )}
+            </div>
           ) : isLowStock ? (
             <p className="text-sm font-medium text-orange-600">Plus que {product.stock} en stock</p>
           ) : (
@@ -97,13 +150,15 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           )}
         </div>
 
-        <ProductActions
-          productId={product.id}
-          isOutOfStock={isOutOfStock}
-          canAddToCart={!!selectedSize}
-          addedToCart={addedToCart}
-          onAddToCart={handleAddToCart}
-        />
+        {!isOutOfStock && (
+          <ProductActions
+            productId={product.id}
+            isOutOfStock={isOutOfStock}
+            canAddToCart={!!selectedSize}
+            addedToCart={addedToCart}
+            onAddToCart={handleAddToCart}
+          />
+        )}
 
         {!selectedSize && !isOutOfStock && (
           <p className="text-lolett-gray-500 mt-4 text-sm">

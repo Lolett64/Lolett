@@ -28,6 +28,10 @@ Stack, architecture, conventions de code, ton de marque, règles paiement/livrai
 
 **Toujours respecter le PRD et le ton LOLETT** : proche, complice, stylé, sans jargon technique visible par l'utilisateur. Le site parle comme une amie qui a du goût, pas comme un robot.
 
+### Règle de processus
+
+**OBLIGATOIRE : Poser des questions avant chaque phase de développement.** Ne jamais commencer à coder une nouvelle phase sans avoir posé les questions nécessaires et obtenu le feu vert explicite du porteur de projet. Cela inclut : les dépendances manquantes, les décisions à valider, les credentials nécessaires, et toute zone d'ombre.
+
 ---
 
 ## 2. Stack technique

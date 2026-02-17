@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 export function NewsletterSection() {
   return (
-    <section className="bg-lolett-cream relative overflow-hidden py-20 sm:py-28 lg:py-36">
+    <section className="noise bg-lolett-cream relative overflow-hidden py-20 sm:py-28 lg:py-36">
       {/* Decorative elements */}
       <div className="border-lolett-blue/5 absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full border" />
       <div className="border-lolett-blue/10 absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full border" />
 
       <div className="relative container">
-        <div className="mx-auto max-w-[55ch] min-w-0 text-center">
+        <ScrollReveal variant="scale" className="mx-auto max-w-[55ch] min-w-0 text-center">
           <span className="text-lolett-blue text-xs font-medium tracking-wider uppercase sm:text-sm">
             Newsletter
           </span>
@@ -35,7 +36,7 @@ export function NewsletterSection() {
           <p className="text-lolett-gray-500 mt-6 text-sm">
             En t&apos;inscrivant, tu acceptes de recevoir nos emails. Pas de spam, promis.
           </p>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

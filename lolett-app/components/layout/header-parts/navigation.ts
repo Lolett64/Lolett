@@ -15,5 +15,6 @@ export const navigation: NavItem[] = [
       { name: 'Femme', href: '/shop/femme' },
     ],
   },
+  { name: 'Notre Histoire', href: '/notre-histoire' },
   { name: 'Contact', href: '/contact' },
 ];

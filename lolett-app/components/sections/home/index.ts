@@ -1,5 +1,6 @@
 export { HeroSection } from './HeroSection';
 export { MarqueeSection } from './MarqueeSection';
+export { TrustBarSection } from './TrustBarSection';
 export { NewArrivalsSection } from './NewArrivalsSection';
 export { CollectionsSection } from './CollectionsSection';
 export { LooksSection } from './LooksSection';

@@ -14,8 +14,8 @@ export function HeroSection() {
       {/* Background image with Ken Burns effect */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=85"
-          alt="Méditerranée"
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=85"
+          alt="Mode méditerranéenne LOLETT"
           fill
           className="animate-ken-burns object-cover"
           priority

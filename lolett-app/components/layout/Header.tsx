@@ -27,8 +27,8 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
-        isScrolled ? 'bg-white/95 py-3 shadow-sm backdrop-blur-md' : 'bg-transparent py-4 sm:py-5'
+        'fixed right-0 left-0 z-50 transition-all duration-300',
+        isScrolled ? 'top-0 bg-white/95 py-3 shadow-sm backdrop-blur-md' : 'top-9 bg-transparent py-4 sm:py-5'
       )}
     >
       <div className="container">

@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Truck, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { SHIPPING } from '@/lib/constants';
 import { useCartCalculation, type CartProductItem } from '../hooks';
 import type { CartItem } from '@/types';
 
@@ -59,23 +60,41 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
 
         {isCart && (
           <div
-            className={`rounded-lg p-3 text-sm ${
+            className={`rounded-xl p-4 text-sm ${
               isFreeShipping
                 ? 'bg-green-50 text-green-700'
-                : 'bg-lolett-yellow/20 text-lolett-gray-600'
+                : 'bg-lolett-cream text-lolett-gray-600'
             }`}
           >
-            {isFreeShipping ? (
-              <span className="font-medium">Livraison offerte — profites-en bien.</span>
-            ) : (
-              <span>
-                Plus que{' '}
-                <span className="font-semibold text-lolett-gray-900">
-                  {amountUntilFreeShipping.toFixed(2)} €
-                </span>{' '}
-                pour la livraison offerte !
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {isFreeShipping ? (
+                <PartyPopper className="h-4 w-4 flex-shrink-0" />
+              ) : (
+                <Truck className="h-4 w-4 flex-shrink-0" />
+              )}
+              {isFreeShipping ? (
+                <span className="font-medium">Livraison offerte — profites-en bien.</span>
+              ) : (
+                <span>
+                  Plus que{' '}
+                  <span className="text-lolett-gray-900 font-semibold">
+                    {amountUntilFreeShipping.toFixed(2)} €
+                  </span>{' '}
+                  pour la livraison offerte !
+                </span>
+              )}
+            </div>
+            {/* Progress bar */}
+            <div className="bg-lolett-gray-200 mt-3 h-2 overflow-hidden rounded-full">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ease-out ${
+                  isFreeShipping ? 'bg-green-500' : 'bg-lolett-blue'
+                }`}
+                style={{
+                  width: `${Math.min(100, (subtotal / SHIPPING.FREE_THRESHOLD) * 100)}%`,
+                }}
+              />
+            </div>
           </div>
         )}
 

@@ -1,15 +1,16 @@
 import Image from 'next/image';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 export function BrandStorySection() {
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-28 lg:py-36">
+    <section className="noise relative overflow-hidden bg-white py-20 sm:py-28 lg:py-36">
       <div className="container">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           {/* Image side */}
-          <div className="relative order-2 lg:order-1">
+          <ScrollReveal variant="left" className="relative order-2 lg:order-1">
             <div className="shadow-luxury relative aspect-[4/5] overflow-hidden rounded-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1523359346063-d879354c0ea5?w=1000&q=85"
+                src="https://images.unsplash.com/photo-1707765643763-aa1f4d3da740?w=1000&q=85"
                 alt="L'essence de LOLETT"
                 fill
                 className="object-cover"
@@ -25,10 +26,10 @@ export function BrandStorySection() {
 
             {/* Decorative element */}
             <div className="border-lolett-blue/20 absolute -top-8 -left-8 hidden h-32 w-32 rounded-full border-2 lg:block" />
-          </div>
+          </ScrollReveal>
 
           {/* Content side */}
-          <div className="order-1 max-w-[65ch] min-w-0 lg:order-2">
+          <ScrollReveal variant="right" className="order-1 max-w-[65ch] min-w-0 lg:order-2">
             <span className="text-lolett-blue text-xs font-medium tracking-wider uppercase sm:text-sm">
               Notre Histoire
             </span>
@@ -61,7 +62,7 @@ export function BrandStorySection() {
                 <p className="text-lolett-gray-500 text-sm">Depuis le Sud de la France</p>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

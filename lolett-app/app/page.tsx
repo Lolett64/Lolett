@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import {
   HeroSection,
   MarqueeSection,
+  TrustBarSection,
   NewArrivalsSection,
   CollectionsSection,
   LooksSection,
@@ -46,6 +47,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <MarqueeSection />
+      <TrustBarSection />
       <NewArrivalsSection products={newProducts} />
       <CollectionsSection />
       <LooksSection looks={looks} />
@@ -53,6 +55,13 @@ export default function HomePage() {
       <TestimonialsSection reviews={reviews} />
       <SocialFeedSection />
       <NewsletterSection />
+
+      {/* Disclaimer LOLETT */}
+      <section className="bg-lolett-gray-100 py-6 text-center">
+        <p className="text-lolett-gray-500 text-sm italic">
+          LOLETT décline toute responsabilité en cas de coup de coeur.
+        </p>
+      </section>
     </>
   );
 }

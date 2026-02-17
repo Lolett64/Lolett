@@ -1,18 +1,19 @@
 import Image from 'next/image';
 import { TikTokIcon, InstagramIcon } from '@/components/icons';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 const socialItems = [
-  { photo: 'photo-1469334031218-e382a71b716b', platform: 'instagram' },
-  { photo: 'photo-1617137968427-85924c800a22', platform: 'tiktok' },
-  { photo: 'photo-1485968579169-a6e9dc7b4b7e', platform: 'instagram' },
-  { photo: 'photo-1523359346063-d879354c0ea5', platform: 'tiktok' },
+  { photo: 'photo-1515886657613-9f3515b0c78f', platform: 'instagram' },  // femme robe été
+  { photo: 'photo-1552374196-1ab2a1c593e8', platform: 'tiktok' },        // homme look décontracté
+  { photo: 'photo-1496747611176-843222e1e57c', platform: 'instagram' },   // femme lumière dorée
+  { photo: 'photo-1507003211169-0a1dd7228f2d', platform: 'tiktok' },     // homme style méditerranéen
 ] as const;
 
 export function SocialFeedSection() {
   return (
     <section className="bg-lolett-gray-900 relative overflow-hidden py-20 sm:py-28 lg:py-36">
       <div className="container">
-        <div className="mb-12 text-center sm:mb-16">
+        <ScrollReveal className="mb-12 text-center sm:mb-16">
           {/* Social icons with brand colors */}
           <div className="mb-6 inline-flex items-center gap-4">
             <div className="rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] p-2">
@@ -26,10 +27,11 @@ export function SocialFeedSection() {
           <h2 className="font-display text-4xl leading-[1.1] font-bold text-white sm:text-5xl lg:text-6xl">
             Rejoins la Communauté
           </h2>
-        </div>
+        </ScrollReveal>
 
-        {/* Social grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+        {/* Social grid — staggered */}
+        <ScrollReveal stagger>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {socialItems.map((item, i) => (
             <a
               key={i}
@@ -63,10 +65,11 @@ export function SocialFeedSection() {
               </div>
             </a>
           ))}
-        </div>
+          </div>
+        </ScrollReveal>
 
         {/* CTA buttons */}
-        <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <ScrollReveal className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
           {/* Instagram CTA */}
           <a
             href="https://instagram.com/lolett"
@@ -87,7 +90,7 @@ export function SocialFeedSection() {
             <TikTokIcon className="h-5 w-5" />
             <span>Suivre sur TikTok</span>
           </a>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

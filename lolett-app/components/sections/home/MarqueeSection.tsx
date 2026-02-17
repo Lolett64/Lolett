@@ -1,25 +1,32 @@
+const items = [
+  'Livraison Offerte dès 100€',
+  'Lin Premium',
+  'Confectionné en Europe',
+  'Retours Gratuits',
+  'Style Méditerranéen',
+  'Coton Premium',
+];
+
+function MarqueeTrack() {
+  return (
+    <div className="flex shrink-0 items-center gap-8 text-sm font-medium tracking-wider whitespace-nowrap text-white/80 uppercase sm:gap-12 sm:text-base" aria-hidden="true">
+      {items.map((text, i) => (
+        <span key={i} className="flex items-center gap-8 sm:gap-12">
+          <span>{text}</span>
+          <span className="text-lolett-yellow text-xs">✦</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function MarqueeSection() {
   return (
-    <section className="bg-lolett-gray-900 overflow-hidden py-6 sm:py-8">
-      <div className="flex overflow-hidden">
-        <div className="animate-marquee flex gap-8 text-sm font-medium tracking-wider whitespace-nowrap text-white/80 uppercase sm:gap-16 sm:text-base">
-          <span>Livraison Offerte dès 100€</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Lin Premium</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Confectionné en Europe</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Retours Gratuits</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Livraison Offerte dès 100€</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Lin Premium</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Confectionné en Europe</span>
-          <span className="text-lolett-yellow">✦</span>
-          <span>Retours Gratuits</span>
-          <span className="text-lolett-yellow">✦</span>
-        </div>
+    <section className="bg-lolett-gray-900 overflow-hidden py-5 sm:py-6">
+      <div className="animate-marquee flex w-max gap-8 sm:gap-12">
+        <MarqueeTrack />
+        <MarqueeTrack />
+        <MarqueeTrack />
       </div>
     </section>
   );

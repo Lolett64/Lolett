@@ -1,18 +1,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 export function CollectionsSection() {
   return (
     <section className="relative">
-      <div className="grid min-h-[auto] grid-cols-1 lg:min-h-screen lg:grid-cols-2">
-        {/* HOMME */}
-        <Link
-          href="/shop/homme"
-          className="group relative block min-h-[60vh] overflow-hidden lg:min-h-screen"
-        >
+      <ScrollReveal stagger>
+        <div className="grid min-h-[auto] grid-cols-1 lg:min-h-screen lg:grid-cols-2">
+          {/* HOMME */}
+          <Link
+            href="/shop/homme"
+            className="group relative block min-h-[60vh] overflow-hidden lg:min-h-screen"
+          >
           <Image
-            src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1200&q=85"
+            src="https://images.unsplash.com/photo-1726741692873-b8a95b0163aa?w=1200&q=85"
             alt="Collection Homme"
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -46,7 +48,7 @@ export function CollectionsSection() {
           className="group relative block min-h-[60vh] overflow-hidden lg:min-h-screen"
         >
           <Image
-            src="https://images.unsplash.com/photo-1485968579169-a6e9dc7b4b7e?w=1200&q=85"
+            src="https://images.unsplash.com/photo-1698648438550-9a3a9a292fd4?w=1200&q=85"
             alt="Collection Femme"
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -73,7 +75,8 @@ export function CollectionsSection() {
           {/* Decorative corner */}
           <div className="group-hover:border-lolett-yellow/60 absolute top-8 left-8 h-16 w-16 border-t-2 border-l-2 border-white/20 transition-colors duration-500" />
         </Link>
-      </div>
+        </div>
+      </ScrollReveal>
     </section>
   );
 }

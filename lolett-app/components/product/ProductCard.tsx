@@ -58,7 +58,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="group relative"
+      className="group relative transition-transform duration-500 ease-out will-change-transform hover:-translate-y-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -66,14 +66,17 @@ export function ProductCard({ product }: ProductCardProps) {
       }}
     >
       <Link href={`/produit/${product.slug}`} className="block">
-        <div className="bg-lolett-gray-100 relative aspect-[3/4] overflow-hidden rounded-lg">
+        <div className={cn(
+          "bg-lolett-gray-100 relative aspect-[3/4] overflow-hidden rounded-xl transition-shadow duration-700 ease-out group-hover:shadow-luxury",
+          isOutOfStock && "opacity-75 saturate-[0.7]"
+        )}>
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
             className={cn(
-              'object-cover transition-all duration-500',
-              isHovered && product.images[1] ? 'opacity-0' : 'opacity-100'
+              'object-cover transition-all duration-700 ease-out',
+              isHovered && product.images[1] ? 'scale-105 opacity-0' : 'scale-100 opacity-100'
             )}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
@@ -83,15 +86,16 @@ export function ProductCard({ product }: ProductCardProps) {
               alt={`${product.name} - Vue 2`}
               fill
               className={cn(
-                'absolute inset-0 object-cover transition-all duration-500',
-                isHovered ? 'scale-105 opacity-100' : 'scale-100 opacity-0'
+                'absolute inset-0 object-cover transition-all duration-700 ease-out',
+                isHovered ? 'scale-110 opacity-100' : 'scale-105 opacity-0'
               )}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           )}
 
           <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:top-3 sm:left-3 sm:gap-2">
-            {product.isNew && <BrandBadge variant="new">Nouveau</BrandBadge>}
+            {isOutOfStock && <BrandBadge variant="soldOut">Victime de son succès</BrandBadge>}
+            {product.isNew && !isOutOfStock && <BrandBadge variant="new">Nouveau</BrandBadge>}
             {isLowStock && <BrandBadge variant="lowStock">Plus que {product.stock}</BrandBadge>}
           </div>
 
@@ -111,8 +115,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div
             className={cn(
-              'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 transition-all duration-300 sm:p-4',
-              isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+              'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3 transition-all duration-500 ease-out sm:p-4',
+              isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
               'hidden sm:block'
             )}
           >
@@ -159,11 +163,11 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        <div className="mt-3 min-w-0 space-y-0.5 sm:mt-4 sm:space-y-1">
-          <h3 className="text-lolett-gray-900 group-hover:text-lolett-blue line-clamp-1 text-sm font-medium transition-colors sm:text-base">
+        <div className="mt-3 min-w-0 space-y-0.5 transition-all duration-500 ease-out sm:mt-4 sm:space-y-1">
+          <h3 className="text-lolett-gray-900 group-hover:text-lolett-blue line-clamp-1 text-sm font-medium transition-colors duration-500 sm:text-base">
             {product.name}
           </h3>
-          <p className="text-lolett-gray-600 text-sm font-semibold sm:text-base">
+          <p className="text-lolett-gray-500 group-hover:text-lolett-gray-900 text-sm font-semibold transition-colors duration-500 sm:text-base">
             {product.price} €
           </p>
         </div>

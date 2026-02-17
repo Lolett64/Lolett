@@ -6,7 +6,7 @@ export const looks: Look[] = [
     id: 'look-001',
     title: 'Le Méditerranéen',
     gender: 'homme',
-    coverImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1726741692717-a4007a9deb22?w=800&q=80',
     productIds: ['prod-001', 'prod-002', 'prod-006'],
     vibe: "Soirée d'été en terrasse",
     shortPitch:
@@ -17,7 +17,7 @@ export const looks: Look[] = [
     id: 'look-002',
     title: 'La Provençale',
     gender: 'femme',
-    coverImage: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1755695213516-2a5165c3abd8?w=800&q=80',
     productIds: ['prod-007', 'prod-011', 'prod-012'],
     vibe: 'Marché du dimanche matin',
     shortPitch: "Robe fluide, panier tressé, foulard soie. L'art de vivre à la française.",

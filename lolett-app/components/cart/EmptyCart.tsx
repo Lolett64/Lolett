@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Button } from '@/components/ui/button';
+import { MICROCOPY } from '@/lib/microcopy';
 
 interface EmptyCartProps {
   title?: string;
@@ -11,7 +12,7 @@ interface EmptyCartProps {
 
 export function EmptyCart({
   title = 'Ton panier est vide',
-  message = 'Ajoute des pièces à ton panier avant de passer commande.',
+  message = MICROCOPY.cartEmpty,
   showIcon = false,
 }: EmptyCartProps) {
   return (
