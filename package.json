@@ -1,0 +1,10 @@
+{
+  "name": "lorett",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix lolett-app",
+    "build": "npm run build --prefix lolett-app",
+    "start": "npm run start --prefix lolett-app"
+  }
+}

@@ -1,0 +1,118 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useCartCalculation, type CartProductItem } from '../hooks';
+import type { CartItem } from '@/types';
+
+interface OrderSummaryProps {
+  items: CartItem[];
+  variant: 'cart' | 'checkout';
+}
+
+export function OrderSummary({ items, variant }: OrderSummaryProps) {
+  const { cartProducts, subtotal, shipping, total, isFreeShipping, amountUntilFreeShipping } =
+    useCartCalculation(items);
+
+  const isCart = variant === 'cart';
+  const isCheckout = variant === 'checkout';
+
+  return (
+    <div
+      className={`sticky top-24 rounded-2xl p-5 sm:top-28 sm:p-6 ${
+        isCart ? 'bg-lolett-gray-100' : 'bg-white sm:p-8'
+      }`}
+    >
+      <h2 className="font-display text-lolett-gray-900 mb-6 text-lg font-semibold">
+        {isCart ? 'Récapitulatif' : 'Récapitulatif de commande'}
+      </h2>
+
+      {isCheckout && (
+        <>
+          <div className="mb-6 space-y-4">
+            {cartProducts.map((item) => (
+              <OrderSummaryItem key={`${item.productId}-${item.size}`} item={item} />
+            ))}
+          </div>
+          <Separator className="my-6" />
+        </>
+      )}
+
+      <div className={isCheckout ? 'space-y-3' : 'space-y-4'}>
+        <div className={`text-lolett-gray-600 flex justify-between ${isCheckout ? 'text-sm' : ''}`}>
+          <span>Sous-total</span>
+          <span>{subtotal.toFixed(2)} €</span>
+        </div>
+        <div className={`text-lolett-gray-600 flex justify-between ${isCheckout ? 'text-sm' : ''}`}>
+          <span>Livraison</span>
+          <span>
+            {shipping === 0 ? (
+              <span className="text-green-600">Offerte</span>
+            ) : (
+              `${shipping.toFixed(2)} €`
+            )}
+          </span>
+        </div>
+
+        {isCart && !isFreeShipping && (
+          <p className="text-lolett-gray-500 bg-lolett-yellow/20 rounded-lg p-3 text-sm">
+            Plus que {amountUntilFreeShipping.toFixed(2)} € pour la livraison offerte
+          </p>
+        )}
+
+        <Separator />
+
+        <div className="text-lolett-gray-900 flex justify-between text-lg font-semibold">
+          <span>Total</span>
+          <span>{total.toFixed(2)} €</span>
+        </div>
+      </div>
+
+      {isCart && (
+        <>
+          <p className="text-lolett-gray-500 mt-4 text-sm italic">
+            T&apos;es à deux clics d&apos;être le plus stylé de ta terrasse.
+          </p>
+
+          <Button
+            asChild
+            size="lg"
+            className="bg-lolett-blue hover:bg-lolett-blue-light mt-6 w-full rounded-full"
+          >
+            <Link href="/checkout">
+              <span>Passer commande</span>
+              <ArrowRight className="ml-2 h-4 w-4 flex-shrink-0" />
+            </Link>
+          </Button>
+
+          <Button asChild variant="ghost" className="text-lolett-gray-600 mt-3 w-full">
+            <Link href="/shop">Continuer mes achats</Link>
+          </Button>
+        </>
+      )}
+    </div>
+  );
+}
+
+function OrderSummaryItem({ item }: { item: CartProductItem }) {
+  return (
+    <div className="flex gap-4">
+      <div className="relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-lg">
+        <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+        <div className="bg-lolett-blue absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
+          {item.quantity}
+        </div>
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-lolett-gray-900 line-clamp-1 text-sm font-medium">{item.product.name}</p>
+        <p className="text-lolett-gray-500 text-xs">Taille : {item.size}</p>
+        <p className="text-lolett-gray-900 mt-1 text-sm font-medium">
+          {(item.product.price * item.quantity).toFixed(2)} €
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,9 @@
+export { HeroSection } from './HeroSection';
+export { MarqueeSection } from './MarqueeSection';
+export { NewArrivalsSection } from './NewArrivalsSection';
+export { CollectionsSection } from './CollectionsSection';
+export { LooksSection } from './LooksSection';
+export { BrandStorySection } from './BrandStorySection';
+export { TestimonialsSection } from './TestimonialsSection';
+export { SocialFeedSection } from './SocialFeedSection';
+export { NewsletterSection } from './NewsletterSection';
