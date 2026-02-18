@@ -26,7 +26,7 @@ export function EmptyCart({
         {title}
       </BrandHeading>
       <p className="text-lolett-gray-600 mx-auto mb-8 max-w-[55ch]">{message}</p>
-      <Button asChild className="bg-lolett-blue hover:bg-lolett-blue-light rounded-full">
+      <Button asChild className="bg-lolett-gold hover:bg-lolett-gold-light rounded-full">
         <Link href="/shop">Explorer la boutique</Link>
       </Button>
     </div>

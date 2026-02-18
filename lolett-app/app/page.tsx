@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import {
   HeroSection,
-  MarqueeSection,
-  TrustBarSection,
   NewArrivalsSection,
   CollectionsSection,
   LooksSection,
@@ -10,9 +8,9 @@ import {
   TestimonialsSection,
   SocialFeedSection,
   NewsletterSection,
+  StoryQuote,
 } from '@/components/sections/home';
-import { getNewProducts } from '@/data/products';
-import { looks } from '@/data/looks';
+import { productRepository, lookRepository } from '@/lib/adapters';
 import { reviews } from '@/data/reviews';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
@@ -40,25 +38,31 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
-  const newProducts = getNewProducts(4);
+export default async function HomePage() {
+  const newProducts = await productRepository.findMany({ isNew: true, limit: 4 });
+  const looks = await lookRepository.findMany();
+
+  const lookProductsEntries = await Promise.all(
+    looks.map(async (look: { id: string; productIds: string[] }) => {
+      const products = await productRepository.findByIds(look.productIds);
+      return [look.id, products] as const;
+    })
+  );
+  const lookProducts = Object.fromEntries(lookProductsEntries);
 
   return (
     <>
       <HeroSection />
-      <MarqueeSection />
-      <TrustBarSection />
       <NewArrivalsSection products={newProducts} />
-      <CollectionsSection />
-      <LooksSection looks={looks} />
       <BrandStorySection />
+      <LooksSection looks={looks} lookProducts={lookProducts} />
       <TestimonialsSection reviews={reviews} />
       <SocialFeedSection />
       <NewsletterSection />
 
       {/* Disclaimer LOLETT */}
-      <section className="bg-lolett-gray-100 py-6 text-center">
-        <p className="text-lolett-gray-500 text-sm italic">
+      <section className="py-6 text-center" style={{ background: '#f7f0e4', borderTop: '1px solid rgba(196,180,156,0.2)' }}>
+        <p className="text-sm italic" style={{ color: '#5a4d3e' }}>
           LOLETT décline toute responsabilité en cas de coup de coeur.
         </p>
       </section>

@@ -13,7 +13,8 @@ export interface Product {
   description: string;
   sizes: Size[];
   colors: ProductColor[];
-  stock: number;
+  stock: number; // Stock total (somme des variantes) - conservé pour rétrocompatibilité
+  variants?: ProductVariant[]; // Stock détaillé par variante (couleur + taille)
   isNew: boolean;
   tags: string[];
   createdAt?: string;
@@ -23,6 +24,17 @@ export interface Product {
 export interface ProductColor {
   name: string;
   hex: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  productId: string;
+  colorName: string;
+  colorHex: string;
+  size: Size;
+  stock: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Look {
@@ -51,6 +63,7 @@ export interface Category {
 export interface CartItem {
   productId: string;
   size: Size;
+  color?: string; // Nom de la couleur (optionnel pour rétrocompatibilité)
   quantity: number;
   addedAt: string;
 }
@@ -78,6 +91,7 @@ export interface OrderItem {
   productId: string;
   productName: string;
   size: Size;
+  color?: string; // Nom de la couleur (optionnel pour rétrocompatibilité)
   quantity: number;
   price: number;
 }

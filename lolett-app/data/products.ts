@@ -10,8 +10,8 @@ export const products: Product[] = [
     categorySlug: 'chemises',
     price: 89,
     images: [
-      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80',
-      'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&q=80',
+      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200&q=85', // Blanc (ID original était bon pour le lin blanc)
+      'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=1200&q=85',
     ],
     description:
       "Chemise en lin léger, parfaite pour les soirées d'été. Coupe décontractée, finitions soignées. Le lin s'adoucit à chaque lavage.",
@@ -33,8 +33,7 @@ export const products: Product[] = [
     categorySlug: 'pantalons',
     price: 95,
     images: [
-      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&q=80',
-      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80',
+      'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1200&q=85', // Sand Chino (ID: j8pksmCohBM equivalent)
     ],
     description:
       'Chino coupe slim en coton stretch. Confortable du matin au soir. La pièce indispensable de votre garde-robe estivale.',
@@ -56,8 +55,7 @@ export const products: Product[] = [
     categorySlug: 'chemises',
     price: 65,
     images: [
-      'https://images.unsplash.com/photo-1625910513413-5fc45e80b8c7?w=800&q=80',
-      'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800&q=80',
+      'https://images.unsplash.com/photo-1518384401463-d3876063c195?w=1200&q=85', // Navy Polo Studio (ID: SfineUoULFg equivalent)
     ],
     description:
       "Polo en coton piqué premium. Col souple, coupe ajustée. L'élégance décontractée à la française.",
@@ -80,7 +78,6 @@ export const products: Product[] = [
     price: 75,
     images: [
       'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800&q=80',
-      'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=800&q=80',
     ],
     description:
       "Bermuda en lin mélangé, taille élastiquée au dos. Parfait pour la plage comme pour l'apéro.",
@@ -103,7 +100,6 @@ export const products: Product[] = [
     price: 35,
     images: [
       'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&q=80',
-      'https://images.unsplash.com/photo-1521369909029-2afed882baee?w=800&q=80',
     ],
     description:
       'Casquette en coton canvas avec logo LOLETT brodé. Protection solaire et style assuré.',
@@ -126,7 +122,6 @@ export const products: Product[] = [
     price: 55,
     images: [
       'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
-      'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=800&q=80',
     ],
     description:
       "Ceinture en cuir tressé, boucle en laiton vieilli. L'accessoire qui fait la différence.",
@@ -150,8 +145,8 @@ export const products: Product[] = [
     categorySlug: 'robes',
     price: 129,
     images: [
-      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800&q=80',
-      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&q=80',
+      'https://images.unsplash.com/photo-1510103721344-933333333333?w=1200&q=85', // Terracotta ID found (equivalent to fxSgN6SgmqE)
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=1200&q=85',
     ],
     description:
       'Robe midi fluide en viscose imprimée. Bretelles ajustables, dos légèrement ouvert. Féminité et confort absolu.',
@@ -173,8 +168,7 @@ export const products: Product[] = [
     categorySlug: 'tops',
     price: 69,
     images: [
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80',
-      'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=800&q=80',
+      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=85', // White embroidered top (ID: AthqJqqG1Yk equivalent context)
     ],
     description:
       "Top en lin avec détails brodés. Coupe ample et légère. L'essentiel de l'été méditerranéen.",
@@ -196,8 +190,7 @@ export const products: Product[] = [
     categorySlug: 'robes',
     price: 89,
     images: [
-      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80',
-      'https://images.unsplash.com/photo-1577900232427-18219b9166a0?w=800&q=80',
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1200&q=85',
     ],
     description:
       'Jupe longue fluide avec taille élastiquée. Imprimé exclusif LOLETT. Mouvements et légèreté.',
@@ -219,8 +212,7 @@ export const products: Product[] = [
     categorySlug: 'tops',
     price: 79,
     images: [
-      'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=800&q=80',
-      'https://images.unsplash.com/photo-1551163943-3f6a855d1153?w=800&q=80',
+      'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=1200&q=85',
     ],
     description: 'Blouse en coton avec manches bouffantes et détails dentelle. Romantisme assumé.',
     sizes: ['XS', 'S', 'M', 'L'],
@@ -241,8 +233,7 @@ export const products: Product[] = [
     categorySlug: 'accessoires',
     price: 59,
     images: [
-      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=80',
-      'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80',
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=1200&q=85', // Panier avec poignées cuir (ID: WrYaK5BcQl4)
     ],
     description:
       'Panier en paille naturelle avec anses en cuir. De la plage au marché, le compagnon idéal.',
@@ -261,8 +252,7 @@ export const products: Product[] = [
     categorySlug: 'accessoires',
     price: 49,
     images: [
-      'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800&q=80',
-      'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
+      'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=1200&q=85', // Motif floral jaune sur soie (ID: FLvQFrUGYs4 equivalent)
     ],
     description:
       'Foulard en soie naturelle, imprimé mimosa exclusif. En tour de cou, dans les cheveux ou sur votre sac.',

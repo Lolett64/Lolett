@@ -15,7 +15,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
     <nav aria-label="Breadcrumb" className="py-4">
       <ol className="flex items-center gap-2 text-sm">
         <li>
-          <Link href="/" className="text-lolett-gray-400 hover:text-lolett-blue transition-colors">
+          <Link href="/" className="text-lolett-gray-400 hover:text-lolett-gold transition-colors">
             <Home className="h-4 w-4" />
           </Link>
         </li>
@@ -25,7 +25,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
             {item.href ? (
               <Link
                 href={item.href}
-                className="text-lolett-gray-500 hover:text-lolett-blue transition-colors"
+                className="text-lolett-gray-500 hover:text-lolett-gold transition-colors"
               >
                 {item.label}
               </Link>

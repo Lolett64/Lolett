@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
-import { BrandHeading } from '@/components/brand/BrandHeading';
-import { ProductGrid } from '@/components/product/ProductGrid';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { getNewProducts } from '@/data/products';
+import { NouveautesContentV2 } from '@/components/product/NouveautesContentV2';
+import { productRepository, lookRepository } from '@/lib/adapters';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -10,9 +8,7 @@ export const metadata: Metadata = {
   title: 'Nouveautés — LOLETT',
   description:
     'Découvrez les dernières pièces LOLETT. Fraîchement débarquées, prêtes à illuminer votre été.',
-  alternates: {
-    canonical: `${BASE_URL}/nouveautes`,
-  },
+  alternates: { canonical: `${BASE_URL}/nouveautes` },
   openGraph: {
     title: 'Nouveautés — LOLETT',
     description: 'Les dernières pièces de la collection. À peine arrivées, déjà indispensables.',
@@ -21,28 +17,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function NouveautesPage() {
-  const newProducts = getNewProducts();
+export default async function NouveautesPage() {
+  const newProducts = await productRepository.findMany({ isNew: true });
+  const looks = await lookRepository.findMany();
+
+  const lookProductsEntries = await Promise.all(
+    looks.map(async (look: { id: string; productIds: string[] }) => {
+      const products = await productRepository.findByIds(look.productIds);
+      return [look.id, products] as const;
+    })
+  );
+  const lookProducts = Object.fromEntries(lookProductsEntries);
 
   return (
-    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
-      <div className="container">
-        <Breadcrumbs items={[{ label: 'Nouveautés' }]} />
-
-        <div className="mt-6 mb-8 sm:mt-8 sm:mb-12">
-          <span className="text-lolett-blue text-sm font-medium tracking-wider uppercase">
-            Fresh arrivals
-          </span>
-          <BrandHeading as="h1" size="2xl" className="mt-2">
-            Fraîchement débarquées
-          </BrandHeading>
-          <p className="text-lolett-gray-600 mt-4 max-w-[55ch] leading-relaxed">
-            Les dernières pièces de la collection. À peine arrivées, déjà indispensables.
-          </p>
-        </div>
-
-        <ProductGrid products={newProducts} />
-      </div>
+    <div className="pt-20 sm:pt-24">
+      <NouveautesContentV2
+        products={newProducts}
+        looks={looks}
+        lookProducts={lookProducts}
+      />
     </div>
   );
 }

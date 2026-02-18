@@ -13,7 +13,7 @@ export function SocialDropdown({ isOpen, onOpen, onClose }: SocialDropdownProps)
   return (
     <div className="relative hidden sm:block" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button
-        className="text-lolett-gray-600 hover:text-lolett-blue touch-target flex items-center justify-center p-2.5 transition-colors"
+        className="text-white group-data-[scrolled=true]/header:text-[#5a4d3e] group-data-[scrolled=true]/header:hover:text-[#1a1510] touch-target flex items-center justify-center p-2.5 transition-colors"
         aria-label="Réseaux sociaux"
         aria-expanded={isOpen}
         aria-haspopup="true"

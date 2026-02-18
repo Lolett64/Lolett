@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { ProductDetails } from '@/components/product/ProductDetails';
 import { ProductLooks } from '@/components/product/ProductLooks';
-import { getProductBySlug } from '@/data/products';
-import { getLooksForProduct } from '@/data/looks';
-import { getCategoryBySlug } from '@/data/categories';
+import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { productRepository, lookRepository, categoryRepository } from '@/lib/adapters';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -17,7 +16,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await productRepository.findBySlug(slug);
 
   if (!product) {
     return { title: 'Produit non trouvé' };
@@ -38,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: product.description,
       url: productUrl,
       type: 'website',
-      images: product.images.map((img) => ({
+      images: product.images.map((img: string) => ({
         url: img,
         alt: product.name,
         width: 800,
@@ -56,15 +55,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await productRepository.findBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
-  const looks = getLooksForProduct(product.id);
-  const category = getCategoryBySlug(product.gender, product.categorySlug);
+  const looks = await lookRepository.findLooksForProduct(product.id);
+  const category = await categoryRepository.findBySlug(product.gender, product.categorySlug);
   const genderLabel = product.gender === 'homme' ? 'Homme' : 'Femme';
+
+  const lookProductsEntries = await Promise.all(
+    looks.map(async (look: { id: string; productIds: string[] }) => {
+      const products = await productRepository.findByIds(look.productIds);
+      return [look.id, products] as const;
+    })
+  );
+  const lookProducts = Object.fromEntries(lookProductsEntries);
+
+  // Related products: same gender, exclude current product
+  const allGenderProducts = await productRepository.findMany({ gender: product.gender });
+  const relatedProducts = allGenderProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
@@ -82,7 +93,9 @@ export default async function ProductPage({ params }: PageProps) {
 
         <ProductDetails product={product} />
 
-        {looks.length > 0 && <ProductLooks looks={looks} />}
+        {looks.length > 0 && <ProductLooks looks={looks} lookProducts={lookProducts} />}
+
+        <RelatedProducts products={relatedProducts} />
       </div>
     </div>
   );

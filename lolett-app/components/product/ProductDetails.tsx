@@ -28,8 +28,43 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
   const addItem = useCartStore((state) => state.addItem);
 
-  const isLowStock = product.stock > 0 && product.stock <= STOCK.LOW_THRESHOLD;
-  const isOutOfStock = product.stock === 0;
+  // Calculer le stock disponible pour la variante sélectionnée
+  const getVariantStock = (colorName: string, size: Size): number => {
+    if (!product.variants || product.variants.length === 0) {
+      // Fallback: utiliser le stock global si pas de variantes
+      return product.stock;
+    }
+    const variant = product.variants.find(
+      (v) => v.colorName === colorName && v.size === size
+    );
+    return variant?.stock ?? 0;
+  };
+
+  // Stock pour la combinaison actuelle
+  const currentVariantStock = selectedSize && selectedColor
+    ? getVariantStock(selectedColor.name, selectedSize)
+    : 0;
+
+  // Vérifier si une taille est disponible pour la couleur sélectionnée
+  const isSizeAvailable = (size: Size): boolean => {
+    if (!product.variants || product.variants.length === 0) {
+      return product.stock > 0;
+    }
+    return getVariantStock(selectedColor.name, size) > 0;
+  };
+
+  // Vérifier si une couleur a du stock disponible
+  const isColorAvailable = (colorName: string): boolean => {
+    if (!product.variants || product.variants.length === 0) {
+      return product.stock > 0;
+    }
+    return product.variants.some(
+      (v) => v.colorName === colorName && v.stock > 0
+    );
+  };
+
+  const isLowStock = currentVariantStock > 0 && currentVariantStock <= STOCK.LOW_THRESHOLD;
+  const isOutOfStock = currentVariantStock === 0;
 
   const [notifyEmail, setNotifyEmail] = useState('');
   const [notifySubmitted, setNotifySubmitted] = useState(false);
@@ -41,11 +76,22 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   );
 
   const handleAddToCart = () => {
-    if (!selectedSize || isOutOfStock) return;
+    if (!selectedSize || !selectedColor || isOutOfStock) return;
 
-    addItem(product.id, selectedSize, quantity);
+    addItem(product.id, selectedSize, quantity, selectedColor.name);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 3000);
+  };
+
+  // Réinitialiser la taille si elle n'est plus disponible pour la couleur sélectionnée
+  const handleColorChange = (color: typeof product.colors[0]) => {
+    setSelectedColor(color);
+    // Si la taille actuelle n'est pas disponible pour la nouvelle couleur, la réinitialiser
+    if (selectedSize && !isSizeAvailable(selectedSize)) {
+      setSelectedSize(null);
+    }
+    // Réinitialiser la quantité
+    setQuantity(1);
   };
 
   return (
@@ -57,7 +103,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         onSelectImage={setSelectedImage}
         isNew={product.isNew}
         isLowStock={isLowStock}
-        stockCount={product.stock}
+        stockCount={currentVariantStock}
       />
 
       <div className="min-w-0 lg:py-8">
@@ -73,11 +119,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           {product.description}
         </p>
 
-        <div className="bg-lolett-gray-100 mt-6 rounded-xl p-3 sm:mt-8 sm:p-4">
-          <p className="text-lolett-gray-700 text-sm">
-            <span className="text-lolett-blue font-medium">{MICROCOPY.productValidated}</span>
+        <div className="mt-6 rounded-xl p-3 sm:mt-8 sm:p-4" style={{ background: 'rgba(196,164,78,0.08)', border: '1px solid rgba(196,164,78,0.2)' }}>
+          <p className="text-sm" style={{ color: '#3a2e1e' }}>
+            <span className="font-medium" style={{ color: '#c4a44e' }}>{MICROCOPY.productValidated}</span>
           </p>
-          <p className="text-lolett-gray-500 mt-1 text-xs italic">
+          <p className="mt-1 text-xs italic" style={{ color: '#8a7d6b' }}>
             {randomMicrocopy}
           </p>
         </div>
@@ -85,18 +131,29 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <ColorSelector
           colors={product.colors}
           selectedColor={selectedColor}
-          onSelectColor={setSelectedColor}
+          onSelectColor={handleColorChange}
+          disabledColors={product.colors
+            .filter((c) => !isColorAvailable(c.name))
+            .map((c) => c.name)}
         />
 
         <SizeSelector
           sizes={product.sizes}
           selectedSize={selectedSize}
-          onSelectSize={setSelectedSize}
+          onSelectSize={(size) => {
+            setSelectedSize(size);
+            // Réinitialiser la quantité si nécessaire
+            const stock = getVariantStock(selectedColor.name, size);
+            if (quantity > stock) {
+              setQuantity(Math.max(1, stock));
+            }
+          }}
+          disabledSizes={product.sizes.filter((s) => !isSizeAvailable(s))}
         />
 
         <QuantitySelector
           quantity={quantity}
-          maxQuantity={product.stock}
+          maxQuantity={currentVariantStock}
           onQuantityChange={setQuantity}
         />
 
@@ -106,10 +163,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
               <p className="flex items-center gap-2 text-sm font-semibold text-orange-700">
                 <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-orange-500" />
-                Victime de son succès
+                {selectedSize && selectedColor
+                  ? `${selectedColor.name} - Taille ${selectedSize} : Victime de son succès`
+                  : 'Victime de son succès'}
               </p>
               <p className="text-lolett-gray-600 mt-1 text-xs">
-                Cet article est temporairement indisponible.
+                {selectedSize && selectedColor
+                  ? `Cette combinaison couleur-taille est temporairement indisponible.`
+                  : 'Cet article est temporairement indisponible.'}
               </p>
 
               {/* Notify me form */}
@@ -144,9 +205,23 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               )}
             </div>
           ) : isLowStock ? (
-            <p className="text-sm font-medium text-orange-600">Plus que {product.stock} en stock</p>
+            <p className="text-sm font-medium text-orange-600">
+              Plus que {currentVariantStock} en stock
+              {selectedSize && selectedColor && (
+                <span className="text-lolett-gray-500 ml-1">
+                  ({selectedColor.name} - {selectedSize})
+                </span>
+              )}
+            </p>
           ) : (
-            <p className="text-sm font-medium text-green-600">En stock</p>
+            <p className="text-sm font-medium text-green-600">
+              En stock
+              {selectedSize && selectedColor && currentVariantStock > 0 && (
+                <span className="text-lolett-gray-500 ml-1">
+                  ({currentVariantStock} disponible{currentVariantStock > 1 ? 's' : ''} - {selectedColor.name} - {selectedSize})
+                </span>
+              )}
+            </p>
           )}
         </div>
 

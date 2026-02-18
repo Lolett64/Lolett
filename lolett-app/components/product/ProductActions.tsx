@@ -33,7 +33,7 @@ export function ProductActions({
           'min-w-0 flex-1 rounded-full text-sm sm:text-base',
           addedToCart
             ? 'bg-green-500 hover:bg-green-600'
-            : 'bg-lolett-blue hover:bg-lolett-blue-light'
+            : 'bg-lolett-gold hover:bg-lolett-gold-light'
         )}
       >
         {addedToCart ? (
@@ -57,7 +57,7 @@ export function ProductActions({
         aria-pressed={isFavorite}
         className={cn(
           'flex-shrink-0 rounded-full',
-          isFavorite && 'bg-lolett-blue border-lolett-blue hover:bg-lolett-blue-light text-white'
+          isFavorite && 'bg-lolett-gold border-lolett-gold hover:bg-lolett-gold-light text-white'
         )}
       >
         <Heart className={cn('h-5 w-5', isFavorite && 'fill-current')} />

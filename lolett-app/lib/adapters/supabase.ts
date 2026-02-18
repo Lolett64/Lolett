@@ -6,7 +6,7 @@ import type {
   CategoryRepository,
   OrderRepository,
 } from './types';
-import type { Product, Look, Category, Order, CustomerInfo, Size, Gender } from '@/types';
+import type { Product, Look, Category, Order, CustomerInfo, Size, Gender, ProductVariant } from '@/types';
 
 // ─── Mappers (snake_case DB → camelCase TS) ───────────────────────────────────
 
@@ -51,6 +51,17 @@ type DbCategory = {
   updated_at: string;
 };
 
+type DbProductVariant = {
+  id: string;
+  product_id: string;
+  color_name: string;
+  color_hex: string;
+  size: string;
+  stock: number;
+  created_at: string;
+  updated_at: string;
+};
+
 type DbOrder = {
   id: string;
   order_number: string;
@@ -72,7 +83,34 @@ type DbOrder = {
   }[];
 };
 
-function mapProduct(row: DbProduct): Product {
+function mapVariant(row: DbProductVariant): ProductVariant {
+  return {
+    id: row.id,
+    productId: row.product_id,
+    colorName: row.color_name,
+    colorHex: row.color_hex,
+    size: row.size as Size,
+    stock: row.stock,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function loadProductVariants(supabase: Awaited<ReturnType<typeof createClient>>, productId: string): Promise<ProductVariant[]> {
+  const { data, error } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', productId);
+  
+  if (error) {
+    console.error('[loadProductVariants]', error.message);
+    return [];
+  }
+  
+  return (data as DbProductVariant[]).map(mapVariant);
+}
+
+function mapProduct(row: DbProduct, variants?: ProductVariant[]): Product {
   return {
     id: row.id,
     slug: row.slug,
@@ -84,7 +122,8 @@ function mapProduct(row: DbProduct): Product {
     description: row.description ?? '',
     sizes: (row.sizes ?? []) as Size[],
     colors: row.colors ?? [],
-    stock: row.stock,
+    stock: row.stock, // Conservé pour rétrocompatibilité
+    variants: variants, // Stock détaillé par variante
     isNew: row.is_new,
     tags: row.tags ?? [],
     createdAt: row.created_at,
@@ -178,7 +217,16 @@ export class SupabaseProductRepository implements ProductRepository {
       console.error('[SupabaseProductRepository.findMany]', error.message);
       return [];
     }
-    return (data as DbProduct[]).map(mapProduct);
+    
+    // Charger les variantes pour tous les produits
+    const products = await Promise.all(
+      (data as DbProduct[]).map(async (row) => {
+        const variants = await loadProductVariants(supabase, row.id);
+        return mapProduct(row, variants);
+      })
+    );
+    
+    return products;
   }
 
   async findById(id: string): Promise<Product | null> {
@@ -188,7 +236,9 @@ export class SupabaseProductRepository implements ProductRepository {
       console.error('[SupabaseProductRepository.findById]', error.message);
       return null;
     }
-    return data ? mapProduct(data as DbProduct) : null;
+    if (!data) return null;
+    const variants = await loadProductVariants(supabase, id);
+    return mapProduct(data as DbProduct, variants);
   }
 
   async findBySlug(slug: string): Promise<Product | null> {
@@ -202,7 +252,9 @@ export class SupabaseProductRepository implements ProductRepository {
       console.error('[SupabaseProductRepository.findBySlug]', error.message);
       return null;
     }
-    return data ? mapProduct(data as DbProduct) : null;
+    if (!data) return null;
+    const variants = await loadProductVariants(supabase, data.id);
+    return mapProduct(data as DbProduct, variants);
   }
 
   async findByCategory(gender: string, categorySlug: string): Promise<Product[]> {
@@ -216,7 +268,16 @@ export class SupabaseProductRepository implements ProductRepository {
       console.error('[SupabaseProductRepository.findByCategory]', error.message);
       return [];
     }
-    return (data as DbProduct[]).map(mapProduct);
+    
+    // Charger les variantes pour tous les produits
+    const products = await Promise.all(
+      (data as DbProduct[]).map(async (row) => {
+        const variants = await loadProductVariants(supabase, row.id);
+        return mapProduct(row, variants);
+      })
+    );
+    
+    return products;
   }
 
   async findByIds(ids: string[]): Promise<Product[]> {
@@ -227,10 +288,19 @@ export class SupabaseProductRepository implements ProductRepository {
       console.error('[SupabaseProductRepository.findByIds]', error.message);
       return [];
     }
+    
+    // Charger les variantes pour tous les produits
+    const productsMap = new Map<string, Product>();
+    await Promise.all(
+      (data as DbProduct[]).map(async (row) => {
+        const variants = await loadProductVariants(supabase, row.id);
+        productsMap.set(row.id, mapProduct(row, variants));
+      })
+    );
+    
     // Preserve the requested order
-    const map = new Map((data as DbProduct[]).map((row) => [row.id, mapProduct(row)]));
     return ids.flatMap((id) => {
-      const product = map.get(id);
+      const product = productsMap.get(id);
       return product ? [product] : [];
     });
   }

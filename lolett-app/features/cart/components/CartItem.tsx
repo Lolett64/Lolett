@@ -30,7 +30,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
       <div className="min-w-0 flex-1">
         <Link
           href={`/produit/${item.product.slug}`}
-          className="text-lolett-gray-900 hover:text-lolett-blue line-clamp-2 text-sm font-medium transition-colors sm:line-clamp-1 sm:text-base"
+          className="text-lolett-gray-900 hover:text-lolett-gold line-clamp-2 text-sm font-medium transition-colors sm:line-clamp-1 sm:text-base"
         >
           {item.product.name}
         </Link>

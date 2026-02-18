@@ -8,11 +8,11 @@ interface BrandBadgeProps {
 
 export function BrandBadge({ children, variant = 'primary', className }: BrandBadgeProps) {
   const variantClasses = {
-    primary: 'bg-lolett-blue text-white',
-    accent: 'bg-lolett-yellow text-lolett-gray-900',
-    new: 'bg-lolett-blue text-white',
-    lowStock: 'bg-orange-500 text-white',
-    soldOut: 'bg-lolett-gray-900 text-white',
+    primary: 'bg-lolett-gold text-white shadow-sm',
+    accent: 'bg-lolett-yellow text-lolett-gray-900 shadow-sm',
+    new: 'bg-white/90 text-lolett-gold backdrop-blur-md shadow-sm border border-white/20',
+    lowStock: 'bg-red-50 text-red-600 border border-red-100',
+    soldOut: 'bg-lolett-gray-900 text-white opacity-90',
   };
 
   return (

@@ -13,7 +13,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-20 pb-16 text-center">
       <div className="mx-auto max-w-lg">
-        <p className="text-lolett-blue mb-4 text-sm font-medium tracking-wider uppercase">
+        <p className="text-lolett-gold mb-4 text-sm font-medium tracking-wider uppercase">
           Erreur 404
         </p>
 
@@ -33,7 +33,7 @@ export default function NotFound() {
           <Button
             asChild
             size="lg"
-            className="bg-lolett-blue hover:bg-lolett-blue-light w-full rounded-full sm:w-auto"
+            className="bg-lolett-gold hover:bg-lolett-gold-light w-full rounded-full sm:w-auto"
           >
             <Link href="/">
               <ArrowLeft className="h-4 w-4 flex-shrink-0" />

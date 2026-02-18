@@ -1,29 +1,28 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BrandHeading } from '@/components/brand/BrandHeading';
-import { ProductGrid } from '@/components/product/ProductGrid';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { getProductsByCategory } from '@/data/products';
-import { getCategoryBySlug, getCategoriesByGender } from '@/data/categories';
-import { ProductSorting } from '@/components/product/ProductSorting';
+import { ShopContentV2 } from '@/components/product/ShopContentV2';
+import { productRepository, categoryRepository } from '@/lib/adapters';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
+const HERO_IMAGES = {
+  homme: 'https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80',
+  femme: 'https://plus.unsplash.com/premium_photo-1683141076955-bddd5efbb03c?w=1600&q=80',
+} as const;
+
+const HERO_POSITIONS = {
+  homme: 'center 65%',
+  femme: 'center center',
+} as const;
+
 interface PageProps {
-  params: Promise<{
-    gender: string;
-    category: string;
-  }>;
+  params: Promise<{ gender: string; category: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { gender, category: categorySlug } = await params;
-  const category = getCategoryBySlug(gender, categorySlug);
-
-  if (!category) {
-    return { title: 'Catégorie non trouvée' };
-  }
+  const category = await categoryRepository.findBySlug(gender, categorySlug);
+  if (!category) return { title: 'Catégorie non trouvée' };
 
   const genderLabel = gender === 'homme' ? 'Homme' : 'Femme';
   const title = `${category.label} ${genderLabel} — LOLETT`;
@@ -32,85 +31,35 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description: category.seoDescription,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      title,
-      description: category.seoDescription,
-      url: canonicalUrl,
-      type: 'website',
-    },
+    alternates: { canonical: canonicalUrl },
+    openGraph: { title, description: category.seoDescription, url: canonicalUrl, type: 'website' },
   };
 }
 
 export default async function CategoryPage({ params }: PageProps) {
   const { gender, category: categorySlug } = await params;
 
-  if (gender !== 'homme' && gender !== 'femme') {
-    notFound();
-  }
+  if (gender !== 'homme' && gender !== 'femme') notFound();
 
-  const category = getCategoryBySlug(gender, categorySlug);
-  if (!category) {
-    notFound();
-  }
+  const category = await categoryRepository.findBySlug(gender, categorySlug);
+  if (!category) notFound();
 
-  const products = getProductsByCategory(gender, categorySlug);
-  const categories = getCategoriesByGender(gender);
+  const products = await productRepository.findByCategory(gender, categorySlug);
+  const categories = await categoryRepository.findByGender(gender);
   const genderLabel = gender === 'homme' ? 'Homme' : 'Femme';
 
   return (
-    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
-      <div className="container">
-        <Breadcrumbs
-          items={[
-            { label: 'Shop', href: '/shop' },
-            { label: genderLabel, href: `/shop/${gender}` },
-            { label: category.label },
-          ]}
-        />
-
-        <div className="mt-6 mb-8 sm:mt-8 sm:mb-12">
-          <BrandHeading as="h1" size="2xl">
-            {category.label} {genderLabel}
-          </BrandHeading>
-          <p className="text-lolett-gray-600 mt-4 max-w-[55ch] leading-relaxed">
-            {category.seoDescription}
-          </p>
-        </div>
-
-        <div className="mb-6 flex flex-wrap gap-2 sm:mb-8 sm:gap-3">
-          <Link
-            href={`/shop/${gender}`}
-            className="bg-lolett-gray-100 text-lolett-gray-600 hover:bg-lolett-gray-200 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4"
-          >
-            Tout voir
-          </Link>
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/shop/${gender}/${cat.slug}`}
-              className={`rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4 ${
-                cat.slug === categorySlug
-                  ? 'bg-lolett-blue text-white'
-                  : 'bg-lolett-gray-100 text-lolett-gray-600 hover:bg-lolett-gray-200'
-              }`}
-            >
-              {cat.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lolett-gray-500 text-sm">
-            {products.length} produit{products.length > 1 ? 's' : ''}
-          </p>
-          <ProductSorting />
-        </div>
-
-        <ProductGrid products={products} />
-      </div>
+    <div className="pt-20 sm:pt-24">
+      <ShopContentV2
+        gender={gender}
+        products={products}
+        categories={categories}
+        activeCategory={categorySlug}
+        heroImage={HERO_IMAGES[gender]}
+        heroImagePosition={HERO_POSITIONS[gender]}
+        heroTitle={`${category.label} ${genderLabel}`}
+        heroSubtitle={category.seoDescription || `Découvrez notre sélection ${category.label.toLowerCase()} pour ${gender === 'homme' ? 'lui' : 'elle'}.`}
+      />
     </div>
   );
 }

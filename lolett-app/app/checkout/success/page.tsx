@@ -62,7 +62,7 @@ function SuccessContent() {
             <Button
               asChild
               size="lg"
-              className="bg-lolett-blue hover:bg-lolett-blue-light rounded-full"
+              className="bg-lolett-gold hover:bg-lolett-gold-light rounded-full"
             >
               <Link href="/shop">
                 <span>Continuer mes achats</span>

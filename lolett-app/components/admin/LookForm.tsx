@@ -2,17 +2,6 @@
 
 import { useState, useRef, FormEvent, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, X, Search, Plus } from 'lucide-react';
 
 interface ProductOption {
@@ -37,6 +26,19 @@ interface LookFormProps {
   lookId?: string;
   mode: 'create' | 'edit';
 }
+
+/* ── Shared styles ─────────────────────────────────────── */
+const card = 'w-full rounded-xl border border-[var(--border)] bg-white p-6 shadow-sm';
+const fieldLabel = 'block text-sm font-medium text-[#4a4a56] mb-1.5';
+const inputBase =
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+const selectBase =
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+const btnPrimary =
+  'inline-flex items-center justify-center rounded-md bg-[#2418a6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#1a1280] disabled:opacity-50';
+const btnOutline =
+  'inline-flex items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[#4a4a56] shadow-sm hover:bg-[#f7f7fb] disabled:opacity-50';
+const sectionTitle = 'text-base font-semibold text-[#1a1a24] mb-4';
 
 export function LookForm({ initialData, lookId, mode }: LookFormProps) {
   const router = useRouter();
@@ -98,9 +100,7 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
   }
 
   const filteredProducts = allProducts.filter(
-    (p) =>
-      !productSearch ||
-      p.name.toLowerCase().includes(productSearch.toLowerCase())
+    (p) => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase())
   );
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -109,21 +109,17 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
     setSaving(true);
 
     try {
-      const url =
-        mode === 'create' ? '/api/admin/looks' : `/api/admin/looks/${lookId}`;
+      const url = mode === 'create' ? '/api/admin/looks' : `/api/admin/looks/${lookId}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
         throw new Error(data.error ?? 'Erreur inconnue');
       }
-
       router.push('/admin/looks');
       router.refresh();
     } catch (err) {
@@ -136,238 +132,259 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
   const selectedProducts = allProducts.filter((p) => form.productIds.includes(p.id));
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-3xl">
-      {/* General info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Informations générales</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="title">Titre *</Label>
-            <Input
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', maxWidth: '48rem' }}>
+      {/* ── Informations générales ────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>Informations générales</h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Titre */}
+          <div>
+            <label htmlFor="title" className={fieldLabel}>Titre *</label>
+            <input
               id="title"
+              type="text"
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               placeholder="Le look parfait pour l'été"
               required
+              className={inputBase}
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>Genre *</Label>
-            <Select
+          {/* Genre */}
+          <div>
+            <label className={fieldLabel}>Genre *</label>
+            <select
               value={form.gender}
-              onValueChange={(v) =>
-                setForm((f) => ({ ...f, gender: v, productIds: [] }))
-              }
+              onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value, productIds: [] }))}
               required
+              className={selectBase}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="homme">Homme</SelectItem>
-                <SelectItem value="femme">Femme</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="">Choisir...</option>
+              <option value="homme">Homme</option>
+              <option value="femme">Femme</option>
+            </select>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="vibe">Vibe / Ambiance</Label>
-            <Input
+          {/* Vibe */}
+          <div>
+            <label htmlFor="vibe" className={fieldLabel}>Vibe / Ambiance</label>
+            <input
               id="vibe"
+              type="text"
               value={form.vibe}
               onChange={(e) => setForm((f) => ({ ...f, vibe: e.target.value }))}
               placeholder="Vacances, Casual, Soirée..."
+              className={inputBase}
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="short_pitch">Accroche courte</Label>
+          {/* Accroche */}
+          <div>
+            <label htmlFor="short_pitch" className={fieldLabel}>Accroche courte</label>
             <textarea
               id="short_pitch"
               value={form.short_pitch}
               onChange={(e) => setForm((f) => ({ ...f, short_pitch: e.target.value }))}
               placeholder="Le look parfait pour vos sorties estivales..."
               rows={3}
-              className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px] resize-y"
+              className={inputBase}
+              style={{ resize: 'vertical' }}
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Cover image */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Image de couverture</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {form.cover_image ? (
-            <div className="relative w-full max-w-sm">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={form.cover_image}
-                alt="Cover"
-                className="w-full aspect-[4/3] object-cover rounded-lg"
-              />
-              <button
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, cover_image: '' }))}
-                className="absolute top-2 right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-              >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          ) : (
-            <div
-              className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-lolett-gray-300 p-8 cursor-pointer hover:border-lolett-blue transition-colors"
-              onClick={() => fileInputRef.current?.click()}
+      {/* ── Image de couverture ──────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>Image de couverture</h3>
+
+        {form.cover_image ? (
+          <div style={{ position: 'relative', width: '100%', maxWidth: '24rem' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={form.cover_image}
+              alt="Cover"
+              style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '0.5rem' }}
+            />
+            <button
+              type="button"
+              onClick={() => setForm((f) => ({ ...f, cover_image: '' }))}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                borderRadius: '50%',
+                background: '#e53935',
+                border: 'none',
+                padding: 4,
+                color: 'white',
+                cursor: 'pointer',
+              }}
             >
-              <Upload className="size-8 text-lolett-gray-400" />
-              <p className="text-sm text-lolett-gray-500">Cliquer pour uploader une image</p>
-              {uploading && <p className="text-xs text-lolett-blue">Upload en cours...</p>}
-            </div>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/avif"
-            className="hidden"
-            onChange={(e) => handleCoverUpload(e.target.files)}
-          />
-        </CardContent>
-      </Card>
+              <X style={{ width: 14, height: 14 }} />
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              borderRadius: '0.5rem',
+              border: '2px dashed #d1d1dc',
+              padding: '2rem',
+              cursor: 'pointer',
+            }}
+          >
+            <Upload style={{ width: 32, height: 32, color: '#9999a8' }} />
+            <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>Cliquer pour uploader une image</p>
+            {uploading && <p style={{ fontSize: '0.75rem', color: '#2418a6' }}>Upload en cours...</p>}
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/avif"
+          style={{ display: 'none' }}
+          onChange={(e) => handleCoverUpload(e.target.files)}
+        />
+      </div>
 
-      {/* Product selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Produits associés{' '}
-            {form.productIds.length > 0 && (
-              <span className="text-sm font-normal text-lolett-gray-500">
-                ({form.productIds.length} sélectionné(s))
-              </span>
+      {/* ── Produits associés ────────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>
+          Produits associés
+          {form.productIds.length > 0 && (
+            <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#6b6b7a', marginLeft: '0.5rem' }}>
+              ({form.productIds.length} sélectionné{form.productIds.length > 1 ? 's' : ''})
+            </span>
+          )}
+        </h3>
+
+        {!form.gender ? (
+          <p style={{ fontSize: '0.875rem', color: '#9999a8' }}>
+            Sélectionnez d&apos;abord un genre pour voir les produits.
+          </p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Selected chips */}
+            {selectedProducts.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {selectedProducts.map((p) => (
+                  <span
+                    key={p.id}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      borderRadius: '9999px',
+                      background: 'rgba(36,24,166,0.08)',
+                      border: '1px solid rgba(36,24,166,0.15)',
+                      padding: '0.25rem 0.75rem',
+                      fontSize: '0.75rem',
+                      color: '#2418a6',
+                      fontWeight: 500,
+                    }}
+                  >
+                    {p.images?.[0] && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.images[0]} alt={p.name} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} />
+                    )}
+                    {p.name}
+                    <button type="button" onClick={() => toggleProduct(p.id)} style={{ color: 'rgba(36,24,166,0.5)', cursor: 'pointer', background: 'none', border: 'none' }}>
+                      <X style={{ width: 12, height: 12 }} />
+                    </button>
+                  </span>
+                ))}
+              </div>
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {!form.gender ? (
-            <p className="text-sm text-lolett-gray-400">
-              Sélectionnez d&apos;abord un genre pour voir les produits.
-            </p>
-          ) : (
-            <>
-              {selectedProducts.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedProducts.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center gap-2 rounded-full bg-lolett-blue/10 border border-lolett-blue/20 px-3 py-1"
+
+            {/* Search */}
+            <div style={{ position: 'relative' }}>
+              <Search style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#9999a8' }} />
+              <input
+                type="text"
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
+                placeholder="Rechercher un produit..."
+                className={inputBase}
+                style={{ paddingLeft: '2.25rem' }}
+              />
+            </div>
+
+            {/* Product list */}
+            <div style={{ maxHeight: '14rem', overflowY: 'auto', borderRadius: '0.5rem', border: '1px solid #e8e8ef' }}>
+              {filteredProducts.length === 0 ? (
+                <p style={{ fontSize: '0.875rem', color: '#9999a8', padding: '1rem', textAlign: 'center' }}>
+                  Aucun produit trouvé
+                </p>
+              ) : (
+                filteredProducts.map((product) => {
+                  const isSelected = form.productIds.includes(product.id);
+                  return (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => toggleProduct(product.id)}
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.625rem 0.75rem',
+                        textAlign: 'left',
+                        background: isSelected ? 'rgba(36,24,166,0.04)' : 'transparent',
+                        border: 'none',
+                        borderBottom: '1px solid #f7f7fb',
+                        cursor: 'pointer',
+                      }}
                     >
-                      {p.images?.[0] && (
+                      {product.images?.[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={p.images[0]}
-                          alt={p.name}
-                          className="size-5 rounded-full object-cover"
-                        />
+                        <img src={product.images[0]} alt={product.name} style={{ width: 32, height: 32, borderRadius: '0.25rem', objectFit: 'cover', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 32, height: 32, borderRadius: '0.25rem', background: '#f7f7fb', flexShrink: 0 }} />
                       )}
-                      <span className="text-xs text-lolett-blue font-medium">{p.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => toggleProduct(p.id)}
-                        className="text-lolett-blue/60 hover:text-red-500"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#1a1a24', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {product.name}
+                        </p>
+                        <p style={{ fontSize: '0.75rem', color: '#6b6b7a' }}>{product.category_slug}</p>
+                      </div>
+                      {isSelected ? (
+                        <X style={{ width: 16, height: 16, color: '#2418a6', flexShrink: 0 }} />
+                      ) : (
+                        <Plus style={{ width: 16, height: 16, color: '#9999a8', flexShrink: 0 }} />
+                      )}
+                    </button>
+                  );
+                })
               )}
+            </div>
+          </div>
+        )}
+      </div>
 
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-lolett-gray-400" />
-                <Input
-                  value={productSearch}
-                  onChange={(e) => setProductSearch(e.target.value)}
-                  placeholder="Rechercher un produit..."
-                  className="pl-9"
-                />
-              </div>
-
-              <div className="max-h-56 overflow-y-auto rounded-lg border border-lolett-gray-200 divide-y divide-lolett-gray-100">
-                {filteredProducts.length === 0 ? (
-                  <p className="text-sm text-lolett-gray-400 p-4 text-center">
-                    Aucun produit trouvé
-                  </p>
-                ) : (
-                  filteredProducts.map((product) => {
-                    const isSelected = form.productIds.includes(product.id);
-                    return (
-                      <button
-                        key={product.id}
-                        type="button"
-                        onClick={() => toggleProduct(product.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                          isSelected
-                            ? 'bg-lolett-blue/5'
-                            : 'hover:bg-lolett-gray-50'
-                        }`}
-                      >
-                        {product.images?.[0] ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="size-8 rounded object-cover shrink-0"
-                          />
-                        ) : (
-                          <div className="size-8 rounded bg-lolett-gray-100 shrink-0" />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-lolett-gray-900 truncate">
-                            {product.name}
-                          </p>
-                          <p className="text-xs text-lolett-gray-500">{product.category_slug}</p>
-                        </div>
-                        {isSelected ? (
-                          <X className="size-4 text-lolett-blue shrink-0" />
-                        ) : (
-                          <Plus className="size-4 text-lolett-gray-400 shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
+      {/* ── Erreur ───────────────────────────────────── */}
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+        <div style={{ borderRadius: '0.5rem', background: '#fef2f2', border: '1px solid #fecaca', padding: '1rem', fontSize: '0.875rem', color: '#b91c1c' }}>
           {error}
         </div>
       )}
 
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving || uploading}>
-          {saving
-            ? 'Enregistrement...'
-            : mode === 'create'
-              ? 'Créer le look'
-              : 'Mettre à jour'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/admin/looks')}
-          disabled={saving}
-        >
+      {/* ── Actions ──────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button type="submit" disabled={saving || uploading} className={btnPrimary}>
+          {saving ? 'Enregistrement...' : mode === 'create' ? 'Créer le look' : 'Mettre à jour'}
+        </button>
+        <button type="button" onClick={() => router.push('/admin/looks')} disabled={saving} className={btnOutline}>
           Annuler
-        </Button>
+        </button>
       </div>
     </form>
   );

@@ -14,7 +14,7 @@ export function Logo({ className, variant = 'default', size = 'md' }: LogoProps)
   };
 
   const colorClasses = {
-    default: 'text-lolett-blue',
+    default: 'text-lolett-gold',
     white: 'text-white',
   };
 

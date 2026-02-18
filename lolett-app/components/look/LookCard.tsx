@@ -5,19 +5,19 @@ import Link from 'next/link';
 import { ShoppingBag, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import type { Look, Size } from '@/types';
-import { getLookProducts, isLookAvailable } from '@/data/looks';
+import type { Look, Size, Product } from '@/types';
 import { useCartStore } from '@/features/cart';
+import { getFirstAvailableColor } from '@/lib/product-utils';
 
 interface LookCardProps {
   look: Look;
+  products: Product[];
   showProducts?: boolean;
 }
 
-export function LookCard({ look, showProducts = true }: LookCardProps) {
+export function LookCard({ look, products, showProducts = true }: LookCardProps) {
   const [addedToCart, setAddedToCart] = useState(false);
-  const products = getLookProducts(look);
-  const available = isLookAvailable(look);
+  const available = products.length > 0 && products.every(p => p.stock > 0);
   const addItem = useCartStore((state) => state.addItem);
 
   const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
@@ -27,7 +27,8 @@ export function LookCard({ look, showProducts = true }: LookCardProps) {
 
     products.forEach((product) => {
       const defaultSize: Size = product.sizes.includes('M') ? 'M' : product.sizes[0];
-      addItem(product.id, defaultSize);
+      const color = getFirstAvailableColor(product);
+      addItem(product.id, defaultSize, 1, color);
     });
 
     setAddedToCart(true);

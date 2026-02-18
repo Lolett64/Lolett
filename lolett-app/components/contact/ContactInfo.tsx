@@ -10,14 +10,14 @@ export function ContactInfo() {
 
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="bg-lolett-blue/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
-              <Mail className="text-lolett-blue h-5 w-5" />
+            <div className="bg-lolett-gold/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
+              <Mail className="text-lolett-gold h-5 w-5" />
             </div>
             <div>
               <p className="text-lolett-gray-900 font-medium">Email</p>
               <a
                 href="mailto:hello@lolett.com"
-                className="text-lolett-gray-600 hover:text-lolett-blue transition-colors"
+                className="text-lolett-gray-600 hover:text-lolett-gold transition-colors"
               >
                 hello@lolett.com
               </a>
@@ -25,14 +25,14 @@ export function ContactInfo() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="bg-lolett-blue/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
-              <Phone className="text-lolett-blue h-5 w-5" />
+            <div className="bg-lolett-gold/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
+              <Phone className="text-lolett-gold h-5 w-5" />
             </div>
             <div>
               <p className="text-lolett-gray-900 font-medium">Téléphone</p>
               <a
                 href="tel:+33600000000"
-                className="text-lolett-gray-600 hover:text-lolett-blue transition-colors"
+                className="text-lolett-gray-600 hover:text-lolett-gold transition-colors"
               >
                 +33 6 00 00 00 00
               </a>
@@ -40,8 +40,8 @@ export function ContactInfo() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="bg-lolett-blue/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
-              <MapPin className="text-lolett-blue h-5 w-5" />
+            <div className="bg-lolett-gold/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
+              <MapPin className="text-lolett-gold h-5 w-5" />
             </div>
             <div className="min-w-0">
               <p className="text-lolett-gray-900 font-medium">Adresse</p>

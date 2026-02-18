@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { products } from '@/data/products';
-import { categories } from '@/data/categories';
+import { productRepository, categoryRepository } from '@/lib/adapters';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lolett.fr';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -47,7 +46,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   // Category pages
-  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
+  const allCategories = await categoryRepository.findMany();
+  const categoryPages: MetadataRoute.Sitemap = allCategories.map((cat) => ({
     url: `${BASE_URL}/shop/${cat.gender}/${cat.slug}`,
     lastModified: now,
     changeFrequency: 'weekly',
@@ -55,7 +55,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Product pages
-  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
+  const allProducts = await productRepository.findMany();
+  const productPages: MetadataRoute.Sitemap = allProducts.map((product) => ({
     url: `${BASE_URL}/produit/${product.slug}`,
     lastModified: product.createdAt ? new Date(product.createdAt) : now,
     changeFrequency: 'weekly',

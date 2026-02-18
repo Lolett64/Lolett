@@ -88,7 +88,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
             <div className="bg-lolett-gray-200 mt-3 h-2 overflow-hidden rounded-full">
               <div
                 className={`h-full rounded-full transition-all duration-700 ease-out ${
-                  isFreeShipping ? 'bg-green-500' : 'bg-lolett-blue'
+                  isFreeShipping ? 'bg-green-500' : 'bg-lolett-gold'
                 }`}
                 style={{
                   width: `${Math.min(100, (subtotal / SHIPPING.FREE_THRESHOLD) * 100)}%`,
@@ -115,7 +115,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
           <Button
             asChild
             size="lg"
-            className="bg-lolett-blue hover:bg-lolett-blue-light mt-6 w-full rounded-full"
+            className="bg-lolett-gold hover:bg-lolett-gold-light mt-6 w-full rounded-full"
           >
             <Link href="/checkout">
               <span>Passer commande</span>
@@ -137,7 +137,7 @@ function OrderSummaryItem({ item }: { item: CartProductItem }) {
     <div className="flex gap-4">
       <div className="relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-lg">
         <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
-        <div className="bg-lolett-blue absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
+        <div className="bg-lolett-gold absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
           {item.quantity}
         </div>
       </div>

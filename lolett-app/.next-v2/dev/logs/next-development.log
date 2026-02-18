@@ -1,0 +1,71 @@
+[00:00:00.416] Server  LOG     
+[00:00:00.416] Server  LOG       We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+[00:00:00.416] Server  LOG       The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+[00:00:00.416] Server  LOG       	- include was updated to add '.next-v2/types/**/*.ts'
+[00:00:00.416] Server  LOG       	- include was updated to add '.next-v2/dev/types/**/*.ts'
+[00:00:00.416] Server  LOG     
+[00:00:00.496] Server  LOG     ✓ Ready in 383ms
+[00:00:32.410] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:32.647] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html
+                          lang="fr"
+                          className="playfair_display_fed1534a-module__F9WnGq__variable dm_sans_efc253b3-module__w1i8D..."
+-                         suppresshydrationwarning="true"
+-                         data-lt-installed="true"
+                        >
+                          ...
+                            <CartBadge>
+                              <LinkComponent href="/panier" className="text-white..." aria-label="Panier (1)">
+                                <a
+                                  className="text-white group-data-[scrolled=true]/header:text-[#5a4d3e] group-data-[s..."
++                                 aria-label="Panier (1)"
+-                                 aria-label="Panier"
+                                  ref={function}
+                                  onClick={function onClick}
+                                  onMouseEnter={function onMouseEnter}
+                                  onTouchStart={function onTouchStart}
+                                  href="/panier"
+                                >
+                                  <ShoppingBag>
++                                 <span
++                                   className="bg-lolett-blue absolute top-1 right-1 flex h-4 w-4 items-center justify..."
++                                 >
+                  ...
+
+[00:00:33.012] Browser WARN    Image with src "https://images.unsplash.com/photo-1726741692873-b8a95b0163aa?w=1200&q=85" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.136] Browser WARN    Image with src "https://images.unsplash.com/photo-1698648438550-9a3a9a292fd4?w=1200&q=85" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.435] Browser WARN    Image with src "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.435] Browser WARN    Image with src "https://images.unsplash.com/photo-1707765643763-aa1f4d3da740?w=1000&q=85" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.435] Browser WARN    Image with src "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&q=80" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.435] Browser WARN    Image with src "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[00:00:33.435] Browser WARN    Image with src "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes

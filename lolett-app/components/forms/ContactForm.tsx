@@ -95,14 +95,14 @@ export function ContactForm() {
             onChange={handleChange}
             required
             rows={5}
-            className="border-lolett-gray-200 focus:ring-lolett-blue w-full resize-none rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+            className="border-lolett-gray-200 focus:ring-lolett-gold w-full resize-none rounded-lg border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
 
         <Button
           type="submit"
           size="lg"
-          className="bg-lolett-blue hover:bg-lolett-blue-light w-full rounded-full"
+          className="bg-lolett-gold hover:bg-lolett-gold-light w-full rounded-full"
         >
           <Send className="mr-2 h-4 w-4" />
           Envoyer le message

@@ -2,27 +2,21 @@
 
 import { useState, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Upload, X } from 'lucide-react';
 import { slugify } from '@/lib/admin/utils';
-import { cn } from '@/lib/utils';
 
 const AVAILABLE_SIZES = ['TU', 'XS', 'S', 'M', 'L', 'XL'] as const;
 
 interface ProductColor {
   name: string;
   hex: string;
+}
+
+interface ProductVariantStock {
+  colorName: string;
+  colorHex: string;
+  size: string;
+  stock: number;
 }
 
 interface ProductFormData {
@@ -34,14 +28,15 @@ interface ProductFormData {
   category_slug: string;
   sizes: string[];
   colors: ProductColor[];
-  stock: string;
+  stock: string; // Conservé pour rétrocompatibilité, calculé automatiquement
+  variants: ProductVariantStock[]; // Stock par variante (couleur + taille)
   is_new: boolean;
   tags: string;
   images: string[];
 }
 
 interface ProductFormProps {
-  initialData?: Partial<ProductFormData>;
+  initialData?: Partial<ProductFormData & { variants?: ProductVariantStock[] }>;
   productId?: string;
   mode: 'create' | 'edit';
 }
@@ -61,9 +56,48 @@ const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string }[]> = 
   ],
 };
 
+/* ── Shared styles ─────────────────────────────────────── */
+const card = 'w-full rounded-xl border border-[var(--border)] bg-white p-6 shadow-sm';
+const fieldLabel = 'block text-sm font-medium text-[#4a4a56] mb-1.5';
+const inputBase =
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+const selectBase =
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+const btnPrimary =
+  'inline-flex items-center justify-center rounded-md bg-[#2418a6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#1a1280] disabled:opacity-50';
+const btnOutline =
+  'inline-flex items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[#4a4a56] shadow-sm hover:bg-[#f7f7fb] disabled:opacity-50';
+const sectionTitle = 'text-base font-semibold text-[#1a1a24] mb-4';
+
 export function ProductForm({ initialData, productId, mode }: ProductFormProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Générer les variantes initiales depuis les données existantes
+  const generateInitialVariants = (colors: ProductColor[], sizes: string[], existingVariants?: ProductVariantStock[]): ProductVariantStock[] => {
+    // Si des variantes existantes sont fournies, les utiliser
+    if (existingVariants && existingVariants.length > 0) {
+      return existingVariants;
+    }
+    
+    // Sinon, générer depuis couleurs/tailles
+    const variants: ProductVariantStock[] = [];
+    colors.forEach((color) => {
+      sizes.forEach((size) => {
+        variants.push({
+          colorName: color.name,
+          colorHex: color.hex,
+          size,
+          stock: 0,
+        });
+      });
+    });
+    return variants;
+  };
+
+  const initialColors = initialData?.colors ?? [];
+  const initialSizes = initialData?.sizes ?? [];
+  const initialVariants = generateInitialVariants(initialColors, initialSizes, initialData?.variants);
 
   const [form, setForm] = useState<ProductFormData>({
     name: initialData?.name ?? '',
@@ -72,9 +106,10 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
     price: initialData?.price ?? '',
     gender: initialData?.gender ?? '',
     category_slug: initialData?.category_slug ?? '',
-    sizes: initialData?.sizes ?? [],
-    colors: initialData?.colors ?? [],
+    sizes: initialSizes,
+    colors: initialColors,
     stock: initialData?.stock ?? '0',
+    variants: initialVariants,
     is_new: initialData?.is_new ?? false,
     tags: initialData?.tags ?? '',
     images: initialData?.images ?? [],
@@ -86,30 +121,112 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
   const [error, setError] = useState('');
 
   function handleNameChange(name: string) {
-    setForm((f) => ({
-      ...f,
-      name,
-      slug: slugify(name),
-    }));
+    setForm((f) => ({ ...f, name, slug: slugify(name) }));
   }
 
   function toggleSize(size: string) {
-    setForm((f) => ({
-      ...f,
-      sizes: f.sizes.includes(size)
+    setForm((f) => {
+      const newSizes = f.sizes.includes(size) 
         ? f.sizes.filter((s) => s !== size)
-        : [...f.sizes, size],
-    }));
+        : [...f.sizes, size];
+      
+      // Régénérer les variantes avec les nouvelles tailles
+      const newVariants: ProductVariantStock[] = [];
+      f.colors.forEach((color) => {
+        newSizes.forEach((s) => {
+          // Conserver le stock existant si la variante existe déjà
+          const existing = f.variants.find(
+            (v) => v.colorName === color.name && v.size === s
+          );
+          newVariants.push({
+            colorName: color.name,
+            colorHex: color.hex,
+            size: s,
+            stock: existing?.stock ?? 0,
+          });
+        });
+      });
+
+      // Calculer le stock total
+      const totalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
+
+      return {
+        ...f,
+        sizes: newSizes,
+        variants: newVariants,
+        stock: totalStock.toString(),
+      };
+    });
   }
 
   function addColor() {
     if (!newColor.name.trim()) return;
-    setForm((f) => ({ ...f, colors: [...f.colors, newColor] }));
+    setForm((f) => {
+      const newColors = [...f.colors, newColor];
+      
+      // Ajouter les variantes pour cette nouvelle couleur avec toutes les tailles
+      const newVariants = [...f.variants];
+      f.sizes.forEach((size) => {
+        newVariants.push({
+          colorName: newColor.name,
+          colorHex: newColor.hex,
+          size,
+          stock: 0,
+        });
+      });
+
+      // Calculer le stock total
+      const totalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
+
+      return {
+        ...f,
+        colors: newColors,
+        variants: newVariants,
+        stock: totalStock.toString(),
+      };
+    });
     setNewColor({ name: '', hex: '#000000' });
   }
 
   function removeColor(idx: number) {
-    setForm((f) => ({ ...f, colors: f.colors.filter((_, i) => i !== idx) }));
+    setForm((f) => {
+      const colorToRemove = f.colors[idx];
+      const newColors = f.colors.filter((_, i) => i !== idx);
+      
+      // Supprimer les variantes de cette couleur
+      const newVariants = f.variants.filter(
+        (v) => v.colorName !== colorToRemove.name
+      );
+
+      // Calculer le stock total
+      const totalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
+
+      return {
+        ...f,
+        colors: newColors,
+        variants: newVariants,
+        stock: totalStock.toString(),
+      };
+    });
+  }
+
+  function updateVariantStock(colorName: string, size: string, stock: number) {
+    setForm((f) => {
+      const newVariants = f.variants.map((v) =>
+        v.colorName === colorName && v.size === size
+          ? { ...v, stock: Math.max(0, stock) }
+          : v
+      );
+
+      // Calculer le stock total
+      const totalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
+
+      return {
+        ...f,
+        variants: newVariants,
+        stock: totalStock.toString(),
+      };
+    });
   }
 
   async function handleImageUpload(files: FileList | null) {
@@ -120,10 +237,7 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
       for (const file of Array.from(files)) {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch('/api/admin/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
         if (res.ok) {
           const data = (await res.json()) as { url: string };
           uploadedUrls.push(data.url);
@@ -153,30 +267,28 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
       category_slug: form.category_slug,
       sizes: form.sizes,
       colors: form.colors,
-      stock: parseInt(form.stock, 10),
+      stock: parseInt(form.stock, 10), // Stock total (somme des variantes)
+      variants: form.variants, // Stock détaillé par variante
       is_new: form.is_new,
-      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+      tags: form.tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean),
       images: form.images,
     };
 
     try {
-      const url =
-        mode === 'create'
-          ? '/api/admin/products'
-          : `/api/admin/products/${productId}`;
+      const url = mode === 'create' ? '/api/admin/products' : `/api/admin/products/${productId}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
         throw new Error(data.error ?? 'Erreur inconnue');
       }
-
       router.push('/admin/products');
       router.refresh();
     } catch (err) {
@@ -189,37 +301,42 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
   const categories = CATEGORIES_BY_GENDER[form.gender] ?? [];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-3xl">
-      {/* Basic info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Informations générales</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 flex flex-col gap-2">
-              <Label htmlFor="name">Nom *</Label>
-              <Input
-                id="name"
-                value={form.name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Nom du produit"
-                required
-              />
-            </div>
-            <div className="col-span-2 flex flex-col gap-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                value={form.slug}
-                onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                placeholder="slug-du-produit"
-              />
-            </div>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', maxWidth: '48rem' }}>
+      {/* ── Informations générales ────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>Informations générales</h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Nom */}
+          <div>
+            <label htmlFor="name" className={fieldLabel}>Nom *</label>
+            <input
+              id="name"
+              type="text"
+              value={form.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="Nom du produit"
+              required
+              className={inputBase}
+            />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">Description *</Label>
+          {/* Slug */}
+          <div>
+            <label htmlFor="slug" className={fieldLabel}>Slug</label>
+            <input
+              id="slug"
+              type="text"
+              value={form.slug}
+              onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+              placeholder="slug-du-produit"
+              className={inputBase}
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className={fieldLabel}>Description *</label>
             <textarea
               id="description"
               value={form.description}
@@ -227,14 +344,16 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
               placeholder="Description du produit..."
               rows={4}
               required
-              className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px] resize-y"
+              className={inputBase}
+              style={{ resize: 'vertical' }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="price">Prix (€) *</Label>
-              <Input
+          {/* Prix + Stock */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label htmlFor="price" className={fieldLabel}>Prix (€) *</label>
+              <input
                 id="price"
                 type="number"
                 min="0"
@@ -243,83 +362,82 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
                 onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                 placeholder="0.00"
                 required
+                className={inputBase}
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="stock">Stock *</Label>
-              <Input
+            <div>
+              <label htmlFor="stock" className={fieldLabel}>Stock total (calculé automatiquement)</label>
+              <input
                 id="stock"
                 type="number"
                 min="0"
                 value={form.stock}
-                onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
-                required
+                readOnly
+                className={inputBase}
+                style={{ background: '#f7f7fb', cursor: 'not-allowed' }}
+                title="Le stock total est calculé automatiquement à partir des variantes"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <Label>Genre *</Label>
-              <Select
+          {/* Genre + Catégorie */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label className={fieldLabel}>Genre *</label>
+              <select
                 value={form.gender}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, gender: v, category_slug: '' }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value, category_slug: '' }))}
                 required
+                className={selectBase}
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="homme">Homme</SelectItem>
-                  <SelectItem value="femme">Femme</SelectItem>
-                </SelectContent>
-              </Select>
+                <option value="">Choisir...</option>
+                <option value="homme">Homme</option>
+                <option value="femme">Femme</option>
+              </select>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label>Catégorie *</Label>
-              <Select
+            <div>
+              <label className={fieldLabel}>Catégorie *</label>
+              <select
                 value={form.category_slug}
-                onValueChange={(v) => setForm((f) => ({ ...f, category_slug: v }))}
+                onChange={(e) => setForm((f) => ({ ...f, category_slug: e.target.value }))}
                 disabled={!form.gender}
+                className={selectBase}
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.slug} value={cat.slug}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="">Choisir...</option>
+                {categories.map((cat) => (
+                  <option key={cat.slug} value={cat.slug}>{cat.label}</option>
+                ))}
+              </select>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Sizes & Colors */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Tailles et couleurs</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label>Tailles disponibles</Label>
-            <div className="flex flex-wrap gap-2">
+      {/* ── Tailles et couleurs ──────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>Tailles et couleurs</h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Tailles */}
+          <div>
+            <span className={fieldLabel}>Tailles disponibles</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {AVAILABLE_SIZES.map((size) => (
                 <button
                   key={size}
                   type="button"
                   onClick={() => toggleSize(size)}
-                  className={cn(
-                    'rounded-md border px-3 py-1.5 text-sm font-medium transition-colors',
-                    form.sizes.includes(size)
-                      ? 'bg-lolett-blue text-white border-lolett-blue'
-                      : 'border-lolett-gray-300 text-lolett-gray-600 hover:border-lolett-blue'
-                  )}
+                  style={{
+                    padding: '0.375rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    border: '1px solid',
+                    borderColor: form.sizes.includes(size) ? '#2418a6' : '#d1d1dc',
+                    background: form.sizes.includes(size) ? '#2418a6' : 'white',
+                    color: form.sizes.includes(size) ? 'white' : '#4a4a56',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
                 >
                   {size}
                 </button>
@@ -327,160 +445,252 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>Couleurs</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {form.colors.map((color, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 rounded-full border border-lolett-gray-200 bg-lolett-gray-50 px-3 py-1"
-                >
-                  <div
-                    className="size-3 rounded-full border border-lolett-gray-300"
-                    style={{ backgroundColor: color.hex }}
-                  />
-                  <span className="text-xs text-lolett-gray-600">{color.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeColor(idx)}
-                    className="text-lolett-gray-400 hover:text-red-500"
+          {/* Couleurs */}
+          <div>
+            <span className={fieldLabel}>Couleurs</span>
+            {form.colors.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                {form.colors.map((color, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      borderRadius: '9999px',
+                      border: '1px solid #e8e8ef',
+                      background: '#f7f7fb',
+                      padding: '0.25rem 0.75rem',
+                      fontSize: '0.75rem',
+                    }}
                   >
-                    <X className="size-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
+                    <span style={{ width: 12, height: 12, borderRadius: '50%', background: color.hex, border: '1px solid #d1d1dc', display: 'inline-block' }} />
+                    {color.name}
+                    <button type="button" onClick={() => removeColor(idx)} style={{ color: '#9999a8', cursor: 'pointer', background: 'none', border: 'none' }}>
+                      <X style={{ width: 12, height: 12 }} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <input
                 type="color"
                 value={newColor.hex}
                 onChange={(e) => setNewColor((c) => ({ ...c, hex: e.target.value }))}
-                className="size-9 rounded border border-lolett-gray-300 p-0.5 cursor-pointer"
+                style={{ width: 36, height: 36, borderRadius: '0.375rem', border: '1px solid #d1d1dc', padding: 2, cursor: 'pointer' }}
               />
-              <Input
+              <input
+                type="text"
                 value={newColor.name}
                 onChange={(e) => setNewColor((c) => ({ ...c, name: e.target.value }))}
                 placeholder="Nom de la couleur (ex: Blanc)"
-                className="flex-1"
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addColor())}
+                className={inputBase}
+                style={{ flex: 1 }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addColor(); } }}
               />
-              <Button type="button" variant="outline" onClick={addColor} size="sm">
-                <Plus className="size-4" />
-              </Button>
+              <button type="button" onClick={addColor} className={btnOutline} style={{ padding: '0.5rem' }}>
+                <Plus style={{ width: 16, height: 16 }} />
+              </button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="tags">Tags (séparés par des virgules)</Label>
-            <Input
+          {/* Stock par variante */}
+          {form.variants.length > 0 && (
+            <div>
+              <span className={fieldLabel}>Stock par variante</span>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+                gap: '0.75rem',
+                marginTop: '0.5rem',
+                padding: '1rem',
+                background: '#f7f7fb',
+                borderRadius: '0.5rem',
+                border: '1px solid #e8e8ef',
+              }}>
+                {form.variants.map((variant, idx) => (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                      <span style={{ 
+                        width: 12, 
+                        height: 12, 
+                        borderRadius: '50%', 
+                        background: variant.colorHex, 
+                        border: '1px solid #d1d1dc', 
+                        display: 'inline-block',
+                        flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: '0.75rem', color: '#4a4a56', fontWeight: 500 }}>
+                        {variant.colorName} - {variant.size}
+                      </span>
+                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      value={variant.stock}
+                      onChange={(e) => updateVariantStock(
+                        variant.colorName,
+                        variant.size,
+                        parseInt(e.target.value, 10) || 0
+                      )}
+                      className={inputBase}
+                      style={{ fontSize: '0.875rem', padding: '0.375rem 0.5rem' }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#6b6b7a', marginTop: '0.5rem' }}>
+                Stock total: <strong>{form.stock}</strong> unités
+              </p>
+            </div>
+          )}
+
+          {/* Tags */}
+          <div>
+            <label htmlFor="tags" className={fieldLabel}>Tags (séparés par des virgules)</label>
+            <input
               id="tags"
+              type="text"
               value={form.tags}
               onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
               placeholder="été, coton, casual..."
+              className={inputBase}
             />
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Nouveau */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
               type="button"
               role="switch"
               aria-checked={form.is_new}
               onClick={() => setForm((f) => ({ ...f, is_new: !f.is_new }))}
-              className={cn(
-                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-                form.is_new ? 'bg-lolett-blue' : 'bg-lolett-gray-300'
-              )}
+              style={{
+                position: 'relative',
+                width: 36,
+                height: 20,
+                borderRadius: 9999,
+                background: form.is_new ? '#2418a6' : '#d1d1dc',
+                border: 'none',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
             >
               <span
-                className={cn(
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform',
-                  form.is_new ? 'translate-x-4' : 'translate-x-0'
-                )}
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  left: form.is_new ? 18 : 2,
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  background: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                  transition: 'left 0.15s ease',
+                }}
               />
             </button>
-            <Label className="cursor-pointer" onClick={() => setForm((f) => ({ ...f, is_new: !f.is_new }))}>
+            <span style={{ fontSize: '0.875rem', color: '#4a4a56', cursor: 'pointer' }} onClick={() => setForm((f) => ({ ...f, is_new: !f.is_new }))}>
               Marquer comme nouveau
-            </Label>
+            </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Images */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Images</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+      {/* ── Images ───────────────────────────────────── */}
+      <div className={card}>
+        <h3 className={sectionTitle}>Images</h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div
-            className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-lolett-gray-300 p-8 cursor-pointer hover:border-lolett-blue transition-colors"
             onClick={() => fileInputRef.current?.click()}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              borderRadius: '0.5rem',
+              border: '2px dashed #d1d1dc',
+              padding: '2rem',
+              cursor: 'pointer',
+            }}
           >
-            <Upload className="size-8 text-lolett-gray-400" />
-            <p className="text-sm text-lolett-gray-500">
+            <Upload style={{ width: 32, height: 32, color: '#9999a8' }} />
+            <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>
               Cliquer pour uploader des images (JPEG, PNG, WebP — max 5MB)
             </p>
-            {uploading && <p className="text-xs text-lolett-blue">Upload en cours...</p>}
+            {uploading && <p style={{ fontSize: '0.75rem', color: '#2418a6' }}>Upload en cours...</p>}
           </div>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp,image/avif"
             multiple
-            className="hidden"
+            style={{ display: 'none' }}
             onChange={(e) => handleImageUpload(e.target.files)}
           />
 
           {form.images.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
               {form.images.map((url, idx) => (
-                <div key={idx} className="relative group aspect-square">
+                <div key={idx} style={{ position: 'relative', aspectRatio: '1', borderRadius: '0.5rem', overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt={`Image ${idx + 1}`}
-                    className="size-full rounded-lg object-cover"
-                  />
+                  <img src={url} alt={`Image ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-1 right-1 rounded-full bg-red-500 p-0.5 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      borderRadius: '50%',
+                      background: '#e53935',
+                      border: 'none',
+                      padding: 2,
+                      color: 'white',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <X className="size-3" />
+                    <X style={{ width: 12, height: 12 }} />
                   </button>
                   {idx === 0 && (
-                    <Badge className="absolute bottom-1 left-1 text-xs" variant="secondary">
+                    <span style={{
+                      position: 'absolute',
+                      bottom: 4,
+                      left: 4,
+                      fontSize: '0.625rem',
+                      background: '#f7f7fb',
+                      color: '#4a4a56',
+                      padding: '2px 6px',
+                      borderRadius: '0.25rem',
+                    }}>
                       Principale
-                    </Badge>
+                    </span>
                   )}
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
+      {/* ── Erreur ───────────────────────────────────── */}
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+        <div style={{ borderRadius: '0.5rem', background: '#fef2f2', border: '1px solid #fecaca', padding: '1rem', fontSize: '0.875rem', color: '#b91c1c' }}>
           {error}
         </div>
       )}
 
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving || uploading}>
-          {saving
-            ? 'Enregistrement...'
-            : mode === 'create'
-              ? 'Créer le produit'
-              : 'Mettre à jour'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/admin/products')}
-          disabled={saving}
-        >
+      {/* ── Actions ──────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button type="submit" disabled={saving || uploading} className={btnPrimary}>
+          {saving ? 'Enregistrement...' : mode === 'create' ? 'Créer le produit' : 'Mettre à jour'}
+        </button>
+        <button type="button" onClick={() => router.push('/admin/products')} disabled={saving} className={btnOutline}>
           Annuler
-        </Button>
+        </button>
       </div>
     </form>
   );

@@ -125,7 +125,7 @@ export function CheckoutForm() {
             type="submit"
             size="lg"
             disabled={!isFormValid || isSubmitting}
-            className="bg-lolett-blue hover:bg-lolett-blue-light w-full rounded-full"
+            className="bg-lolett-gold hover:bg-lolett-gold-light w-full rounded-full"
           >
             {isSubmitting ? (
               'Traitement en cours...'

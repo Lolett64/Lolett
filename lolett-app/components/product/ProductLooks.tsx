@@ -5,16 +5,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Look, Size } from '@/types';
-import { getLookProducts } from '@/data/looks';
+import type { Look, Size, Product } from '@/types';
 import { useCartStore } from '@/features/cart';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { STOCK } from '@/lib/constants';
+import { getFirstAvailableColor } from '@/lib/product-utils';
 
 interface ProductLooksProps {
   looks: Look[];
+  lookProducts: Record<string, Product[]>;
 }
 
 interface PieceState {
@@ -22,7 +23,7 @@ interface PieceState {
   addedToCart: boolean;
 }
 
-export function ProductLooks({ looks }: ProductLooksProps) {
+export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lookAddedToCart, setLookAddedToCart] = useState(false);
   const [pieceStates, setPieceStates] = useState<Record<string, PieceState>>({});
@@ -30,7 +31,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
   const addItem = useCartStore((state) => state.addItem);
 
   const currentLook = looks[currentIndex];
-  const products = getLookProducts(currentLook);
+  const products = lookProducts[currentLook.id] ?? [];
   const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
 
   const availableProducts = products.filter((p) => p.stock > 0);
@@ -46,7 +47,10 @@ export function ProductLooks({ looks }: ProductLooksProps) {
     const state = pieceStates[productId];
     if (!state?.selectedSize) return;
 
-    addItem(productId, state.selectedSize);
+    const product = products.find((p) => p.id === productId);
+    const color = product ? getFirstAvailableColor(product) : undefined;
+
+    addItem(productId, state.selectedSize, 1, color);
     setPieceStates((prev) => ({
       ...prev,
       [productId]: { ...prev[productId], addedToCart: true },
@@ -66,7 +70,8 @@ export function ProductLooks({ looks }: ProductLooksProps) {
       const size: Size =
         pieceState?.selectedSize ??
         (product.sizes.includes('M') ? 'M' : product.sizes[0]);
-      addItem(product.id, size);
+      const color = getFirstAvailableColor(product);
+      addItem(product.id, size, 1, color);
     });
 
     setLookAddedToCart(true);
@@ -88,7 +93,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
   return (
     <section className="border-lolett-gray-200 mt-12 border-t pt-10 sm:mt-20 sm:pt-16">
       <div className="mb-8 text-center sm:mb-12">
-        <span className="text-lolett-blue text-sm font-medium tracking-wider uppercase">
+        <span className="text-lolett-gold text-sm font-medium tracking-wider uppercase">
           Prêt à sortir
         </span>
         <BrandHeading as="h2" size="lg" className="mt-2">
@@ -122,7 +127,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
                 aria-label={`Look ${i + 1}`}
                 className={cn(
                   'h-2 rounded-full transition-all',
-                  i === currentIndex ? 'bg-lolett-blue w-6' : 'bg-lolett-gray-300 w-2'
+                  i === currentIndex ? 'bg-lolett-gold w-6' : 'bg-lolett-gray-300 w-2'
                 )}
               />
             ))}
@@ -231,7 +236,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
                                 className={cn(
                                   'h-8 min-w-[32px] rounded-md px-2 text-xs font-medium transition-all',
                                   selectedSize === size
-                                    ? 'bg-lolett-blue text-white'
+                                    ? 'bg-lolett-gold text-white'
                                     : 'bg-lolett-gray-100 text-lolett-gray-700 hover:bg-lolett-gray-200'
                                 )}
                               >
@@ -254,7 +259,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
                           addedToCart
                             ? 'bg-green-500 text-white'
                             : selectedSize
-                              ? 'bg-lolett-blue text-white hover:opacity-90'
+                              ? 'bg-lolett-gold text-white hover:opacity-90'
                               : 'bg-lolett-gray-100 text-lolett-gray-400 cursor-not-allowed'
                         )}
                       >
@@ -292,7 +297,7 @@ export function ProductLooks({ looks }: ProductLooksProps) {
                 'w-full rounded-full',
                 lookAddedToCart
                   ? 'bg-green-500 text-white hover:bg-green-500'
-                  : 'bg-lolett-blue hover:bg-lolett-blue-light'
+                  : 'bg-lolett-gold hover:bg-lolett-gold-light'
               )}
             >
               {lookAddedToCart ? (

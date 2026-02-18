@@ -26,7 +26,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild className="lg:hidden">
         <button
-          className="text-lolett-gray-600 hover:text-lolett-blue touch-target flex items-center justify-center p-2.5 transition-colors"
+          className="text-lolett-gray-600 hover:text-lolett-gold touch-target flex items-center justify-center p-2.5 transition-colors"
           aria-label="Menu"
           aria-expanded={isOpen}
         >
@@ -48,8 +48,8 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
                     onClick={closeMenu}
                     aria-current={pathname === item.href ? 'page' : undefined}
                     className={cn(
-                      'hover:text-lolett-blue block py-3 text-lg font-medium transition-colors',
-                      pathname === item.href ? 'text-lolett-blue' : 'text-lolett-gray-900'
+                      'hover:text-lolett-gold block py-3 text-lg font-medium transition-colors',
+                      pathname === item.href ? 'text-lolett-gold' : 'text-lolett-gray-900'
                     )}
                   >
                     {item.name}
@@ -63,8 +63,8 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
                           onClick={closeMenu}
                           aria-current={pathname === child.href ? 'page' : undefined}
                           className={cn(
-                            'hover:text-lolett-blue block py-2 text-base transition-colors',
-                            pathname === child.href ? 'text-lolett-blue' : 'text-lolett-gray-600'
+                            'hover:text-lolett-gold block py-2 text-base transition-colors',
+                            pathname === child.href ? 'text-lolett-gold' : 'text-lolett-gray-600'
                           )}
                         >
                           {child.name}
@@ -102,12 +102,12 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
               <Link
                 href="/favoris"
                 onClick={closeMenu}
-                className="text-lolett-gray-700 hover:text-lolett-blue flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 transition-colors"
+                className="text-lolett-gray-700 hover:text-lolett-gold flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 transition-colors"
               >
                 <Heart className="h-5 w-5" />
                 <span>Favoris</span>
                 {favCount > 0 && (
-                  <span className="bg-lolett-blue rounded-full px-1.5 py-0.5 text-xs text-white">
+                  <span className="bg-lolett-gold rounded-full px-1.5 py-0.5 text-xs text-white">
                     {favCount}
                   </span>
                 )}
@@ -115,12 +115,12 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
               <Link
                 href="/panier"
                 onClick={closeMenu}
-                className="bg-lolett-blue hover:bg-lolett-blue-light flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-white transition-colors"
+                className="bg-lolett-gold hover:bg-lolett-gold-light flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-white transition-colors"
               >
                 <ShoppingBag className="h-5 w-5" />
                 <span>Panier</span>
                 {cartCount > 0 && (
-                  <span className="text-lolett-blue rounded-full bg-white px-1.5 py-0.5 text-xs">
+                  <span className="text-lolett-gold rounded-full bg-white px-1.5 py-0.5 text-xs">
                     {cartCount}
                   </span>
                 )}

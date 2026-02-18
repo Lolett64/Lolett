@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, DM_Sans } from 'next/font/google';
 import './globals.css';
-import { AnnouncementBar } from '@/components/layout/AnnouncementBar';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { SiteChrome } from '@/components/layout/SiteChrome';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -44,10 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable}`}>
       <body className="font-body antialiased">
-        <AnnouncementBar />
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

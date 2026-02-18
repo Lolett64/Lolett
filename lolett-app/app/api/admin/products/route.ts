@@ -41,16 +41,41 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
   const body = (await request.json()) as Record<string, unknown>;
+  
+  // Extraire les variantes du body
+  const { variants, ...productData } = body;
 
-  const { data, error } = await supabase
+  // Insérer le produit
+  const { data: product, error: productError } = await supabase
     .from('products')
-    .insert([body])
+    .insert([productData])
     .select()
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (productError) {
+    return NextResponse.json({ error: productError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ product: data }, { status: 201 });
+  // Insérer les variantes si fournies
+  if (variants && Array.isArray(variants) && variants.length > 0) {
+    const variantRecords = variants.map((v: { colorName: string; colorHex: string; size: string; stock: number }) => ({
+      product_id: product.id,
+      color_name: v.colorName,
+      color_hex: v.colorHex,
+      size: v.size,
+      stock: v.stock,
+    }));
+
+    const { error: variantError } = await supabase
+      .from('product_variants')
+      .insert(variantRecords);
+
+    if (variantError) {
+      // Rollback: supprimer le produit si les variantes échouent
+      await supabase.from('products').delete().eq('id', product.id);
+      return NextResponse.json({ error: `Erreur lors de la création des variantes: ${variantError.message}` }, { status: 500 });
+    }
+  }
+
+  return NextResponse.json({ product }, { status: 201 });
 }

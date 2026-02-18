@@ -1,10 +1,11 @@
 export { HeroSection } from './HeroSection';
-export { MarqueeSection } from './MarqueeSection';
 export { TrustBarSection } from './TrustBarSection';
 export { NewArrivalsSection } from './NewArrivalsSection';
+export { NewArrivalsSectionV2 } from './NewArrivalsSectionV2';
 export { CollectionsSection } from './CollectionsSection';
-export { LooksSection } from './LooksSection';
+export { LooksSectionV3 as LooksSection } from './LooksSectionV3';
 export { BrandStorySection } from './BrandStorySection';
 export { TestimonialsSection } from './TestimonialsSection';
 export { SocialFeedSection } from './SocialFeedSection';
 export { NewsletterSection } from './NewsletterSection';
+export { StoryQuote } from './StoryQuote';

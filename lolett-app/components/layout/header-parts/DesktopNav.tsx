@@ -10,6 +10,7 @@ interface DesktopNavProps {
   openDropdown: string | null;
   onDropdownOpen: (name: string) => void;
   onDropdownClose: () => void;
+  isScrolled?: boolean;
 }
 
 export function DesktopNav({
@@ -17,6 +18,7 @@ export function DesktopNav({
   openDropdown,
   onDropdownOpen,
   onDropdownClose,
+  isScrolled = false,
 }: DesktopNavProps) {
   return (
     <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
@@ -33,8 +35,14 @@ export function DesktopNav({
             aria-expanded={item.children ? openDropdown === item.name : undefined}
             aria-haspopup={item.children ? 'true' : undefined}
             className={cn(
-              'hover:text-lolett-blue flex items-center gap-1 py-2 text-sm font-medium transition-colors',
-              pathname === item.href ? 'text-lolett-blue' : 'text-lolett-gray-600'
+              'flex items-center gap-1 py-2 text-lg font-bold transition-colors',
+              isScrolled
+                ? pathname === item.href
+                  ? 'text-[#1a1510]'
+                  : 'text-[#5a4d3e] hover:text-[#1a1510]'
+                : pathname === item.href
+                  ? 'text-white'
+                  : 'text-white/80 hover:text-white'
             )}
           >
             <span>{item.name}</span>
@@ -50,13 +58,14 @@ export function DesktopNav({
 
           {item.children && openDropdown === item.name && (
             <div className="animate-fade-in absolute top-full left-0 pt-2">
-              <div className="border-lolett-gray-200 min-w-[160px] rounded-lg border bg-white py-2 shadow-lg">
+              <div className="min-w-[160px] rounded-lg border py-2 shadow-lg" style={{ borderColor: 'rgba(196,180,156,0.2)', background: '#fefcf8' }}>
                 {item.children.map((child) => (
                   <Link
                     key={child.href}
                     href={child.href}
                     aria-current={pathname === child.href ? 'page' : undefined}
-                    className="text-lolett-gray-600 hover:bg-lolett-gray-100 hover:text-lolett-blue block px-4 py-2.5 text-sm transition-colors"
+                    className="block px-4 py-2.5 text-sm transition-colors hover:bg-[#f7f0e4]"
+                    style={{ color: '#5a4d3e' }}
                   >
                     {child.name}
                   </Link>

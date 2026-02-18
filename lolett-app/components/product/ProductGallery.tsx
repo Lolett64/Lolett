@@ -50,7 +50,7 @@ export function ProductGallery({
               className={cn(
                 'relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-lg transition-all sm:h-24 sm:w-20',
                 selectedImage === index
-                  ? 'ring-lolett-blue ring-2'
+                  ? 'ring-lolett-gold ring-2'
                   : 'opacity-60 hover:opacity-100'
               )}
             >

@@ -67,7 +67,7 @@ export function Footer() {
               {/* Email - bleu LOLETT */}
               <a
                 href="mailto:hello@lolett.com"
-                className="hover:bg-lolett-blue touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300"
+                className="hover:bg-lolett-gold touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300"
                 aria-label="Email"
               >
                 <Mail className="h-5 w-5" />

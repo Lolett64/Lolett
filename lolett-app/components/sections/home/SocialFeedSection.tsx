@@ -1,96 +1,59 @@
 import Image from 'next/image';
-import { TikTokIcon, InstagramIcon } from '@/components/icons';
+import { InstagramIcon } from '@/components/icons';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
-const socialItems = [
-  { photo: 'photo-1515886657613-9f3515b0c78f', platform: 'instagram' },  // femme robe été
-  { photo: 'photo-1552374196-1ab2a1c593e8', platform: 'tiktok' },        // homme look décontracté
-  { photo: 'photo-1496747611176-843222e1e57c', platform: 'instagram' },   // femme lumière dorée
-  { photo: 'photo-1507003211169-0a1dd7228f2d', platform: 'tiktok' },     // homme style méditerranéen
-] as const;
+const photos = [
+  'https://plus.unsplash.com/premium_photo-1751921504814-6259b4fa5df7?w=400&q=80',   // Femme posant rue ensoleillée + palmiers
+  'https://images.unsplash.com/photo-1763604608266-6ee862e562da?w=400&q=80',          // Femme robe blanche face océan, balcon
+  'https://images.unsplash.com/photo-1766113494488-7035026e5d1b?w=400&q=80',          // Homme costume léger, extérieur
+  'https://images.unsplash.com/photo-1744698276062-a0ffe2246318?w=400&q=80',          // Femme robe rose, ruelle Séville
+  'https://images.unsplash.com/photo-1758445046145-ad814225632e?w=400&q=80',          // Homme chapeau paille, terrasse café
+];
 
 export function SocialFeedSection() {
   return (
-    <section className="bg-lolett-gray-900 relative overflow-hidden py-20 sm:py-28 lg:py-36">
+    <section className="py-14 sm:py-20" style={{ background: '#fefcf8' }}>
       <div className="container">
-        <ScrollReveal className="mb-12 text-center sm:mb-16">
-          {/* Social icons with brand colors */}
-          <div className="mb-6 inline-flex items-center gap-4">
-            <div className="rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] p-2">
-              <InstagramIcon className="h-5 w-5 flex-shrink-0 text-white" />
+        <ScrollReveal>
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <InstagramIcon className="h-5 w-5 text-[#1a1510]" />
+              <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: '#1a1510' }}>@lolett_officiel</span>
             </div>
-            <div className="rounded-full bg-black p-2">
-              <TikTokIcon className="h-5 w-5 flex-shrink-0 text-white" />
-            </div>
-            <span className="text-lg font-medium text-white">@lolett</span>
-          </div>
-          <h2 className="font-display text-4xl leading-[1.1] font-bold text-white sm:text-5xl lg:text-6xl">
-            Rejoins la Communauté
-          </h2>
-        </ScrollReveal>
-
-        {/* Social grid — staggered */}
-        <ScrollReveal stagger>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-          {socialItems.map((item, i) => (
             <a
-              key={i}
-              href={
-                item.platform === 'instagram'
-                  ? 'https://instagram.com/lolett'
-                  : 'https://tiktok.com/@lolett'
-              }
+              href="https://instagram.com/lolett"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-square overflow-hidden rounded-xl"
+              className="text-sm font-medium transition-colors hover:opacity-70"
+              style={{ color: '#c4a44e' }}
+            >
+              Suivre &rarr;
+            </a>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
+          {photos.map((photo, i) => (
+            <a
+              key={i}
+              href="https://instagram.com/lolett"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative aspect-square overflow-hidden rounded-lg"
             >
               <Image
-                src={`https://images.unsplash.com/${item.photo}?w=600&q=80`}
-                alt={`${item.platform === 'instagram' ? 'Instagram' : 'TikTok'} ${i + 1}`}
+                src={photo}
+                alt={`Instagram ${i + 1}`}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="(max-width: 640px) 33vw, 20vw"
               />
-              <div
-                className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
-                  item.platform === 'instagram'
-                    ? 'bg-transparent group-hover:bg-gradient-to-br group-hover:from-[#833AB4]/70 group-hover:via-[#E1306C]/70 group-hover:to-[#F77737]/70'
-                    : 'bg-transparent group-hover:bg-black/70'
-                }`}
-              >
-                {item.platform === 'instagram' ? (
-                  <InstagramIcon className="h-8 w-8 scale-50 text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
-                ) : (
-                  <TikTokIcon className="h-8 w-8 scale-50 text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
-                )}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/40">
+                <InstagramIcon className="h-6 w-6 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </div>
             </a>
           ))}
-          </div>
-        </ScrollReveal>
-
-        {/* CTA buttons */}
-        <ScrollReveal className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          {/* Instagram CTA */}
-          <a
-            href="https://instagram.com/lolett"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] px-8 py-4 font-medium text-white shadow-lg transition-all duration-300 hover:opacity-90"
-          >
-            <InstagramIcon className="h-5 w-5" />
-            <span>Suivre sur Instagram</span>
-          </a>
-          {/* TikTok CTA */}
-          <a
-            href="https://tiktok.com/@lolett"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-black px-8 py-4 font-medium text-white shadow-lg transition-all duration-300 hover:bg-gray-900"
-          >
-            <TikTokIcon className="h-5 w-5" />
-            <span>Suivre sur TikTok</span>
-          </a>
-        </ScrollReveal>
+        </div>
       </div>
     </section>
   );

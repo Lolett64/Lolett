@@ -27,12 +27,32 @@
    ║  DATE FIX: Janvier 2025                                                  ║
    ╚══════════════════════════════════════════════════════════════════════════╝ */
 
+/* Container / max-width breakpoints (Tailwind 4 fix — must be non-inline) */
+@theme {
+  --container-3xs: 16rem;
+  --container-2xs: 18rem;
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-5xl: 64rem;
+  --container-6xl: 72rem;
+  --container-7xl: 80rem;
+}
+
 /* LOLETT Design Tokens */
 @theme inline {
   /* Colors */
   --color-lolett-blue: #2418a6;
   --color-lolett-blue-light: #3a2ed4;
   --color-lolett-blue-dark: #1a1280;
+  --color-lolett-gold: #c4a44e;
+  --color-lolett-gold-light: #d4b85e;
+  --color-lolett-gold-dark: #a8893e;
   --color-lolett-yellow: #f4b740;
   --color-lolett-yellow-light: #ffd06a;
   --color-lolett-cream: #fefcf8;
@@ -80,24 +100,15 @@
   --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-  --spacing-4xl: 6rem;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-  --shadow-product: 0 8px 30px rgb(0 0 0 / 0.06);
-  --shadow-luxury: 0 25px 50px -12px rgb(36 24 166 / 0.15);
-  --shadow-glow: 0 0 60px rgb(244 183 64 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.02);
+  --shadow-md: 0 4px 12px -1px rgb(0 0 0 / 0.04), 0 2px 8px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.05), 0 8px 16px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.06);
+  --shadow-product: 0 10px 40px rgb(0 0 0 / 0.05);
+  --shadow-luxury: 0 30px 60px -12px rgb(36 24 166 / 0.12);
+  --shadow-glow: 0 0 70px rgb(244 183 64 / 0.25);
 }
 
 :root {
@@ -173,7 +184,7 @@
   a:focus-visible,
   button:focus-visible,
   [role='button']:focus-visible {
-    @apply outline-lolett-blue outline-2 outline-offset-2;
+    @apply outline-lolett-gold outline-2 outline-offset-2;
   }
 
   /* Prevent text overflow */
@@ -218,20 +229,6 @@
     min-width: 0;
   }
 
-  /* Ensure all flex and grid children can shrink */
-  [class*='flex'] > *,
-  [class*='grid'] > * {
-    min-width: 0;
-  }
-
-  /* Force inline text elements to wrap */
-  h1 span,
-  h2 span,
-  h3 span,
-  p span {
-    display: inline !important;
-    white-space: normal !important;
-  }
 }
 
 @layer utilities {
@@ -307,9 +304,9 @@
     inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.035;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.045;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 256px 256px;
   }
@@ -664,6 +661,13 @@
   }
 }
 
+/* Scroll line indicator */
+@keyframes scrollLine {
+  0% { transform: translateY(-100%); }
+  50% { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+
 /* Ken Burns zoom */
 @keyframes kenBurns {
   0% {
@@ -912,14 +916,6 @@
   }
 }
 
-/* ============================================
-   SMOOTH SCROLL SECTIONS
-   ============================================ */
-
-section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
 
 /* Optional: Enable scroll snapping on container */
 .scroll-snap-container {

@@ -28,7 +28,7 @@ export function CheckoutContent() {
       <div className="container">
         <Link
           href="/panier"
-          className="text-lolett-gray-600 hover:text-lolett-blue touch-target mb-6 inline-flex items-center gap-2 transition-colors sm:mb-8"
+          className="text-lolett-gray-600 hover:text-lolett-gold touch-target mb-6 inline-flex items-center gap-2 transition-colors sm:mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Retour au panier</span>
