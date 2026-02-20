@@ -8,6 +8,8 @@ import {
   Package,
   Image,
   Tag,
+  FileText,
+  Mail,
   X,
   Menu,
 } from 'lucide-react';
@@ -20,6 +22,8 @@ const navItems = [
   { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false },
   { href: '/admin/looks', label: 'Looks', icon: Image, exact: false },
   { href: '/admin/categories', label: 'Catégories', icon: Tag, exact: false },
+  { href: '/admin/contenu', label: 'Contenu', icon: FileText, exact: false },
+  { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
 ];
 
 function NavLink({

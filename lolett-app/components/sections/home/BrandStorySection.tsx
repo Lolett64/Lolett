@@ -1,21 +1,29 @@
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
-const pillars = [
+const defaultPillars = [
   { title: 'Qualité durable', description: 'Matières nobles sélectionnées pour durer.' },
   { title: 'Style méditerranéen', description: 'L\u2019élégance provençale au quotidien.' },
   { title: 'Simplicité élégante', description: 'Prêt à porter, prêt à sortir.' },
 ];
 
-export function BrandStorySection() {
+interface BrandStorySectionProps {
+  content?: Record<string, string>;
+}
+
+export function BrandStorySection({ content }: BrandStorySectionProps) {
+  const pillars = defaultPillars.map((p, i) => ({
+    title: content?.[`pillar${i + 1}_title`] || p.title,
+    description: content?.[`pillar${i + 1}_description`] || p.description,
+  }));
   return (
     <section className="py-14 sm:py-20" style={{ background: '#1a1510' }}>
       <div className="container max-w-3xl text-center">
         <ScrollReveal>
           <div className="mx-auto mb-6 h-px w-16" style={{ background: '#c4a44e' }} />
           <blockquote className="font-display text-2xl leading-snug font-bold sm:text-3xl lg:text-4xl" style={{ color: '#fefcf8' }}>
-            &laquo;&thinsp;La mode n&rsquo;est pas une question d&rsquo;image,<br />mais une question de lumière.&thinsp;&raquo;
+            {content?.quote || "\u00AB\u2009La mode n\u2019est pas une question d\u2019image, mais une question de lumi\u00E8re.\u2009\u00BB"}
           </blockquote>
-          <p className="mt-3 text-sm font-medium tracking-wider uppercase" style={{ color: '#c4a44e' }}>&mdash; L&rsquo;esprit du Sud</p>
+          <p className="mt-3 text-sm font-medium tracking-wider uppercase" style={{ color: '#c4a44e' }}>&mdash; {content?.author || "L\u2019esprit du Sud"}</p>
           <div className="mx-auto mt-6 h-px w-16" style={{ background: '#c4a44e' }} />
         </ScrollReveal>
 

@@ -10,8 +10,7 @@ import { ProductFilters, type FilterState } from './ProductFilters';
 import { ActiveFilters, type ActiveFilter } from './ActiveFilters';
 import { EmptyState } from './EmptyState';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { Product, Category } from '@/types';
+import type { Product, Category, Size } from '@/types';
 
 interface ShopContentProps {
   gender: 'homme' | 'femme';
@@ -30,7 +29,6 @@ export function ShopContent({ gender, products, categories, heroImage, heroTitle
     sizes: [],
   });
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
-  const [showFiltersDesktop, setShowFiltersDesktop] = useState(false);
 
   // Filtrer les produits
   const filtered = useMemo(() => {
@@ -48,7 +46,7 @@ export function ShopContent({ gender, products, categories, heroImage, heroTitle
 
       // Filtre tailles
       if (filters.sizes.length > 0) {
-        const hasMatchingSize = filters.sizes.some((size) => product.sizes.includes(size as any));
+        const hasMatchingSize = filters.sizes.some((size) => product.sizes.includes(size as Size));
         if (!hasMatchingSize) return false;
       }
 

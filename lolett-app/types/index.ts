@@ -114,3 +114,52 @@ export interface Review {
   comment: string;
   createdAt: string;
 }
+
+export interface UserProfile {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  avatarUrl: string | null;
+  loyaltyPoints: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserAddress {
+  id: string;
+  userId: string;
+  label: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+}
+
+export interface UserReview {
+  id: string;
+  userId: string;
+  productId: string;
+  rating: number;
+  comment: string | null;
+  flagged: boolean;
+  flagCount: number;
+  createdAt: string;
+  updatedAt: string;
+  productName?: string;
+  productImage?: string;
+  authorName?: string;
+}
+
+export interface LoyaltyReward {
+  id: string;
+  name: string;
+  description: string | null;
+  pointsCost: number;
+  rewardType: 'discount' | 'shipping' | 'access';
+  value: number | null;
+  isActive: boolean;
+}

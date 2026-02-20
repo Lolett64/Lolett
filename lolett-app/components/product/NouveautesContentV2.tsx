@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, SlidersHorizontal, X } from 'lucide-react';
 import { ProductGrid } from './ProductGrid';
 import { ProductSorting, type SortOption } from './ProductSorting';
 import { ProductFilters, type FilterState } from './ProductFilters';
 import { ActiveFilters, type ActiveFilter } from './ActiveFilters';
 import { EmptyState } from './EmptyState';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Product, Look } from '@/types';
+import type { Product, Look, Size } from '@/types';
 
 interface NouveautesContentV2Props {
   products: Product[];
@@ -49,7 +48,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
         if (!filters.colors.some((color) => productColors.includes(color))) return false;
       }
       if (filters.sizes.length > 0) {
-        if (!filters.sizes.some((size) => product.sizes.includes(size as any))) return false;
+        if (!filters.sizes.some((size) => product.sizes.includes(size as Size))) return false;
       }
       return true;
     });

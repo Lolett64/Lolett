@@ -3,24 +3,35 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
-const collections = [
+const defaultCollections = [
   {
     href: '/shop/homme',
     label: 'Pour Lui',
     title: "L'Essentiel Homme",
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=85', // Homme en lin, style premium
+    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=85',
     alt: 'Collection Homme',
   },
   {
     href: '/shop/femme',
     label: 'Pour Elle',
     title: 'Élégance Solaire',
-    image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=85', // Femme robe, style solaire
+    image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=85',
     alt: 'Collection Femme',
   },
 ];
 
-export function CollectionsSection() {
+interface CollectionsSectionProps {
+  content?: Record<string, string>;
+}
+
+export function CollectionsSection({ content }: CollectionsSectionProps) {
+  const collections = defaultCollections.map((col, i) => ({
+    ...col,
+    label: i === 0 ? (content?.homme_label || col.label) : (content?.femme_label || col.label),
+    title: i === 0 ? (content?.homme_title || col.title) : (content?.femme_title || col.title),
+    image: i === 0 ? (content?.homme_image || col.image) : (content?.femme_image || col.image),
+  }));
+
   return (
     <section className="relative py-8 sm:py-12" style={{ background: '#fefcf8' }}>
       <div className="container">

@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Filter, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types';
-import { ActiveFilters, type ActiveFilter } from './ActiveFilters';
 
 export interface FilterState {
   priceMin?: number;

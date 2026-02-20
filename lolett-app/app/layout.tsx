@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { Playfair_Display, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { SiteChrome } from '@/components/layout/SiteChrome';
+import { AuthProvider } from '@/lib/auth/context';
+import { CartSync } from '@/features/cart/CartSync';
+import { getSiteContent } from '@/lib/cms/content';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -38,11 +41,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const footerContent = await getSiteContent('footer');
+
   return (
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable}`}>
       <body className="font-body antialiased">
-        <SiteChrome>{children}</SiteChrome>
+        <AuthProvider>
+          <CartSync />
+          <SiteChrome footerContent={footerContent}>{children}</SiteChrome>
+        </AuthProvider>
       </body>
     </html>
   );

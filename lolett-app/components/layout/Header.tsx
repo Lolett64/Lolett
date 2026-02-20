@@ -14,6 +14,7 @@ import {
   SocialDropdown,
   CartBadge,
   FavoritesBadge,
+  AccountBadge,
 } from './header-parts';
 
 export function Header() {
@@ -96,6 +97,7 @@ export function Header() {
               onOpen={() => setSocialHover(true)}
               onClose={() => setSocialHover(false)}
             />
+            <AccountBadge />
             <FavoritesBadge />
             <CartBadge />
             <MobileMenu

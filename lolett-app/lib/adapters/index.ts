@@ -15,18 +15,14 @@ if (useMock) {
   console.warn('[adapters] Using MOCK data — set USE_MOCK_DATA=false to use Supabase');
 }
 
-const adapters = useMock
-  ? (require('./mock') as {
-      productRepository: ProductRepository;
-      lookRepository: LookRepository;
-      categoryRepository: CategoryRepository;
-      orderRepository: OrderRepository;
-    })
-  : (require('./supabase') as {
-      productRepository: ProductRepository;
-      lookRepository: LookRepository;
-      categoryRepository: CategoryRepository;
-      orderRepository: OrderRepository;
-    });
+type Adapters = {
+  productRepository: ProductRepository;
+  lookRepository: LookRepository;
+  categoryRepository: CategoryRepository;
+  orderRepository: OrderRepository;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const adapters: Adapters = useMock ? require('./mock') : require('./supabase');
 
 export const { productRepository, lookRepository, categoryRepository, orderRepository } = adapters;

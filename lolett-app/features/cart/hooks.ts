@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import type { CartItem, Product } from '@/types';
-import { getProductById } from '@/data/products';
 import { SHIPPING } from '@/lib/constants';
 
 export interface CartProductItem extends CartItem {
@@ -17,13 +16,49 @@ export interface CartCalculation {
   freeThreshold: number;
   shippingCost: number;
   amountUntilFreeShipping: number;
+  loading: boolean;
 }
 
 export function useCartCalculation(items: CartItem[]): CartCalculation {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const productIds = useMemo(() => items.map((i) => i.productId), [items]);
+
+  useEffect(() => {
+    if (productIds.length === 0) {
+      setProducts([]);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+
+    fetch('/api/products/by-ids', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: productIds }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) {
+          setProducts(data.products ?? []);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productIds]);
+
   return useMemo(() => {
     const cartProducts = items
       .map((item) => {
-        const product = getProductById(item.productId);
+        const product = products.find((p) => p.id === item.productId);
         return product ? { ...item, product } : null;
       })
       .filter((item): item is CartProductItem => item !== null);
@@ -49,6 +84,7 @@ export function useCartCalculation(items: CartItem[]): CartCalculation {
       freeThreshold: SHIPPING.FREE_THRESHOLD,
       shippingCost: SHIPPING.COST,
       amountUntilFreeShipping,
+      loading,
     };
-  }, [items]);
+  }, [items, products, loading]);
 }

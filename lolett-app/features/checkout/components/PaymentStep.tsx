@@ -1,7 +1,6 @@
 'use client';
 
-import { CreditCard, Lock, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Lock } from 'lucide-react';
 
 interface PaymentStepProps {
   onBack: () => void;
@@ -14,28 +13,27 @@ interface PaymentStepProps {
 
 export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMethod, onMethodChange }: PaymentStepProps) {
   return (
-    <div className="space-y-6">
-      <div>
-        <button
-          onClick={onBack}
-          className="mb-4 inline-flex items-center gap-2 text-sm text-[#8a7d6b] transition-colors hover:text-[#c4a44e]"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Retour à la livraison
-        </button>
-        <h2 className="font-playfair text-xl font-semibold text-[#1a1510]">
-          Mode de paiement
-        </h2>
-      </div>
+    <div>
+      <h2 className="ckv-heading-italic" style={{ marginBottom: 32 }}>
+        Finalisez votre achat
+      </h2>
 
-      <div className="space-y-3">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
         {/* Card option */}
         <label
-          className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
-            paymentMethod === 'card'
-              ? 'border-[#c4a44e] bg-[#c4a44e]/5'
-              : 'border-[#c4b49c]/20 hover:border-[#c4b49c]/40'
-          }`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: '18px 20px',
+            borderRadius: 8,
+            border: '1px solid #E8E0D6',
+            borderLeft: paymentMethod === 'card' ? '3px solid #C4956A' : '1px solid #E8E0D6',
+            backgroundColor: paymentMethod === 'card' ? '#FFFBF7' : '#fff',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
           <input
             type="radio"
@@ -43,38 +41,64 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
             value="card"
             checked={paymentMethod === 'card'}
             onChange={() => onMethodChange('card')}
-            className="sr-only"
+            style={{ display: 'none' }}
           />
           <div
-            className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-              paymentMethod === 'card' ? 'border-[#c4a44e]' : 'border-[#c4b49c]/40'
-            }`}
+            style={{
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+              border: `2px solid ${paymentMethod === 'card' ? '#C4956A' : '#D4CBC0'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
           >
-            {paymentMethod === 'card' && <div className="h-2.5 w-2.5 rounded-full bg-[#c4a44e]" />}
+            {paymentMethod === 'card' && (
+              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#C4956A' }} />
+            )}
           </div>
-          <CreditCard className="h-5 w-5 text-[#5a4d3e]" />
-          <span className="text-sm font-medium text-[#1a1510]">Carte bancaire</span>
-          <div className="ml-auto flex gap-1.5">
-            <span className="rounded bg-[#faf9f7] px-1.5 py-0.5 text-[10px] font-medium text-[#8a7d6b]">VISA</span>
-            <span className="rounded bg-[#faf9f7] px-1.5 py-0.5 text-[10px] font-medium text-[#8a7d6b]">MC</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C2420" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#2C2420', flex: 1 }}>Carte bancaire</span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#9B8E82', backgroundColor: '#F5F0EA', padding: '3px 8px', borderRadius: 4 }}>VISA</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#9B8E82', backgroundColor: '#F5F0EA', padding: '3px 8px', borderRadius: 4 }}>MC</span>
           </div>
         </label>
 
         {paymentMethod === 'card' && (
-          <div className="ml-9 rounded-lg border border-[#c4b49c]/10 bg-[#faf9f7] p-4">
-            <p className="text-xs text-[#5a4d3e]">
-              Vous serez redirigé vers une page de paiement sécurisée Stripe pour saisir vos informations de carte.
+          <div style={{
+            marginLeft: 32,
+            padding: '14px 18px',
+            borderRadius: 6,
+            backgroundColor: '#FAF7F2',
+            border: '1px solid #E8E0D6',
+          }}>
+            <p style={{ fontSize: 12, color: '#7A6E62', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
+              Vous serez redirige vers une page securisee Stripe pour saisir vos informations de carte.
             </p>
           </div>
         )}
 
         {/* PayPal option */}
         <label
-          className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
-            paymentMethod === 'paypal'
-              ? 'border-[#c4a44e] bg-[#c4a44e]/5'
-              : 'border-[#c4b49c]/20 hover:border-[#c4b49c]/40'
-          }`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: '18px 20px',
+            borderRadius: 8,
+            border: '1px solid #E8E0D6',
+            borderLeft: paymentMethod === 'paypal' ? '3px solid #C4956A' : '1px solid #E8E0D6',
+            backgroundColor: paymentMethod === 'paypal' ? '#FFFBF7' : '#fff',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
           <input
             type="radio"
@@ -82,54 +106,92 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
             value="paypal"
             checked={paymentMethod === 'paypal'}
             onChange={() => onMethodChange('paypal')}
-            className="sr-only"
+            style={{ display: 'none' }}
           />
           <div
-            className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-              paymentMethod === 'paypal' ? 'border-[#c4a44e]' : 'border-[#c4b49c]/40'
-            }`}
+            style={{
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+              border: `2px solid ${paymentMethod === 'paypal' ? '#C4956A' : '#D4CBC0'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
           >
-            {paymentMethod === 'paypal' && <div className="h-2.5 w-2.5 rounded-full bg-[#c4a44e]" />}
+            {paymentMethod === 'paypal' && (
+              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#C4956A' }} />
+            )}
           </div>
-          <span className="text-sm font-bold text-[#003087]">Pay</span>
-          <span className="text-sm font-bold text-[#009cde]">Pal</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#003087' }}>Pay</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#009cde', marginLeft: -10 }}>Pal</span>
         </label>
 
         {paymentMethod === 'paypal' && (
-          <div className="ml-9 rounded-lg border border-[#c4b49c]/10 bg-[#faf9f7] p-4">
-            <div className="flex items-center gap-2 text-sm text-[#8a7d6b]">
-              <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-              Bientôt disponible
+          <div style={{
+            marginLeft: 32,
+            padding: '14px 18px',
+            borderRadius: 6,
+            backgroundColor: '#FAF7F2',
+            border: '1px solid #E8E0D6',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#D4A853', animation: 'pulse 1.5s infinite' }} />
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#9B8E82', fontFamily: "'DM Sans', sans-serif" }}>Bientot disponible</span>
             </div>
-            <p className="text-xs text-[#8a7d6b]">
-              PayPal sera activé prochainement.
+            <p style={{ fontSize: 12, color: '#9B8E82', fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
+              PayPal sera active prochainement.
             </p>
           </div>
         )}
       </div>
 
       {/* SSL badge */}
-      <div className="flex items-center justify-center gap-2 rounded-lg bg-[#faf9f7] py-3 text-xs text-[#8a7d6b]">
-        <Lock className="h-3.5 w-3.5 text-[#c4a44e]" />
-        Paiement sécurisé SSL 256-bit
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        padding: '12px 0',
+        borderRadius: 6,
+        backgroundColor: '#FAF7F2',
+        marginBottom: 24,
+        fontSize: 12,
+        color: '#9B8E82',
+        fontFamily: "'DM Sans', sans-serif",
+      }}>
+        <Lock size={14} color="#C4956A" />
+        Paiement securise SSL 256-bit
       </div>
 
-      {/* Confirm button */}
-      <Button
-        onClick={onConfirm}
-        disabled={isSubmitting || paymentMethod === 'paypal'}
-        size="lg"
-        className="w-full rounded-full bg-[#c4a44e] text-white hover:bg-[#b3943f]"
-      >
-        {isSubmitting ? (
-          'Redirection vers Stripe...'
-        ) : (
-          <>
-            <Lock className="mr-2 h-4 w-4" />
-            Payer {total.toFixed(2)} €
-          </>
-        )}
-      </Button>
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: 12 }}>
+        <button
+          onClick={onBack}
+          className="ckv-btn-outline"
+          style={{ flex: '0 0 auto' }}
+        >
+          Retour
+        </button>
+        <button
+          onClick={onConfirm}
+          disabled={isSubmitting || paymentMethod === 'paypal'}
+          className="ckv-btn-primary"
+          style={{ flex: 1 }}
+        >
+          {isSubmitting ? (
+            'Redirection vers Stripe...'
+          ) : paymentMethod === 'paypal' ? (
+            'Bientot disponible'
+          ) : (
+            <>
+              <Lock size={14} style={{ marginRight: 8 }} />
+              Payer {total.toFixed(2)} &euro;
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

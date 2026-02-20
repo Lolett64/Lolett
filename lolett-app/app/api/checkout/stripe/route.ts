@@ -41,13 +41,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.CHECKOUT_REDIRECT_URL || 'http://localhost:3000';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       line_items: lineItems,
       customer_email: customer.email,
+      allow_promotion_codes: true,
       metadata: {
         // Store order data in metadata for the webhook
         customer: JSON.stringify(customer),

@@ -9,7 +9,7 @@ import { ActiveFilters, type ActiveFilter } from './ActiveFilters';
 import { EmptyState } from './EmptyState';
 import { Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Product } from '@/types';
+import type { Product, Size } from '@/types';
 
 interface NouveautesContentProps {
   products: Product[];
@@ -57,7 +57,7 @@ export function NouveautesContent({ products }: NouveautesContentProps) {
         if (!hasMatchingColor) return false;
       }
       if (filters.sizes.length > 0) {
-        const hasMatchingSize = filters.sizes.some((size) => product.sizes.includes(size as any));
+        const hasMatchingSize = filters.sizes.some((size) => product.sizes.includes(size as Size));
         if (!hasMatchingSize) return false;
       }
       return true;
@@ -97,7 +97,6 @@ export function NouveautesContent({ products }: NouveautesContentProps) {
   }, [sorted, page]);
 
   const hasMore = paginated.length < sorted.length;
-  const totalPages = Math.ceil(sorted.length / PRODUCTS_PER_PAGE);
 
   // Construire les filtres actifs
   const activeFilters: ActiveFilter[] = useMemo(() => {

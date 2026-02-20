@@ -8,10 +8,11 @@ import {
   TestimonialsSection,
   SocialFeedSection,
   NewsletterSection,
-  StoryQuote,
+  TrustBarSection,
 } from '@/components/sections/home';
 import { productRepository, lookRepository } from '@/lib/adapters';
 import { reviews } from '@/data/reviews';
+import { getSiteContent } from '@/lib/cms/content';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -39,8 +40,15 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const newProducts = await productRepository.findMany({ isNew: true, limit: 4 });
-  const looks = await lookRepository.findMany();
+  const [newProducts, looks, hero, collections, brandStory, newsletter, trustBar] = await Promise.all([
+    productRepository.findMany({ isNew: true, limit: 4 }),
+    lookRepository.findMany(),
+    getSiteContent('hero'),
+    getSiteContent('collections'),
+    getSiteContent('brand_story'),
+    getSiteContent('newsletter'),
+    getSiteContent('trust_bar'),
+  ]);
 
   const lookProductsEntries = await Promise.all(
     looks.map(async (look: { id: string; productIds: string[] }) => {
@@ -52,13 +60,15 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection content={hero} />
+      <TrustBarSection content={trustBar} />
+      <CollectionsSection content={collections} />
       <NewArrivalsSection products={newProducts} />
-      <BrandStorySection />
+      <BrandStorySection content={brandStory} />
       <LooksSection looks={looks} lookProducts={lookProducts} />
       <TestimonialsSection reviews={reviews} />
       <SocialFeedSection />
-      <NewsletterSection />
+      <NewsletterSection content={newsletter} />
 
       {/* Disclaimer LOLETT */}
       <section className="py-6 text-center" style={{ background: '#f7f0e4', borderTop: '1px solid rgba(196,180,156,0.2)' }}>

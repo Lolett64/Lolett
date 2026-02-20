@@ -2,7 +2,7 @@
 
 import { useState, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Upload, X } from 'lucide-react';
+import { Plus, Upload, X } from 'lucide-react';
 import { slugify } from '@/lib/admin/utils';
 
 const AVAILABLE_SIZES = ['TU', 'XS', 'S', 'M', 'L', 'XL'] as const;

@@ -5,7 +5,11 @@ import { ArrowRight } from 'lucide-react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { useEffect, useRef, useState } from 'react';
 
-export function HeroSection() {
+interface HeroSectionProps {
+  content?: Record<string, string>;
+}
+
+export function HeroSection({ content }: HeroSectionProps) {
   const scrollY = useScrollPosition();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -48,7 +52,7 @@ export function HeroSection() {
             transition: 'opacity 1.5s ease-out',
           }}
         >
-          <source src="/videos/hero-beach.mp4" type="video/mp4" />
+          <source src={content?.video_url || "/videos/hero-beach.mp4"} type="video/mp4" />
         </video>
       </div>
 
@@ -113,7 +117,7 @@ export function HeroSection() {
             style={{ background: 'rgba(255,255,255,0.08)' }}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#f4b740] shadow-[0_0_6px_rgba(244,183,64,0.6)]" />
-            Collection Été 2026
+            {content?.badge || 'Collection Été 2026'}
           </span>
         </div>
 
@@ -126,7 +130,7 @@ export function HeroSection() {
             textShadow: '0 2px 40px rgba(0,0,0,0.3)',
           }}
         >
-          L&apos;Élégance
+          {content?.title_line1 || "L'Élégance"}
           <br />
           <span
             style={{
@@ -136,7 +140,7 @@ export function HeroSection() {
               filter: 'drop-shadow(0 2px 20px rgba(244,183,64,0.3))',
             }}
           >
-            Méditerranéenne
+            {content?.title_line2 || 'Méditerranéenne'}
           </span>
         </h1>
 
@@ -149,8 +153,7 @@ export function HeroSection() {
             textShadow: '0 1px 8px rgba(0,0,0,0.3)',
           }}
         >
-          Vêtements pensés au Sud, portés partout. Une mode qui respire
-          la lumière et célèbre la vie.
+          {content?.subtitle || 'Vêtements pensés au Sud, portés partout. Une mode qui respire la lumière et célèbre la vie.'}
         </p>
 
         {/* CTAs */}
@@ -175,7 +178,7 @@ export function HeroSection() {
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            Shop Femme
+            {content?.cta_femme || 'Shop Femme'}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
 
@@ -198,7 +201,7 @@ export function HeroSection() {
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            Shop Homme
+            {content?.cta_homme || 'Shop Homme'}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>

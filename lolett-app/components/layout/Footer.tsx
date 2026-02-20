@@ -21,7 +21,11 @@ const footerLinks = {
   ],
 };
 
-export function Footer() {
+interface FooterProps {
+  content?: Record<string, string>;
+}
+
+export function Footer({ content }: FooterProps) {
   return (
     <footer className="bg-lolett-gray-900 text-white">
       <div className="container pt-12 pb-4 sm:pt-16 sm:pb-6">
@@ -30,13 +34,12 @@ export function Footer() {
           <div className="col-span-2 min-w-0 sm:col-span-2 lg:col-span-2">
             <Logo variant="white" size="lg" />
             <p className="text-lolett-gray-400 mt-4 max-w-[45ch] leading-relaxed">
-              Mode méditerranéenne. Pensée au Sud, portée partout. Pour ceux qui aiment la vie sous
-              le soleil.
+              {content?.tagline || 'Mode méditerranéenne. Pensée au Sud, portée partout. Pour ceux qui aiment la vie sous le soleil.'}
             </p>
             <div className="mt-6 flex gap-3">
               {/* Instagram - gradient rose/violet/orange */}
               <a
-                href="https://instagram.com/lolett"
+                href={content?.instagram_url || "https://instagram.com/lolett"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-gradient-to-br hover:from-[#833AB4] hover:via-[#E1306C] hover:to-[#F77737]"
@@ -46,7 +49,7 @@ export function Footer() {
               </a>
               {/* TikTok - noir/blanc */}
               <a
-                href="https://tiktok.com/@lolett"
+                href={content?.tiktok_url || "https://tiktok.com/@lolett"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-black"
@@ -56,7 +59,7 @@ export function Footer() {
               </a>
               {/* Facebook - bleu officiel */}
               <a
-                href="https://facebook.com/lolett"
+                href={content?.facebook_url || "https://facebook.com/lolett"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-[#1877F2]"
@@ -66,7 +69,7 @@ export function Footer() {
               </a>
               {/* Email - bleu LOLETT */}
               <a
-                href="mailto:hello@lolett.com"
+                href={`mailto:${content?.email || 'hello@lolett.com'}`}
                 className="hover:bg-lolett-gold touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300"
                 aria-label="Email"
               >
@@ -145,7 +148,7 @@ export function Footer() {
           >
             Fait avec passion par <span className="font-medium">Propul&apos;SEO</span>
           </a>
-          <p>Fait avec amour depuis le Sud</p>
+          <p>{content?.made_with || 'Fait avec amour depuis le Sud'}</p>
         </div>
       </div>
     </footer>

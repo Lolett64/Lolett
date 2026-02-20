@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, ShoppingBag, Menu } from 'lucide-react';
+import { Heart, ShoppingBag, Menu, User, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/brand/Logo';
 import { TikTokIcon, InstagramIcon } from '@/components/icons';
 import { useCartStore } from '@/features/cart';
 import { useFavoritesStore } from '@/features/favorites';
+import { useAuth } from '@/lib/auth/context';
+import { createClient } from '@/lib/supabase/client';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { navigation } from './navigation';
 
@@ -19,8 +21,16 @@ interface MobileMenuProps {
 export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) {
   const cartCount = useCartStore((state) => state.getItemCount());
   const favCount = useFavoritesStore((state) => state.getCount());
+  const { user } = useAuth();
 
   const closeMenu = () => onOpenChange(false);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    closeMenu();
+    window.location.href = '/';
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -76,6 +86,40 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
               ))}
             </div>
           </nav>
+          {/* Account section */}
+          <div className="border-lolett-gray-200 border-t px-6 py-4">
+            {user ? (
+              <div className="flex flex-col gap-1">
+                <Link
+                  href="/compte"
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#c4a44e] transition-colors"
+                >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#c4a44e] text-xs font-bold text-white">
+                    {user.user_metadata?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
+                  </div>
+                  Mon espace
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 py-2 text-base text-[#5a4d3e] hover:text-[#c4a44e] transition-colors"
+                >
+                  <LogOut className="h-5 w-5" />
+                  Deconnexion
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/connexion"
+                onClick={closeMenu}
+                className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#c4a44e] transition-colors"
+              >
+                <User className="h-5 w-5" />
+                Connexion
+              </Link>
+            )}
+          </div>
+
           <div className="border-lolett-gray-200 bg-lolett-gray-100 border-t p-6">
             {/* Social links mobile */}
             <div className="mb-4 flex justify-center gap-3">

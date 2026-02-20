@@ -4,7 +4,12 @@ import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+interface SiteChromeProps {
+  children: React.ReactNode;
+  footerContent?: Record<string, string>;
+}
+
+export function SiteChrome({ children, footerContent }: SiteChromeProps) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith('/admin');
 
@@ -16,7 +21,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <>
       <Header />
       <main className="min-h-screen">{children}</main>
-      <Footer />
+      <Footer content={footerContent} />
     </>
   );
 }

@@ -45,6 +45,20 @@ export async function POST(req: NextRequest) {
       const shipping = parseFloat(metadata.shipping || '0');
       const userId = metadata.userId || undefined;
 
+      const admin = createAdminClient();
+
+      // Idempotency: skip if order already created (e.g. inline by /session endpoint)
+      const { data: existingOrder } = await admin
+        .from('orders')
+        .select('id')
+        .eq('payment_id', session.payment_intent as string)
+        .maybeSingle();
+
+      if (existingOrder) {
+        console.log(`[Stripe webhook] Order already exists for payment ${session.payment_intent}, skipping`);
+        return NextResponse.json({ received: true });
+      }
+
       // 1. Create order
       const orderRepo = new SupabaseOrderRepository();
       const order = await orderRepo.create({
@@ -55,8 +69,6 @@ export async function POST(req: NextRequest) {
         userId,
         paymentProvider: 'stripe',
       });
-
-      const admin = createAdminClient();
 
       // 2. Mark as paid
       await admin

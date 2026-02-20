@@ -1,12 +1,20 @@
 import { Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 
-const trustItems = [
-  { icon: Truck, label: 'Livraison offerte dès 100€' },
-  { icon: RotateCcw, label: 'Retours gratuits 30j' },
-  { icon: ShieldCheck, label: 'Paiement 100% sécurisé' },
+const defaultTrustItems = [
+  { icon: Truck, key: 'trust_1', label: 'Livraison offerte dès 100€' },
+  { icon: RotateCcw, key: 'trust_2', label: 'Retours gratuits 30j' },
+  { icon: ShieldCheck, key: 'trust_3', label: 'Paiement 100% sécurisé' },
 ] as const;
 
-export function TrustBarSection() {
+interface TrustBarSectionProps {
+  content?: Record<string, string>;
+}
+
+export function TrustBarSection({ content }: TrustBarSectionProps) {
+  const trustItems = defaultTrustItems.map(item => ({
+    ...item,
+    label: content?.[item.key] || item.label,
+  }));
   return (
     <section style={{ background: '#1a1510' }}>
       <div className="container">

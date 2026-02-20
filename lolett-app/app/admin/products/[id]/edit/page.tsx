@@ -28,7 +28,7 @@ interface ProductRow {
 
 async function getProduct(id: string): Promise<ProductRow | null> {
   // Utiliser l'API pour charger le produit avec ses variantes
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   try {
     const response = await fetch(`${baseUrl}/api/admin/products/${id}`, {
       cache: 'no-store',
