@@ -428,6 +428,8 @@ export class SupabaseOrderRepository implements OrderRepository {
     customer: CustomerInfo;
     total: number;
     shipping: number;
+    userId?: string;
+    paymentProvider?: 'stripe' | 'paypal' | 'demo';
   }): Promise<Order> {
     const admin = createAdminClient();
     const orderNumber = generateOrderNumber();
@@ -440,6 +442,8 @@ export class SupabaseOrderRepository implements OrderRepository {
         total: orderData.total,
         shipping: orderData.shipping,
         status: 'pending',
+        user_id: orderData.userId || null,
+        payment_provider: orderData.paymentProvider || 'demo',
       })
       .select('*')
       .single();
