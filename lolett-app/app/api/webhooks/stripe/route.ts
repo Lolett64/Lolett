@@ -4,8 +4,9 @@ import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-});
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (process.env.STRIPE_WEBHOOK_SECRET && signature) {
-      event = stripe.webhooks.constructEvent(
+      event = getStripe().webhooks.constructEvent(
         body,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET

@@ -4,7 +4,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+}
 
 // GET /api/checkout/stripe/session?session_id=cs_xxx
 // Returns the orderId associated with a Stripe checkout session.
@@ -16,7 +18,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status !== 'paid') {
       return NextResponse.json({ error: 'Payment not completed' }, { status: 402 });
