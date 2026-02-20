@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +52,22 @@ export async function POST(request: NextRequest) {
         });
       }
     }
+
+    // 5. Send confirmation email (non-blocking)
+    await sendOrderConfirmation({
+      to: customer.email,
+      orderNumber: order.orderNumber,
+      items: items.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
+        productName: i.productName,
+        size: i.size,
+        quantity: i.quantity,
+        price: i.price,
+      })),
+      customer,
+      subtotal: total - (shipping ?? 0),
+      shipping: shipping ?? 0,
+      total,
+    });
 
     return NextResponse.json({
       orderId: order.id,
