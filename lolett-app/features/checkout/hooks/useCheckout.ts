@@ -43,6 +43,7 @@ export function useCheckout() {
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal' | 'demo'>('card');
 
   // Load user profile + addresses if logged in
   useEffect(() => {
@@ -127,16 +128,38 @@ export function useCheckout() {
         price: cp.product.price,
       }));
 
+      const payload = {
+        items: orderItems,
+        customer: formData,
+        total,
+        shipping,
+        userId: user?.id,
+      };
+
+      // Stripe: redirect to Stripe Checkout hosted page
+      if (paymentMethod === 'card') {
+        const res = await fetch('/api/checkout/stripe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) throw new Error('Stripe checkout failed');
+        const { url } = await res.json();
+        if (url) {
+          window.location.href = url;
+          return; // Don't reset isSubmitting, page is redirecting
+        }
+        throw new Error('No Stripe URL returned');
+      }
+
+      // Demo / PayPal fallback: create order directly
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: orderItems,
-          customer: formData,
-          total,
-          shipping,
-          userId: user?.id,
-          paymentProvider: 'demo',
+          ...payload,
+          paymentProvider: paymentMethod === 'paypal' ? 'paypal' : 'demo',
         }),
       });
 
@@ -170,6 +193,8 @@ export function useCheckout() {
     loadingAddresses,
     total,
     shipping,
+    paymentMethod,
+    setPaymentMethod,
     handleChange,
     handleSubmit,
     goToPayment,

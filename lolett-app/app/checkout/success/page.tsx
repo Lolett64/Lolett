@@ -13,22 +13,60 @@ import type { Order } from '@/types';
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
+  const sessionId = searchParams.get('session_id');
 
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(!!orderId);
+  const [loading, setLoading] = useState(!!orderId || !!sessionId);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!orderId) return;
-    fetch(`/api/orders/${orderId}`)
-      .then((res) => {
+    async function loadOrder() {
+      try {
+        let resolvedOrderId = orderId;
+
+        // If coming from Stripe, resolve session_id → orderId
+        if (!resolvedOrderId && sessionId) {
+          const sessionRes = await fetch(`/api/checkout/stripe/session?session_id=${sessionId}`);
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            resolvedOrderId = sessionData.orderId;
+          }
+          // If orderId is still null, webhook might not have fired yet — retry a few times
+          if (!resolvedOrderId) {
+            for (let i = 0; i < 5; i++) {
+              await new Promise((r) => setTimeout(r, 2000));
+              const retryRes = await fetch(`/api/checkout/stripe/session?session_id=${sessionId}`);
+              if (retryRes.ok) {
+                const retryData = await retryRes.json();
+                if (retryData.orderId) {
+                  resolvedOrderId = retryData.orderId;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (!resolvedOrderId) {
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`/api/orders/${resolvedOrderId}`);
         if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then((data) => setOrder(data))
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [orderId]);
+        const data = await res.json();
+        setOrder(data);
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (orderId || sessionId) {
+      loadOrder();
+    }
+  }, [orderId, sessionId]);
 
   if (loading) {
     return (
