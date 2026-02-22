@@ -47,19 +47,19 @@
 /* LOLETT Design Tokens */
 @theme inline {
   /* Colors */
-  --color-lolett-blue: #2418a6;
-  --color-lolett-blue-light: #3a2ed4;
-  --color-lolett-blue-dark: #1a1280;
-  --color-lolett-gold: #c4a44e;
-  --color-lolett-gold-light: #d4b85e;
-  --color-lolett-gold-dark: #a8893e;
-  --color-lolett-yellow: #f4b740;
-  --color-lolett-yellow-light: #ffd06a;
-  --color-lolett-cream: #fefcf8;
-  --color-lolett-warm: #f7f5f0;
-  --color-lolett-gray-100: #f7f7fb;
-  --color-lolett-gray-200: #e8e8ef;
-  --color-lolett-gray-300: #d1d1dc;
+  --color-lolett-blue: #1B0B94;
+  --color-lolett-blue-light: #3228c4;
+  --color-lolett-blue-dark: #130970;
+  --color-lolett-gold: #1B0B94;
+  --color-lolett-gold-light: #3228c4;
+  --color-lolett-gold-dark: #130970;
+  --color-lolett-yellow: #2418a6;
+  --color-lolett-yellow-light: #4a3fd4;
+  --color-lolett-cream: #FDF5E6;
+  --color-lolett-warm: #F9F7F2;
+  --color-lolett-gray-100: #F9F7F2;
+  --color-lolett-gray-200: #F2EFE8;
+  --color-lolett-gray-300: #E4DFD3;
   --color-lolett-gray-400: #9999a8;
   --color-lolett-gray-500: #6b6b7a;
   --color-lolett-gray-600: #4a4a56;
@@ -108,29 +108,33 @@
   --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.06);
   --shadow-product: 0 10px 40px rgb(0 0 0 / 0.05);
   --shadow-luxury: 0 30px 60px -12px rgb(36 24 166 / 0.12);
-  --shadow-glow: 0 0 70px rgb(244 183 64 / 0.25);
+  --shadow-glow: 0 0 70px rgb(27 11 148 / 0.25);
 }
 
 :root {
   --radius: 0.5rem;
-  --background: #ffffff;
-  --foreground: #1a1a24;
-  --card: #ffffff;
-  --card-foreground: #1a1a24;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a24;
-  --primary: #2418a6;
+  --background: #FDF5E6;
+  --foreground: #1B0B94;
+  --card: #FDF5E6;
+  --card-foreground: #1B0B94;
+  --popover: #FDF5E6;
+  --popover-foreground: #1B0B94;
+  --lolett-gray-100: #F9F7F2;
+  --lolett-gray-200: #F2EFE8;
+  --lolett-gray-300: #E4DFD3;
+  --lolett-gray-900: #1B0B94;
+  --primary: #1B0B94;
   --primary-foreground: #ffffff;
   --secondary: #f7f7fb;
   --secondary-foreground: #1a1a24;
   --muted: #f7f5f0;
   --muted-foreground: #6b6b7a;
-  --accent: #f4b740;
+  --accent: #1B0B94;
   --accent-foreground: #1a1a24;
   --destructive: #e53935;
   --border: #e8e8ef;
   --input: #e8e8ef;
-  --ring: #2418a6;
+  --ring: #1B0B94;
 }
 
 @layer base {
@@ -278,7 +282,7 @@
 
   /* Gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, #2418a6 0%, #3a2ed4 50%, #f4b740 100%);
+    background: linear-gradient(135deg, #1B0B94 0%, #3228c4 50%, #6a5fd4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -401,7 +405,7 @@
   }
 
   .shadow-glow {
-    box-shadow: 0 0 60px rgb(244 183 64 / 0.3);
+    box-shadow: 0 0 60px rgb(27 11 148 / 0.3);
   }
 
   /* Animated underline */
@@ -624,10 +628,10 @@
 @keyframes pulseGlow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgb(244 183 64 / 0.3);
+    box-shadow: 0 0 20px rgb(27 11 148 / 0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgb(244 183 64 / 0.5);
+    box-shadow: 0 0 40px rgb(27 11 148 / 0.5);
   }
 }
 
@@ -863,7 +867,7 @@
 }
 
 ::selection {
-  background: #2418a6;
+  background: #1B0B94;
   color: white;
 }
 
@@ -887,7 +891,7 @@
   .cursor-dot {
     width: 8px;
     height: 8px;
-    background: #2418a6;
+    background: #1B0B94;
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
@@ -898,7 +902,7 @@
   .cursor-ring {
     width: 40px;
     height: 40px;
-    border: 1px solid #2418a6;
+    border: 1px solid #1B0B94;
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
@@ -912,7 +916,7 @@
   .cursor-ring.hovering {
     width: 60px;
     height: 60px;
-    border-color: #f4b740;
+    border-color: #1B0B94;
   }
 }
 

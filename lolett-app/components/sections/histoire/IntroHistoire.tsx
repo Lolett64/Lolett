@@ -9,8 +9,8 @@ export function IntroHistoire() {
           {/* Sidebar sticky */}
           <div>
             <div className="lg:sticky lg:top-28">
-              <p className="text-[10px] font-medium tracking-wider uppercase text-[#b89840]">LOLETT</p>
-              <p className="mt-3 text-xs text-[#7a6f63]">Fondée au bord de la Méditerranée. Portée partout.</p>
+              <p className="text-[10px] font-medium tracking-wider uppercase text-[#130970]">LOLETT</p>
+              <p className="mt-3 text-xs text-[#7a6f63]">Née dans le Sud-Ouest. Portée partout.</p>
               <div className="mt-6 h-px bg-[#d9d0c0]" />
               <div className="relative mt-6 aspect-[3/4] overflow-hidden rounded-2xl bg-[#e8e2d8]">
                 <Image
@@ -40,7 +40,7 @@ export function IntroHistoire() {
             </div>
 
             {/* Citation */}
-            <div className="border-l-2 border-[#c4a44e]/40 pl-8">
+            <div className="border-l-2 border-[#1B0B94]/40 pl-8">
               <p className="text-xl italic leading-relaxed text-[#1a1510]">
                 &laquo;&thinsp;Juste des pièces qui fonctionnent ensemble, pour que tu sortes de chez toi en te disant — ouais, je suis bien là.&thinsp;&raquo;
               </p>

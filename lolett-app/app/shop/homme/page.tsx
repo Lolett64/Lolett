@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ShopContentV2 } from '@/components/product/ShopContentV2';
+import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE_URL}/shop/homme` },
   openGraph: {
     title: 'Sélection Homme — LOLETT',
-    description: 'Lin léger, coton premium. Tout ce qu\'il faut pour un été au Sud.',
+    description: "Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud.",
     url: `${BASE_URL}/shop/homme`,
     type: 'website',
   },
@@ -22,13 +22,15 @@ export default async function ShopHommePage() {
   const categories = await categoryRepository.findByGender('homme');
 
   return (
-    <div className="pt-20 sm:pt-24">
-      <ShopContentV2
+    <div className="min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
+      <ShopContentV4
         gender="homme"
         products={products}
         categories={categories}
         heroImage="https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80"
-        heroImagePosition="center 65%"
+        heroImagePosition="50% 60%"
+        heroImageScale={1.0}
+        heroHeight="h-[35vh] min-h-[300px]"
         heroTitle="Collection Homme"
         heroSubtitle="Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud."
       />

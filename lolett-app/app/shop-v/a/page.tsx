@@ -1,264 +1,215 @@
-/* Variante A — Blanc pur + touches dorées, minimaliste luxe */
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
-import { ArrowRight, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { Heart } from 'lucide-react';
 
-const hommeProducts = [
-  { src: '/images/chemise-lin-mediterranee.png', alt: 'Chemise Lin Méditerranée', name: 'Chemise Lin Méditerranée', price: '89€' },
-  { src: '/images/polo-pique-riviera.png', alt: 'Polo Piqué Riviera', name: 'Polo Piqué Riviera', price: '75€' },
-  { src: '/images/chino-sable.png', alt: 'Chino Sable', name: 'Chino Sable', price: '95€' },
-  { src: '/images/bermuda-lin-mistral.png', alt: 'Bermuda Lin Mistral', name: 'Bermuda Lin Mistral', price: '79€' },
+/* ═══════════════════════════════════════════════════════
+   VARIANTE A — LUXE DISCRET
+   Minimalisme raffiné, espaces généreux, peu de déco.
+   Hero warm transparent, cards modérées.
+   ═══════════════════════════════════════════════════════ */
+
+const SAND = '#FDF5E6';
+const GOLD = '#B89547';
+const BROWN = '#1a1510';
+const MUTED = '#9B8E82';
+const CREAM = '#FEFAF3';
+
+const categories = ['Tout voir', 'Chemises', 'Pantalons', 'Polos', 'Bermudas', 'Accessoires'];
+
+const products = [
+  { name: 'Chemise Lin Méditerranée', price: 89, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80', slug: 'chemise-lin', isNew: true },
+  { name: 'Chino Sable', price: 95, image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=600&q=80', slug: 'chino-sable', isNew: false },
+  { name: 'Polo Piqué Riviera', price: 69, image: 'https://images.unsplash.com/photo-1625910513413-5fc421e0fd9f?w=600&q=80', slug: 'polo-riviera', isNew: true },
+  { name: 'Bermuda Lin Mistral', price: 75, image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=600&q=80', slug: 'bermuda-lin', isNew: false },
+  { name: 'Veste Lin Cannes', price: 165, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80', slug: 'veste-lin', isNew: false },
+  { name: 'T-shirt Coton Bio', price: 49, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80', slug: 'tshirt-coton', isNew: true },
 ];
 
-const femmeProducts = [
-  { src: '/images/robe-midi-provencale.png', alt: 'Robe Midi Provençale', name: 'Robe Midi Provençale', price: '125€' },
-  { src: '/images/top-lin-cote-azur.png', alt: "Top Lin Côte d'Azur", name: "Top Lin Côte d'Azur", price: '65€' },
-  { src: '/images/blouse-romantique-calanques.jpg', alt: 'Blouse Romantique Calanques', name: 'Blouse Romantique Calanques', price: '95€' },
-  { src: '/images/jupe-longue-soleil.jpeg', alt: 'Jupe Longue Soleil', name: 'Jupe Longue Soleil', price: '89€' },
-];
+export default function ShopHommeA() {
+  const [activeCat, setActiveCat] = useState(0);
 
-const categories = [
-  { name: 'Chemises', href: '/shop/homme' },
-  { name: 'Pantalons', href: '/shop/homme' },
-  { name: 'Robes', href: '/shop/femme' },
-  { name: 'Tops', href: '/shop/femme' },
-  { name: 'Accessoires', href: '/shop/homme' },
-  { name: 'Lookbooks', href: '/looks' },
-];
-
-export default function ShopVA() {
   return (
-    <div className="relative min-h-screen bg-[#f3efe8] text-[#2a2520]">
+    <div style={{ background: SAND, minHeight: '100vh' }}>
+      {/* Label */}
+      <div style={{ background: GOLD, color: SAND, textAlign: 'center', padding: '8px 0', fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', fontWeight: 500 }}>
+        Variante A — Luxe Discret
+      </div>
 
-      {/* Texture lin */}
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
-        }}
-      />
-
-      {/* ── HERO — 3 colonnes éditoriales ── */}
-      <section className="relative overflow-hidden pt-24 pb-0 sm:pt-32">
-        {/* Hairline centrale */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-[#c4a44e]/[0.07]" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Surtittle */}
-          <p className="mb-8 text-center text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">
-            Collection Été 2026
+      {/* ── HERO ── */}
+      <section style={{ position: 'relative', height: 'clamp(320px, 40vw, 480px)', overflow: 'hidden' }}>
+        <Image
+          src="https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80"
+          alt="Collection Homme"
+          fill
+          style={{ objectFit: 'cover', objectPosition: 'center 65%' }}
+          priority
+        />
+        {/* Warm transparent overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(253,245,230,0.25) 0%, rgba(253,245,230,0.55) 70%, rgba(253,245,230,0.9) 100%)',
+        }} />
+        {/* Content */}
+        <div style={{
+          position: 'relative', zIndex: 1, height: '100%',
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          padding: 'clamp(24px, 4vw, 48px) clamp(24px, 5vw, 80px)',
+          maxWidth: 1200, margin: '0 auto',
+        }}>
+          <p style={{
+            fontFamily: 'var(--font-montserrat), sans-serif',
+            fontSize: 11, letterSpacing: 4, textTransform: 'uppercase',
+            color: GOLD, fontWeight: 600, marginBottom: 12,
+          }}>
+            Pour Lui
           </p>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px_1fr] lg:items-stretch lg:gap-6">
-
-            {/* Card HOMME */}
-            <Link href="/shop/homme" className="group">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#ede9e1] sm:aspect-[3/4]">
-                <Image
-                  src="/images/chemise-lin-mediterranee.png"
-                  alt="Collection Homme LOLETT"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  sizes="(max-width: 1024px) 90vw, 42vw"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Collection</p>
-                  <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Homme</h2>
-                  <p className="mt-1 text-sm text-white/55">Chemises · Pantalons · Accessoires</p>
-                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#c4a44e]">
-                    Découvrir <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Colonne centrale — titre */}
-            <div className="flex flex-col items-center justify-center py-8 text-center lg:py-0">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#c4a44e] to-transparent" />
-              <h1 className="font-display mt-6 text-5xl font-bold leading-tight tracking-tight xl:text-6xl">
-                La Boutique
-              </h1>
-              <div className="mt-6 h-px w-12 bg-gradient-to-r from-transparent via-[#c4a44e] to-transparent" />
-              <p className="mt-5 max-w-[16ch] text-sm leading-relaxed text-[#4a3f35]">
-                Des pièces pensées pour le Sud. Pour lui, pour elle.
-              </p>
-              <div className="mt-8 hidden text-[10px] font-medium tracking-wider uppercase text-[#b89840] lg:block">
-                ↓ Explorer
-              </div>
-            </div>
-
-            {/* Card FEMME */}
-            <Link href="/shop/femme" className="group">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#ede9e1] sm:aspect-[3/4]">
-                <Image
-                  src="/images/robe-midi-provencale.png"
-                  alt="Collection Femme LOLETT"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  sizes="(max-width: 1024px) 90vw, 42vw"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Collection</p>
-                  <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Femme</h2>
-                  <p className="mt-1 text-sm text-white/55">Robes · Tops · Accessoires</p>
-                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#c4a44e]">
-                    Découvrir <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
+          <h1 style={{
+            fontFamily: 'var(--font-newsreader), serif',
+            fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 400,
+            color: BROWN, lineHeight: 1.1, marginBottom: 8,
+          }}>
+            Collection Homme
+          </h1>
+          <p style={{
+            fontFamily: 'var(--font-montserrat), sans-serif',
+            fontSize: 15, color: 'rgba(26,21,16,0.6)', maxWidth: 440,
+            lineHeight: 1.6,
+          }}>
+            Lin léger, coton premium. Tout ce qu&apos;il faut pour un été au Sud.
+          </p>
         </div>
       </section>
 
-      {/* ── CATÉGORIES ── */}
-      <section className="border-y border-[#d9d0c0] py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex items-center gap-2 overflow-x-auto">
-            <span className="mr-2 flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#7a6f63]">
-              Catégories
-            </span>
-            {categories.map((cat) => (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className="flex-shrink-0 rounded-full border border-[#b8a98e] bg-white/60 px-4 py-1.5 text-xs font-semibold text-[#3d3328] transition-all hover:border-[#b89840] hover:bg-[#b89840]/10 hover:text-[#b89840]"
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── NOUVELLES ARRIVÉES ── */}
-      <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <p className="text-[10px] font-medium tracking-wider uppercase text-[#b89840]">Just in</p>
-              <h2 className="font-display mt-2 text-3xl font-bold text-[#1e1610] sm:text-4xl">Nouvelles arrivées</h2>
-            </div>
-            <Link
-              href="/nouveautes"
-              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#b89840] sm:flex"
+      {/* ── CATEGORY STRIP ── */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(24px, 5vw, 80px)' }}>
+        <div style={{
+          display: 'flex', gap: 8, overflowX: 'auto', padding: '24px 0',
+          borderBottom: `1px solid rgba(184,149,71,0.15)`,
+          scrollbarWidth: 'none',
+        }}>
+          {categories.map((cat, i) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCat(i)}
+              style={{
+                flexShrink: 0,
+                padding: '10px 24px',
+                borderRadius: 999,
+                border: activeCat === i ? 'none' : `1px solid rgba(184,149,71,0.25)`,
+                background: activeCat === i ? GOLD : 'transparent',
+                color: activeCat === i ? '#fff' : MUTED,
+                fontFamily: 'var(--font-montserrat), sans-serif',
+                fontSize: 13, fontWeight: 500, letterSpacing: 0.5,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
             >
-              Tout voir <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
-            {[...hommeProducts.slice(0, 2), ...femmeProducts.slice(0, 2)].map((p, i) => (
-              <Link key={i} href="/shop" className="group">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#e8e2d8]">
-                  <Image
-                    src={p.src}
-                    alt={p.alt}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    sizes="(max-width: 640px) 47vw, 23vw"
-                  />
-                </div>
-                <div className="mt-3 min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#1e1610] transition-colors group-hover:text-[#b89840]">
+      {/* ── TOOLBAR ── */}
+      <div style={{
+        maxWidth: 1200, margin: '0 auto',
+        padding: '16px clamp(24px, 5vw, 80px)',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: MUTED }}>
+          {products.length} produits
+        </p>
+        <select style={{
+          fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13,
+          color: BROWN, background: 'transparent', border: `1px solid rgba(184,149,71,0.25)`,
+          padding: '8px 16px', borderRadius: 8, cursor: 'pointer', outline: 'none',
+        }}>
+          <option>Nouveautés</option>
+          <option>Prix croissant</option>
+          <option>Prix décroissant</option>
+        </select>
+      </div>
+
+      {/* ── PRODUCT GRID ── */}
+      <div style={{
+        maxWidth: 1200, margin: '0 auto',
+        padding: '8px clamp(24px, 5vw, 80px) 80px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: 24,
+      }}>
+        {products.map((p) => (
+          <Link key={p.slug} href={`/produit/${p.slug}`} style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                borderRadius: 12, overflow: 'hidden',
+                background: SAND,
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(26,21,16,0.08)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              {/* Image */}
+              <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
+                <Image src={p.image} alt={p.name} fill style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }} sizes="(max-width: 768px) 50vw, 33vw" />
+                {/* Badge */}
+                {p.isNew && (
+                  <div style={{
+                    position: 'absolute', top: 12, left: 12,
+                    background: GOLD, color: '#fff',
+                    fontFamily: 'var(--font-montserrat), sans-serif',
+                    fontSize: 10, fontWeight: 600, letterSpacing: 1.5,
+                    textTransform: 'uppercase', padding: '5px 12px', borderRadius: 4,
+                  }}>
+                    Nouveau
+                  </div>
+                )}
+                {/* Favorite */}
+                <button
+                  onClick={e => e.preventDefault()}
+                  style={{
+                    position: 'absolute', top: 12, right: 12,
+                    background: 'rgba(253,245,230,0.85)', backdropFilter: 'blur(8px)',
+                    border: 'none', borderRadius: '50%', width: 36, height: 36,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: MUTED, transition: 'color 0.3s',
+                  }}
+                >
+                  <Heart size={16} />
+                </button>
+              </div>
+              {/* Info */}
+              <div style={{ padding: '16px 4px 4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <p style={{
+                    fontFamily: 'var(--font-newsreader), serif',
+                    fontSize: 16, color: BROWN, fontWeight: 400,
+                  }}>
                     {p.name}
                   </p>
-                  <p className="mt-0.5 text-sm font-medium text-[#7a6f63]">{p.price}</p>
+                  <p style={{
+                    fontFamily: 'var(--font-montserrat), sans-serif',
+                    fontSize: 14, color: BROWN, fontWeight: 600,
+                    flexShrink: 0, marginLeft: 12,
+                  }}>
+                    {p.price} €
+                  </p>
                 </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 text-center sm:hidden">
-            <Link href="/nouveautes" className="inline-flex items-center gap-1 text-sm font-medium text-[#c4a44e]">
-              Voir toutes les nouveautés <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── LOOKS ÉDITORIAUX ── */}
-      <section className="bg-[#ebe5d9] py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <p className="text-[10px] font-medium tracking-wider uppercase text-[#b89840]">Prêt à sortir</p>
-              <h2 className="font-display mt-2 text-3xl font-bold text-[#1e1610] sm:text-4xl">Looks du moment</h2>
+              </div>
             </div>
-            <Link
-              href="/looks"
-              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#b89840] sm:flex"
-            >
-              Tous les looks <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {/* Grand look */}
-            <Link href="/looks" className="group sm:col-span-2">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#e5ddd2]">
-                <Image
-                  src="/images/polo-pique-riviera.png"
-                  alt="Le Riviera Décontracté"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 90vw, 60vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Look Homme</p>
-                  <h3 className="font-display mt-1 text-2xl font-bold text-white">Le Riviera Décontracté</h3>
-                  <p className="mt-1 text-xs text-white/60">4 pièces · Polo · Bermuda · Casquette · Ceinture</p>
-                </div>
-              </div>
-            </Link>
-
-            {/* Petit look */}
-            <Link href="/looks" className="group">
-              <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#e5ddd2]">
-                <Image
-                  src="/images/blouse-romantique-calanques.jpg"
-                  alt="La Bohème Azuréenne"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 90vw, 30vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-6 left-6">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Look Femme</p>
-                  <h3 className="font-display mt-1 text-xl font-bold text-white">La Bohème Azuréenne</h3>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── TRUST BAR ── */}
-      <section className="border-t border-[#d9d0c0] py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-3">
-            {[
-              { title: 'Livraison offerte', desc: "Dès 100€ d'achat en France" },
-              { title: 'Retours 30 jours', desc: 'Satisfait ou remboursé' },
-              { title: 'Qualité premium', desc: 'Matières nobles & durables' },
-            ].map((item, i) => (
-              <div key={i}>
-                <div className="mx-auto mb-3 h-px w-8 bg-[#c4a44e]" />
-                <p className="text-sm font-bold text-[#1e1610]">{item.title}</p>
-                <p className="mt-1 text-xs font-medium text-[#6a5f55]">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

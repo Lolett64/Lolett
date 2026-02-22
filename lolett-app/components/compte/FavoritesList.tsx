@@ -54,7 +54,7 @@ export function FavoritesList() {
         <div className="h-8 bg-[#f3efe8] rounded w-40 mb-6" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl border border-[#c4b49c]/15 p-4 animate-pulse">
+            <div key={i} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-4 animate-pulse">
               <div className="aspect-[3/4] bg-[#f3efe8] rounded-lg mb-3" />
               <div className="h-4 bg-[#f3efe8] rounded w-3/4 mb-2" />
               <div className="h-3 bg-[#f3efe8] rounded w-1/3" />
@@ -70,13 +70,13 @@ export function FavoritesList() {
       <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Mes favoris</h1>
 
       {products.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
+        <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
           <Heart className="h-12 w-12 text-[#c4b49c]/40 mx-auto mb-4" />
           <h3 className="font-playfair text-lg text-[#1a1510] mb-2">Aucun favori</h3>
           <p className="text-sm text-[#8a7d6b] font-body mb-6">Sauvegardez vos articles preferes ici.</p>
           <Link
             href="/shop/femme"
-            className="inline-block px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors"
+            className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors"
           >
             Decouvrir la boutique
           </Link>
@@ -84,7 +84,7 @@ export function FavoritesList() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((p) => (
-            <div key={p.id} className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm overflow-hidden group">
+            <div key={p.id} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm overflow-hidden group">
               <Link href={`/shop/${p.gender}/${p.slug}`}>
                 <div className="aspect-[3/4] bg-[#f3efe8] overflow-hidden">
                   {p.images?.[0] && (
@@ -98,7 +98,7 @@ export function FavoritesList() {
               </Link>
               <div className="p-4">
                 <Link href={`/shop/${p.gender}/${p.slug}`}>
-                  <h3 className="text-sm font-medium text-[#1a1510] font-body hover:text-[#c4a44e] transition-colors">{p.name}</h3>
+                  <h3 className="text-sm font-medium text-[#1a1510] font-body hover:text-[#1B0B94] transition-colors">{p.name}</h3>
                 </Link>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-sm font-semibold text-[#1a1510] font-body">{p.price.toFixed(2)} &euro;</span>

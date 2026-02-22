@@ -65,12 +65,12 @@ export function ContentImageUpload({ value, onChange, label }: ContentImageUploa
         onDrop={handleDrop}
         className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors duration-200 ${
           dragOver
-            ? 'border-[#2418a6] bg-[#2418a6]/5'
+            ? 'border-[#1B0B94] bg-[#1B0B94]/5'
             : 'border-gray-300 hover:border-gray-400'
         }`}
       >
         {uploading ? (
-          <Loader2 className="size-6 animate-spin text-[#2418a6]" />
+          <Loader2 className="size-6 animate-spin text-[#1B0B94]" />
         ) : (
           <>
             <Upload className="size-6 text-gray-400 mb-2" />

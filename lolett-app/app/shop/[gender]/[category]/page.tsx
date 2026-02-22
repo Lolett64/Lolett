@@ -49,7 +49,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const genderLabel = gender === 'homme' ? 'Homme' : 'Femme';
 
   return (
-    <div className="pt-20 sm:pt-24">
+    <div className="pt-20 sm:pt-24 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
       <ShopContentV2
         gender={gender}
         products={products}

@@ -37,7 +37,7 @@ export function OrderList() {
       <div className="space-y-4">
         <div className="h-8 bg-[#f3efe8] rounded w-48 mb-6" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse">
+          <div key={i} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse">
             <div className="h-4 bg-[#f3efe8] rounded w-32 mb-3" />
             <div className="h-3 bg-[#f3efe8] rounded w-48" />
           </div>
@@ -51,13 +51,13 @@ export function OrderList() {
       <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Mes commandes</h1>
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
+        <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
           <ShoppingBag className="h-12 w-12 text-[#c4b49c]/40 mx-auto mb-4" />
           <h3 className="font-playfair text-lg text-[#1a1510] mb-2">Aucune commande</h3>
           <p className="text-sm text-[#8a7d6b] font-body mb-6">Vous n&apos;avez pas encore passe de commande.</p>
           <Link
             href="/shop/femme"
-            className="inline-block px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors"
+            className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors"
           >
             Decouvrir la boutique
           </Link>
@@ -70,11 +70,11 @@ export function OrderList() {
               <Link
                 key={order.id}
                 href={`/compte/commandes/${order.id}`}
-                className="block bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 hover:border-[#c4a44e]/30 transition-colors"
+                className="block bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 hover:border-[#1B0B94]/30 transition-colors"
               >
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-[#c4a44e]" />
+                    <Package className="h-5 w-5 text-[#1B0B94]" />
                     <div>
                       <p className="text-sm font-semibold text-[#1a1510] font-body">
                         Commande #{order.orderNumber}

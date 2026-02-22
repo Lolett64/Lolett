@@ -107,21 +107,21 @@ export function LooksSectionV3({ looks, lookProducts }: LooksSectionProps) {
 
   return (
     <section className="relative overflow-hidden py-20 sm:py-28 lg:py-36" style={{ background: '#f8f6f1' }}>
-      <div className="pointer-events-none absolute top-0 left-1/2 h-full w-px -translate-x-1/2" style={{ background: 'linear-gradient(to bottom, transparent, rgba(196,164,78,0.15), transparent)' }} />
+      <div className="pointer-events-none absolute top-0 left-1/2 h-full w-px -translate-x-1/2" style={{ background: 'linear-gradient(to bottom, transparent, rgba(27,11,148,0.15), transparent)' }} />
 
       <div className="container relative">
         <ScrollReveal>
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
             {/* Left — Info panel */}
             <div className="order-2 lg:order-1">
-              <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: '#c4a44e' }}>Prêt à Sortir</span>
+              <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: '#1B0B94' }}>Prêt à Sortir</span>
               <h2 className="font-display mt-4 text-5xl leading-tight font-bold sm:text-6xl lg:text-7xl" style={{ color: '#1a1510' }}>Le Look Complet</h2>
               <p className="mt-5 text-lg sm:text-xl" style={{ color: '#8a7d6b' }}>Pas envie de réfléchir ? On a composé des ensembles pour toi.</p>
 
               {activeLook && (
                 <div className="mt-10 space-y-4 transition-all duration-300">
-                  <div className="h-px w-16" style={{ background: '#c4a44e' }} />
-                  <span className="inline-block rounded-full px-4 py-1 text-xs font-semibold tracking-wide uppercase" style={{ background: 'rgba(196,164,78,0.12)', color: '#c4a44e' }}>{activeLook.vibe}</span>
+                  <div className="h-px w-16" style={{ background: '#1B0B94' }} />
+                  <span className="inline-block rounded-full px-4 py-1 text-xs font-semibold tracking-wide uppercase" style={{ background: 'rgba(27,11,148,0.12)', color: '#1B0B94' }}>{activeLook.vibe}</span>
                   <h3 className="font-display text-3xl font-bold sm:text-4xl" style={{ color: '#1a1510' }}>{activeLook.title}</h3>
                   <p className="max-w-[40ch] text-lg" style={{ color: '#8a7d6b' }}>{activeLook.shortPitch}</p>
                   <div className="flex items-center gap-6 pt-2">
@@ -135,7 +135,7 @@ export function LooksSectionV3({ looks, lookProducts }: LooksSectionProps) {
                           : activeAvailable ? 'text-white hover:opacity-90'
                           : 'cursor-not-allowed bg-gray-300 text-gray-500'
                       )}
-                      style={!isAdded && activeAvailable ? { background: '#c4a44e' } : undefined}
+                      style={!isAdded && activeAvailable ? { background: '#1B0B94' } : undefined}
                     >
                       {isAdded ? (<><Check className="h-4 w-4" /><span>Ajouté !</span></>) : activeAvailable ? (<><ShoppingBag className="h-4 w-4" /><span>Adopter ce look</span></>) : (<><X className="h-4 w-4" /><span>Indisponible</span></>)}
                     </button>
@@ -143,9 +143,9 @@ export function LooksSectionV3({ looks, lookProducts }: LooksSectionProps) {
 
                   {count > 1 && (
                     <div className="flex items-center gap-4 pt-6">
-                      <button onClick={goPrev} className="rounded-full border border-gray-300 p-2 text-gray-600 transition-all hover:border-[#c4a44e] hover:text-[#c4a44e]" aria-label="Look précédent"><ChevronLeft className="h-4 w-4" /></button>
+                      <button onClick={goPrev} className="rounded-full border border-gray-300 p-2 text-gray-600 transition-all hover:border-[#1B0B94] hover:text-[#1B0B94]" aria-label="Look précédent"><ChevronLeft className="h-4 w-4" /></button>
                       <span className="text-sm font-medium tabular-nums" style={{ color: '#8a7d6b' }}>{activeIndex + 1} / {count}</span>
-                      <button onClick={goNext} className="rounded-full border border-gray-300 p-2 text-gray-600 transition-all hover:border-[#c4a44e] hover:text-[#c4a44e]" aria-label="Look suivant"><ChevronRight className="h-4 w-4" /></button>
+                      <button onClick={goNext} className="rounded-full border border-gray-300 p-2 text-gray-600 transition-all hover:border-[#1B0B94] hover:text-[#1B0B94]" aria-label="Look suivant"><ChevronRight className="h-4 w-4" /></button>
                     </div>
                   )}
                 </div>

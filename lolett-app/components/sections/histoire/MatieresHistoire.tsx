@@ -16,12 +16,12 @@ export function MatieresHistoire() {
           <div>
             <span className="font-display text-6xl font-bold leading-none text-[#e8e2d8]">III.</span>
             <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Nos matières</h2>
-            <p className="mt-2 text-[10px] font-medium tracking-wider uppercase text-[#b89840]">Ce qu&apos;on choisit</p>
+            <p className="mt-2 text-[10px] font-medium tracking-wider uppercase text-[#130970]">Ce qu&apos;on choisit</p>
 
             <div className="mt-10 space-y-8">
               {matieres.map((m, i) => (
                 <div key={i} className="flex gap-5">
-                  <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#c4a44e]" />
+                  <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#1B0B94]" />
                   <div>
                     <p className="font-bold text-[#1a1510]">{m.title}</p>
                     <p className="mt-1.5 text-sm leading-relaxed text-[#7a6f63]">{m.text}</p>
@@ -41,7 +41,7 @@ export function MatieresHistoire() {
               <div className="relative aspect-[2/3]">
                 <Image
                   src="/images/chemise-lin-mediterranee.png"
-                  alt="Lin Méditerranée"
+                  alt="Lin du Sud-Ouest"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 45vw, 22vw"

@@ -35,7 +35,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 p-8 animate-pulse">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-8 animate-pulse">
         <div className="h-6 bg-[#f3efe8] rounded w-48 mb-6" />
         <div className="space-y-4">
           <div className="h-4 bg-[#f3efe8] rounded w-64" />
@@ -47,9 +47,9 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   if (!order) {
     return (
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
         <p className="text-[#5a4d3e] font-body">Commande introuvable.</p>
-        <Link href="/compte/commandes" className="text-[#c4a44e] hover:text-[#b3933d] text-sm font-body mt-3 inline-block">
+        <Link href="/compte/commandes" className="text-[#1B0B94] hover:text-[#b3933d] text-sm font-body mt-3 inline-block">
           Retour aux commandes
         </Link>
       </div>
@@ -60,14 +60,14 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   return (
     <div>
-      <Link href="/compte/commandes" className="inline-flex items-center gap-1 text-sm text-[#c4a44e] hover:text-[#b3933d] font-body mb-4 transition-colors">
+      <Link href="/compte/commandes" className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#b3933d] font-body mb-4 transition-colors">
         <ArrowLeft className="h-4 w-4" />
         Retour aux commandes
       </Link>
 
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
         <div className="flex items-center gap-3 mb-6">
-          <Package className="h-5 w-5 text-[#c4a44e]" />
+          <Package className="h-5 w-5 text-[#1B0B94]" />
           <h1 className="font-playfair text-xl text-[#1a1510]">Commande #{order.orderNumber}</h1>
         </div>
 
@@ -79,11 +79,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 <div key={step} className="flex flex-col items-center flex-1">
                   <div className={cn(
                     'h-3 w-3 rounded-full mb-1',
-                    i <= currentStep ? 'bg-[#c4a44e]' : 'bg-[#c4b49c]/30'
+                    i <= currentStep ? 'bg-[#1B0B94]' : 'bg-[#c4b49c]/30'
                   )} />
                   <span className={cn(
                     'text-[10px] font-body',
-                    i <= currentStep ? 'text-[#c4a44e]' : 'text-[#8a7d6b]'
+                    i <= currentStep ? 'text-[#1B0B94]' : 'text-[#8a7d6b]'
                   )}>
                     {statusLabels[step]}
                   </span>
@@ -92,7 +92,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             </div>
             <div className="relative mt-[-22px] mx-[6px] h-0.5 bg-[#c4b49c]/20">
               <div
-                className="absolute h-full bg-[#c4a44e] transition-all"
+                className="absolute h-full bg-[#1B0B94] transition-all"
                 style={{ width: `${Math.max(0, currentStep / (statusSteps.length - 1)) * 100}%` }}
               />
             </div>

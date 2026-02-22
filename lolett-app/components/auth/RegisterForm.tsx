@@ -47,21 +47,21 @@ export default function RegisterForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#fefcf8] flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: '#FDF5E6' }}>
         <div className="w-full max-w-md text-center">
           <div className="mb-10">
             <h1 className="font-playfair text-4xl tracking-widest text-[#1a1510]">LOLETT</h1>
-            <p className="text-[#c4a44e] text-sm tracking-wider mt-2 font-body">MODE MEDITERRANEENNE</p>
+            <p className="text-[#1B0B94] text-sm tracking-wider mt-2 font-body">MODE DU SUD-OUEST</p>
           </div>
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
-            <div className="mb-4 text-[#c4a44e] text-4xl">&#10003;</div>
+          <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
+            <div className="mb-4 text-[#1B0B94] text-4xl">&#10003;</div>
             <h2 className="font-playfair text-2xl text-[#1a1510] mb-4">Inscription reussie</h2>
             <p className="text-[#5a4d3e] font-body text-sm mb-6">
               Un email de confirmation vous a ete envoye. Verifiez votre boite de reception pour activer votre compte.
             </p>
             <Link
               href="/connexion"
-              className="inline-block px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
+              className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
             >
               Se connecter
             </Link>
@@ -72,14 +72,14 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fefcf8] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: '#FDF5E6' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="font-playfair text-4xl tracking-widest text-[#1a1510]">LOLETT</h1>
-          <p className="text-[#c4a44e] text-sm tracking-wider mt-2 font-body">MODE MEDITERRANEENNE</p>
+          <p className="text-[#1B0B94] text-sm tracking-wider mt-2 font-body">MODE DU SUD-OUEST</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
+        <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
           <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-8">Creer un compte</h2>
 
           {error && (
@@ -98,7 +98,7 @@ export default function RegisterForm() {
                   required
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                   placeholder="Jean"
                 />
               </div>
@@ -110,7 +110,7 @@ export default function RegisterForm() {
                   required
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                   placeholder="Dupont"
                 />
               </div>
@@ -124,7 +124,7 @@ export default function RegisterForm() {
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                 placeholder="vous@exemple.com"
               />
             </div>
@@ -138,7 +138,7 @@ export default function RegisterForm() {
                 minLength={8}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                 placeholder="8 caracteres minimum"
               />
             </div>
@@ -152,7 +152,7 @@ export default function RegisterForm() {
                 minLength={8}
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -160,7 +160,7 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -173,7 +173,7 @@ export default function RegisterForm() {
 
           <p className="text-center mt-6 text-sm text-[#5a4d3e] font-body">
             Deja un compte ?{' '}
-            <Link href="/connexion" className="text-[#c4a44e] hover:text-[#b3933d] transition-colors font-medium">
+            <Link href="/connexion" className="text-[#1B0B94] hover:text-[#b3933d] transition-colors font-medium">
               Se connecter
             </Link>
           </p>

@@ -48,7 +48,7 @@ const categories: CategorySeed[] = [
     label: 'Bas',
     seo_title: 'Bas Homme — LOLETT',
     seo_description:
-      'Pantalons et shorts homme LOLETT. Coupes décontractées et matières respirantes pour un style méditerranéen au quotidien.',
+      'Pantalons et shorts homme LOLETT. Coupes décontractées et matières respirantes pour un style du Sud-Ouest au quotidien.',
   },
   {
     gender: 'homme',
@@ -89,7 +89,7 @@ const categories: CategorySeed[] = [
     label: 'Chaussures',
     seo_title: 'Chaussures Femme — LOLETT',
     seo_description:
-      'Chaussures femme LOLETT. Mules, sandales et espadrilles pour sublimer vos tenues avec une touche méditerranéenne.',
+      'Chaussures femme LOLETT. Mules, sandales et espadrilles pour sublimer vos tenues avec une touche du Sud-Ouest.',
   },
   {
     gender: 'femme',

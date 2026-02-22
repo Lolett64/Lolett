@@ -20,7 +20,7 @@ export function VisionSection({ content }: VisionSectionProps) {
       >
         <Image
           src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80"
-          alt="Mode méditerranéenne — Notre vision"
+          alt="Mode du Sud-Ouest — Notre vision"
           fill
           className="object-cover"
           sizes="100vw"
@@ -33,7 +33,7 @@ export function VisionSection({ content }: VisionSectionProps) {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-6 py-28 text-center">
         <ScrollReveal>
-          <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#c4a44e]">
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#1B0B94]">
             Notre Vision
           </p>
         </ScrollReveal>
@@ -42,7 +42,7 @@ export function VisionSection({ content }: VisionSectionProps) {
           <h2 className="font-display mt-6 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
             {content?.vision_title || 'La plupart des sites te vendent des pièces.'}
             <br />
-            <span className="text-[#c4a44e]">{content?.vision_highlight || 'Nous, on te propose des looks complets.'}</span>
+            <span className="text-[#1B0B94]">{content?.vision_highlight || 'Nous, on te propose des looks complets.'}</span>
           </h2>
         </ScrollReveal>
 

@@ -34,7 +34,7 @@ export function Footer({ content }: FooterProps) {
           <div className="col-span-2 min-w-0 sm:col-span-2 lg:col-span-2">
             <Logo variant="white" size="lg" />
             <p className="text-lolett-gray-400 mt-4 max-w-[45ch] leading-relaxed">
-              {content?.tagline || 'Mode méditerranéenne. Pensée au Sud, portée partout. Pour ceux qui aiment la vie sous le soleil.'}
+              {content?.tagline || 'Mode du Sud-Ouest. Née ici, portée partout. Pour ceux qui aiment la vie sous le soleil.'}
             </p>
             <div className="mt-6 flex gap-3">
               {/* Instagram - gradient rose/violet/orange */}

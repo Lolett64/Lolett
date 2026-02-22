@@ -15,15 +15,20 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    if (process.env.STRIPE_WEBHOOK_SECRET && signature) {
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+      }
+      // Dev/test only: accept unverified events
+      event = JSON.parse(body) as Stripe.Event;
+    } else if (!signature) {
+      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+    } else {
       event = getStripe().webhooks.constructEvent(
         body,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET
       );
-    } else {
-      // Without webhook secret, parse directly (dev/test mode)
-      event = JSON.parse(body) as Stripe.Event;
     }
   } catch (err) {
     console.error('[Stripe webhook] Signature verification failed:', err);

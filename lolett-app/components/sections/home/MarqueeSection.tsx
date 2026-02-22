@@ -3,7 +3,7 @@ const items = [
   'Lin Premium',
   'Confectionné en Europe',
   'Retours Gratuits',
-  'Style Méditerranéen',
+  'Style Sud-Ouest',
   'Coton Premium',
 ];
 
@@ -18,7 +18,7 @@ function MarqueeTrack() {
           >
             {text}
           </span>
-          <span style={{ color: '#c4a44e', fontSize: '10px' }}>◆</span>
+          <span style={{ color: '#1B0B94', fontSize: '10px' }}>◆</span>
         </span>
       ))}
     </div>

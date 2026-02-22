@@ -37,7 +37,7 @@ export function CheckoutContent() {
 
         .ckv-page {
           min-height: 100vh;
-          background-color: #FAF7F2;
+          background-color: #FDF5E6;
           padding-top: 80px;
           padding-bottom: 64px;
           font-family: 'DM Sans', sans-serif;
@@ -74,7 +74,7 @@ export function CheckoutContent() {
         }
 
         .ckv-card {
-          background: #fff;
+          background: #FEFAF3;
           border-radius: 12px;
           padding: 32px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -84,7 +84,7 @@ export function CheckoutContent() {
         }
 
         .ckv-summary-card {
-          background: #fff;
+          background: #FEFAF3;
           border-radius: 12px;
           padding: 24px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -149,7 +149,7 @@ export function CheckoutContent() {
         }
         .ckv-float-input:disabled {
           color: #9B8E82;
-          background: #FDFCFA;
+          background: #F5EDD8;
         }
 
         .ckv-float-label {

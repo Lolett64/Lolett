@@ -71,6 +71,7 @@ type DbOrder = {
   status: Order['status'];
   payment_provider: Order['paymentProvider'] | null;
   payment_id: string | null;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
   order_items: {
@@ -169,6 +170,7 @@ function mapOrder(row: DbOrder): Order {
     status: row.status,
     paymentProvider: row.payment_provider ?? undefined,
     paymentId: row.payment_id ?? undefined,
+    userId: row.user_id ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     items: (row.order_items ?? []).map((item) => ({

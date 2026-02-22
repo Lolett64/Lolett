@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -6,31 +7,27 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function Logo({ className, variant = 'default', size = 'md' }: LogoProps) {
-  const sizeClasses = {
-    sm: 'text-xl',
-    md: 'text-2xl',
-    lg: 'text-4xl',
+export function Logo({ className, size = 'md' }: LogoProps) {
+  const sizeMap = {
+    sm: 32,
+    md: 44,
+    lg: 60,
   };
 
-  const colorClasses = {
-    default: 'text-lolett-gold',
-    white: 'text-white',
-  };
+  const h = sizeMap[size];
 
   return (
-    <div
+    <Image
+      src="/images/Logo Lolett.jpeg"
+      alt="LOLETT"
+      width={h * 2.5}
+      height={h}
       className={cn(
-        'font-display font-bold tracking-tight',
-        sizeClasses[size],
-        colorClasses[variant],
+        'object-contain rounded',
         className
       )}
-    >
-      <span className="relative">
-        LOLETT
-        <span className="bg-lolett-yellow absolute -top-1 -right-2 h-1.5 w-1.5 rounded-full" />
-      </span>
-    </div>
+      style={{ height: h, width: 'auto' }}
+      priority
+    />
   );
 }

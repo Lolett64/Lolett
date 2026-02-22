@@ -8,7 +8,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 export const metadata: Metadata = {
   title: 'La Boutique — LOLETT',
   description:
-    'Explore les collections LOLETT pour homme et femme. Mode méditerranéenne, looks complets, livraison offerte dès 100 €.',
+    'Explore les collections LOLETT pour homme et femme. Mode du Sud-Ouest, looks complets, livraison offerte dès 100 €.',
   alternates: { canonical: `${BASE_URL}/shop` },
   openGraph: {
     title: 'La Boutique — LOLETT',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 const hommeProducts = [
-  { src: '/images/chemise-lin-mediterranee.png', alt: 'Chemise Lin Méditerranée', name: 'Chemise Lin Méditerranée', price: '89€' },
+  { src: '/images/chemise-lin-mediterranee.png', alt: 'Chemise Lin Sud-Ouest', name: 'Chemise Lin Sud-Ouest', price: '89€' },
   { src: '/images/polo-pique-riviera.png', alt: 'Polo Piqué Riviera', name: 'Polo Piqué Riviera', price: '75€' },
   { src: '/images/chino-sable.png', alt: 'Chino Sable', name: 'Chino Sable', price: '95€' },
   { src: '/images/bermuda-lin-mistral.png', alt: 'Bermuda Lin Mistral', name: 'Bermuda Lin Mistral', price: '79€' },
@@ -43,7 +43,7 @@ const categories = [
 
 export default function ShopPage() {
   return (
-    <div className="relative min-h-screen bg-[#f3efe8] text-[#2a2520]">
+    <div className="relative min-h-screen text-[#1B0B94]" style={{ backgroundColor: '#FDF5E6' }}>
 
       {/* Texture lin */}
       <div
@@ -57,11 +57,11 @@ export default function ShopPage() {
       {/* ── HERO — 3 colonnes éditoriales ── */}
       <section className="relative overflow-hidden pt-24 pb-0 sm:pt-32">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-[#c4a44e]/[0.07]" />
+          <div className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-[#1B0B94]/[0.07]" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <p className="mb-8 text-center text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">
+          <p className="mb-8 text-center text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">
             Collection Été 2026
           </p>
 
@@ -80,10 +80,10 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Collection</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Collection</p>
                   <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Homme</h2>
                   <p className="mt-1 text-sm text-white/55">Chemises · Pantalons · Accessoires</p>
-                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#c4a44e]">
+                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#1B0B94]">
                     Découvrir <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>
@@ -92,15 +92,15 @@ export default function ShopPage() {
 
             {/* Colonne centrale — titre */}
             <div className="flex flex-col items-center justify-center py-8 text-center lg:py-0">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#c4a44e] to-transparent" />
+              <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#1B0B94] to-transparent" />
               <h1 className="font-display mt-6 text-5xl font-bold leading-tight tracking-tight xl:text-6xl">
                 La Boutique
               </h1>
-              <div className="mt-6 h-px w-12 bg-gradient-to-r from-transparent via-[#c4a44e] to-transparent" />
+              <div className="mt-6 h-px w-12 bg-gradient-to-r from-transparent via-[#1B0B94] to-transparent" />
               <p className="mt-5 max-w-[16ch] text-sm leading-relaxed text-[#4a3f35]">
                 Des pièces pensées pour le Sud. Pour lui, pour elle.
               </p>
-              <div className="mt-8 hidden text-[10px] font-medium tracking-wider uppercase text-[#b89840] lg:block">
+              <div className="mt-8 hidden text-[10px] font-medium tracking-wider uppercase text-[#130970] lg:block">
                 ↓ Explorer
               </div>
             </div>
@@ -118,10 +118,10 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Collection</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Collection</p>
                   <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Femme</h2>
                   <p className="mt-1 text-sm text-white/55">Robes · Tops · Accessoires</p>
-                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#c4a44e]">
+                  <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#1B0B94]">
                     Découvrir <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>
@@ -142,7 +142,7 @@ export default function ShopPage() {
               <Link
                 key={cat.name}
                 href={cat.href}
-                className="flex-shrink-0 rounded-full border border-[#b8a98e] bg-white/60 px-4 py-1.5 text-xs font-semibold text-[#3d3328] transition-all hover:border-[#b89840] hover:bg-[#b89840]/10 hover:text-[#b89840]"
+                className="flex-shrink-0 rounded-full border border-[#b8a98e] bg-white/60 px-4 py-1.5 text-xs font-semibold text-[#3d3328] transition-all hover:border-[#130970] hover:bg-[#130970]/10 hover:text-[#130970]"
               >
                 {cat.name}
               </Link>
@@ -156,12 +156,12 @@ export default function ShopPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
-              <p className="text-[10px] font-medium tracking-wider uppercase text-[#b89840]">Just in</p>
+              <p className="text-[10px] font-medium tracking-wider uppercase text-[#130970]">Just in</p>
               <h2 className="font-display mt-2 text-3xl font-bold text-[#1e1610] sm:text-4xl">Nouvelles arrivées</h2>
             </div>
             <Link
               href="/nouveautes"
-              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#b89840] sm:flex"
+              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#130970] sm:flex"
             >
               Tout voir <ChevronRight className="h-4 w-4" />
             </Link>
@@ -180,7 +180,7 @@ export default function ShopPage() {
                   />
                 </div>
                 <div className="mt-3 min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#1e1610] transition-colors group-hover:text-[#b89840]">
+                  <p className="truncate text-sm font-semibold text-[#1e1610] transition-colors group-hover:text-[#130970]">
                     {p.name}
                   </p>
                   <p className="mt-0.5 text-sm font-medium text-[#7a6f63]">{p.price}</p>
@@ -190,7 +190,7 @@ export default function ShopPage() {
           </div>
 
           <div className="mt-8 text-center sm:hidden">
-            <Link href="/nouveautes" className="inline-flex items-center gap-1 text-sm font-medium text-[#b89840]">
+            <Link href="/nouveautes" className="inline-flex items-center gap-1 text-sm font-medium text-[#130970]">
               Voir toutes les nouveautés <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -202,12 +202,12 @@ export default function ShopPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
-              <p className="text-[10px] font-medium tracking-wider uppercase text-[#b89840]">Prêt à sortir</p>
+              <p className="text-[10px] font-medium tracking-wider uppercase text-[#130970]">Prêt à sortir</p>
               <h2 className="font-display mt-2 text-3xl font-bold text-[#1e1610] sm:text-4xl">Looks du moment</h2>
             </div>
             <Link
               href="/looks"
-              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#b89840] sm:flex"
+              className="hidden items-center gap-1 text-sm font-semibold text-[#4a3f35] transition-colors hover:text-[#130970] sm:flex"
             >
               Tous les looks <ChevronRight className="h-4 w-4" />
             </Link>
@@ -225,7 +225,7 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Look Homme</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Look Homme</p>
                   <h3 className="font-display mt-1 text-2xl font-bold text-white">Le Riviera Décontracté</h3>
                   <p className="mt-1 text-xs text-white/60">4 pièces · Polo · Bermuda · Casquette · Ceinture</p>
                 </div>
@@ -243,7 +243,7 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-6 left-6">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#c4a44e]">Look Femme</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Look Femme</p>
                   <h3 className="font-display mt-1 text-xl font-bold text-white">La Bohème Azuréenne</h3>
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function ShopPage() {
               { title: 'Qualité premium', desc: 'Matières nobles & durables' },
             ].map((item, i) => (
               <div key={i}>
-                <div className="mx-auto mb-3 h-px w-8 bg-[#c4a44e]" />
+                <div className="mx-auto mb-3 h-px w-8 bg-[#1B0B94]" />
                 <p className="text-sm font-bold text-[#1e1610]">{item.title}</p>
                 <p className="mt-1 text-xs font-medium text-[#6a5f55]">{item.desc}</p>
               </div>

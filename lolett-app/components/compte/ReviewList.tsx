@@ -32,7 +32,7 @@ export function ReviewList() {
       <div>
         <div className="h-8 bg-[#f3efe8] rounded w-40 mb-6" />
         {[1, 2].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse mb-4">
+          <div key={i} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse mb-4">
             <div className="h-4 bg-[#f3efe8] rounded w-40 mb-3" />
             <div className="h-3 bg-[#f3efe8] rounded w-full" />
           </div>
@@ -46,7 +46,7 @@ export function ReviewList() {
       <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Mes avis</h1>
 
       {reviews.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
+        <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
           <Star className="h-12 w-12 text-[#c4b49c]/40 mx-auto mb-4" />
           <h3 className="font-playfair text-lg text-[#1a1510] mb-2">Aucun avis</h3>
           <p className="text-sm text-[#8a7d6b] font-body">Vous n&apos;avez pas encore laisse d&apos;avis.</p>
@@ -54,7 +54,7 @@ export function ReviewList() {
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div key={review.id} className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5">
+            <div key={review.id} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -71,7 +71,7 @@ export function ReviewList() {
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-3.5 w-3.5 ${i < review.rating ? 'text-[#c4a44e] fill-[#c4a44e]' : 'text-[#c4b49c]/30'}`}
+                            className={`h-3.5 w-3.5 ${i < review.rating ? 'text-[#1B0B94] fill-[#1B0B94]' : 'text-[#c4b49c]/30'}`}
                           />
                         ))}
                       </div>

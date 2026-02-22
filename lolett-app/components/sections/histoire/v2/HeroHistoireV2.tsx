@@ -20,7 +20,7 @@ export function HeroHistoireV2({ content }: HeroHistoireV2Props) {
       >
         <Image
           src="https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=1600&q=80"
-          alt="Côte méditerranéenne sud de la France"
+          alt="Paysage du Sud-Ouest"
           fill
           priority
           className="object-cover"
@@ -33,13 +33,13 @@ export function HeroHistoireV2({ content }: HeroHistoireV2Props) {
 
       {/* Content */}
       <div className="relative z-10 text-center">
-        <p className="text-xs font-medium tracking-[0.3em] uppercase text-[#c4a44e]">
+        <p className="text-xs font-medium tracking-[0.3em] uppercase text-[#1B0B94]">
           Notre Histoire
         </p>
         <h1 className="font-display mt-6 text-7xl font-bold leading-none tracking-tight text-white sm:text-8xl lg:text-9xl">
           LOLETT
         </h1>
-        <div className="mx-auto mt-6 h-px w-20 bg-gradient-to-r from-transparent via-[#c4a44e] to-transparent" />
+        <div className="mx-auto mt-6 h-px w-20 bg-gradient-to-r from-transparent via-[#1B0B94] to-transparent" />
         <p className="mx-auto mt-8 max-w-[48ch] text-lg leading-relaxed text-white/80 sm:text-xl">
           {content?.hero_subtitle || 'Pensée au Sud. Portée partout.'}
         </p>

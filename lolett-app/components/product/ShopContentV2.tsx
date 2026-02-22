@@ -36,13 +36,13 @@ function DecoArchSVG() {
     >
       <path
         d="M20 180 Q20 40 100 20 Q180 40 180 180"
-        stroke="#c4a44e"
+        stroke="#1B0B94"
         strokeWidth="1.5"
         fill="none"
       />
       <path
         d="M50 180 Q50 70 100 50 Q150 70 150 180"
-        stroke="#c4a44e"
+        stroke="#1B0B94"
         strokeWidth="1"
         fill="none"
       />
@@ -63,7 +63,7 @@ function DecoDottedCircle() {
         cx="150"
         cy="150"
         r="140"
-        stroke="#c4a44e"
+        stroke="#1B0B94"
         strokeWidth="1"
         strokeDasharray="4 8"
       />
@@ -71,7 +71,7 @@ function DecoDottedCircle() {
         cx="150"
         cy="150"
         r="100"
-        stroke="#c4a44e"
+        stroke="#1B0B94"
         strokeWidth="0.8"
         strokeDasharray="3 6"
       />
@@ -90,7 +90,7 @@ function DecoCurveSVG() {
     >
       <path
         d="M180 0 Q40 100 160 200 Q20 300 180 400"
-        stroke="#c4a44e"
+        stroke="#1B0B94"
         strokeWidth="1.5"
         fill="none"
       />
@@ -188,7 +188,7 @@ export function ShopContentV2({
   const handleClearAllFilters = () => setFilters({ colors: [], sizes: [] });
 
   return (
-    <div className="min-w-0" style={{ background: '#fefcf8' }}>
+    <div className="min-w-0" style={{ background: '#FDF5E6' }}>
       {/* ═══ Hero ═══ */}
       <div
         className="relative overflow-hidden"
@@ -216,7 +216,7 @@ export function ShopContentV2({
         {/* Golden accent line at bottom */}
         <div
           className="absolute bottom-0 left-0 right-0"
-          style={{ height: '2px', background: 'linear-gradient(to right, #c4a44e, transparent 80%)' }}
+          style={{ height: '2px', background: 'linear-gradient(to right, #1B0B94, transparent 80%)' }}
         />
 
         {/* Decorative arch SVG top-right */}
@@ -226,7 +226,7 @@ export function ShopContentV2({
         <div className="absolute inset-0 flex min-w-0 flex-col justify-center px-6 sm:px-10 lg:px-14">
           <span
             className="text-xs font-semibold tracking-wider uppercase"
-            style={{ color: '#c4a44e', fontFamily: 'var(--font-display, serif)' }}
+            style={{ color: '#1B0B94', fontFamily: 'var(--font-display, serif)' }}
           >
             {gender === 'homme' ? 'Pour Lui' : 'Pour Elle'}
           </span>
@@ -259,8 +259,8 @@ export function ShopContentV2({
             )}
             style={
               !activeCategory
-                ? { background: '#c4a44e' }
-                : { background: 'rgba(255,255,255,0.8)' }
+                ? { background: '#1B0B94' }
+                : { background: 'rgba(253,245,230,0.9)' }
             }
           >
             Tout voir
@@ -277,8 +277,8 @@ export function ShopContentV2({
               )}
               style={
                 cat.slug === activeCategory
-                  ? { background: '#c4a44e' }
-                  : { background: 'rgba(255,255,255,0.8)' }
+                  ? { background: '#1B0B94' }
+                  : { background: 'rgba(253,245,230,0.9)' }
               }
             >
               {cat.label}
@@ -290,7 +290,7 @@ export function ShopContentV2({
       {/* ═══ Toolbar ═══ */}
       <div
         className="mt-6 flex min-w-0 flex-wrap items-center justify-between gap-3 px-6 pb-4 sm:px-10 lg:px-14"
-        style={{ borderBottom: '1px solid rgba(196,164,78,0.2)' }}
+        style={{ borderBottom: '1px solid rgba(27,11,148,0.2)' }}
       >
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <p className="shrink-0 text-base font-medium" style={{ color: '#8a7d6b' }}>
@@ -315,7 +315,7 @@ export function ShopContentV2({
             size="sm"
             className="gap-2 lg:hidden"
             style={{
-              borderColor: 'rgba(196,164,78,0.3)',
+              borderColor: 'rgba(27,11,148,0.3)',
               color: '#1a1510',
             }}
           >
@@ -324,7 +324,7 @@ export function ShopContentV2({
             {activeFilters.length > 0 && (
               <span
                 className="ml-1 rounded-full px-1.5 py-0.5 text-xs text-white"
-                style={{ background: '#c4a44e' }}
+                style={{ background: '#1B0B94' }}
               >
                 {activeFilters.length}
               </span>
@@ -347,20 +347,20 @@ export function ShopContentV2({
           <div
             className="sticky top-24 rounded-xl p-5"
             style={{
-              background: '#fdf9f0',
-              borderTop: '3px solid #c4a44e',
+              background: '#FDF5E6',
+              borderTop: '3px solid #1B0B94',
             }}
           >
             <h3
               className="mb-4 flex items-center gap-2 text-base font-semibold uppercase tracking-wider"
               style={{ color: '#1a1510', fontFamily: 'var(--font-display, serif)' }}
             >
-              <Filter className="h-4 w-4" style={{ color: '#c4a44e' }} />
+              <Filter className="h-4 w-4" style={{ color: '#1B0B94' }} />
               Affiner
             </h3>
             <div
               className="mb-4"
-              style={{ height: '1px', background: 'rgba(196,164,78,0.25)' }}
+              style={{ height: '1px', background: 'rgba(27,11,148,0.25)' }}
             />
             <ProductFilters
               products={products}

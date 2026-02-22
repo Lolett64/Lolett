@@ -238,7 +238,7 @@ export default function AdminContenuPage() {
                   <button
                     onClick={() => handleSave(sectionKey)}
                     disabled={!dirty || saving === sectionKey}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#2418a6] px-4 py-2 text-sm font-medium text-white hover:bg-[#1c1285] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#1B0B94] px-4 py-2 text-sm font-medium text-white hover:bg-[#130970] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving === sectionKey ? (
                       <Loader2 className="size-4 animate-spin" />

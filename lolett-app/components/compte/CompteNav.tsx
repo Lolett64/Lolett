@@ -27,7 +27,7 @@ export function CompteNav() {
   };
 
   return (
-    <nav className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm overflow-hidden">
+    <nav className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm overflow-hidden">
       <div className="p-4 border-b border-[#c4b49c]/10">
         <h2 className="font-playfair text-lg text-[#1a1510]">Mon espace</h2>
       </div>
@@ -41,7 +41,7 @@ export function CompteNav() {
               className={cn(
                 'flex items-center gap-3 px-4 py-3 text-sm font-body transition-colors border-l-2',
                 active
-                  ? 'border-l-[#c4a44e] text-[#c4a44e] bg-[#c4a44e]/5'
+                  ? 'border-l-[#1B0B94] text-[#1B0B94] bg-[#1B0B94]/5'
                   : 'border-l-transparent text-[#5a4d3e] hover:bg-[#f3efe8]'
               )}
             >

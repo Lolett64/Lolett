@@ -126,8 +126,8 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/produit/${product.slug}`} className="block">
         <div
           className={cn(
-            "bg-lolett-gray-100 relative aspect-[3/4] overflow-hidden rounded-xl transition-shadow duration-700 ease-out group-hover:shadow-luxury",
-            isOutOfStock && "opacity-75 saturate-[0.7]"
+            "relative aspect-[3/4] overflow-hidden rounded-xl transition-shadow duration-700 ease-out group-hover:shadow-luxury bg-[#1B0B94]/5",
+            isOutOfStock && "opacity-75"
           )}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}

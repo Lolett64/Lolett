@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { ContactV1 } from '@/components/contact/ContactV1';
-import { getSiteContent } from '@/lib/cms/content';
+import { ContactV2 } from '@/components/contact/ContactV2';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -19,7 +18,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ContactPage() {
-  const content = await getSiteContent('contact');
-  return <ContactV1 content={content} />;
+export default function ContactPage() {
+  return <ContactV2 />;
 }

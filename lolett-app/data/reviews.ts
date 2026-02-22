@@ -14,7 +14,7 @@ export const reviews: Review[] = [
     author: 'Thomas B.',
     rating: 5,
     comment:
-      'Enfin une marque qui comprend le style méditerranéen. La chemise en lin est parfaite.',
+      'Enfin une marque qui comprend le style du Sud-Ouest. La chemise en lin est parfaite.',
     createdAt: '2024-06-08T00:00:00Z',
   },
   {

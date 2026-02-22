@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Header } from './Header';
+import { HighBarV4 } from '@/components/headers/HighBarV4';
 import { Footer } from './Footer';
 
 interface SiteChromeProps {
@@ -17,11 +17,13 @@ export function SiteChrome({ children, footerContent }: SiteChromeProps) {
     return <>{children}</>;
   }
 
+  const isTestPage = pathname.startsWith('/test');
+
   return (
     <>
-      <Header />
+      {!isTestPage && <HighBarV4 hexColor="#FDF5E6" />}
       <main className="min-h-screen">{children}</main>
-      <Footer content={footerContent} />
+      {!isTestPage && <Footer content={footerContent} />}
     </>
   );
 }

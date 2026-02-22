@@ -39,7 +39,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
       >
         <span className="pr-4 text-base font-medium text-white">{q}</span>
         <ChevronDown
-          className={`h-5 w-5 flex-shrink-0 text-[#c4a44e] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+          className={`h-5 w-5 flex-shrink-0 text-[#1B0B94] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
         />
       </button>
       <div
@@ -91,9 +91,9 @@ export function ContactPageV2() {
 
       {/* ══ HERO ══ */}
       <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20">
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c4a44e]/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#1B0B94]/20 to-transparent" />
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <p className="text-xs font-medium tracking-[0.3em] uppercase text-[#c4a44e]">
+          <p className="text-xs font-medium tracking-[0.3em] uppercase text-[#1B0B94]">
             Contact
           </p>
           <h1 className="font-display mt-6 text-5xl font-bold leading-tight sm:text-6xl lg:text-7xl">
@@ -115,7 +115,7 @@ export function ContactPageV2() {
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm sm:p-10">
                 {submitted ? (
                   <div className="py-16 text-center">
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#c4a44e]">
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#1B0B94]">
                       <Check className="h-8 w-8 text-white" />
                     </div>
                     <h2 className="font-display text-2xl font-bold">Message envoyé !</h2>
@@ -134,7 +134,7 @@ export function ContactPageV2() {
                           value={formData.name}
                           onChange={handleChange}
                           required
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#c4a44e] focus:outline-none"
+                          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#1B0B94] focus:outline-none"
                           placeholder="Ton nom"
                         />
                       </div>
@@ -147,7 +147,7 @@ export function ContactPageV2() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#c4a44e] focus:outline-none"
+                          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#1B0B94] focus:outline-none"
                           placeholder="ton@email.com"
                         />
                       </div>
@@ -161,7 +161,7 @@ export function ContactPageV2() {
                         value={formData.subject}
                         onChange={handleChange}
                         required
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#c4a44e] focus:outline-none"
+                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#1B0B94] focus:outline-none"
                         placeholder="De quoi s'agit-il ?"
                       />
                     </div>
@@ -175,7 +175,7 @@ export function ContactPageV2() {
                         onChange={handleChange}
                         required
                         rows={6}
-                        className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#c4a44e] focus:outline-none"
+                        className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 transition-colors focus:border-[#1B0B94] focus:outline-none"
                         placeholder="Dis-nous tout..."
                       />
                     </div>
@@ -186,7 +186,7 @@ export function ContactPageV2() {
                     <button
                       type="submit"
                       disabled={sending}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#c4a44e] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#b89840] disabled:opacity-50"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1B0B94] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#130970] disabled:opacity-50"
                     >
                       <Send className="h-4 w-4" />
                       {sending ? 'Envoi en cours...' : 'Envoyer le message'}
@@ -203,13 +203,13 @@ export function ContactPageV2() {
                   <h2 className="font-display text-xl font-semibold">Nos coordonnées</h2>
                   {contactInfo.map((item, i) => (
                     <div key={i} className="flex items-start gap-4">
-                      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#c4a44e]/10">
-                        <item.icon className="h-5 w-5 text-[#c4a44e]" />
+                      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#1B0B94]/10">
+                        <item.icon className="h-5 w-5 text-[#1B0B94]" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white/80">{item.label}</p>
                         {item.href ? (
-                          <a href={item.href} className="text-sm text-white/50 transition-colors hover:text-[#c4a44e]">
+                          <a href={item.href} className="text-sm text-white/50 transition-colors hover:text-[#1B0B94]">
                             {item.value}
                           </a>
                         ) : (
@@ -236,7 +236,7 @@ export function ContactPageV2() {
                   <div className="relative aspect-[4/3] bg-[#1a1510]">
                     <div className="flex h-full items-center justify-center">
                       <div className="text-center">
-                        <MapPin className="mx-auto h-8 w-8 text-[#c4a44e]" />
+                        <MapPin className="mx-auto h-8 w-8 text-[#1B0B94]" />
                         <p className="mt-3 font-display text-lg font-semibold">Sud de la France</p>
                         <p className="mt-1 text-sm text-white/40">Là où le soleil brille</p>
                       </div>
@@ -254,7 +254,7 @@ export function ContactPageV2() {
         <div className="mx-auto max-w-3xl px-6">
           <ScrollReveal>
             <div className="mb-12 text-center">
-              <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#c4a44e]">
+              <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#1B0B94]">
                 FAQ
               </p>
               <h2 className="font-display mt-4 text-3xl font-bold sm:text-4xl">

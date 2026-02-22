@@ -36,14 +36,14 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fefcf8] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: '#FDF5E6' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="font-playfair text-4xl tracking-widest text-[#1a1510]">LOLETT</h1>
-          <p className="text-[#c4a44e] text-sm tracking-wider mt-2 font-body">MODE MEDITERRANEENNE</p>
+          <p className="text-[#1B0B94] text-sm tracking-wider mt-2 font-body">MODE DU SUD-OUEST</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
+        <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
           <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-8">Nouveau mot de passe</h2>
 
           {error && (
@@ -62,7 +62,7 @@ export default function ResetPasswordForm() {
                 minLength={8}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                 placeholder="8 caracteres minimum"
               />
             </div>
@@ -76,7 +76,7 @@ export default function ResetPasswordForm() {
                 minLength={8}
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -84,7 +84,7 @@ export default function ResetPasswordForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">

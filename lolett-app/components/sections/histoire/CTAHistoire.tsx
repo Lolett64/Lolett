@@ -13,13 +13,13 @@ export function CTAHistoire() {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/shop/femme"
-            className="inline-flex items-center gap-2 rounded-full bg-[#1a1510] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#c4a44e]"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1a1510] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#1B0B94]"
           >
             Shop Femme <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/shop/homme"
-            className="inline-flex items-center gap-2 rounded-full border border-[#d5cfc5] px-8 py-3.5 text-sm font-semibold text-[#1a1510] transition-all hover:border-[#c4a44e]"
+            className="inline-flex items-center gap-2 rounded-full border border-[#d5cfc5] px-8 py-3.5 text-sm font-semibold text-[#1a1510] transition-all hover:border-[#1B0B94]"
           >
             Shop Homme <ArrowRight className="h-4 w-4" />
           </Link>

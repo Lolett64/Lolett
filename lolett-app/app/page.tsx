@@ -6,13 +6,10 @@ import {
   LooksSection,
   BrandStorySection,
   TestimonialsSection,
-  SocialFeedSection,
   NewsletterSection,
-  TrustBarSection,
-} from '@/components/sections/home';
+} from '@/components/sections/home-v3';
 import { productRepository, lookRepository } from '@/lib/adapters';
 import { reviews } from '@/data/reviews';
-import { getSiteContent } from '@/lib/cms/content';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -39,19 +36,22 @@ export const metadata: Metadata = {
   },
 };
 
+const hexColor = "#FDF5E6";
+
+const content = {
+  title_line1: "L'Héritage",
+  title_line2: "Terroir",
+  subtitle: "Atelier Bordeaux",
+  description: "L'élégance sans effort. Le lin noble et la coupe juste, pour lui et pour elle.",
+  video_src: "/videos/hero-beach.mp4",
+};
+
 export default async function HomePage() {
-  const [newProducts, looks, hero, collections, brandStory, newsletter, trustBar] = await Promise.all([
-    productRepository.findMany({ isNew: true, limit: 4 }),
-    lookRepository.findMany(),
-    getSiteContent('hero'),
-    getSiteContent('collections'),
-    getSiteContent('brand_story'),
-    getSiteContent('newsletter'),
-    getSiteContent('trust_bar'),
-  ]);
+  const newProducts = (await productRepository.findMany({ isNew: true })).slice(0, 4);
+  const featuredLooks = (await lookRepository.findMany()).slice(0, 3);
 
   const lookProductsEntries = await Promise.all(
-    looks.map(async (look: { id: string; productIds: string[] }) => {
+    featuredLooks.map(async (look) => {
       const products = await productRepository.findByIds(look.productIds);
       return [look.id, products] as const;
     })
@@ -59,23 +59,19 @@ export default async function HomePage() {
   const lookProducts = Object.fromEntries(lookProductsEntries);
 
   return (
-    <>
-      <HeroSection content={hero} />
-      <TrustBarSection content={trustBar} />
-      <CollectionsSection content={collections} />
-      <NewArrivalsSection products={newProducts} />
-      <BrandStorySection content={brandStory} />
-      <LooksSection looks={looks} lookProducts={lookProducts} />
-      <TestimonialsSection reviews={reviews} />
-      <SocialFeedSection />
-      <NewsletterSection content={newsletter} />
-
-      {/* Disclaimer LOLETT */}
-      <section className="py-6 text-center" style={{ background: '#f7f0e4', borderTop: '1px solid rgba(196,180,156,0.2)' }}>
-        <p className="text-sm italic" style={{ color: '#5a4d3e' }}>
-          LOLETT décline toute responsabilité en cas de coup de coeur.
-        </p>
-      </section>
-    </>
+    <div
+      className="min-h-screen relative font-[family-name:var(--font-montserrat)] text-[#1B0B94]"
+      style={{ backgroundColor: hexColor }}
+    >
+      <main>
+        <HeroSection content={content} hexColor={hexColor} />
+        <CollectionsSection content={content} hexColor={hexColor} />
+        <NewArrivalsSection products={newProducts} hexColor={hexColor} />
+        <BrandStorySection content={content} hexColor={hexColor} />
+        <LooksSection looks={featuredLooks} lookProducts={lookProducts} hexColor={hexColor} />
+        <TestimonialsSection reviews={reviews} hexColor={hexColor} />
+        <NewsletterSection content={content} hexColor={hexColor} />
+      </main>
+    </div>
   );
 }

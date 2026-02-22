@@ -9,6 +9,7 @@ import { LogIn } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,14 +23,14 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (res.ok) {
         router.push('/admin');
         router.refresh();
       } else {
-        setError('Mot de passe incorrect.');
+        setError('Email ou mot de passe incorrect.');
       }
     } catch {
       setError('Une erreur est survenue.');
@@ -48,6 +49,19 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@lolett.fr"
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
             <Label htmlFor="password">Mot de passe</Label>
             <Input
               id="password"
@@ -56,7 +70,6 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              autoFocus
             />
           </div>
 

@@ -6,7 +6,7 @@
 INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 ('hero', 'badge_text',        'Collection Été 2026',                                          'text',     'Badge texte',              10),
 ('hero', 'title_line1',       'L''Élégance',                                                  'text',     'Titre ligne 1',            20),
-('hero', 'title_line2',       'Méditerranéenne',                                               'text',     'Titre ligne 2 (doré)',     30),
+('hero', 'title_line2',       'Du Sud-Ouest',                                                  'text',     'Titre ligne 2 (doré)',     30),
 ('hero', 'subtitle',          'Vêtements pensés au Sud, portés partout. Une mode qui respire la lumière et célèbre la vie.', 'textarea', 'Sous-titre',     40),
 ('hero', 'video_src',         '/videos/hero-beach.mp4',                                        'video',    'Vidéo de fond',            50),
 ('hero', 'cta1_text',         'Shop Femme',                                                    'text',     'Bouton CTA 1',             60),
@@ -33,8 +33,8 @@ INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 ('brand_story', 'quote_author',    'L''esprit du Sud',                                                        'text',     'Auteur de la citation',     20),
 ('brand_story', 'pillar1_title',   'Qualité durable',                                                         'text',     'Pilier 1 — titre',          30),
 ('brand_story', 'pillar1_desc',    'Matières nobles sélectionnées pour durer.',                                'text',     'Pilier 1 — description',    40),
-('brand_story', 'pillar2_title',   'Style méditerranéen',                                                     'text',     'Pilier 2 — titre',          50),
-('brand_story', 'pillar2_desc',    'L''élégance provençale au quotidien.',                                     'text',     'Pilier 2 — description',    60),
+('brand_story', 'pillar2_title',   'Style du Sud-Ouest',                                                      'text',     'Pilier 2 — titre',          50),
+('brand_story', 'pillar2_desc',    'L''élégance du Sud-Ouest au quotidien.',                                     'text',     'Pilier 2 — description',    60),
 ('brand_story', 'pillar3_title',   'Simplicité élégante',                                                     'text',     'Pilier 3 — titre',          70),
 ('brand_story', 'pillar3_desc',    'Prêt à porter, prêt à sortir.',                                           'text',     'Pilier 3 — description',    80);
 
@@ -42,7 +42,7 @@ INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 ('newsletter', 'discount_badge',  '-10% sur ta 1ère commande',                                  'text',     'Badge réduction',       10),
 ('newsletter', 'title',           'Reste connecté',                                              'text',     'Titre',                 20),
-('newsletter', 'description',     'Nouveautés, exclusivités et inspirations méditerranéennes.',   'textarea', 'Description',           30),
+('newsletter', 'description',     'Nouveautés, exclusivités et inspirations du Sud-Ouest.',       'textarea', 'Description',           30),
 ('newsletter', 'button_text',     'S''inscrire',                                                  'text',     'Texte du bouton',       40),
 ('newsletter', 'disclaimer',      'Pas de spam, promis. Désinscription en un clic.',              'text',     'Disclaimer',            50);
 
@@ -70,7 +70,7 @@ INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 
 -- ── FOOTER ────────────────────────────────────────────────────
 INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
-('footer', 'tagline',          'Mode méditerranéenne. Pensée au Sud, portée partout. Pour ceux qui aiment la vie sous le soleil.', 'textarea', 'Tagline',               10),
+('footer', 'tagline',          'Mode du Sud-Ouest. Née ici, portée partout. Pour ceux qui aiment la vie sous le soleil.', 'textarea', 'Tagline',               10),
 ('footer', 'instagram_url',    'https://instagram.com/lolett',     'url',  'Instagram URL',         20),
 ('footer', 'tiktok_url',       'https://tiktok.com/@lolett',       'url',  'TikTok URL',            30),
 ('footer', 'facebook_url',     'https://facebook.com/lolett',      'url',  'Facebook URL',          40),
@@ -88,7 +88,7 @@ INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 ('notre_histoire', 'hero_image',        'https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=1600&q=80', 'image',    'Hero — image de fond',       40),
 -- Origine
 ('notre_histoire', 'origine_label',     'L''Origine',                                                              'text',     'Origine — sur-titre',        50),
-('notre_histoire', 'origine_title',     'Née au bord de la Méditerranée',                                          'text',     'Origine — titre',            60),
+('notre_histoire', 'origine_title',     'Née dans le Sud-Ouest',                                                   'text',     'Origine — titre',            60),
 ('notre_histoire', 'origine_text1',     'C''est parti d''une idée simple — on mérite tous d''être bien habillés sans y passer trois heures. Des coupes qui tombent bien, des matières qu''on a envie de toucher, et des prix qui ne font pas grimacer.', 'textarea', 'Origine — paragraphe 1', 70),
 ('notre_histoire', 'origine_quote',     'Je sélectionne chaque pièce comme si c''était pour moi.',                 'textarea', 'Origine — citation',         80),
 ('notre_histoire', 'origine_text2',     'Ici, pas de tendances éphémères ni de collections à rallonge. Juste des pièces qui fonctionnent ensemble, pour que tu sortes de chez toi en te disant — ouais, je suis bien là.', 'textarea', 'Origine — paragraphe 2', 90),
@@ -99,10 +99,10 @@ INSERT INTO site_content (section, key, value, type, label, sort_order) VALUES
 ('notre_histoire', 'vision_text',       'Une chemise en lin qui va avec ce chino, cette ceinture et ces chaussures. Tu ajoutes tout d''un clic, et tu es prêt.', 'textarea', 'Vision — description', 130),
 ('notre_histoire', 'vision_aside',      'C''est comme avoir une amie styliste qui te dit « fais-moi confiance, prends ça ». Sauf que c''est un site, et tu peux le faire en pyjama.', 'textarea', 'Vision — aparté', 140),
 ('notre_histoire', 'vision_image',      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80', 'image',   'Vision — image de fond',     150),
--- Méditerranée
-('notre_histoire', 'med_label',         'L''Esprit',                                                               'text',     'Méditerranée — sur-titre',   160),
-('notre_histoire', 'med_title',         'Méditerranée',                                                            'text',     'Méditerranée — titre',       170),
-('notre_histoire', 'med_text',          'Le soleil, les matières naturelles, l''art de vivre simplement bien. C''est ça, notre ADN.', 'textarea', 'Méditerranée — description', 180),
+-- Sud-Ouest
+('notre_histoire', 'med_label',         'L''Esprit',                                                               'text',     'Sud-Ouest — sur-titre',      160),
+('notre_histoire', 'med_title',         'Sud-Ouest',                                                               'text',     'Sud-Ouest — titre',          170),
+('notre_histoire', 'med_text',          'Le soleil, les matières naturelles, l''art de vivre simplement bien. C''est ça, notre ADN.', 'textarea', 'Sud-Ouest — description',    180),
 ('notre_histoire', 'med_image1',        '/images/robe-midi-provencale.png',                                        'image',    'Galerie — image 1',          190),
 ('notre_histoire', 'med_image2',        '/images/polo-pique-riviera.png',                                          'image',    'Galerie — image 2',          200),
 ('notre_histoire', 'med_image3',        'https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=400&q=80',    'image',    'Galerie — image 3',          210),

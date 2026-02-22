@@ -10,7 +10,7 @@ INSERT INTO categories (gender, slug, label, seo_title, seo_description) VALUES
   ('homme', 'chemises',    'Chemises & Polos',  'Chemises et Polos Homme | LOLETT',    'Chemises en lin, polos piqué — élégance décontractée à la française.'),
   ('homme', 'pantalons',   'Pantalons',         'Pantalons Homme | LOLETT',            'Chinos, bermudas — les essentiels de votre garde-robe estivale.'),
   ('homme', 'accessoires', 'Accessoires',       'Accessoires Homme | LOLETT',          'Casquettes, ceintures — les détails qui font la différence.'),
-  ('femme', 'robes',       'Robes & Jupes',     'Robes et Jupes Femme | LOLETT',       'Robes midi, jupes longues — féminité et légèreté méditerranéenne.'),
+  ('femme', 'robes',       'Robes & Jupes',     'Robes et Jupes Femme | LOLETT',       'Robes midi, jupes longues — féminité et légèreté du Sud-Ouest.'),
   ('femme', 'tops',        'Tops & Blouses',    'Tops et Blouses Femme | LOLETT',      'Tops en lin, blouses romantiques — l''essentiel de l''été.'),
   ('femme', 'accessoires', 'Accessoires',       'Accessoires Femme | LOLETT',          'Paniers, foulards — les compagnons indispensables de votre style.')
 ON CONFLICT (gender, slug) DO NOTHING;
@@ -23,8 +23,8 @@ ON CONFLICT (gender, slug) DO NOTHING;
 
 INSERT INTO products (slug, name, gender, category_slug, price, images, description, sizes, colors, stock, is_new, tags, created_at)
 VALUES (
-  'chemise-lin-mediterranee',
-  'Chemise Lin Méditerranée',
+  'chemise-lin-sud-ouest',
+  'Chemise Lin Sud-Ouest',
   'homme',
   'chemises',
   89.00,
@@ -70,7 +70,7 @@ VALUES (
   ],
   'Polo en coton piqué premium. Col souple, coupe ajustée. L''élégance décontractée à la française.',
   ARRAY['S', 'M', 'L', 'XL'],
-  '[{"name":"Blanc","hex":"#FFFFFF"},{"name":"Bleu LOLETT","hex":"#2418A6"}]'::jsonb,
+  '[{"name":"Blanc","hex":"#FFFFFF"},{"name":"Bleu LOLETT","hex":"#1B0B94"}]'::jsonb,
   20, false, ARRAY['coton','classique','polo'],
   '2024-05-15T00:00:00Z'
 );
@@ -160,7 +160,7 @@ VALUES (
     'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80',
     'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=800&q=80'
   ],
-  'Top en lin avec détails brodés. Coupe ample et légère. L''essentiel de l''été méditerranéen.',
+  'Top en lin avec détails brodés. Coupe ample et légère. L''essentiel de l''été du Sud-Ouest.',
   ARRAY['XS', 'S', 'M', 'L'],
   '[{"name":"Blanc","hex":"#FFFFFF"},{"name":"Bleu Ciel","hex":"#87CEEB"}]'::jsonb,
   14, true, ARRAY['lin','été','top'],
@@ -245,7 +245,7 @@ VALUES (
 
 INSERT INTO looks (title, gender, cover_image, vibe, short_pitch, created_at)
 VALUES (
-  'Le Méditerranéen',
+  'Le Sud-Ouest',
   'homme',
   'https://images.unsplash.com/photo-1726741692717-a4007a9deb22?w=800&q=80',
   'Soirée d''été en terrasse',
@@ -267,22 +267,22 @@ VALUES (
 -- 4. LOOK_PRODUCTS (via subqueries sur slug/title)
 -- ============================================
 
--- Look "Le Méditerranéen" : chemise lin + chino sable + ceinture cuir
+-- Look "Le Sud-Ouest" : chemise lin + chino sable + ceinture cuir
 INSERT INTO look_products (look_id, product_id, position)
 SELECT
-  (SELECT id FROM looks WHERE title = 'Le Méditerranéen'),
-  (SELECT id FROM products WHERE slug = 'chemise-lin-mediterranee'),
+  (SELECT id FROM looks WHERE title = 'Le Sud-Ouest'),
+  (SELECT id FROM products WHERE slug = 'chemise-lin-sud-ouest'),
   0;
 
 INSERT INTO look_products (look_id, product_id, position)
 SELECT
-  (SELECT id FROM looks WHERE title = 'Le Méditerranéen'),
+  (SELECT id FROM looks WHERE title = 'Le Sud-Ouest'),
   (SELECT id FROM products WHERE slug = 'pantalon-chino-sable'),
   1;
 
 INSERT INTO look_products (look_id, product_id, position)
 SELECT
-  (SELECT id FROM looks WHERE title = 'Le Méditerranéen'),
+  (SELECT id FROM looks WHERE title = 'Le Sud-Ouest'),
   (SELECT id FROM products WHERE slug = 'ceinture-cuir-tresse'),
   2;
 

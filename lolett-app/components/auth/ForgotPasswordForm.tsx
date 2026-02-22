@@ -32,14 +32,14 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fefcf8] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: '#FDF5E6' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="font-playfair text-4xl tracking-widest text-[#1a1510]">LOLETT</h1>
-          <p className="text-[#c4a44e] text-sm tracking-wider mt-2 font-body">MODE MEDITERRANEENNE</p>
+          <p className="text-[#1B0B94] text-sm tracking-wider mt-2 font-body">MODE DU SUD-OUEST</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
+        <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
           <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-4">Mot de passe oublie</h2>
           <p className="text-[#5a4d3e] font-body text-sm text-center mb-8">
             Entrez votre adresse email et nous vous enverrons un lien de reinitialisation.
@@ -53,13 +53,13 @@ export default function ForgotPasswordForm() {
 
           {success ? (
             <div className="text-center">
-              <div className="mb-4 text-[#c4a44e] text-4xl">&#9993;</div>
+              <div className="mb-4 text-[#1B0B94] text-4xl">&#9993;</div>
               <p className="text-[#5a4d3e] font-body text-sm mb-6">
                 Un email de reinitialisation vous a ete envoye. Verifiez votre boite de reception.
               </p>
               <Link
                 href="/connexion"
-                className="inline-block px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
+                className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
               >
                 Retour a la connexion
               </Link>
@@ -74,7 +74,7 @@ export default function ForgotPasswordForm() {
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+                  className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
                   placeholder="vous@exemple.com"
                 />
               </div>
@@ -82,7 +82,7 @@ export default function ForgotPasswordForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
@@ -93,7 +93,7 @@ export default function ForgotPasswordForm() {
               </button>
 
               <p className="text-center text-sm text-[#5a4d3e] font-body">
-                <Link href="/connexion" className="text-[#c4a44e] hover:text-[#b3933d] transition-colors">
+                <Link href="/connexion" className="text-[#1B0B94] hover:text-[#b3933d] transition-colors">
                   Retour a la connexion
                 </Link>
               </p>

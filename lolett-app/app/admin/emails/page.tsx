@@ -212,15 +212,15 @@ export default function AdminEmailsPage() {
               <button
                 key={email.id}
                 onClick={() => selectTemplate(email)}
-                className="text-left rounded-xl bg-white border border-gray-200 shadow-sm p-5 hover:border-[#2418a6]/40 hover:shadow-md transition-all duration-300 group"
+                className="text-left rounded-xl bg-white border border-gray-200 shadow-sm p-5 hover:border-[#1B0B94]/40 hover:shadow-md transition-all duration-300 group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-[#2418a6]/10 text-[#2418a6]">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-[#1B0B94]/10 text-[#1B0B94]">
                       <Mail className="size-5" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900 group-hover:text-[#2418a6] transition-colors">
+                      <h3 className="font-medium text-gray-900 group-hover:text-[#1B0B94] transition-colors">
                         {email.label}
                       </h3>
                       <p className="text-sm text-gray-500 mt-0.5">{email.subject_template}</p>
@@ -253,7 +253,7 @@ export default function AdminEmailsPage() {
             setSelectedId(null);
             setFormData(null);
           }}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#2418a6] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1B0B94] transition-colors"
         >
           <ArrowLeft className="size-4" />
           Retour aux emails
@@ -296,7 +296,7 @@ export default function AdminEmailsPage() {
                 value={formData.body_text}
                 onChange={(e) => updateField('body_text', e.target.value)}
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#2418a6] focus:ring-1 focus:ring-[#2418a6] outline-none transition-colors"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] outline-none transition-colors"
               />
             </div>
             <Field label="Texte du bouton" value={formData.cta_text} onChange={(v) => updateField('cta_text', v)} />
@@ -346,7 +346,7 @@ export default function AdminEmailsPage() {
             <button
               onClick={handleSave}
               disabled={saving || !isDirty}
-              className="flex items-center gap-2 rounded-lg bg-[#2418a6] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c1385] disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-[#1B0B94] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#130970] disabled:opacity-50 transition-colors"
             >
               {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
               Enregistrer
@@ -436,7 +436,7 @@ export default function AdminEmailsPage() {
                 <button
                   onClick={handleSendTest}
                   disabled={sendingTest || !testEmail}
-                  className="flex items-center gap-2 rounded-lg bg-[#2418a6] px-4 py-2 text-sm font-medium text-white hover:bg-[#1c1385] disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-2 rounded-lg bg-[#1B0B94] px-4 py-2 text-sm font-medium text-white hover:bg-[#130970] disabled:opacity-50 transition-colors"
                 >
                   {sendingTest ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
                   Envoyer

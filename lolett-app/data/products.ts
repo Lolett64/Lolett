@@ -4,8 +4,8 @@ export const products: Product[] = [
   // HOMME - 5 produits
   {
     id: 'prod-001',
-    slug: 'chemise-lin-mediterranee',
-    name: 'Chemise Lin Méditerranée',
+    slug: 'chemise-lin-sud-ouest',
+    name: 'Chemise Lin Sud-Ouest',
     gender: 'homme',
     categorySlug: 'chemises',
     price: 89,
@@ -61,7 +61,7 @@ export const products: Product[] = [
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { name: 'Blanc', hex: '#FFFFFF' },
-      { name: 'Bleu LOLETT', hex: '#2418A6' },
+      { name: 'Bleu LOLETT', hex: '#1B0B94' },
     ],
     stock: 20,
     isNew: false,
@@ -147,7 +147,7 @@ export const products: Product[] = [
       '/images/top-lin-cote-azur.png',
     ],
     description:
-      "Top en lin avec détails brodés. Coupe ample et légère. L'essentiel de l'été méditerranéen.",
+      "Top en lin avec détails brodés. Coupe ample et légère. L'essentiel de l'été du Sud-Ouest.",
     sizes: ['XS', 'S', 'M', 'L'],
     colors: [
       { name: 'Blanc', hex: '#FFFFFF' },

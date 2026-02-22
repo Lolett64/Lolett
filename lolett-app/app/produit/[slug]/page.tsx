@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: PageProps) {
   const relatedProducts = allGenderProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
-    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
+    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
       <div className="container">
         <Breadcrumbs
           items={[

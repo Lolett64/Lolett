@@ -60,11 +60,11 @@ const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string }[]> = 
 const card = 'w-full rounded-xl border border-[var(--border)] bg-white p-6 shadow-sm';
 const fieldLabel = 'block text-sm font-medium text-[#4a4a56] mb-1.5';
 const inputBase =
-  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20';
 const selectBase =
-  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20';
 const btnPrimary =
-  'inline-flex items-center justify-center rounded-md bg-[#2418a6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#1a1280] disabled:opacity-50';
+  'inline-flex items-center justify-center rounded-md bg-[#1B0B94] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#130970] disabled:opacity-50';
 const btnOutline =
   'inline-flex items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[#4a4a56] shadow-sm hover:bg-[#f7f7fb] disabled:opacity-50';
 const sectionTitle = 'text-base font-semibold text-[#1a1a24] mb-4';
@@ -431,8 +431,8 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
                     padding: '0.375rem 0.75rem',
                     borderRadius: '0.375rem',
                     border: '1px solid',
-                    borderColor: form.sizes.includes(size) ? '#2418a6' : '#d1d1dc',
-                    background: form.sizes.includes(size) ? '#2418a6' : 'white',
+                    borderColor: form.sizes.includes(size) ? '#1B0B94' : '#d1d1dc',
+                    background: form.sizes.includes(size) ? '#1B0B94' : 'white',
                     color: form.sizes.includes(size) ? 'white' : '#4a4a56',
                     fontSize: '0.875rem',
                     fontWeight: 500,
@@ -571,7 +571,7 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
                 width: 36,
                 height: 20,
                 borderRadius: 9999,
-                background: form.is_new ? '#2418a6' : '#d1d1dc',
+                background: form.is_new ? '#1B0B94' : '#d1d1dc',
                 border: 'none',
                 cursor: 'pointer',
                 flexShrink: 0,
@@ -621,7 +621,7 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
             <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>
               Cliquer pour uploader des images (JPEG, PNG, WebP — max 5MB)
             </p>
-            {uploading && <p style={{ fontSize: '0.75rem', color: '#2418a6' }}>Upload en cours...</p>}
+            {uploading && <p style={{ fontSize: '0.75rem', color: '#1B0B94' }}>Upload en cours...</p>}
           </div>
           <input
             ref={fileInputRef}
