@@ -1,31 +1,22 @@
 import { cookies } from 'next/headers';
-import { createHmac, randomBytes } from 'crypto';
 
 const COOKIE_NAME = 'lolett_admin_token';
-const SECRET = process.env.ADMIN_TOKEN_SECRET || 'dev-fallback-change-in-production';
 
-function signToken(payload: string): string {
-  return createHmac('sha256', SECRET).update(payload).digest('hex');
+async function hmacSign(secret: string, data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function generateToken(): { token: string; signature: string } {
-  const token = randomBytes(32).toString('hex');
-  const signature = signToken(token);
-  return { token, signature };
-}
-
-function verifyToken(cookieValue: string): boolean {
-  const parts = cookieValue.split('.');
-  if (parts.length !== 2) return false;
-  const [token, signature] = parts;
-  const expectedSignature = signToken(token);
-  // Timing-safe comparison
-  if (signature.length !== expectedSignature.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < signature.length; i++) {
-    mismatch |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i);
-  }
-  return mismatch === 0;
+async function verifyToken(cookieValue: string): Promise<boolean> {
+  const lastDot = cookieValue.lastIndexOf('.');
+  if (lastDot === -1) return false;
+  const payload = cookieValue.substring(0, lastDot);
+  const signature = cookieValue.substring(lastDot + 1);
+  const secret = process.env.ADMIN_TOKEN_SECRET || 'dev-fallback';
+  const expected = await hmacSign(secret, payload);
+  return signature === expected;
 }
 
 export async function isAdminAuthenticated(): Promise<boolean> {
@@ -35,32 +26,13 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return verifyToken(token.value);
 }
 
-export async function setAdminCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  const { token, signature } = generateToken();
-  cookieStore.set(COOKIE_NAME, `${token}.${signature}`, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24, // 24 hours
-    path: '/',
-  });
-}
-
 export async function clearAdminCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
 }
 
-export function checkAdminCookieFromRequest(request: Request): boolean {
-  const cookieHeader = request.headers.get('cookie') ?? '';
-  const parsedCookies = Object.fromEntries(
-    cookieHeader.split(';').map((c) => {
-      const [key, ...rest] = c.trim().split('=');
-      return [key.trim(), rest.join('=')];
-    })
-  );
-  const value = parsedCookies[COOKIE_NAME];
-  if (!value) return false;
-  return verifyToken(value);
+export function checkAdminCookieFromRequest(_request: Request): boolean {
+  // Synchronous check not possible with async crypto — always return false
+  // Admin routes use isAdminAuthenticated() in layout instead
+  return false;
 }
