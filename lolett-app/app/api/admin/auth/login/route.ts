@@ -11,6 +11,14 @@ export async function POST(request: Request) {
   }
 
   if (body.email !== adminEmail || body.password !== adminPassword) {
+    console.log('[admin-login] mismatch', {
+      emailMatch: body.email === adminEmail,
+      passMatch: body.password === adminPassword,
+      envEmailLen: adminEmail.length,
+      envPassLen: adminPassword.length,
+      bodyEmailLen: body.email?.length,
+      bodyPassLen: body.password?.length,
+    });
     return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
   }
 
