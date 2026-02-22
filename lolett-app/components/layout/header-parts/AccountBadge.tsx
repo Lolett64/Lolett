@@ -21,7 +21,10 @@ export function AccountBadge() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (loading || !user) {
+  // Treat unconfirmed users as not logged in
+  const isAuthenticated = user && user.email_confirmed_at;
+
+  if (loading || !isAuthenticated) {
     return (
       <Link
         href="/connexion"
@@ -41,7 +44,7 @@ export function AccountBadge() {
     router.push('/');
   };
 
-  const initials = user.user_metadata?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?';
+  const initials = user!.user_metadata?.first_name?.[0]?.toUpperCase() || user!.email?.[0]?.toUpperCase() || '?';
 
   return (
     <div ref={ref} className="relative hidden sm:block">
