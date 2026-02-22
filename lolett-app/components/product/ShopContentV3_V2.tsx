@@ -57,7 +57,7 @@ export function ShopContentV3_V2({
     const sorted = useMemo(() => {
         const copy = [...filtered];
         switch (sort) {
-            case 'newest': return copy.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            case 'newest': return copy.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
             default: return copy;
         }
     }, [filtered, sort]);
