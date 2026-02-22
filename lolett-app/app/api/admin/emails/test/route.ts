@@ -3,9 +3,7 @@ import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { getEmailSettings } from '@/lib/cms/emails';
 import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmation-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendHtmlEmail } from '@/lib/email-provider';
 
 const MOCK_ORDER_DATA = {
   firstName: 'Marie',
@@ -70,15 +68,15 @@ export async function POST(request: Request) {
     const fromName = settings?.from_name || 'LOLETT';
     const fromEmail = settings?.from_email || 'onboarding@resend.dev';
 
-    const { error } = await resend.emails.send({
+    const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
       to: recipient,
       subject: `[TEST] ${subject}`,
       html,
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, recipient });

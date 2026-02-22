@@ -21,9 +21,7 @@ export function AccountBadge() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (loading) return null;
-
-  if (!user) {
+  if (loading || !user) {
     return (
       <Link
         href="/connexion"

@@ -1,8 +1,6 @@
-import { Resend } from 'resend';
+import { sendHtmlEmail } from '@/lib/email-provider';
 import { renderOrderConfirmationV3 } from './templates/order-confirmation-v3';
 import { getEmailSettings } from '@/lib/cms/emails';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface OrderEmailData {
   to: string;
@@ -16,7 +14,6 @@ interface OrderEmailData {
 
 export async function sendOrderConfirmation(data: OrderEmailData) {
   try {
-    // Try to fetch settings from DB, fallback to hardcoded
     let settings: Awaited<ReturnType<typeof getEmailSettings>> = null;
     try {
       settings = await getEmailSettings('order_confirmation');
@@ -53,14 +50,18 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
     const subject = settings?.subject_template?.replace('{orderNumber}', data.orderNumber)
       || `Confirmation de commande ${data.orderNumber}`;
 
-    await resend.emails.send({
+    const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
       to: data.to,
       subject,
       html,
     });
 
-    console.log(`[Email] Order confirmation sent to ${data.to} for ${data.orderNumber}`);
+    if (result.success) {
+      console.log(`[Email] Order confirmation sent to ${data.to} for ${data.orderNumber}`);
+    } else {
+      console.error(`[Email] Failed to send order confirmation: ${result.error}`);
+    }
   } catch (error) {
     console.error('[Email] Failed to send order confirmation:', error);
   }
