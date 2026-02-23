@@ -93,16 +93,16 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
                 <Link
                   href="/compte"
                   onClick={closeMenu}
-                  className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#c4a44e] transition-colors"
+                  className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#1B0B94] transition-colors"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#c4a44e] text-xs font-bold text-white">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1B0B94] text-xs font-bold text-white">
                     {user.user_metadata?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
                   </div>
                   Mon espace
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 py-2 text-base text-[#5a4d3e] hover:text-[#c4a44e] transition-colors"
+                  className="flex items-center gap-2 py-2 text-base text-[#5a4d3e] hover:text-[#1B0B94] transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
                   Deconnexion
@@ -112,7 +112,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
               <Link
                 href="/connexion"
                 onClick={closeMenu}
-                className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#c4a44e] transition-colors"
+                className="flex items-center gap-2 py-2 text-base font-medium text-[#1a1510] hover:text-[#1B0B94] transition-colors"
               >
                 <User className="h-5 w-5" />
                 Connexion
@@ -120,7 +120,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
             )}
           </div>
 
-          <div className="border-lolett-gray-200 bg-lolett-gray-100 border-t p-6">
+          <div className="border-lolett-gray-200 bg-[#F0E8D5] border-t p-6">
             {/* Social links mobile */}
             <div className="mb-4 flex justify-center gap-3">
               <a
@@ -146,7 +146,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
               <Link
                 href="/favoris"
                 onClick={closeMenu}
-                className="text-lolett-gray-700 hover:text-lolett-gold flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 transition-colors"
+                className="text-lolett-gray-700 hover:text-lolett-gold flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#FDF5E6] py-3 transition-colors"
               >
                 <Heart className="h-5 w-5" />
                 <span>Favoris</span>

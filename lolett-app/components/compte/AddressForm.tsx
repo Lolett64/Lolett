@@ -41,16 +41,16 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
     onSaved();
   };
 
-  const inputCls = "w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors";
+  const inputCls = "w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors";
 
   return (
     <div>
-      <button onClick={onCancel} className="inline-flex items-center gap-1 text-sm text-[#c4a44e] hover:text-[#b3933d] font-body mb-4 transition-colors">
+      <button onClick={onCancel} className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#b3933d] font-body mb-4 transition-colors">
         <ArrowLeft className="h-4 w-4" />
         Retour
       </button>
 
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
         <h1 className="font-playfair text-xl text-[#1a1510] mb-6">
           {address ? 'Modifier l\'adresse' : 'Nouvelle adresse'}
         </h1>
@@ -97,7 +97,7 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
               type="checkbox"
               checked={isDefault}
               onChange={(e) => setIsDefault(e.target.checked)}
-              className="h-4 w-4 rounded border-[#c4b49c]/30 text-[#c4a44e] focus:ring-[#c4a44e]"
+              className="h-4 w-4 rounded border-[#c4b49c]/30 text-[#1B0B94] focus:ring-[#1B0B94]"
             />
             <span className="text-sm text-[#5a4d3e] font-body">Adresse par defaut</span>
           </label>
@@ -106,7 +106,7 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors disabled:opacity-50"
+              className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors disabled:opacity-50"
             >
               {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>

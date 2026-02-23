@@ -115,7 +115,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-10 lg:px-14">
           <p
             className="mb-3 text-xs font-medium uppercase tracking-wider"
-            style={{ color: '#c4a44e' }}
+            style={{ color: '#1B0B94' }}
           >
             Nouvelle Collection
           </p>
@@ -132,14 +132,14 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
         {/* Golden accent line */}
         <div
           className="absolute bottom-0 left-0 w-full"
-          style={{ height: 2, background: 'linear-gradient(to right, #c4a44e, #c4a44e80, transparent)' }}
+          style={{ height: 2, background: 'linear-gradient(to right, #1B0B94, #1B0B9480, transparent)' }}
         />
       </section>
 
       {/* ─── 2. Gender Toggle (sticky) ─── */}
       <div
         className="sticky top-0 z-30 w-full"
-        style={{ backgroundColor: '#fefcf8', borderBottom: '1px solid #c4a44e30' }}
+        style={{ backgroundColor: '#FDF5E6', borderBottom: '1px solid #1B0B9430' }}
       >
         <div className="flex items-center justify-center gap-10 px-6 sm:px-10 lg:px-14 py-0">
           {(['femme', 'homme'] as const).map((gender) => (
@@ -158,7 +158,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
               {activeGender === gender && (
                 <span
                   className="absolute bottom-0 left-0 w-full"
-                  style={{ height: 3, backgroundColor: '#c4a44e' }}
+                  style={{ height: 3, backgroundColor: '#1B0B94' }}
                 />
               )}
             </button>
@@ -168,7 +168,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
 
       {/* ─── 3. Looks Section ─── */}
       {genderLooks.length > 0 && (
-        <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#fefcf8' }}>
+        <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#FDF5E6' }}>
           <div className="mb-10 flex items-center gap-4">
             <h2
               className="text-2xl font-bold sm:text-3xl"
@@ -178,7 +178,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
             </h2>
             <div
               className="hidden h-px flex-1 sm:block"
-              style={{ background: 'linear-gradient(to right, #c4a44e, transparent)' }}
+              style={{ background: 'linear-gradient(to right, #1B0B94, transparent)' }}
             />
           </div>
 
@@ -208,7 +208,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
                     <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 p-6 min-w-0">
                       <p
                         className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: '#c4a44e' }}
+                        style={{ color: '#1B0B94' }}
                       >
                         {look.vibe}
                       </p>
@@ -253,7 +253,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
                       <Link
                         href={`/look/${look.id}`}
                         className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-80"
-                        style={{ color: '#c4a44e' }}
+                        style={{ color: '#1B0B94' }}
                       >
                         Adopter ce look
                         <ArrowRight className="h-4 w-4" />
@@ -268,7 +268,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
       )}
 
       {/* ─── 4. Product Grid Section ─── */}
-      <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#fefcf8' }}>
+      <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#FDF5E6' }}>
         {/* Title bar */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between min-w-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -280,7 +280,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
             </h2>
             <span
               className="shrink-0 rounded-full px-3 py-1 text-xs font-medium"
-              style={{ backgroundColor: '#c4a44e20', color: '#c4a44e' }}
+              style={{ backgroundColor: '#1B0B9420', color: '#1B0B94' }}
             >
               {sorted.length} pièce{sorted.length !== 1 ? 's' : ''}
             </span>
@@ -290,14 +290,14 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
             <button
               onClick={() => setShowFiltersMobile(true)}
               className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium lg:hidden"
-              style={{ border: '1px solid #c4a44e40', color: '#1a1510' }}
+              style={{ border: '1px solid #1B0B9440', color: '#1a1510' }}
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filtres
               {activeFiltersList.length > 0 && (
                 <span
                   className="flex h-5 w-5 items-center justify-center rounded-full text-xs text-white"
-                  style={{ backgroundColor: '#c4a44e' }}
+                  style={{ backgroundColor: '#1B0B94' }}
                 >
                   {activeFiltersList.length}
                 </span>
@@ -325,8 +325,8 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
             <div
               className="rounded-xl p-5"
               style={{
-                backgroundColor: '#fefcf8',
-                borderTop: '3px solid #c4a44e',
+                backgroundColor: '#FDF5E6',
+                borderTop: '3px solid #1B0B94',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
               }}
             >
@@ -359,7 +359,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
                       className="rounded-full px-8 py-3 text-sm font-medium transition-opacity hover:opacity-80"
                       style={{
                         backgroundColor: '#1a1510',
-                        color: '#fefcf8',
+                        color: '#FDF5E6',
                       }}
                     >
                       Charger plus
@@ -381,9 +381,9 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
           />
           <div
             className="relative ml-auto flex h-full w-full max-w-sm flex-col overflow-y-auto"
-            style={{ backgroundColor: '#fefcf8' }}
+            style={{ backgroundColor: '#FDF5E6' }}
           >
-            <div className="flex items-center justify-between border-b p-5" style={{ borderColor: '#c4a44e30' }}>
+            <div className="flex items-center justify-between border-b p-5" style={{ borderColor: '#1B0B9430' }}>
               <h3 className="text-lg font-semibold" style={{ color: '#1a1510' }}>
                 Filtres
               </h3>
@@ -403,11 +403,11 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
                 isMobile={true}
               />
             </div>
-            <div className="border-t p-5" style={{ borderColor: '#c4a44e30' }}>
+            <div className="border-t p-5" style={{ borderColor: '#1B0B9430' }}>
               <button
                 onClick={() => setShowFiltersMobile(false)}
                 className="w-full rounded-full py-3 text-sm font-medium text-white"
-                style={{ backgroundColor: '#c4a44e' }}
+                style={{ backgroundColor: '#1B0B94' }}
               >
                 Voir {sorted.length} résultat{sorted.length !== 1 ? 's' : ''}
               </button>

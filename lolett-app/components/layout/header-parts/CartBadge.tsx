@@ -66,14 +66,14 @@ export function CartBadge() {
       {/* Dropdown - desktop only */}
       {!isMobile && isOpen && (
         <div className="absolute right-0 top-full z-50 min-w-[320px] animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="mt-2 rounded-xl border border-[#c4b49c]/20 bg-white p-4 shadow-lg">
+          <div className="mt-2 rounded-xl border border-[#c4b49c]/20 bg-[#FEFAF3] p-4 shadow-lg">
             {cartProducts.length === 0 ? (
               <div className="py-6 text-center">
                 <ShoppingBag className="mx-auto mb-3 h-8 w-8 text-[#c4b49c]/40" />
                 <p className="text-sm font-medium text-[#5a4d3e]">Votre panier est vide</p>
                 <Link
                   href="/shop"
-                  className="mt-2 inline-block text-xs text-[#c4a44e] hover:underline"
+                  className="mt-2 inline-block text-xs text-[#1B0B94] hover:underline"
                 >
                   Explorer la boutique
                 </Link>
@@ -90,7 +90,7 @@ export function CartBadge() {
                       key={`${item.productId}-${item.size}-${item.color || ''}`}
                       className="flex gap-3"
                     >
-                      <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-[#faf9f7]">
+                      <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-[#F0E8D5]">
                         <Image
                           src={item.product.images[0]}
                           alt={item.product.name}
@@ -131,13 +131,13 @@ export function CartBadge() {
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <Link
                     href="/panier"
-                    className="rounded-full border border-[#c4b49c]/30 px-4 py-2 text-center text-sm font-medium text-[#1a1510] transition-colors hover:bg-[#faf9f7]"
+                    className="rounded-full border border-[#c4b49c]/30 px-4 py-2 text-center text-sm font-medium text-[#1a1510] transition-colors hover:bg-[#F0E8D5]"
                   >
                     Voir mon panier
                   </Link>
                   <Link
                     href="/checkout"
-                    className="rounded-full bg-[#c4a44e] px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-[#b3943f]"
+                    className="rounded-full bg-[#1B0B94] px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-[#130970]"
                   >
                     Commander
                   </Link>

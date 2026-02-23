@@ -83,6 +83,7 @@ export interface Order {
   status: 'pending' | 'confirmed' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'expired';
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;
+  userId?: string;
   createdAt: string;
   updatedAt?: string;
 }

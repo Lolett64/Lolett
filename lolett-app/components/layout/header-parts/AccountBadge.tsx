@@ -53,13 +53,13 @@ export function AccountBadge() {
         className="relative flex items-center justify-center p-2.5 transition-colors"
         aria-label="Mon compte"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#c4a44e] text-xs font-bold text-white">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1B0B94] text-xs font-bold text-white">
           {initials}
         </div>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-[#c4b49c]/20 bg-white py-2 shadow-lg z-50">
+        <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-[#c4b49c]/20 bg-[#FEFAF3] py-2 shadow-lg z-50">
           <div className="border-b border-[#c4b49c]/10 px-4 py-2">
             <p className="text-sm font-medium text-[#1a1510] truncate">{user.user_metadata?.first_name || 'Mon compte'}</p>
             <p className="text-xs text-[#8a7d6b] truncate">{user.email}</p>

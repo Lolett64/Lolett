@@ -112,17 +112,17 @@ export function LooksSectionV2({ looks, lookProducts }: LooksSectionProps) {
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{ backgroundImage: `radial-gradient(circle at 20% 30%, #c4a44e 1px, transparent 1px), radial-gradient(circle at 80% 70%, #c4a44e 1px, transparent 1px)`, backgroundSize: '60px 60px' }}
+        style={{ backgroundImage: `radial-gradient(circle at 20% 30%, #1B0B94 1px, transparent 1px), radial-gradient(circle at 80% 70%, #1B0B94 1px, transparent 1px)`, backgroundSize: '60px 60px' }}
       />
       <div
         className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[800px] -translate-x-1/2"
-        style={{ background: 'radial-gradient(ellipse, rgba(196,164,78,0.08) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse, rgba(27,11,148,0.08) 0%, transparent 70%)' }}
       />
 
       <div className="container relative">
         <ScrollReveal>
           <div className="mb-12 text-center sm:mb-16 lg:mb-20">
-            <span className="inline-block rounded-full border px-5 py-1.5 text-xs font-semibold tracking-[0.2em] uppercase" style={{ borderColor: 'rgba(196,164,78,0.4)', color: '#c4a44e' }}>
+            <span className="inline-block rounded-full border px-5 py-1.5 text-xs font-semibold tracking-[0.2em] uppercase" style={{ borderColor: 'rgba(27,11,148,0.4)', color: '#1B0B94' }}>
               Prêt à Sortir
             </span>
             <h2 className="font-display mt-6 text-4xl leading-tight font-bold text-white sm:text-5xl lg:text-6xl">Le Look Complet</h2>
@@ -134,8 +134,8 @@ export function LooksSectionV2({ looks, lookProducts }: LooksSectionProps) {
           <div className="relative">
             {count > 1 && (
               <>
-                <button onClick={goPrev} className="absolute -left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#c4a44e]/40 bg-[#1a1510]/80 p-2.5 text-[#c4a44e] shadow-lg backdrop-blur-sm transition-all hover:bg-[#c4a44e] hover:text-white sm:-left-6" aria-label="Look précédent"><ChevronLeft className="h-5 w-5" /></button>
-                <button onClick={goNext} className="absolute -right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#c4a44e]/40 bg-[#1a1510]/80 p-2.5 text-[#c4a44e] shadow-lg backdrop-blur-sm transition-all hover:bg-[#c4a44e] hover:text-white sm:-right-6" aria-label="Look suivant"><ChevronRight className="h-5 w-5" /></button>
+                <button onClick={goPrev} className="absolute -left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#1B0B94]/40 bg-[#1a1510]/80 p-2.5 text-[#1B0B94] shadow-lg backdrop-blur-sm transition-all hover:bg-[#1B0B94] hover:text-white sm:-left-6" aria-label="Look précédent"><ChevronLeft className="h-5 w-5" /></button>
+                <button onClick={goNext} className="absolute -right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#1B0B94]/40 bg-[#1a1510]/80 p-2.5 text-[#1B0B94] shadow-lg backdrop-blur-sm transition-all hover:bg-[#1B0B94] hover:text-white sm:-right-6" aria-label="Look suivant"><ChevronRight className="h-5 w-5" /></button>
               </>
             )}
 
@@ -148,7 +148,7 @@ export function LooksSectionV2({ looks, lookProducts }: LooksSectionProps) {
 
                 return (
                   <div key={`${look.id}-${i}`} data-look-card className="w-[85vw] flex-shrink-0 snap-center sm:w-[70vw] md:w-[55vw] lg:w-[42vw]">
-                    <div className="group relative overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(196,164,78,0.2)' }}>
+                    <div className="group relative overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(27,11,148,0.2)' }}>
                       <div className="relative aspect-[3/4]">
                         <Image src={look.coverImage} alt={look.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 640px) 85vw, (max-width: 768px) 70vw, (max-width: 1024px) 55vw, 42vw" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -159,14 +159,14 @@ export function LooksSectionV2({ looks, lookProducts }: LooksSectionProps) {
                           <h3 className="font-display text-2xl font-bold text-white sm:text-3xl">{look.title}</h3>
                           <p className="mt-2 line-clamp-2 text-sm text-white/70 sm:text-base">{look.shortPitch}</p>
                           <div className="mt-5 flex items-center justify-between gap-4">
-                            <span className="text-xl font-bold sm:text-2xl" style={{ color: '#c4a44e' }}>{totalPrice.toFixed(0)} €</span>
+                            <span className="text-xl font-bold sm:text-2xl" style={{ color: '#1B0B94' }}>{totalPrice.toFixed(0)} €</span>
                             <button
                               onClick={() => handleAddLook(look)}
                               disabled={!available}
                               className={cn(
                                 'flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition-all sm:px-6',
                                 isAdded ? 'border-green-500 bg-green-500 text-white'
-                                  : available ? 'border-[#c4a44e] bg-transparent text-[#c4a44e] hover:bg-[#c4a44e] hover:text-white'
+                                  : available ? 'border-[#1B0B94] bg-transparent text-[#1B0B94] hover:bg-[#1B0B94] hover:text-white'
                                   : 'cursor-not-allowed border-white/20 text-white/40'
                               )}
                             >
@@ -184,8 +184,8 @@ export function LooksSectionV2({ looks, lookProducts }: LooksSectionProps) {
             {count > 1 && (
               <div className="mx-auto mt-8 flex max-w-[200px] gap-1.5">
                 {looks.map((look, i) => (
-                  <button key={look.id} onClick={() => goTo(i)} className="h-1 flex-1 overflow-hidden rounded-full transition-all" style={{ background: 'rgba(196,164,78,0.15)' }} aria-label={`Voir look ${i + 1}`}>
-                    <div className={cn('h-full rounded-full transition-all duration-500', i === activeIndex ? 'w-full' : 'w-0')} style={{ background: '#c4a44e' }} />
+                  <button key={look.id} onClick={() => goTo(i)} className="h-1 flex-1 overflow-hidden rounded-full transition-all" style={{ background: 'rgba(27,11,148,0.15)' }} aria-label={`Voir look ${i + 1}`}>
+                    <div className={cn('h-full rounded-full transition-all duration-500', i === activeIndex ? 'w-full' : 'w-0')} style={{ background: '#1B0B94' }} />
                   </button>
                 ))}
               </div>

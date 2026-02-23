@@ -20,20 +20,20 @@ export function TrustBarSection({ content }: TrustBarSectionProps) {
       <div className="container">
         <div
           className="grid grid-cols-1 sm:grid-cols-3"
-          style={{ borderColor: 'rgba(196,180,156,0.15)' }}
+          style={{ borderColor: 'rgba(27,11,148,0.15)' }}
         >
           {trustItems.map((item, i) => (
             <div
               key={item.label}
               className="flex items-center justify-center gap-3 py-5 sm:py-7"
               style={{
-                borderLeft: i > 0 ? '1px solid rgba(196,180,156,0.15)' : 'none',
+                borderLeft: i > 0 ? '1px solid rgba(27,11,148,0.15)' : 'none',
               }}
             >
               <item.icon
                 className="h-5 w-5 flex-shrink-0"
                 strokeWidth={1.5}
-                style={{ color: '#c4a44e' }}
+                style={{ color: '#1B0B94' }}
               />
               <span
                 className="text-sm font-medium"

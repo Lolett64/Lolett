@@ -25,7 +25,7 @@ export function SocialFeedSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium transition-colors hover:opacity-70"
-              style={{ color: '#c4a44e' }}
+              style={{ color: '#1B0B94' }}
             >
               Suivre &rarr;
             </a>

@@ -97,7 +97,7 @@ export function ShopContentV3({
             <div className="min-w-0 space-y-5">
               <p
                 className="uppercase tracking-wider text-xs font-medium"
-                style={{ color: '#c4a44e' }}
+                style={{ color: '#1B0B94' }}
               >
                 {genderLabel}
               </p>
@@ -119,7 +119,7 @@ export function ShopContentV3({
               <div
                 className="-rotate-2 shadow-2xl"
                 style={{
-                  border: '2px solid #c4a44e',
+                  border: '2px solid #1B0B94',
                   padding: '6px',
                   backgroundColor: '#1a1510',
                 }}
@@ -144,7 +144,7 @@ export function ShopContentV3({
       <div
         className="-mx-4 sm:-mx-6 lg:-mx-8 h-px"
         style={{
-          background: 'linear-gradient(to right, transparent, #c4a44e, transparent)',
+          background: 'linear-gradient(to right, transparent, #1B0B94, transparent)',
         }}
       />
 
@@ -169,7 +169,7 @@ export function ShopContentV3({
                 {!activeCategory && (
                   <span
                     className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                    style={{ backgroundColor: '#c4a44e' }}
+                    style={{ backgroundColor: '#1B0B94' }}
                   />
                 )}
               </Link>
@@ -189,7 +189,7 @@ export function ShopContentV3({
                     {isActive && (
                       <span
                         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                        style={{ backgroundColor: '#c4a44e' }}
+                        style={{ backgroundColor: '#1B0B94' }}
                       />
                     )}
                   </Link>
@@ -214,7 +214,7 @@ export function ShopContentV3({
                 className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-sm transition-colors"
                 style={{
                   color: '#fefcf8',
-                  border: '1px solid #c4a44e33',
+                  border: '1px solid #1B0B9433',
                 }}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -227,7 +227,7 @@ export function ShopContentV3({
           {showFiltersDesktop && (
             <div
               className="mt-3 pt-3 hidden md:block"
-              style={{ borderTop: '1px solid #c4a44e22' }}
+              style={{ borderTop: '1px solid #1B0B9422' }}
             >
               <ProductFilters
                 products={products}
@@ -248,7 +248,7 @@ export function ShopContentV3({
           />
           <div
             className="absolute inset-y-0 right-0 w-full max-w-sm overflow-y-auto p-6"
-            style={{ backgroundColor: '#fefcf8' }}
+            style={{ backgroundColor: '#FDF5E6' }}
           >
             <div className="flex items-center justify-between mb-6 min-w-0">
               <h2 className="font-display text-lg font-medium" style={{ color: '#1a1510' }}>
@@ -268,7 +268,7 @@ export function ShopContentV3({
               <Button
                 onClick={() => setShowFiltersMobile(false)}
                 className="w-full text-white"
-                style={{ backgroundColor: '#c4a44e' }}
+                style={{ backgroundColor: '#1B0B94' }}
               >
                 Voir {sorted.length} article{sorted.length !== 1 ? 's' : ''}
               </Button>
@@ -281,14 +281,14 @@ export function ShopContentV3({
       <div
         className="-mx-4 sm:-mx-6 lg:-mx-8 h-16"
         style={{
-          background: 'linear-gradient(to bottom, #1a1510, #fefcf8)',
+          background: 'linear-gradient(to bottom, #1a1510, #FDF5E6)',
         }}
       />
 
       {/* ─── Content — Product Grid ─── */}
       <section
         className="-mx-4 sm:-mx-6 lg:-mx-8 min-h-[50vh]"
-        style={{ backgroundColor: '#fefcf8' }}
+        style={{ backgroundColor: '#FDF5E6' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Active filters */}

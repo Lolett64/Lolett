@@ -41,7 +41,7 @@ export function AddressList() {
       <div className="space-y-4">
         <div className="h-8 bg-[#f3efe8] rounded w-48 mb-6" />
         {[1, 2].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse">
+          <div key={i} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-6 animate-pulse">
             <div className="h-4 bg-[#f3efe8] rounded w-40 mb-3" />
             <div className="h-3 bg-[#f3efe8] rounded w-56" />
           </div>
@@ -66,7 +66,7 @@ export function AddressList() {
         <h1 className="font-playfair text-xl text-[#1a1510]">Mes adresses</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white text-sm font-body font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white text-sm font-body font-semibold transition-colors"
         >
           <Plus className="h-4 w-4" />
           Ajouter
@@ -74,7 +74,7 @@ export function AddressList() {
       </div>
 
       {addresses.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
+        <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
           <MapPin className="h-12 w-12 text-[#c4b49c]/40 mx-auto mb-4" />
           <h3 className="font-playfair text-lg text-[#1a1510] mb-2">Aucune adresse</h3>
           <p className="text-sm text-[#8a7d6b] font-body">Ajoutez votre premiere adresse de livraison.</p>
@@ -82,13 +82,13 @@ export function AddressList() {
       ) : (
         <div className="space-y-4">
           {addresses.map((addr) => (
-            <div key={addr.id} className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5">
+            <div key={addr.id} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-[#1a1510] font-body">{addr.label}</p>
                     {addr.isDefault && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#c4a44e] bg-[#c4a44e]/10 px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#1B0B94] bg-[#1B0B94]/10 px-2 py-0.5 rounded-full">
                         <Star className="h-3 w-3" />
                         Par defaut
                       </span>
@@ -104,7 +104,7 @@ export function AddressList() {
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button
                     onClick={() => setEditAddress(addr)}
-                    className="p-2 text-[#8a7d6b] hover:text-[#c4a44e] transition-colors"
+                    className="p-2 text-[#8a7d6b] hover:text-[#1B0B94] transition-colors"
                     aria-label="Modifier"
                   >
                     <Pencil className="h-4 w-4" />

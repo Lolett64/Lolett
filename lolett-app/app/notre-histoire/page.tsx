@@ -1,12 +1,5 @@
 import type { Metadata } from 'next';
-import {
-  HeroHistoireV2,
-  OrigineSection,
-  VisionSection,
-  MediterraneeSection,
-  CTAHistoireV2,
-} from '@/components/sections/histoire/v2';
-import { getSiteContent } from '@/lib/cms/content';
+import NotreHistoireContent from './content';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -20,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Notre Histoire — LOLETT',
     description:
-      'Mode méditerranéenne pensée au Sud, portée partout. Découvrez l\'histoire de LOLETT.',
+      'Mode du Sud-Ouest pensée au Sud, portée partout. Découvrez l\'histoire de LOLETT.',
     url: `${BASE_URL}/notre-histoire`,
     type: 'website',
     images: [
@@ -28,7 +21,7 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/images/chemise-lin-mediterranee.png`,
         width: 800,
         height: 600,
-        alt: 'LOLETT — Mode Méditerranéenne',
+        alt: 'LOLETT — Mode du Sud-Ouest',
       },
     ],
   },
@@ -36,7 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Notre Histoire — LOLETT',
     description:
-      'Mode méditerranéenne pensée au Sud, portée partout.',
+      'Mode du Sud-Ouest pensée au Sud, portée partout.',
   },
 };
 
@@ -54,20 +47,14 @@ const jsonLd = {
   },
 };
 
-export default async function NotreHistoirePage() {
-  const content = await getSiteContent('notre_histoire');
-
+export default function NotreHistoirePage() {
   return (
-    <div className="relative">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HeroHistoireV2 content={content} />
-      <OrigineSection content={content} />
-      <VisionSection content={content} />
-      <MediterraneeSection content={content} />
-      <CTAHistoireV2 content={content} />
-    </div>
+      <NotreHistoireContent />
+    </>
   );
 }

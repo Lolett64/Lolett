@@ -60,7 +60,7 @@ export function ContactV1({ content }: ContactV1Props) {
 
         .cv1-page {
           min-height: 100vh;
-          background-color: #FAF7F2;
+          background-color: #FDF5E6;
           padding: 120px 20px 80px;
           font-family: 'DM Sans', sans-serif;
           color: #2C2420;
@@ -114,7 +114,7 @@ export function ContactV1({ content }: ContactV1Props) {
         }
 
         .cv1-card {
-          background: #fff;
+          background: #FEFAF3;
           border-radius: 12px;
           padding: 36px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -158,7 +158,7 @@ export function ContactV1({ content }: ContactV1Props) {
           align-items: center;
           gap: 10px;
           padding: 14px 20px;
-          background: #fff;
+          background: #FEFAF3;
           border-radius: 50px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.04);
           text-decoration: none;

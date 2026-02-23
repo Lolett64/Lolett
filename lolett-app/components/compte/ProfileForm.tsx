@@ -44,7 +44,7 @@ export function ProfileForm() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-8 animate-pulse">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-8 animate-pulse">
         <div className="h-6 bg-[#f3efe8] rounded w-40 mb-8" />
         <div className="space-y-4">
           <div className="h-10 bg-[#f3efe8] rounded" />
@@ -56,12 +56,12 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
+    <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
       <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Mon profil</h1>
 
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#c4a44e] text-xl font-bold text-white font-playfair">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1B0B94] text-xl font-bold text-white font-playfair">
           {initials}
         </div>
         <div>
@@ -85,7 +85,7 @@ export function ProfileForm() {
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
             />
           </div>
           <div>
@@ -95,7 +95,7 @@ export function ProfileForm() {
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
             />
           </div>
         </div>
@@ -119,7 +119,7 @@ export function ProfileForm() {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#c4a44e] focus:ring-1 focus:ring-[#c4a44e] transition-colors"
+            className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
             placeholder="06 12 34 56 78"
           />
         </div>
@@ -127,7 +127,7 @@ export function ProfileForm() {
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? 'Enregistrement...' : 'Enregistrer'}
         </button>

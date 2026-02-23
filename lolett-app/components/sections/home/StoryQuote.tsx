@@ -68,7 +68,7 @@ export function StoryQuote({ quote, author, className }: StoryQuoteProps) {
                 fontWeight: 600,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
-                color: '#c4a44e',
+                color: '#1B0B94',
               }}
             >
               — {author}

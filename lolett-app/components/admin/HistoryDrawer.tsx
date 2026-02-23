@@ -138,7 +138,7 @@ export function HistoryDrawer({ open, onClose, tableName, recordId, onRestore }:
                     <button
                       onClick={() => handleRestore(entry.id)}
                       disabled={restoring === entry.id}
-                      className="flex items-center gap-1.5 text-xs font-medium text-[#2418a6] hover:underline disabled:opacity-50"
+                      className="flex items-center gap-1.5 text-xs font-medium text-[#1B0B94] hover:underline disabled:opacity-50"
                     >
                       <RotateCcw className="size-3" />
                       {restoring === entry.id ? 'Restauration...' : 'Restaurer'}

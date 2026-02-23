@@ -35,14 +35,14 @@ export function OrigineSection({ content }: OrigineSectionProps) {
           {/* Texte */}
           <div>
             <ScrollReveal>
-              <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#b89840]">
+              <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#130970]">
                 L&apos;Origine
               </p>
             </ScrollReveal>
 
             <ScrollReveal>
               <h2 className="font-display mt-5 text-4xl font-bold leading-tight text-[#1a1510] sm:text-5xl">
-                {content?.origine_title || "Née au bord de la Méditerranée"}
+                {content?.origine_title || "Née dans le Sud-Ouest"}
               </h2>
             </ScrollReveal>
 
@@ -53,7 +53,7 @@ export function OrigineSection({ content }: OrigineSectionProps) {
             </ScrollReveal>
 
             <ScrollReveal>
-              <div className="mt-8 border-l-2 border-[#c4a44e]/40 pl-6">
+              <div className="mt-8 border-l-2 border-[#1B0B94]/40 pl-6">
                 <p className="text-xl italic leading-relaxed text-[#1a1510]">
                   {content?.origine_quote || "\u00AB\u2009Je sélectionne chaque pièce comme si c'était pour moi.\u2009\u00BB"}
                 </p>

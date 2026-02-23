@@ -39,6 +39,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Admin routes are protected by their own password-based auth (lib/admin/auth.ts)
+  // No Supabase auth check needed here — the admin layout handles redirection to /admin-login
+
   const authPaths = ['/connexion', '/inscription'];
   const isAuthPage = authPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)

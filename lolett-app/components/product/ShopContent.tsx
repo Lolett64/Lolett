@@ -124,7 +124,7 @@ export function ShopContent({ gender, products, categories, heroImage, heroTitle
         <Image src={heroImage} alt={heroTitle} fill className="object-cover" sizes="100vw" />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(26,21,16,0.7), rgba(26,21,16,0.3))' }} />
         <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-10 lg:px-14">
-          <span className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#c4a44e' }}>
+          <span className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#1B0B94' }}>
             {gender === 'homme' ? 'Pour Lui' : 'Pour Elle'}
           </span>
           <h1 className="font-display mt-2 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">{heroTitle}</h1>
@@ -137,7 +137,7 @@ export function ShopContent({ gender, products, categories, heroImage, heroTitle
         <Link
           href={`/shop/${gender}`}
           className="rounded-full px-3 py-2 text-sm font-medium sm:px-4"
-          style={!activeCategory ? { background: '#c4a44e', color: '#fff' } : { background: 'rgba(196,164,78,0.1)', color: '#8a7d6b' }}
+          style={!activeCategory ? { background: '#1B0B94', color: '#fff' } : { background: 'rgba(27,11,148,0.1)', color: '#8a7d6b' }}
         >
           Tout voir
         </Link>
@@ -146,7 +146,7 @@ export function ShopContent({ gender, products, categories, heroImage, heroTitle
             key={cat.id}
             href={`/shop/${gender}/${cat.slug}`}
             className="rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4"
-            style={cat.slug === activeCategory ? { background: '#c4a44e', color: '#fff' } : { background: 'rgba(196,164,78,0.1)', color: '#8a7d6b' }}
+            style={cat.slug === activeCategory ? { background: '#1B0B94', color: '#fff' } : { background: 'rgba(27,11,148,0.1)', color: '#8a7d6b' }}
           >
             {cat.label}
           </Link>

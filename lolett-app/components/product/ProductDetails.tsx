@@ -119,9 +119,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           {product.description}
         </p>
 
-        <div className="mt-6 rounded-xl p-3 sm:mt-8 sm:p-4" style={{ background: 'rgba(196,164,78,0.08)', border: '1px solid rgba(196,164,78,0.2)' }}>
+        <div className="mt-6 rounded-xl p-3 sm:mt-8 sm:p-4" style={{ background: 'rgba(27,11,148,0.08)', border: '1px solid rgba(27,11,148,0.2)' }}>
           <p className="text-sm" style={{ color: '#3a2e1e' }}>
-            <span className="font-medium" style={{ color: '#c4a44e' }}>{MICROCOPY.productValidated}</span>
+            <span className="font-medium" style={{ color: '#1B0B94' }}>{MICROCOPY.productValidated}</span>
           </p>
           <p className="mt-1 text-xs italic" style={{ color: '#8a7d6b' }}>
             {randomMicrocopy}

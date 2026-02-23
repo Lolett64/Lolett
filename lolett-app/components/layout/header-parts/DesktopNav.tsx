@@ -58,7 +58,7 @@ export function DesktopNav({
 
           {item.children && openDropdown === item.name && (
             <div className="animate-fade-in absolute top-full left-0 pt-2">
-              <div className="min-w-[160px] rounded-lg border py-2 shadow-lg" style={{ borderColor: 'rgba(196,180,156,0.2)', background: '#fefcf8' }}>
+              <div className="min-w-[160px] rounded-lg border py-2 shadow-lg" style={{ borderColor: 'rgba(27,11,148,0.2)', background: '#FDF5E6' }}>
                 {item.children.map((child) => (
                   <Link
                     key={child.href}

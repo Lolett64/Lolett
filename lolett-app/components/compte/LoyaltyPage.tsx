@@ -29,7 +29,7 @@ export function LoyaltyPage() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 p-8 animate-pulse">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 p-8 animate-pulse">
         <div className="h-6 bg-[#f3efe8] rounded w-48 mb-6" />
         <div className="h-20 bg-[#f3efe8] rounded mb-4" />
         <div className="h-4 bg-[#f3efe8] rounded w-64" />
@@ -42,12 +42,12 @@ export function LoyaltyPage() {
       <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Programme fidelite</h1>
 
       {/* Points card */}
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8 mb-6">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <Award className="h-6 w-6 text-[#c4a44e]" />
+          <Award className="h-6 w-6 text-[#1B0B94]" />
           <span className="text-sm text-[#5a4d3e] font-body">Mes points</span>
         </div>
-        <p className="font-playfair text-5xl text-[#c4a44e] mb-2">{points}</p>
+        <p className="font-playfair text-5xl text-[#1B0B94] mb-2">{points}</p>
         <p className="text-sm text-[#8a7d6b] font-body">
           {nextReward
             ? `Plus que ${nextReward.pointsCost - points} points pour debloquer "${nextReward.name}"`
@@ -59,7 +59,7 @@ export function LoyaltyPage() {
           <div className="mt-4">
             <div className="h-2 rounded-full bg-[#f3efe8] overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#c4a44e] transition-all duration-500"
+                className="h-full rounded-full bg-[#1B0B94] transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -72,7 +72,7 @@ export function LoyaltyPage() {
       </div>
 
       {/* Rewards */}
-      <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
+      <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
         <h2 className="font-playfair text-lg text-[#1a1510] mb-4">Recompenses disponibles</h2>
         {rewards.length === 0 ? (
           <div className="text-center py-8">
@@ -84,15 +84,15 @@ export function LoyaltyPage() {
             {rewards.map((r) => {
               const canRedeem = points >= r.pointsCost;
               return (
-                <div key={r.id} className="flex items-center justify-between p-4 rounded-lg border border-[#c4b49c]/10 hover:border-[#c4a44e]/20 transition-colors">
+                <div key={r.id} className="flex items-center justify-between p-4 rounded-lg border border-[#c4b49c]/10 hover:border-[#1B0B94]/20 transition-colors">
                   <div>
                     <p className="text-sm font-medium text-[#1a1510] font-body">{r.name}</p>
                     {r.description && <p className="text-xs text-[#8a7d6b] font-body mt-0.5">{r.description}</p>}
-                    <p className="text-xs text-[#c4a44e] font-body mt-1">{r.pointsCost} points</p>
+                    <p className="text-xs text-[#1B0B94] font-body mt-1">{r.pointsCost} points</p>
                   </div>
                   <button
                     disabled={!canRedeem}
-                    className="px-4 py-2 rounded-lg bg-[#c4a44e] hover:bg-[#b3933d] text-white text-xs font-semibold font-body transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white text-xs font-semibold font-body transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     Echanger
                   </button>

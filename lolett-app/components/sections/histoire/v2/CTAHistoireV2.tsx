@@ -12,11 +12,11 @@ export function CTAHistoireV2({ content }: CTAHistoireV2Props) {
   return (
     <section className="relative bg-[#0f0d0a] py-28 sm:py-36">
       {/* Subtle gradient top */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c4a44e]/30 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1B0B94]/30 to-transparent" />
 
       <div className="mx-auto max-w-3xl px-6 text-center">
         <ScrollReveal>
-          <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#c4a44e]">
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-[#1B0B94]">
             Prêt ?
           </p>
         </ScrollReveal>
@@ -35,13 +35,13 @@ export function CTAHistoireV2({ content }: CTAHistoireV2Props) {
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Link
               href="/shop/femme"
-              className="inline-flex items-center gap-2 rounded-full bg-[#c4a44e] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#b89840]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#1B0B94] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#130970]"
             >
               Shop Femme <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/shop/homme"
-              className="inline-flex items-center gap-2 rounded-full border border-[#c4a44e]/40 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:border-[#c4a44e]"
+              className="inline-flex items-center gap-2 rounded-full border border-[#1B0B94]/40 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:border-[#1B0B94]"
             >
               Shop Homme <ArrowRight className="h-4 w-4" />
             </Link>

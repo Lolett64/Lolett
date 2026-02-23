@@ -4,7 +4,7 @@ import { products, getProductsByIds } from './products';
 export const looks: Look[] = [
   {
     id: 'look-001',
-    title: 'Le Méditerranéen',
+    title: 'Le Sud-Ouest',
     gender: 'homme',
     coverImage: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=85', // Look homme lin premium
     productIds: ['prod-001', 'prod-002', 'prod-006'],

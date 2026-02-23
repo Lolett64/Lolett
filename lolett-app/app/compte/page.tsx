@@ -44,11 +44,11 @@ export default function CompteDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 text-center">
-          <p className="font-playfair text-2xl text-[#c4a44e]">{profile?.loyaltyPoints ?? 0}</p>
+          <p className="font-playfair text-2xl text-[#1B0B94]">{profile?.loyaltyPoints ?? 0}</p>
           <p className="text-xs text-[#8a7d6b] font-body mt-1">Points fidelite</p>
         </div>
         <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 text-center">
-          <p className="font-playfair text-2xl text-[#c4a44e]">{orderCount ?? 0}</p>
+          <p className="font-playfair text-2xl text-[#1B0B94]">{orderCount ?? 0}</p>
           <p className="text-xs text-[#8a7d6b] font-body mt-1">Commandes</p>
         </div>
       </div>
@@ -59,10 +59,10 @@ export default function CompteDashboard() {
           <Link
             key={href}
             href={href}
-            className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 hover:border-[#c4a44e]/30 transition-colors group"
+            className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 hover:border-[#1B0B94]/30 transition-colors group"
           >
-            <Icon className="h-5 w-5 text-[#c4a44e] mb-3" />
-            <h3 className="font-body text-sm font-semibold text-[#1a1510] group-hover:text-[#c4a44e] transition-colors">{label}</h3>
+            <Icon className="h-5 w-5 text-[#1B0B94] mb-3" />
+            <h3 className="font-body text-sm font-semibold text-[#1a1510] group-hover:text-[#1B0B94] transition-colors">{label}</h3>
             <p className="text-xs text-[#8a7d6b] font-body mt-1">{desc}</p>
           </Link>
         ))}

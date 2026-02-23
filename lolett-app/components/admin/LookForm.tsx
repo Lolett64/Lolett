@@ -31,11 +31,11 @@ interface LookFormProps {
 const card = 'w-full rounded-xl border border-[var(--border)] bg-white p-6 shadow-sm';
 const fieldLabel = 'block text-sm font-medium text-[#4a4a56] mb-1.5';
 const inputBase =
-  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none placeholder:text-[#9999a8] focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20';
 const selectBase =
-  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#2418a6] focus:ring-2 focus:ring-[#2418a6]/20';
+  'block w-full rounded-md border border-[var(--input)] bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20';
 const btnPrimary =
-  'inline-flex items-center justify-center rounded-md bg-[#2418a6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#1a1280] disabled:opacity-50';
+  'inline-flex items-center justify-center rounded-md bg-[#1B0B94] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#130970] disabled:opacity-50';
 const btnOutline =
   'inline-flex items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[#4a4a56] shadow-sm hover:bg-[#f7f7fb] disabled:opacity-50';
 const sectionTitle = 'text-base font-semibold text-[#1a1a24] mb-4';
@@ -243,7 +243,7 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
           >
             <Upload style={{ width: 32, height: 32, color: '#9999a8' }} />
             <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>Cliquer pour uploader une image</p>
-            {uploading && <p style={{ fontSize: '0.75rem', color: '#2418a6' }}>Upload en cours...</p>}
+            {uploading && <p style={{ fontSize: '0.75rem', color: '#1B0B94' }}>Upload en cours...</p>}
           </div>
         )}
         <input
@@ -287,7 +287,7 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
                       border: '1px solid rgba(36,24,166,0.15)',
                       padding: '0.25rem 0.75rem',
                       fontSize: '0.75rem',
-                      color: '#2418a6',
+                      color: '#1B0B94',
                       fontWeight: 500,
                     }}
                   >
@@ -357,7 +357,7 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
                         <p style={{ fontSize: '0.75rem', color: '#6b6b7a' }}>{product.category_slug}</p>
                       </div>
                       {isSelected ? (
-                        <X style={{ width: 16, height: 16, color: '#2418a6', flexShrink: 0 }} />
+                        <X style={{ width: 16, height: 16, color: '#1B0B94', flexShrink: 0 }} />
                       ) : (
                         <Plus style={{ width: 16, height: 16, color: '#9999a8', flexShrink: 0 }} />
                       )}

@@ -11,9 +11,9 @@ import type { Product } from '@/types';
 function SkeletonCard() {
   return (
     <div className="animate-pulse">
-      <div className="aspect-[3/4] rounded-xl" style={{ background: 'rgba(196,164,78,0.08)' }} />
-      <div className="mt-3 h-4 w-3/4 rounded" style={{ background: 'rgba(196,164,78,0.08)' }} />
-      <div className="mt-2 h-4 w-1/3 rounded" style={{ background: 'rgba(196,164,78,0.08)' }} />
+      <div className="aspect-[3/4] rounded-xl" style={{ background: 'rgba(27,11,148,0.08)' }} />
+      <div className="mt-3 h-4 w-3/4 rounded" style={{ background: 'rgba(27,11,148,0.08)' }} />
+      <div className="mt-2 h-4 w-1/3 rounded" style={{ background: 'rgba(27,11,148,0.08)' }} />
     </div>
   );
 }
@@ -41,7 +41,7 @@ export default function FavorisPage() {
   }, [items]);
 
   return (
-    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20">
+    <div className="pt-20 pb-16 sm:pt-24 sm:pb-20 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
       <div className="container">
         <Breadcrumbs items={[{ label: 'Favoris' }]} />
 
@@ -51,12 +51,12 @@ export default function FavorisPage() {
               Mes Favoris
             </h1>
             {!loading && products.length > 0 && (
-              <span className="text-sm font-medium" style={{ color: '#c4a44e' }}>
+              <span className="text-sm font-medium" style={{ color: '#1B0B94' }}>
                 {products.length} pièce{products.length > 1 ? 's' : ''}
               </span>
             )}
           </div>
-          <div className="mt-4 h-px" style={{ background: 'rgba(196,164,78,0.2)' }} />
+          <div className="mt-4 h-px" style={{ background: 'rgba(27,11,148,0.2)' }} />
         </div>
 
         {loading ? (
@@ -67,8 +67,8 @@ export default function FavorisPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="py-20 text-center sm:py-28">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full" style={{ background: 'rgba(196,164,78,0.1)' }}>
-              <Heart className="h-9 w-9" style={{ color: '#c4a44e' }} />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full" style={{ background: 'rgba(27,11,148,0.1)' }}>
+              <Heart className="h-9 w-9" style={{ color: '#1B0B94' }} />
             </div>
             <h2 className="font-display text-2xl font-bold" style={{ color: '#1a1510' }}>
               Aucun coup de c&oelig;ur&hellip; pour l&apos;instant
@@ -79,7 +79,7 @@ export default function FavorisPage() {
             <Link
               href="/shop/femme"
               className="mt-8 inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: '#c4a44e' }}
+              style={{ background: '#1B0B94' }}
             >
               Explorer la boutique <ArrowRight className="h-4 w-4" />
             </Link>

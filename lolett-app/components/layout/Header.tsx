@@ -38,7 +38,7 @@ export function Header() {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         boxShadow: isScrolled
-          ? '0 1px 0 rgba(196,180,156,0.2)'
+          ? '0 1px 0 rgba(27,11,148,0.2)'
           : 'none',
       }}
     >
@@ -51,7 +51,7 @@ export function Header() {
         >
           {/* Left — Logo */}
           <Link href="/" className="relative z-10 flex-shrink-0">
-            <Logo size="md" variant={isScrolled ? 'default' : 'white'} />
+            <Logo size="md" />
           </Link>
 
           {/* Center — Navigation */}
@@ -74,7 +74,7 @@ export function Header() {
                   : 'border-white/15 bg-white/10 text-white'
               )}
               style={isScrolled ? {
-                borderColor: 'rgba(196,180,156,0.3)',
+                borderColor: 'rgba(27,11,148,0.3)',
                 background: 'rgba(244,183,64,0.08)',
               } : undefined}
             >
@@ -82,12 +82,12 @@ export function Header() {
               <span>Livraison offerte dès {SHIPPING.FREE_THRESHOLD}€</span>
               <span
                 className="h-1 w-1 rounded-full"
-                style={{ background: isScrolled ? 'rgba(196,180,156,0.5)' : 'rgba(255,255,255,0.4)' }}
+                style={{ background: isScrolled ? 'rgba(27,11,148,0.5)' : 'rgba(255,255,255,0.4)' }}
               />
               <span>24/48h</span>
               <span
                 className="h-1 w-1 rounded-full"
-                style={{ background: isScrolled ? 'rgba(196,180,156,0.5)' : 'rgba(255,255,255,0.4)' }}
+                style={{ background: isScrolled ? 'rgba(27,11,148,0.5)' : 'rgba(255,255,255,0.4)' }}
               />
               <span>Retours 30j</span>
             </div>
