@@ -13,7 +13,7 @@ interface HeroSectionProps {
 export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps) {
   return (
     <section
-      className="relative h-screen min-h-[700px] flex flex-col items-center justify-center overflow-hidden px-0 m-0"
+      className="relative h-screen min-h-[700px] flex flex-col items-center justify-start pt-[15vh] overflow-hidden px-0 m-0"
       style={{ backgroundColor: hexColor }}
     >
 

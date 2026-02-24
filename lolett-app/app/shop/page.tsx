@@ -55,10 +55,7 @@ export default function ShopPage() {
       />
 
       {/* ── HERO — 3 colonnes éditoriales ── */}
-      <section className="relative overflow-hidden pt-24 pb-0 sm:pt-32">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-[#1B0B94]/[0.07]" />
-        </div>
+      <section className="relative overflow-hidden pt-4 pb-0 sm:pt-6">
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <p className="mb-8 text-center text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">
@@ -131,25 +128,6 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {/* ── CATÉGORIES ── */}
-      <section className="border-y border-[#d9d0c0] py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex items-center gap-2 overflow-x-auto">
-            <span className="mr-2 flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#7a6f63]">
-              Catégories
-            </span>
-            {categories.map((cat) => (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className="flex-shrink-0 rounded-full border border-[#b8a98e] bg-white/60 px-4 py-1.5 text-xs font-semibold text-[#3d3328] transition-all hover:border-[#130970] hover:bg-[#130970]/10 hover:text-[#130970]"
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── NOUVELLES ARRIVÉES ── */}
       <section className="py-16 sm:py-24">

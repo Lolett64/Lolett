@@ -35,7 +35,7 @@ export function CollectionsSection({ content, hexColor = '#FFFFFF' }: Collection
 
   return (
     <section
-      className="py-16 md:py-20 border-b border-[#1B0B94]/10"
+      className="pt-0 pb-16 md:pb-20 border-b border-[#1B0B94]/10"
       style={{ backgroundColor: hexColor }}
     >
       <div className="max-w-[1700px] mx-auto px-4 sm:px-8">

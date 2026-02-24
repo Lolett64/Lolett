@@ -99,7 +99,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
   return (
     <div className="min-w-0">
       {/* ─── 1. Hero ─── */}
-      <section className="relative w-full overflow-hidden" style={{ height: 400 }}>
+      <section className="relative w-full overflow-hidden" style={{ height: 340 }}>
         <Image
           src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&q=80"
           alt="Nouvelle collection LOLETT"
@@ -107,160 +107,132 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
           className="object-cover"
           priority
         />
-        {/* Dark gradient overlay */}
+        {/* Dark overlay for text readability */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to right, rgba(26,21,16,0.85) 0%, rgba(26,21,16,0.4) 60%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(to right, rgba(26,21,16,0.75) 0%, rgba(26,21,16,0.45) 50%, rgba(26,21,16,0.2) 100%)' }}
         />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-10 lg:px-14">
           <p
-            className="mb-3 text-xs font-medium uppercase tracking-wider"
-            style={{ color: '#1B0B94' }}
+            className="mb-3 text-xs font-medium uppercase tracking-[0.25em]"
+            style={{ color: '#B89547' }}
           >
             Nouvelle Collection
           </p>
           <h1
             className="mb-4 text-4xl font-bold text-white sm:text-5xl lg:text-6xl"
-            style={{ fontFamily: 'var(--font-display, serif)' }}
+            style={{ fontFamily: 'var(--font-display, serif)', textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
           >
             Fraîchement Débarquées
           </h1>
-          <p className="max-w-lg text-base text-white/70">
+          <p className="max-w-lg text-base text-white/90">
             Les pièces de la saison. À peine arrivées, déjà indispensables.
           </p>
         </div>
-        {/* Golden accent line */}
+        {/* Accent line */}
         <div
           className="absolute bottom-0 left-0 w-full"
-          style={{ height: 2, background: 'linear-gradient(to right, #1B0B94, #1B0B9480, transparent)' }}
+          style={{ height: 3, background: 'linear-gradient(to right, #B89547, #1B0B94, transparent)' }}
         />
       </section>
 
-      {/* ─── 2. Gender Toggle (sticky) ─── */}
+      {/* ─── 2. Gender Toggle (sticky) + Looks title ─── */}
       <div
         className="sticky top-0 z-30 w-full"
         style={{ backgroundColor: '#FDF5E6', borderBottom: '1px solid #1B0B9430' }}
       >
-        <div className="flex items-center justify-center gap-10 px-6 sm:px-10 lg:px-14 py-0">
-          {(['femme', 'homme'] as const).map((gender) => (
-            <button
-              key={gender}
-              onClick={() => handleGenderChange(gender)}
-              className={cn(
-                'relative py-4 text-sm font-medium uppercase tracking-wider transition-colors',
-                activeGender === gender ? 'font-semibold' : 'hover:opacity-80'
-              )}
-              style={{
-                color: activeGender === gender ? '#1a1510' : '#8a7d6b',
-              }}
-            >
-              {gender === 'femme' ? 'Femme' : 'Homme'}
-              {activeGender === gender && (
-                <span
-                  className="absolute bottom-0 left-0 w-full"
-                  style={{ height: 3, backgroundColor: '#1B0B94' }}
-                />
-              )}
-            </button>
-          ))}
+        <div className="flex items-center justify-between px-6 sm:px-10 lg:px-14 py-0">
+          <h2
+            className="text-lg font-bold sm:text-xl"
+            style={{ fontFamily: 'var(--font-display, serif)', color: '#1B0B94' }}
+          >
+            Nos Looks du Moment
+          </h2>
+          <div className="flex items-center gap-10">
+            {(['femme', 'homme'] as const).map((gender) => (
+              <button
+                key={gender}
+                onClick={() => handleGenderChange(gender)}
+                className={cn(
+                  'relative py-4 text-sm font-medium uppercase tracking-wider transition-colors',
+                  activeGender === gender ? 'font-semibold' : 'hover:opacity-80'
+                )}
+                style={{
+                  color: activeGender === gender ? '#1a1510' : '#8a7d6b',
+                }}
+              >
+                {gender === 'femme' ? 'Femme' : 'Homme'}
+                {activeGender === gender && (
+                  <span
+                    className="absolute bottom-0 left-0 w-full"
+                    style={{ height: 3, backgroundColor: '#1B0B94' }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ─── 3. Looks Section ─── */}
+      {/* ─── 3. Looks Section (horizontal scroll, compact) ─── */}
       {genderLooks.length > 0 && (
-        <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#FDF5E6' }}>
-          <div className="mb-10 flex items-center gap-4">
-            <h2
-              className="text-2xl font-bold sm:text-3xl"
-              style={{ fontFamily: 'var(--font-display, serif)', color: '#1a1510' }}
-            >
-              Nos Looks du Moment
-            </h2>
-            <div
-              className="hidden h-px flex-1 sm:block"
-              style={{ background: 'linear-gradient(to right, #1B0B94, transparent)' }}
-            />
-          </div>
+        <section className="w-full py-8" style={{ backgroundColor: '#FDF5E6' }}>
 
-          <div
-            className={cn(
-              'grid gap-6',
-              genderLooks.length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
-            )}
-          >
+          <div className="flex gap-4 overflow-x-auto px-6 sm:px-10 lg:px-14 pb-4 snap-x snap-mandatory scrollbar-hide">
             {genderLooks.map((look) => {
               const lp = lookProducts[look.id] ?? [];
               return (
-                <div key={look.id} className="group relative min-w-0 overflow-hidden rounded-xl">
-                  <div className="relative aspect-[4/5] w-full overflow-hidden">
+                <Link
+                  key={look.id}
+                  href={`/look/${look.id}`}
+                  className="group relative flex-shrink-0 w-[300px] sm:w-[340px] overflow-hidden rounded-xl snap-start"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden">
                     <Image
                       src={look.coverImage}
                       alt={look.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    {/* Bottom gradient */}
+                    {/* Stronger gradient for text readability */}
                     <div
                       className="absolute inset-0"
-                      style={{ background: 'linear-gradient(to top, rgba(26,21,16,0.85) 0%, rgba(26,21,16,0.3) 40%, transparent 70%)' }}
+                      style={{ background: 'linear-gradient(to top, rgba(27,11,148,0.9) 0%, rgba(27,11,148,0.4) 35%, transparent 65%)' }}
                     />
                     {/* Content overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 p-6 min-w-0">
-                      <p
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: '#1B0B94' }}
-                      >
+                    <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-1.5 p-5">
+                      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#B89547]">
                         {look.vibe}
                       </p>
-                      <h3
-                        className="text-xl font-bold text-white"
-                        style={{ fontFamily: 'var(--font-display, serif)' }}
-                      >
+                      <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-display, serif)' }}>
                         {look.title}
                       </h3>
-                      <p className="text-sm text-white/70 line-clamp-2 min-w-0">
+                      <p className="text-xs text-white/80 line-clamp-1">
                         {look.shortPitch}
                       </p>
 
                       {/* Product thumbnails */}
                       {lp.length > 0 && (
-                        <div className="flex items-center -space-x-2 mt-1">
-                          {lp.slice(0, 5).map((product, i) => (
+                        <div className="flex items-center -space-x-1.5 mt-2">
+                          {lp.slice(0, 4).map((product, i) => (
                             <div
                               key={product.id}
-                              className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-white/30"
+                              className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white/40"
                               style={{ zIndex: lp.length - i }}
                             >
-                              <Image
-                                src={product.images[0]}
-                                alt={product.name}
-                                fill
-                                className="object-cover"
-                              />
+                              <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
                             </div>
                           ))}
-                          {lp.length > 5 && (
-                            <div
-                              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/30 text-xs font-medium text-white"
-                              style={{ backgroundColor: 'rgba(26,21,16,0.7)', zIndex: 0 }}
-                            >
-                              +{lp.length - 5}
+                          {lp.length > 4 && (
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white/40 text-[10px] font-medium text-white" style={{ backgroundColor: 'rgba(27,11,148,0.7)', zIndex: 0 }}>
+                              +{lp.length - 4}
                             </div>
                           )}
                         </div>
                       )}
-
-                      <Link
-                        href={`/look/${look.id}`}
-                        className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-80"
-                        style={{ color: '#1B0B94' }}
-                      >
-                        Adopter ce look
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
