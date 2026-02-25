@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+
+const VALID_SIZES = ['TU', 'XS', 'S', 'M', 'L', 'XL'] as const;
+
+const WebhookItemSchema = z.array(z.object({
+  productId: z.string(),
+  productName: z.string(),
+  size: z.enum(VALID_SIZES),
+  quantity: z.number().int().positive(),
+  price: z.number().positive(),
+}));
+
+const WebhookCustomerSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  address: z.string(),
+  city: z.string(),
+  postalCode: z.string(),
+  country: z.string(),
+});
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -15,21 +37,14 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
-      }
-      // Dev/test only: accept unverified events
-      event = JSON.parse(body) as Stripe.Event;
-    } else if (!signature) {
-      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
-    } else {
-      event = getStripe().webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
+    if (!process.env.STRIPE_WEBHOOK_SECRET || !signature) {
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 400 });
     }
+    event = getStripe().webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (err) {
     console.error('[Stripe webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -45,8 +60,8 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const items = JSON.parse(metadata.items);
-      const customer = JSON.parse(metadata.customer);
+      const items = WebhookItemSchema.parse(JSON.parse(metadata.items));
+      const customer = WebhookCustomerSchema.parse(JSON.parse(metadata.customer));
       const total = parseFloat(metadata.total || '0');
       const shipping = parseFloat(metadata.shipping || '0');
       const userId = metadata.userId || undefined;

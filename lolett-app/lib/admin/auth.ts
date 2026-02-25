@@ -31,8 +31,9 @@ export async function clearAdminCookie(): Promise<void> {
   cookieStore.delete(COOKIE_NAME);
 }
 
-export function checkAdminCookieFromRequest(_request: Request): boolean {
-  // Synchronous check not possible with async crypto — always return false
-  // Admin routes use isAdminAuthenticated() in layout instead
-  return false;
+export async function checkAdminCookieFromRequest(request: Request): Promise<boolean> {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const match = cookieHeader.match(/lolett_admin_token=([^;]+)/);
+  if (!match) return false;
+  return verifyToken(decodeURIComponent(match[1]));
 }

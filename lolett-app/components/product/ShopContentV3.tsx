@@ -91,7 +91,7 @@ export function ShopContentV3({
         className="-mx-4 sm:-mx-6 lg:-mx-8 min-h-[380px] flex items-center"
         style={{ backgroundColor: '#1a1510' }}
       >
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center min-w-0">
             {/* Left — Text */}
             <div className="min-w-0 space-y-5">
@@ -153,7 +153,7 @@ export function ShopContentV3({
         className="-mx-4 sm:-mx-6 lg:-mx-8 sticky top-0 z-30"
         style={{ backgroundColor: '#1a1510' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between gap-4 min-w-0">
             {/* Categories */}
             <nav className="flex items-center gap-5 overflow-x-auto min-w-0 scrollbar-hide">
@@ -290,7 +290,7 @@ export function ShopContentV3({
         className="-mx-4 sm:-mx-6 lg:-mx-8 min-h-[50vh]"
         style={{ backgroundColor: '#FDF5E6' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Active filters */}
           {activeFilters.length > 0 && (
             <div className="mb-6">

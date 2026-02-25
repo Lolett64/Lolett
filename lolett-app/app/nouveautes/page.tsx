@@ -30,7 +30,7 @@ export default async function NouveautesPage() {
   const lookProducts = Object.fromEntries(lookProductsEntries);
 
   return (
-    <div className="pt-20 sm:pt-24 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
       <NouveautesContentV2
         products={newProducts}
         looks={looks}

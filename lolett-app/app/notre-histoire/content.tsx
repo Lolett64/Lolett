@@ -96,7 +96,7 @@ export default function NotreHistoireContent() {
   return (
     <main style={{ background: SAND, color: BROWN }}>
       {/* HERO */}
-      <section style={{ position: 'relative', height: '40vh', minHeight: 280, overflow: 'hidden' }}>
+      <section style={{ position: 'relative', height: '25vh', minHeight: 180, overflow: 'hidden' }}>
         <Image
           src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80"
           alt="Mediterranean beach"
@@ -116,7 +116,7 @@ export default function NotreHistoireContent() {
       </section>
 
       {/* INTRO */}
-      <section style={{ padding: 'clamp(32px, 5vw, 60px) 24px', maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+      <section style={{ padding: 'clamp(32px, 5vw, 60px) 24px', maxWidth: 1400, margin: '0 auto', textAlign: 'center' }}>
         <Reveal>
           <div style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(184,149,71,0.03) 3px, rgba(184,149,71,0.03) 4px)', padding: 'clamp(20px, 3vw, 40px)', borderRadius: 4 }}>
             <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: GOLD, fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 24 }}>
@@ -130,7 +130,7 @@ export default function NotreHistoireContent() {
       </section>
 
       {/* MATERIALS BAR */}
-      <section style={{ padding: '24px 24px', maxWidth: 800, margin: '0 auto' }}>
+      <section style={{ padding: '24px 24px', maxWidth: 1100, margin: '0 auto' }}>
         <Reveal>
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'clamp(20px, 4vw, 48px)' }}>
             {materials.map((m, i) => (
@@ -152,7 +152,7 @@ export default function NotreHistoireContent() {
       <div style={{ width: 60, height: 1, background: GOLD, margin: '24px auto', opacity: 0.4 }} />
 
       {/* VISION */}
-      <section style={{ padding: 'clamp(32px, 5vw, 60px) clamp(24px, 5vw, 80px)', maxWidth: 1100, margin: '0 auto' }}>
+      <section style={{ padding: 'clamp(32px, 5vw, 60px) clamp(24px, 5vw, 80px)', maxWidth: 1400, margin: '0 auto' }}>
         <Reveal>
           <div style={{ display: 'flex', gap: 'clamp(32px, 5vw, 80px)', flexWrap: 'wrap', alignItems: 'center' }}>
             <div style={{ flex: '1 1 400px' }}>
@@ -177,7 +177,7 @@ export default function NotreHistoireContent() {
       </section>
 
       {/* MATIERES */}
-      <section style={{ padding: 'clamp(24px, 4vw, 48px) clamp(24px, 5vw, 80px)', maxWidth: 1100, margin: '0 auto' }}>
+      <section style={{ padding: 'clamp(24px, 4vw, 48px) clamp(24px, 5vw, 80px)', maxWidth: 1400, margin: '0 auto' }}>
         <Reveal>
           <div style={{ display: 'flex', gap: 'clamp(32px, 5vw, 80px)', flexWrap: 'wrap', alignItems: 'center', flexDirection: 'row-reverse' }}>
             <div style={{ flex: '1 1 400px' }}>
@@ -217,7 +217,7 @@ export default function NotreHistoireContent() {
       </section>
 
       {/* QUOTE */}
-      <section style={{ padding: 'clamp(32px, 5vw, 60px) 24px', maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+      <section style={{ padding: 'clamp(32px, 5vw, 60px) 24px', maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
         <Reveal>
           <div style={{ borderTop: '1px solid rgba(184,149,71,0.3)', borderBottom: '1px solid rgba(184,149,71,0.3)', padding: '40px 0' }}>
             <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 'clamp(20px, 3vw, 28px)', fontStyle: 'italic', lineHeight: 1.6, color: BROWN }}>

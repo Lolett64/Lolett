@@ -85,7 +85,7 @@ export function ShopContentV3_V1({
                 {/* Layer 2: Deep Gradient for Title Readability */}
                 <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                <div className="absolute inset-0 flex flex-col justify-end pb-32 px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto">
+                <div className="absolute inset-0 flex flex-col justify-end pb-32 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
                         <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#B89547] font-bold">
@@ -125,7 +125,7 @@ export function ShopContentV3_V1({
             </div>
 
             {/* ═══ V1 CONTENT AREA ═══ */}
-            <div className="max-w-7xl mx-auto mt-20 px-6 lg:px-12">
+            <div className="max-w-[1600px] mx-auto mt-20 px-6 lg:px-12">
 
                 <div className="flex flex-col lg:flex-row gap-12">
 

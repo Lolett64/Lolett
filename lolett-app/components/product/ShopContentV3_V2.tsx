@@ -89,7 +89,7 @@ export function ShopContentV3_V2({
             </div>
 
             {/* ═══ V2 BARRE : "Navigation Éditoriale" ═══ */}
-            <div className="max-w-7xl mx-auto px-6 md:px-20 py-12 flex flex-col items-center">
+            <div className="max-w-[1600px] mx-auto px-6 md:px-20 py-12 flex flex-col items-center">
                 <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
                     <Link href={`/shop/${gender}`} className={cn("relative group font-[family-name:var(--font-newsreader)] text-2xl italic", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}>
                         Tout voir
@@ -109,7 +109,7 @@ export function ShopContentV3_V2({
             </div>
 
             {/* ═══ V2 CONTENT : "Filtres Horizontaux" ═══ */}
-            <div className="max-w-7xl mx-auto px-6 md:px-20">
+            <div className="max-w-[1600px] mx-auto px-6 md:px-20">
 
                 <div className="border-t border-b border-[#1B0B94]/10 py-6 mb-12 flex items-center justify-between">
                     <button

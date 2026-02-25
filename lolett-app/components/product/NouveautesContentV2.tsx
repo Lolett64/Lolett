@@ -99,87 +99,44 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
   return (
     <div className="min-w-0">
       {/* ─── 1. Hero ─── */}
-      <section className="relative w-full overflow-hidden" style={{ height: 340 }}>
-        <Image
-          src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&q=80"
-          alt="Nouvelle collection LOLETT"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Dark overlay for text readability */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to right, rgba(26,21,16,0.75) 0%, rgba(26,21,16,0.45) 50%, rgba(26,21,16,0.2) 100%)' }}
-        />
-        <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-10 lg:px-14">
-          <p
-            className="mb-3 text-xs font-medium uppercase tracking-[0.25em]"
-            style={{ color: '#B89547' }}
-          >
-            Nouvelle Collection
-          </p>
-          <h1
-            className="mb-4 text-4xl font-bold text-white sm:text-5xl lg:text-6xl"
-            style={{ fontFamily: 'var(--font-display, serif)', textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
-          >
-            Fraîchement Débarquées
-          </h1>
-          <p className="max-w-lg text-base text-white/90">
-            Les pièces de la saison. À peine arrivées, déjà indispensables.
-          </p>
-        </div>
-        {/* Accent line */}
-        <div
-          className="absolute bottom-0 left-0 w-full"
-          style={{ height: 3, background: 'linear-gradient(to right, #B89547, #1B0B94, transparent)' }}
-        />
+      <section className="w-full py-8 px-6 sm:px-10 lg:px-14 flex flex-col items-center text-center" style={{ background: 'linear-gradient(180deg, #F5ECD7 0%, #FDF5E6 100%)' }}>
+        <div className="w-10 h-[1px] bg-[#B89547] mb-3" />
+        <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.25em] text-[#B89547]">
+          Nouvelle Collection
+        </p>
+        <h1
+          className="mb-2 text-2xl sm:text-3xl font-bold text-[#1B0B94]"
+          style={{ fontFamily: 'var(--font-newsreader, serif)' }}
+        >
+          Fraîchement Débarquées
+        </h1>
+        <p className="max-w-md text-sm text-[#1B0B94]/55">
+          Les pièces de la saison. À peine arrivées, déjà indispensables.
+        </p>
+        <div className="w-10 h-[1px] bg-[#B89547] mt-3" />
       </section>
 
-      {/* ─── 2. Gender Toggle (sticky) + Looks title ─── */}
+      {/* ─── 2. Looks title ─── */}
       <div
-        className="sticky top-0 z-30 w-full"
+        className="w-full"
         style={{ backgroundColor: '#FDF5E6', borderBottom: '1px solid #1B0B9430' }}
       >
-        <div className="flex items-center justify-between px-6 sm:px-10 lg:px-14 py-0">
+        <div className="flex items-center px-6 sm:px-10 lg:px-14 py-4">
           <h2
             className="text-lg font-bold sm:text-xl"
             style={{ fontFamily: 'var(--font-display, serif)', color: '#1B0B94' }}
           >
             Nos Looks du Moment
           </h2>
-          <div className="flex items-center gap-10">
-            {(['femme', 'homme'] as const).map((gender) => (
-              <button
-                key={gender}
-                onClick={() => handleGenderChange(gender)}
-                className={cn(
-                  'relative py-4 text-sm font-medium uppercase tracking-wider transition-colors',
-                  activeGender === gender ? 'font-semibold' : 'hover:opacity-80'
-                )}
-                style={{
-                  color: activeGender === gender ? '#1a1510' : '#8a7d6b',
-                }}
-              >
-                {gender === 'femme' ? 'Femme' : 'Homme'}
-                {activeGender === gender && (
-                  <span
-                    className="absolute bottom-0 left-0 w-full"
-                    style={{ height: 3, backgroundColor: '#1B0B94' }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* ─── 3. Looks Section (horizontal scroll, compact) ─── */}
-      {genderLooks.length > 0 && (
+      {/* ─── 3. Looks Section (horizontal scroll, ALL genders) ─── */}
+      {looks.length > 0 && (
         <section className="w-full py-8" style={{ backgroundColor: '#FDF5E6' }}>
 
-          <div className="flex gap-4 overflow-x-auto px-6 sm:px-10 lg:px-14 pb-4 snap-x snap-mandatory scrollbar-hide">
-            {genderLooks.map((look) => {
+          <div className="flex gap-4 justify-center flex-wrap px-6 sm:px-10 lg:px-14 pb-4">
+            {looks.map((look) => {
               const lp = lookProducts[look.id] ?? [];
               return (
                 <Link
@@ -241,6 +198,31 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
 
       {/* ─── 4. Product Grid Section ─── */}
       <section className="w-full px-6 sm:px-10 lg:px-14 py-16" style={{ backgroundColor: '#FDF5E6' }}>
+        {/* Gender toggle */}
+        <div className="flex items-center gap-10 mb-8 border-b border-[#1B0B94]/10 pb-0">
+          {(['femme', 'homme'] as const).map((gender) => (
+            <button
+              key={gender}
+              onClick={() => handleGenderChange(gender)}
+              className={cn(
+                'relative pb-3 text-sm font-medium uppercase tracking-wider transition-colors',
+                activeGender === gender ? 'font-semibold' : 'hover:opacity-80'
+              )}
+              style={{
+                color: activeGender === gender ? '#1B0B94' : '#8a7d6b',
+              }}
+            >
+              {gender === 'femme' ? 'Femme' : 'Homme'}
+              {activeGender === gender && (
+                <span
+                  className="absolute bottom-0 left-0 w-full"
+                  style={{ height: 3, backgroundColor: '#1B0B94' }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
         {/* Title bar */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between min-w-0">
           <div className="flex items-center gap-3 min-w-0">

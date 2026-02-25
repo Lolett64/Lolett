@@ -1,12 +1,36 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+
+const VariantSchema = z.object({
+  colorName: z.string(),
+  colorHex: z.string(),
+  size: z.string(),
+  stock: z.number().int().min(0),
+});
+
+const ProductUpdateSchema = z.object({
+  slug: z.string().min(1).optional(),
+  name: z.string().min(1).optional(),
+  gender: z.enum(['homme', 'femme']).optional(),
+  category_slug: z.string().min(1).optional(),
+  price: z.number().positive().optional(),
+  images: z.array(z.string()).optional(),
+  description: z.string().optional(),
+  sizes: z.array(z.string()).optional(),
+  colors: z.array(z.object({ name: z.string(), hex: z.string() })).optional(),
+  stock: z.number().int().min(0).optional(),
+  is_new: z.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+  variants: z.array(VariantSchema).optional(),
+}).passthrough();
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -45,16 +69,20 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const { id } = await params;
   const supabase = createAdminClient();
-  const body = (await request.json()) as Record<string, unknown>;
-  
+  const rawBody = await request.json();
+  const parsed = ProductUpdateSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Données invalides', details: parsed.error.flatten() }, { status: 400 });
+  }
+
   // Extraire les variantes du body
-  const { variants, ...productData } = body;
+  const { variants, ...productData } = parsed.data;
 
   // Mettre à jour le produit
   const { data, error } = await supabase
@@ -107,7 +135,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

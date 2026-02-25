@@ -3,7 +3,7 @@ import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -25,7 +25,8 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
-  const ext = file.name.split('.').pop() ?? 'jpg';
+  const mimeToExt: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif' };
+  const ext = mimeToExt[file.type] || 'jpg';
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   const arrayBuffer = await file.arrayBuffer();

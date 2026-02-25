@@ -3,7 +3,7 @@ import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET(request: Request) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

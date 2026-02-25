@@ -57,7 +57,7 @@ export default function ShopPage() {
       {/* ── HERO — 3 colonnes éditoriales ── */}
       <section className="relative overflow-hidden pt-4 pb-0 sm:pt-6">
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6">
           <p className="mb-8 text-center text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">
             Collection Été 2026
           </p>
@@ -131,7 +131,7 @@ export default function ShopPage() {
 
       {/* ── NOUVELLES ARRIVÉES ── */}
       <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
               <p className="text-[10px] font-medium tracking-wider uppercase text-[#130970]">Just in</p>
@@ -177,7 +177,7 @@ export default function ShopPage() {
 
       {/* ── LOOKS ÉDITORIAUX ── */}
       <section className="bg-[#ebe5d9] py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
               <p className="text-[10px] font-medium tracking-wider uppercase text-[#130970]">Prêt à sortir</p>
@@ -232,7 +232,7 @@ export default function ShopPage() {
 
       {/* ── TRUST BAR ── */}
       <section className="border-t border-[#d9d0c0] py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6">
           <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-3">
             {[
               { title: 'Livraison offerte', desc: "Dès 100€ d'achat en France" },

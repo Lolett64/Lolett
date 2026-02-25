@@ -3,7 +3,7 @@ import Image from 'next/image';
 export function IntroHistoire() {
   return (
     <section className="border-t border-[#d9d0c0] py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-[1600px] px-6">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-[280px_1fr]">
 
           {/* Sidebar sticky */}

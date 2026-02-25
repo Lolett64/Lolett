@@ -99,7 +99,7 @@ export function ShopContentV4({
                 {/* Deep Gradient for Title Readability (V1 style refined) */}
                 <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto">
+                <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
                         <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#B89547] font-bold">
@@ -118,7 +118,7 @@ export function ShopContentV4({
             </div>
 
             {/* ═══ BARRE : Style V2 (Éditorial) ═══ */}
-            <div className="max-w-7xl mx-auto px-6 md:px-20 py-10 flex flex-col items-center">
+            <div className="max-w-[1600px] mx-auto px-6 md:px-20 py-10 flex flex-col items-center">
                 <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
                     <Link href={`/shop/${gender}`} className={cn("relative group font-[family-name:var(--font-newsreader)] text-2xl italic", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}>
                         Tout voir
@@ -138,7 +138,7 @@ export function ShopContentV4({
             </div>
 
             {/* ═══ CONTENT AREA : Style V1 (Sidebar + Grid) ═══ */}
-            <div className="max-w-7xl mx-auto mt-10 px-6 lg:px-12">
+            <div className="max-w-[1600px] mx-auto mt-10 px-6 lg:px-12">
 
                 <div className="flex flex-col lg:flex-row gap-12">
 

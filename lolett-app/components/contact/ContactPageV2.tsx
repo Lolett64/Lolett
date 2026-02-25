@@ -107,7 +107,7 @@ export function ContactPageV2() {
 
       {/* ══ FORM + INFO ══ */}
       <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-[1600px] px-6">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-[1fr_400px] lg:gap-20">
 
             {/* Formulaire */}

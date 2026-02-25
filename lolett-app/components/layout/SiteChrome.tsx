@@ -20,10 +20,10 @@ export function SiteChrome({ children, footerContent }: SiteChromeProps) {
   const isTestPage = pathname.startsWith('/test');
 
   return (
-    <>
+    <div className="w-full max-w-[100vw] overflow-x-hidden">
       {!isTestPage && <HighBarV4 hexColor="#FDF5E6" />}
       <main className="min-h-screen">{children}</main>
       {!isTestPage && <Footer content={footerContent} />}
-    </>
+    </div>
   );
 }

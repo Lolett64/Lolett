@@ -9,7 +9,7 @@ interface ContainerProps {
 export function Container({ children, className, size = 'default' }: ContainerProps) {
   const sizeClasses = {
     narrow: 'max-w-4xl',
-    default: 'max-w-7xl',
+    default: '',
     wide: 'max-w-[1600px]',
   };
 

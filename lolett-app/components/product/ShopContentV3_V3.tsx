@@ -99,7 +99,7 @@ export function ShopContentV3_V3({
                 "sticky top-20 z-[60] py-4 transition-all duration-500 px-6",
                 isScrolled ? "bg-white/80 backdrop-blur-xl border-b border-[#1B0B94]/5 shadow-sm" : "bg-transparent"
             )}>
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                <div className="max-w-[1600px] mx-auto flex items-center justify-between">
                     <div className="flex gap-8 overflow-x-auto no-scrollbar">
                         <Link href={`/shop/${gender}`} className={cn("text-[10px] uppercase tracking-[0.2em] font-black transition-colors", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/30 hover:text-[#1B0B94]")}>
                             Tous
@@ -126,7 +126,7 @@ export function ShopContentV3_V3({
             </div>
 
             {/* ═══ V3 CONTENT Area ═══ */}
-            <div className="max-w-7xl mx-auto mt-16 px-6 relative">
+            <div className="max-w-[1600px] mx-auto mt-16 px-6 relative">
 
                 <div className="flex items-center justify-between mb-16 px-1">
                     <div className="flex items-center gap-6">

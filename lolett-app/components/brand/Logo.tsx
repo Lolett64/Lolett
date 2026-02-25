@@ -7,14 +7,30 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function Logo({ className, size = 'md' }: LogoProps) {
+export function Logo({ className, variant = 'default', size = 'md' }: LogoProps) {
   const sizeMap = {
-    sm: 32,
-    md: 44,
-    lg: 60,
+    sm: 'text-lg',
+    md: 'text-xl',
+    lg: 'text-3xl',
   };
 
-  const h = sizeMap[size];
+  if (variant === 'white') {
+    return (
+      <span
+        className={cn(
+          'font-[family-name:var(--font-montserrat)] font-black tracking-[-0.02em] text-white inline-flex items-center',
+          sizeMap[size],
+          className
+        )}
+      >
+        LOLET
+        <span className="inline-block transform rotate-[15deg] origin-bottom-left">T</span>
+      </span>
+    );
+  }
+
+  const hMap = { sm: 32, md: 44, lg: 60 };
+  const h = hMap[size];
 
   return (
     <Image

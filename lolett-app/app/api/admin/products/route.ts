@@ -1,9 +1,33 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+const VariantSchema = z.object({
+  colorName: z.string(),
+  colorHex: z.string(),
+  size: z.string(),
+  stock: z.number().int().min(0),
+});
+
+const ProductCreateSchema = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  gender: z.enum(['homme', 'femme']),
+  category_slug: z.string().min(1),
+  price: z.number().positive(),
+  images: z.array(z.string()).optional(),
+  description: z.string().optional(),
+  sizes: z.array(z.string()).optional(),
+  colors: z.array(z.object({ name: z.string(), hex: z.string() })).optional(),
+  stock: z.number().int().min(0).optional(),
+  is_new: z.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+  variants: z.array(VariantSchema).optional(),
+}).passthrough();
+
 export async function GET(request: Request) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -35,15 +59,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!checkAdminCookieFromRequest(request)) {
+  if (!(await checkAdminCookieFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const supabase = createAdminClient();
-  const body = (await request.json()) as Record<string, unknown>;
-  
+  const rawBody = await request.json();
+  const parsed = ProductCreateSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Données invalides', details: parsed.error.flatten() }, { status: 400 });
+  }
+
   // Extraire les variantes du body
-  const { variants, ...productData } = body;
+  const { variants, ...productData } = parsed.data;
 
   // Insérer le produit
   const { data: product, error: productError } = await supabase

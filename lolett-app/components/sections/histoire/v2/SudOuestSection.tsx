@@ -38,7 +38,7 @@ interface SudOuestSectionProps {
 export function SudOuestSection({ content }: SudOuestSectionProps) {
   return (
     <section className="bg-[#1a1510] py-28 sm:py-36">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-[1600px] px-6">
 
         {/* Header */}
         <div className="mb-16 text-center">

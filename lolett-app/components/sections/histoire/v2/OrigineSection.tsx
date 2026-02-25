@@ -13,7 +13,7 @@ export function OrigineSection({ content }: OrigineSectionProps) {
 
   return (
     <section className="relative overflow-hidden bg-[#f3efe8] py-28 sm:py-36">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-[1600px] px-6">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-20">
 
           {/* Image parallax */}
