@@ -142,8 +142,13 @@
     @apply border-border outline-ring/50;
   }
 
-  html, body {
+  html {
     scroll-behavior: smooth;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -876,7 +881,6 @@
 
 /* Prevent horizontal overflow on mobile */
 @media (max-width: 640px) {
-  html,
   body {
     overflow-x: hidden;
   }

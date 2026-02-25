@@ -47,12 +47,6 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
               <div className="relative">
                 <ProductCard product={product} />
               </div>
-              {/* UX : Add to cart rapide au survol sur desktop */}
-              <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
-                <button className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-[#1B0B94]/20 flex items-center justify-center text-[#1B0B94] hover:bg-[#1B0B94] hover:text-white transition-colors shadow-sm">
-                  <span className="text-lg leading-none">+</span>
-                </button>
-              </div>
             </div>
           ))}
         </div>

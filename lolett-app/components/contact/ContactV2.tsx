@@ -110,7 +110,7 @@ export function ContactV2() {
       {/* Hero */}
       <div style={{
         height: '25vh', minHeight: '200px',
-        backgroundImage: 'url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80)',
         backgroundSize: 'cover', backgroundPosition: 'center 40%',
         position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>

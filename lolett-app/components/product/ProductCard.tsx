@@ -166,13 +166,13 @@ export function ProductCard({ product }: ProductCardProps) {
             {isLowStock && <BrandBadge variant="lowStock">Plus que {totalStock}</BrandBadge>}
           </div>
 
-          {/* Mobile favorite button - always visible */}
+          {/* Favorite button - visible on hover only */}
           <button
             onClick={handleFavorite}
             className={cn(
-              'absolute top-2 right-2 rounded-full p-2 transition-all sm:top-3 sm:right-3 sm:opacity-0 sm:group-hover:opacity-100',
+              'absolute top-2 right-2 rounded-full p-2 transition-all opacity-0 group-hover:opacity-100 sm:top-3 sm:right-3',
               isFavorite
-                ? 'bg-lolett-gold text-white opacity-100'
+                ? 'bg-lolett-gold text-white !opacity-100'
                 : 'text-lolett-gray-700 bg-white/90 backdrop-blur-sm hover:bg-white'
             )}
             aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}

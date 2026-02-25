@@ -65,7 +65,7 @@ export default async function HomePage() {
     >
       <main>
         <HeroSection content={content} hexColor={hexColor} />
-        <CollectionsSection content={content} hexColor={hexColor} />
+        {/* <CollectionsSection content={content} hexColor={hexColor} /> */}
         <NewArrivalsSection products={newProducts} hexColor={hexColor} />
         <BrandStorySection content={content} hexColor={hexColor} />
         <LooksSection looks={featuredLooks} lookProducts={lookProducts} hexColor={hexColor} />

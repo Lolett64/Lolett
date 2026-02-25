@@ -30,7 +30,7 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
     const initials = user?.user_metadata?.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'L';
 
     return (
-        <header className="relative z-[100]">
+        <header className="sticky top-0 z-[100]">
             <div
                 className="transition-shadow duration-300"
                 style={{
