@@ -25,7 +25,7 @@ export function NewsletterForm({ variant = 'light' }: NewsletterFormProps) {
   if (status === 'success') {
     return (
       <p className={`text-sm tracking-wide font-medium py-6 ${isDark ? 'text-[#c9a24a]' : 'text-[#c9a24a]'}`}>
-        Bienvenue dans le cercle Lorett.
+        Bienvenue dans le cercle Lolett.
       </p>
     );
   }

@@ -30,7 +30,7 @@ export function BrandStorySection({ hexColor = '#FFFFFF' }: BrandStorySectionPro
           <div className="w-px h-8 bg-[#1B0B94]/30 mx-auto mt-6 mb-8" />
 
           <p className="font-[family-name:var(--font-newsreader)] text-2xl md:text-3xl leading-relaxed text-[#1B0B94]/80 max-w-[1100px] mx-auto italic tracking-tight">
-            {`"Chez Lorett, le vêtement ne contraint jamais. Il accompagne le mouvement, reflète la lumière du bassin et vieillit avec la grâce des matières naturelles. Nos racines s'ancrent profondément dans le sable chaud de la côte Atlantique."`}
+            {`"Chez Lolett, le vêtement ne contraint jamais. Il accompagne le mouvement, reflète la lumière du bassin et vieillit avec la grâce des matières naturelles. Nos racines s'ancrent profondément dans le sable chaud de la côte Atlantique."`}
           </p>
         </ScrollReveal>
 

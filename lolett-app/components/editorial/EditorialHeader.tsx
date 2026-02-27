@@ -63,7 +63,7 @@ export function EditorialHeader({ theme = 'dark' }: EditorialHeaderProps) {
         <Link href="/" className="absolute left-1/2 -translate-x-1/2">
           <Image
             src="/images/Logo Lolett.jpeg"
-            alt="Lorett - Accueil"
+            alt="Lolett - Accueil"
             width={160}
             height={60}
             className={`h-10 w-auto object-contain transition-all duration-700 ${!isLightText ? 'scale-90 brightness-100' : 'scale-110 brightness-[2] invert'
