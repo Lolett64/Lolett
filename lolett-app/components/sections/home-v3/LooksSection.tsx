@@ -22,10 +22,10 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
 
         <div className="text-center mb-12 md:mb-16">
           <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-medium mb-4 block">
-            Vestiaire d&apos;Atelier
+            Prêt à sortir
           </span>
           <h2 className="font-[family-name:var(--font-newsreader)] text-5xl md:text-6xl italic text-[#1B0B94]">
-            Notes de Style
+            Le Look Complet
           </h2>
         </div>
 

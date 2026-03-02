@@ -18,9 +18,12 @@ export function TestimonialsSection({ reviews, hexColor = '#FFFFFF' }: Testimoni
       <div className="max-w-[1200px] mx-auto px-6">
 
         <div className="text-center mb-16">
-          <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-medium block">
-            Ce qu&apos;ils en disent
+          <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-medium mb-4 block">
+            Témoignages
           </span>
+          <h2 className="font-[family-name:var(--font-newsreader)] text-4xl md:text-5xl font-bold text-[#1B0B94]">
+            Ce qu&apos;ils en pensent
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12 border-t border-[#1B0B94]/10 pt-8">

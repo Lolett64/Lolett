@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import {
   HeroSection,
   NewArrivalsSection,
@@ -39,11 +41,13 @@ export const metadata: Metadata = {
 const hexColor = "#FDF5E6";
 
 const content = {
-  title_line1: "L'Héritage",
-  title_line2: "Terroir",
-  subtitle: "Atelier Bordeaux",
-  description: "L'élégance sans effort. Le lin noble et la coupe juste, pour lui et pour elle.",
+  title_line1: "Porter &",
+  title_line2: "vibrer le Sud",
+  subtitle: "Lolett",
+  description: "Pour lui, pour elle, pour vous.",
   video_src: "/videos/hero-beach.mp4",
+  cta1_text: "Vestiaire Femme",
+  cta2_text: "Vestiaire Homme",
 };
 
 export default async function HomePage() {
@@ -70,7 +74,42 @@ export default async function HomePage() {
         <BrandStorySection content={content} hexColor={hexColor} />
         <LooksSection looks={featuredLooks} lookProducts={lookProducts} hexColor={hexColor} />
         <TestimonialsSection reviews={reviews} hexColor={hexColor} />
-        <NewsletterSection content={content} hexColor={hexColor} />
+        <NewsletterSection content={{
+          title: "Reste connecté",
+          description: "Nouveautés, exclusivités et inspirations du Sud-Ouest.",
+          placeholder_text: "ton@email.com",
+          button_text: "S'inscrire",
+        }} hexColor={hexColor} />
+
+        {/* CTA Final */}
+        <section className="relative bg-[#0B0F1A] text-white py-20 md:py-28 text-center overflow-hidden">
+          <div className="max-w-3xl mx-auto px-6">
+            <span className="text-[#B89547] text-[10px] uppercase tracking-[0.4em] font-medium mb-6 block">
+              Prêt ?
+            </span>
+            <h2 className="font-[family-name:var(--font-newsreader)] text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+              Installe-toi, regarde, et si tu craques...
+            </h2>
+            <p className="text-white/60 italic text-lg mb-10">
+              On t&apos;avait prévenu.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/shop/femme" className="inline-flex items-center justify-center gap-2 bg-[#B89547] text-[#0B0F1A] px-8 py-4 text-sm uppercase tracking-[0.2em] font-bold hover:bg-[#B89547]/90 transition-colors">
+                Shop Femme <ArrowRight size={16} />
+              </Link>
+              <Link href="/shop/homme" className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-8 py-4 text-sm uppercase tracking-[0.2em] font-bold hover:bg-white/10 transition-colors">
+                Shop Homme <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Disclaimer */}
+        <section className="py-6 text-center" style={{ backgroundColor: hexColor }}>
+          <p className="text-[#1B0B94]/40 text-sm italic font-[family-name:var(--font-newsreader)]">
+            LOLETT décline toute responsabilité en cas de coup de coeur.
+          </p>
+        </section>
       </main>
     </div>
   );

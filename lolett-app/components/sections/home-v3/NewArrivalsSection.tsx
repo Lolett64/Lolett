@@ -21,10 +21,10 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-[#1B0B94]/10 pb-6 gap-6">
           <div>
             <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-bold mb-4 block">
-              Derniers Rayons
+              Nouveautés
             </span>
             <h2 className="font-[family-name:var(--font-newsreader)] text-5xl sm:text-7xl italic text-[#1B0B94] tracking-tight">
-              Nouveautés Atelier
+              Fraîchement Arrivées
             </h2>
           </div>
           <Link

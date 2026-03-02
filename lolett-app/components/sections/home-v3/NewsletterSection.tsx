@@ -46,7 +46,7 @@ export function NewsletterSection({ content, hexColor = '#FFFFFF' }: NewsletterS
             </div>
 
             <p className="text-[8px] uppercase tracking-[0.2em] text-[#1B0B94]/40 mt-6 text-center w-full">
-              Désinscription à tout moment. Envois modérés.
+              Pas de spam, promis. Désinscription en un clic.
             </p>
           </form>
         </ScrollReveal>

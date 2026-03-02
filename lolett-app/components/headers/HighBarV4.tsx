@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ShoppingBag, Heart, AtSign, ChevronDown, Phone, User } from 'lucide-react';
+import { ShoppingBag, Heart, AtSign, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { useCartStore } from '@/features/cart';
 import { useFavoritesStore } from '@/features/favorites';
@@ -39,17 +39,13 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
             >
                 {/* Top Bar — Réassurance */}
                 <div className="w-full bg-[#1B0B94] text-white text-[11px] font-medium tracking-wide">
-                    <div className="w-full flex items-center justify-between px-6 md:px-8 py-2">
-                        <a href="tel:+33123456789" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-                            <Phone size={11} strokeWidth={2} />
-                            <span>01 23 45 67 89</span>
-                        </a>
+                    <div className="w-full flex items-center justify-center px-6 md:px-8 py-2">
                         <div className="flex items-center gap-2">
                             <span>Livraison offerte dès {SHIPPING.FREE_THRESHOLD}€</span>
                             <span className="w-1 h-1 rounded-full bg-[#B89547]"></span>
                             <span>24/48h</span>
                             <span className="w-1 h-1 rounded-full bg-[#B89547]"></span>
-                            <span>Retours 30j</span>
+                            <span>Retours 14j</span>
                         </div>
                     </div>
                 </div>
