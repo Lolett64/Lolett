@@ -1,23 +1,21 @@
-# Session State — 2026-03-02 20:15
+# Session State — 2026-03-02 21:30
 
 ## Branch
 main
 
 ## Completed This Session
-- Landing page retours cliente: Hero textes (Porter & vibrer le Sud), boutons Vestiaire Femme/Homme
-- BrandStory: citation lumière + piliers (Qualité durable, Lolett invite le sud, Simplicité élégante)
-- NewArrivals: "Fraîchement Arrivées", Looks: "Le Look Complet", Testimonials: "Ce qu'ils en pensent"
-- Newsletter: "Reste connecté" + textes v1
-- CTA Final: "Installe-toi, regarde, et si tu craques..." + disclaimer coup de coeur
-- HighBarV4: suppression téléphone, Retours 30j → 14j, barre centrée
+- Hero: titre agrandi x1.5 + container élargi max-w-7xl + whitespace-nowrap
+- Hero: sous-titre et boutons agrandis x1.5
+- BrandStory: nouveau titre "S'habiller c'est s'exprimer, pas impressionner" + paragraphe côte Atlantique + 3 piliers (Matières Nobles, Style du Sud-Ouest, Coupe Parfaite)
+- LooksSection: refonte carrousel (layout gauche texte / droite image, navigation flèches, badge occasion, prix + CTA)
+- Shop: petit texte jaune "Pour Lui"/"Pour Elle" + ombre, gros titres restent "Collection Homme/Femme"
 
 ## Next Task
 Page Notre Histoire — refonte complète: titre "Mon histoire", texte personnel de Lola (PDF pages 3-4), citation styliste pyjama
 
 ## Blockers
-Page s'affiche mal parfois — cache .next corrompu, résolu avec pkill + rm -rf .next + Cmd+Shift+R
+None
 
 ## Key Context
 - PDF retours cliente dans docs/Retour cliente v3.pdf — reste à faire: Notre Histoire, Contact (passage au "je", suppr tel, 24-48h), FAQ (passage au "je")
-- Approche preview abandonnée, on modifie directement les fichiers originaux
-- Fichiers preview supprimés (app/preview/ + components/.../preview/)
+- Fichiers modifiés non commités: HeroSection, BrandStorySection, LooksSection, ShopContentV4, shop pages

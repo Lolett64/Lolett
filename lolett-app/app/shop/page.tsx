@@ -77,7 +77,7 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Collection</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Pour Lui</p>
                   <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Homme</h2>
                   <p className="mt-1 text-sm text-white/55">Chemises · Pantalons · Accessoires</p>
                   <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#1B0B94]">
@@ -115,7 +115,7 @@ export default function ShopPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-8">
-                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Collection</p>
+                  <p className="text-[10px] font-medium tracking-wider uppercase text-[#1B0B94]">Pour Elle</p>
                   <h2 className="font-display mt-1 text-3xl font-bold text-white sm:text-4xl">Femme</h2>
                   <p className="mt-1 text-sm text-white/55">Robes · Tops · Accessoires</p>
                   <div className="mt-5 flex items-center gap-2 text-sm font-medium text-white transition-colors duration-300 group-hover:text-[#1B0B94]">

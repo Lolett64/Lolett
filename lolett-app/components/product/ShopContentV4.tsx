@@ -102,8 +102,8 @@ export function ShopContentV4({
                 <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
-                        <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#B89547] font-bold">
-                            Collection {gender === 'homme' ? 'Homme' : 'Femme'}
+                        <span className="font-sans text-sm uppercase tracking-[0.4em] text-[#B89547] font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                            {gender === 'homme' ? 'Pour Lui' : 'Pour Elle'}
                         </span>
                     </div>
 

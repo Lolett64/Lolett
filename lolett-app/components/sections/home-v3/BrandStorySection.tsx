@@ -20,39 +20,39 @@ export function BrandStorySection({ hexColor = '#FFFFFF' }: BrandStorySectionPro
           <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-medium mb-6 block">L&apos;esprit du Sud</span>
 
           <h2 className="font-[family-name:var(--font-newsreader)] text-4xl sm:text-7xl lg:text-[6rem] text-[#1B0B94] leading-[0.9] max-w-[1400px] mx-auto text-balance tracking-tighter">
-            La mode n&apos;est pas une question d&apos;image,<br />
-            <span className="italic">mais une question de lumière.</span>
+            S&apos;habiller c&apos;est s&apos;exprimer, pas<br />
+            <span className="italic">impressionner.</span>
           </h2>
 
           <div className="w-px h-8 bg-[#1B0B94]/30 mx-auto mt-6 mb-8" />
 
-          <p className="font-[family-name:var(--font-newsreader)] text-2xl md:text-3xl leading-relaxed text-[#1B0B94]/80 max-w-[1100px] mx-auto italic tracking-tight">
-            S&apos;habiller c&apos;est s&apos;exprimer, pas impressionner.
+          <p className="text-base md:text-lg leading-relaxed text-[#1B0B94]/80 max-w-[900px] mx-auto font-[family-name:var(--font-montserrat)]">
+            Chez Lolett, le vêtement ne contraint jamais. Il accompagne le mouvement, reflète la lumière du bassin et vieillit avec la grâce des matières naturelles. Nos racines s&apos;ancrent profondément dans le sable chaud de la côte Atlantique.
           </p>
         </ScrollReveal>
 
-        <ScrollReveal delay={200} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6 pt-6 border-t border-[#1B0B94]/20">
+        <ScrollReveal delay={200} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 pt-8 border-t border-[#1B0B94]/20">
           <div className="flex flex-col items-center text-center">
             <Gem strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Qualité durable</h3>
+            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Matières Nobles</h3>
             <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              Matières nobles sélectionnées pour durer.
+              Lin pur, coton biologique et fibres naturelles sélectionnées pour leur tombé parfait.
             </p>
           </div>
 
           <div className="flex flex-col items-center text-center">
             <Sun strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Lolett invite le sud dans ton dressing</h3>
+            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Style du Sud-Ouest</h3>
             <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              L&apos;élégance provençale au quotidien.
+              Lolett invite le sud dans ton dressing.
             </p>
           </div>
 
           <div className="flex flex-col items-center text-center">
             <Sparkles strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Simplicité élégante</h3>
+            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Coupe Parfaite</h3>
             <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              Prêt à porter, prêt à sortir.
+              Prototypage exclusif dans nos ateliers de Bordeaux. Une architecture du vêtement sans compromis.
             </p>
           </div>
         </ScrollReveal>
