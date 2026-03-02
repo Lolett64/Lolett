@@ -17,15 +17,40 @@ import {
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/products', label: 'Produits', icon: ShoppingBag, exact: false },
-  { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false },
-  { href: '/admin/looks', label: 'Looks', icon: Image, exact: false },
-  { href: '/admin/categories', label: 'Catégories', icon: Tag, exact: false },
-  { href: '/admin/materials', label: 'Matières', icon: Gem, exact: false },
-  { href: '/admin/contenu', label: 'Contenu', icon: FileText, exact: false },
-  { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
+interface NavGroup {
+  label: string;
+  items: { href: string; label: string; icon: React.ElementType; exact: boolean }[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: '',
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+    ],
+  },
+  {
+    label: 'Site',
+    items: [
+      { href: '/admin/contenu', label: 'Contenu', icon: FileText, exact: false },
+    ],
+  },
+  {
+    label: 'Catalogue',
+    items: [
+      { href: '/admin/products', label: 'Produits', icon: ShoppingBag, exact: false },
+      { href: '/admin/looks', label: 'Looks', icon: Image, exact: false },
+      { href: '/admin/categories', label: 'Catégories', icon: Tag, exact: false },
+      { href: '/admin/materials', label: 'Matières', icon: Gem, exact: false },
+    ],
+  },
+  {
+    label: 'Gestion',
+    items: [
+      { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false },
+      { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
+    ],
+  },
 ];
 
 function NavLink({
@@ -103,13 +128,22 @@ export function AdminSidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex flex-1 flex-col gap-1 p-3">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.href}
-              {...item}
-              onClick={() => setMobileOpen(false)}
-            />
+        <nav className="flex flex-1 flex-col gap-0.5 p-3">
+          {navGroups.map((group) => (
+            <div key={group.label || 'top'}>
+              {group.label && (
+                <p className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-lolett-gray-400">
+                  {group.label}
+                </p>
+              )}
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.href}
+                  {...item}
+                  onClick={() => setMobileOpen(false)}
+                />
+              ))}
+            </div>
           ))}
         </nav>
 

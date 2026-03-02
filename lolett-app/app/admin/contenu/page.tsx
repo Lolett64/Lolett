@@ -17,15 +17,31 @@ interface ContentItem {
   sort_order: number;
 }
 
+// Ordre = parcours du site (landing → pages → global)
+const SECTION_ORDER = [
+  'hero',
+  'collections',
+  'brand_story',
+  'looks',
+  'testimonials',
+  'newsletter',
+  'trust_bar',
+  'notre_histoire',
+  'contact',
+  'footer',
+];
+
 const SECTION_LABELS: Record<string, string> = {
   hero: 'Hero / Accueil',
   collections: 'Collections',
   brand_story: 'Histoire de marque',
+  looks: 'Looks du moment',
+  testimonials: 'Témoignages',
   newsletter: 'Newsletter',
   trust_bar: 'Barre de confiance',
+  notre_histoire: 'Notre Histoire',
   contact: 'Contact',
   footer: 'Pied de page',
-  notre_histoire: 'Notre Histoire',
 };
 
 export default function AdminContenuPage() {
@@ -120,7 +136,11 @@ export default function AdminContenuPage() {
     }
   };
 
-  const sectionKeys = Object.keys(sections);
+  const sectionKeys = Object.keys(sections).sort((a, b) => {
+    const ia = SECTION_ORDER.indexOf(a);
+    const ib = SECTION_ORDER.indexOf(b);
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  });
 
   return (
     <div className="space-y-6">
