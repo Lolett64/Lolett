@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Look, Product } from '@/types';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { ScrollReveal } from '@/components/editorial/ScrollReveal';
 
 interface LooksSectionProps {
   looks: Look[];
@@ -14,6 +15,7 @@ interface LooksSectionProps {
 
 export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }: LooksSectionProps) {
   const [current, setCurrent] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
 
   if (!looks || looks.length === 0) return null;
 
@@ -21,92 +23,145 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
   const products = lookProducts[look.id] || [];
   const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
 
-  const prev = () => setCurrent((c) => (c - 1 + looks.length) % looks.length);
-  const next = () => setCurrent((c) => (c + 1) % looks.length);
+  const navigate = (dir: 'prev' | 'next') => {
+    setTransitioning(true);
+    setTimeout(() => {
+      setCurrent(dir === 'prev' ? (current - 1 + looks.length) % looks.length : (current + 1) % looks.length);
+      setTransitioning(false);
+    }, 400);
+  };
 
   return (
-    <section
-      className="py-16 md:py-24 border-b border-[#1B0B94]/10"
-      style={{ backgroundColor: hexColor }}
-    >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+    <section className="py-24 md:py-32" style={{ backgroundColor: hexColor }}>
+      <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
 
-          {/* Left — Text content */}
-          <div className="flex flex-col justify-center">
-            <span className="text-[#B89547] text-xs uppercase tracking-[0.3em] font-medium mb-6">
-              Prêt à sortir
-            </span>
-            <h2 className="font-[family-name:var(--font-newsreader)] text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95] mb-4">
-              Le Look Complet
-            </h2>
-            <p className="text-[#1B0B94]/60 text-base mb-10 max-w-md">
-              Pas envie de réfléchir ? On a composé des ensembles pour toi.
-            </p>
-
-            <div className="w-12 h-px bg-[#1B0B94]/20 mb-8" />
-
-            {/* Current look details */}
-            <div className="mb-8">
-              {look.occasion && (
-                <span className="inline-block text-[10px] uppercase tracking-[0.2em] font-medium text-[#B89547] border border-[#B89547]/40 rounded-full px-4 py-1.5 mb-4">
-                  {look.occasion}
-                </span>
-              )}
-              <h3 className="font-[family-name:var(--font-newsreader)] text-3xl md:text-4xl font-bold text-[#1B0B94] mb-4">
-                {look.title}
-              </h3>
-              <p className="text-[#1B0B94]/60 text-sm leading-relaxed max-w-md">
-                {look.shortPitch}
+        {/* Section header */}
+        <ScrollReveal className="mb-16 md:mb-20">
+          <div className="flex items-start gap-6">
+            <span className="font-[family-name:var(--font-newsreader)] text-8xl md:text-9xl font-light text-[#1B0B94]/[0.07] leading-none select-none -mt-4">L</span>
+            <div>
+              <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
+                Prêt à sortir
+              </span>
+              <h2 className="font-[family-name:var(--font-newsreader)] text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95]">
+                Le Look Complet
+              </h2>
+              <p className="text-[#1B0B94]/50 text-base mt-4 max-w-md font-[family-name:var(--font-montserrat)]">
+                Pas envie de réfléchir ? On a composé des ensembles pour toi.
               </p>
             </div>
+          </div>
+        </ScrollReveal>
 
-            {/* Price + CTA */}
-            <div className="flex items-center gap-6 mb-10">
-              <span className="font-[family-name:var(--font-newsreader)] text-4xl font-bold text-[#1B0B94]">
-                {totalPrice > 0 ? `${totalPrice} €` : ''}
-              </span>
-              <Link
-                href={`/looks/${look.id}`}
-                className="inline-flex items-center gap-2 bg-[#B89547] text-white px-6 py-3 text-xs uppercase tracking-[0.15em] font-medium rounded-full hover:bg-[#a6833d] transition-colors"
-              >
-                <ShoppingBag size={14} />
-                Adopter ce look
-              </Link>
+        <ScrollReveal delay={200}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            {/* Left — Look details */}
+            <div
+              className="flex flex-col justify-center order-2 lg:order-1"
+              style={{
+                opacity: transitioning ? 0 : 1,
+                transform: transitioning ? 'translateY(20px)' : 'translateY(0)',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+            >
+              <div className="mb-8">
+                <h3 className="font-[family-name:var(--font-newsreader)] text-3xl md:text-4xl lg:text-5xl font-bold text-[#1B0B94] mb-4 leading-tight">
+                  {look.title}
+                </h3>
+                <p className="text-[#1B0B94]/55 text-sm leading-relaxed max-w-md">
+                  {look.shortPitch}
+                </p>
+              </div>
+
+              {/* Product thumbnails */}
+              {products.length > 0 && (
+                <div className="flex gap-3 mb-8">
+                  {products.slice(0, 4).map((p) => (
+                    <div key={p.id} className="w-16 h-20 relative rounded-sm overflow-hidden border border-[#1B0B94]/8 bg-white/50">
+                      <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="64px" />
+                    </div>
+                  ))}
+                  {products.length > 4 && (
+                    <div className="w-16 h-20 rounded-sm border border-[#1B0B94]/8 flex items-center justify-center bg-white/30">
+                      <span className="text-xs text-[#1B0B94]/40 font-medium">+{products.length - 4}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Price + CTA */}
+              <div className="flex items-center gap-6 mb-10">
+                {totalPrice > 0 && (
+                  <span className="font-[family-name:var(--font-newsreader)] text-3xl md:text-4xl font-bold text-[#1B0B94]">
+                    {totalPrice}&nbsp;€
+                  </span>
+                )}
+                <Link
+                  href={`/looks/${look.id}`}
+                  className="group inline-flex items-center gap-3 bg-[#B89547] text-white px-7 py-3.5 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#a6833d] transition-all duration-500 hover:shadow-[0_6px_24px_rgba(184,149,71,0.3)]"
+                >
+                  <ShoppingBag size={14} />
+                  Adopter ce look
+                </Link>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex items-center gap-5">
+                <button
+                  onClick={() => navigate('prev')}
+                  className="w-11 h-11 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
+                  aria-label="Look précédent"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <div className="flex gap-2">
+                  {looks.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setTransitioning(true); setTimeout(() => { setCurrent(i); setTransitioning(false); }, 400); }}
+                      className="transition-all duration-500"
+                      style={{
+                        width: i === current ? 24 : 8,
+                        height: 3,
+                        backgroundColor: i === current ? '#B89547' : 'rgba(27,11,148,0.15)',
+                      }}
+                      aria-label={`Look ${i + 1}`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => navigate('next')}
+                  className="w-11 h-11 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
+                  aria-label="Look suivant"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
             </div>
 
-            {/* Navigation arrows + counter */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={prev}
-                className="w-10 h-10 rounded-full border border-[#1B0B94]/20 flex items-center justify-center text-[#1B0B94]/60 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <span className="text-sm text-[#1B0B94]/50 font-medium tabular-nums">
-                {current + 1} / {looks.length}
-              </span>
-              <button
-                onClick={next}
-                className="w-10 h-10 rounded-full border border-[#1B0B94]/20 flex items-center justify-center text-[#1B0B94]/60 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all"
-              >
-                <ChevronRight size={18} />
-              </button>
+            {/* Right — Look image */}
+            <div
+              className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)]"
+              style={{
+                opacity: transitioning ? 0.3 : 1,
+                transform: transitioning ? 'scale(0.97)' : 'scale(1)',
+                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+            >
+              <Image
+                src={look.coverImage}
+                alt={look.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              {/* Subtle inner gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
             </div>
-          </div>
 
-          {/* Right — Look image */}
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src={look.coverImage}
-              alt={look.title}
-              fill
-              className="object-cover transition-all duration-700"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
           </div>
-
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

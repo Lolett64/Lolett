@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ScrollReveal } from '@/components/editorial/ScrollReveal';
 import { Product } from '@/types';
 
 interface NewArrivalsSectionProps {
@@ -11,55 +12,59 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
   if (!products || products.length === 0) return null;
 
   return (
-    <section
-      className="py-20 border-b border-[#1B0B94]/10"
-      style={{ backgroundColor: hexColor }}
-    >
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-8">
+    <section className="py-24 md:py-32" style={{ backgroundColor: hexColor }}>
+      <div className="max-w-[1600px] mx-auto px-6 sm:px-10">
 
-        {/* En-tête de section Éditoriale */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-[#1B0B94]/10 pb-6 gap-6">
-          <div>
-            <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-bold mb-4 block">
-              Nouveautés
-            </span>
-            <h2 className="font-[family-name:var(--font-newsreader)] text-5xl sm:text-7xl italic text-[#1B0B94] tracking-tight">
-              Fraîchement Arrivées
-            </h2>
-          </div>
-          <Link
-            href="/shop/nouveautes"
-            className="group hidden sm:inline-flex items-center gap-3 text-[#1B0B94] text-[9px] uppercase tracking-[0.2em] font-medium hover:text-[#B89547] transition-colors"
-          >
-            Voir toute la sélection
-            <span className="w-8 h-px bg-[#1B0B94]/30 group-hover:bg-[#B89547] group-hover:w-12 transition-all duration-300" />
-          </Link>
-        </div>
-
-        {/* Grille de produits */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-4">
-          {products.map((product, i) => (
-            <div key={product.id} className="group relative">
-              {/* UX Recommandation : Intégration subtile d'un badge "Nouveau" ou "Édition Limitée" */}
-              {i < 2 && (
-                <div className="absolute top-4 left-4 z-10 w-2 h-2 rounded-full bg-[#B89547] shadow-[0_0_10px_rgba(184,149,71,0.5)] animate-pulse" title="Nouveau" />
-              )}
-              <div className="relative">
-                <ProductCard product={product} />
+        {/* Editorial header */}
+        <ScrollReveal className="mb-20">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pb-8 border-b border-[#1B0B94]/8">
+            <div className="flex items-start gap-6">
+              <span className="font-[family-name:var(--font-newsreader)] text-8xl md:text-9xl font-light text-[#1B0B94]/[0.07] leading-none select-none -mt-4">N</span>
+              <div>
+                <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
+                  Nouveautés
+                </span>
+                <h2 className="font-[family-name:var(--font-newsreader)] text-5xl sm:text-6xl lg:text-7xl italic text-[#1B0B94] tracking-tight leading-[0.95]">
+                  Fraîchement<br className="hidden sm:block" /> Arrivées
+                </h2>
               </div>
             </div>
+            <Link
+              href="/shop/nouveautes"
+              className="group hidden md:inline-flex items-center gap-4 text-[#1B0B94]/60 hover:text-[#B89547] transition-colors duration-500"
+            >
+              <span className="text-[9px] uppercase tracking-[0.25em] font-medium">Voir toute la sélection</span>
+              <span className="w-10 h-px bg-current group-hover:w-16 transition-all duration-500" />
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        {/* Product grid with staggered reveals */}
+        <div className="grid grid-cols-2 gap-x-5 gap-y-14 sm:gap-x-8 sm:gap-y-16 lg:grid-cols-4">
+          {products.map((product, i) => (
+            <ScrollReveal key={product.id} delay={i * 120} distance={50}>
+              <div className="group relative">
+                {i < 2 && (
+                  <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B89547] shadow-[0_0_8px_rgba(184,149,71,0.6)]" />
+                    <span className="text-[8px] uppercase tracking-[0.2em] font-semibold text-[#B89547]">New</span>
+                  </div>
+                )}
+                <ProductCard product={product} />
+              </div>
+            </ScrollReveal>
           ))}
         </div>
 
-        {/* Lien Mobile */}
-        <div className="mt-12 text-center sm:hidden">
+        {/* Mobile link */}
+        <ScrollReveal className="mt-14 text-center md:hidden">
           <Link
             href="/shop"
-            className="inline-block border border-[#1B0B94] px-8 py-3 text-[10px] uppercase tracking-[0.2em] font-medium text-[#1B0B94] hover:bg-[#1B0B94] hover:text-[#F3EFEA] transition-colors"
+            className="inline-block border border-[#1B0B94] px-10 py-4 text-[10px] uppercase tracking-[0.25em] font-medium text-[#1B0B94] hover:bg-[#1B0B94] hover:text-white transition-all duration-500"
           >
             Voir la suite
           </Link>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

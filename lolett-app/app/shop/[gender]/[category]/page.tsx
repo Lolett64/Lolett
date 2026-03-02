@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { ShopContentV2 } from '@/components/product/ShopContentV2';
 import { productRepository, categoryRepository } from '@/lib/adapters';
 
+export const revalidate = 60;
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 const HERO_IMAGES = {

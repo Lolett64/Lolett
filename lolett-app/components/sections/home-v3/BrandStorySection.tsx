@@ -7,61 +7,90 @@ interface BrandStorySectionProps {
   hexColor?: string;
 }
 
-export function BrandStorySection({ hexColor = '#FFFFFF' }: BrandStorySectionProps) {
+export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStorySectionProps) {
+  const quote = content?.quote || "S'habiller c'est s'exprimer, pas impressionner.";
+  const quoteAuthor = content?.quote_author || "L'esprit du Sud";
+  const bodyText = content?.body_text || "On ne crée pas des vêtements. On crée la sensation d'être prêt, d'être soi, sans y penser.";
+  const p1Title = content?.pillar1_title || 'Matières Nobles';
+  const p1Desc = content?.pillar1_desc || 'Lin pur, coton biologique et fibres naturelles sélectionnées pour leur tombé parfait.';
+  const p2Title = content?.pillar2_title || 'Style du Sud-Ouest';
+  const p2Desc = content?.pillar2_desc || 'Lolett invite le sud dans ton dressing : des matières qui voyagent, des coupes qui restent.';
+  const p3Title = content?.pillar3_title || 'Coupe Parfaite';
+  const p3Desc = content?.pillar3_desc || 'Prototypage exclusif dans nos ateliers de Bordeaux. Une architecture du vêtement sans compromis.';
+  const ctaText = content?.cta_text || 'Découvrir la Maison';
+  const ctaHref = content?.cta_href || '/notre-histoire';
+
+  // Split quote at comma for dramatic two-line display
+  const hasComma = quote.includes(',');
+  const quoteLine1 = hasComma ? quote.split(',')[0] + ',' : quote;
+  const quoteLine2 = hasComma ? quote.split(',').slice(1).join(',').trim() : '';
+
+  const pillars = [
+    { icon: Gem, title: p1Title, desc: p1Desc },
+    { icon: Sun, title: p2Title, desc: p2Desc },
+    { icon: Sparkles, title: p3Title, desc: p3Desc },
+  ];
+
   return (
-    <section
-      className="py-8 md:py-10 border-b border-[#1B0B94]/10 relative overflow-hidden"
-      style={{ backgroundColor: hexColor }}
-    >
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 relative z-10">
+    <section className="relative py-24 md:py-36 overflow-hidden" style={{ backgroundColor: hexColor }}>
+      {/* Decorative oversized letter */}
+      <div className="absolute top-12 right-8 md:right-20 font-[family-name:var(--font-newsreader)] text-[20rem] md:text-[30rem] leading-none font-light text-[#1B0B94]/[0.02] select-none pointer-events-none" aria-hidden="true">
+        L
+      </div>
 
-        <ScrollReveal className="text-center mb-6">
-          <div className="w-px h-8 bg-[#1B0B94]/30 mx-auto mb-6" />
-          <span className="text-[#B89547] text-[10px] uppercase tracking-[0.3em] font-medium mb-6 block">L&apos;esprit du Sud</span>
+      <div className="max-w-[1300px] mx-auto px-6 lg:px-12 relative z-10">
 
-          <h2 className="font-[family-name:var(--font-newsreader)] text-4xl sm:text-7xl lg:text-[6rem] text-[#1B0B94] leading-[0.9] max-w-[1400px] mx-auto text-balance tracking-tighter">
-            S&apos;habiller c&apos;est s&apos;exprimer, pas<br />
-            <span className="italic">impressionner.</span>
+        {/* Quote block */}
+        <ScrollReveal className="text-center mb-8">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <span className="w-8 h-px bg-[#B89547]/60" />
+            <span className="text-[#B89547] text-[9px] uppercase tracking-[0.5em] font-semibold">{quoteAuthor}</span>
+            <span className="w-8 h-px bg-[#B89547]/60" />
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={150} className="text-center mb-10">
+          <h2 className="font-[family-name:var(--font-newsreader)] text-[clamp(2.5rem,7vw,6.5rem)] text-[#1B0B94] leading-[0.88] max-w-[1200px] mx-auto tracking-tighter">
+            {quoteLine1}
+            {quoteLine2 && (
+              <>
+                <br />
+                <span className="italic">{quoteLine2}</span>
+              </>
+            )}
           </h2>
+        </ScrollReveal>
 
-          <div className="w-px h-8 bg-[#1B0B94]/30 mx-auto mt-6 mb-8" />
-
-          <p className="text-base md:text-lg leading-relaxed text-[#1B0B94]/80 max-w-[900px] mx-auto font-[family-name:var(--font-montserrat)]">
-            Chez Lolett, le vêtement ne contraint jamais. Il accompagne le mouvement, reflète la lumière du bassin et vieillit avec la grâce des matières naturelles. Nos racines s&apos;ancrent profondément dans le sable chaud de la côte Atlantique.
+        <ScrollReveal delay={300} className="text-center mb-16">
+          <div className="w-px h-10 bg-[#1B0B94]/15 mx-auto mb-10" />
+          <p className="text-base md:text-lg leading-[1.9] text-[#1B0B94]/65 max-w-[750px] mx-auto font-[family-name:var(--font-montserrat)]">
+            {bodyText}
           </p>
         </ScrollReveal>
 
-        <ScrollReveal delay={200} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 pt-8 border-t border-[#1B0B94]/20">
-          <div className="flex flex-col items-center text-center">
-            <Gem strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Matières Nobles</h3>
-            <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              Lin pur, coton biologique et fibres naturelles sélectionnées pour leur tombé parfait.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <Sun strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Style du Sud-Ouest</h3>
-            <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              Lolett invite le sud dans ton dressing.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <Sparkles strokeWidth={1} className="w-10 h-10 text-[#B89547] mb-6" />
-            <h3 className="text-xs md:text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] mb-4">Coupe Parfaite</h3>
-            <p className="text-sm text-[#1B0B94]/80 max-w-[300px] font-medium leading-relaxed">
-              Prototypage exclusif dans nos ateliers de Bordeaux. Une architecture du vêtement sans compromis.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <div className="text-center mt-10">
-          <Link href="/notre-histoire" className="inline-flex items-center justify-center border border-[#1B0B94] px-12 py-5 text-sm uppercase tracking-[0.25em] font-bold text-[#1B0B94] hover:bg-[#1B0B94] hover:text-white transition-all duration-500 shadow-sm hover:shadow-xl hover:-translate-y-1">
-            Découvrir la Maison
-          </Link>
+        {/* Pillars — three columns with gold icons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-6 lg:gap-16 mt-16 pt-12 border-t border-[#1B0B94]/8">
+          {pillars.map((pillar, i) => (
+            <ScrollReveal key={i} delay={i * 150 + 200} className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full border border-[#B89547]/20 flex items-center justify-center mb-6 bg-[#B89547]/[0.04]">
+                <pillar.icon strokeWidth={1} className="w-6 h-6 text-[#B89547]" />
+              </div>
+              <h3 className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-bold text-[#1B0B94] mb-4">{pillar.title}</h3>
+              <p className="text-sm text-[#1B0B94]/60 max-w-[280px] leading-relaxed">{pillar.desc}</p>
+            </ScrollReveal>
+          ))}
         </div>
+
+        {/* CTA */}
+        <ScrollReveal delay={600} className="text-center mt-16">
+          <Link
+            href={ctaHref}
+            className="group inline-flex items-center gap-4 border border-[#1B0B94] px-12 py-5 text-[11px] uppercase tracking-[0.3em] font-bold text-[#1B0B94] hover:bg-[#1B0B94] hover:text-white transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.1)]"
+          >
+            {ctaText}
+            <span className="w-6 h-px bg-current group-hover:w-10 transition-all duration-500" />
+          </Link>
+        </ScrollReveal>
 
       </div>
     </section>

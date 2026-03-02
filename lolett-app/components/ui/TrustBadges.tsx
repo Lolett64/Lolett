@@ -8,7 +8,7 @@ interface TrustBadgesProps {
 const badges = [
   { icon: Lock, label: 'Paiement sécurisé', sublabel: 'SSL 256-bit' },
   { icon: Truck, label: 'Livraison 24-48h', sublabel: 'Offerte dès 100€' },
-  { icon: RotateCcw, label: 'Retours 30j', sublabel: 'Gratuits & simples' },
+  { icon: RotateCcw, label: 'Retours 14j', sublabel: 'Gratuits & simples' },
 ];
 
 export function TrustBadges({ className = '', variant = 'default' }: TrustBadgesProps) {

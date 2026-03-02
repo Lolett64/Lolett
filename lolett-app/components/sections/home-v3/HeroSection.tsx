@@ -1,9 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-// Using styles from the Heritage Terroir and Rivera concepts
-// with Newsreader and Montserrat fonts inherited from globals / layout
 
 interface HeroSectionProps {
   content?: Record<string, string>;
@@ -11,72 +9,125 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <section
-      className="relative h-screen min-h-[700px] flex flex-col items-center justify-start pt-[15vh] overflow-hidden px-0 m-0"
+      className="relative h-screen min-h-[700px] flex flex-col items-center justify-center overflow-hidden"
       style={{ backgroundColor: hexColor }}
     >
+      {/* Keyframe animations */}
+      <style>{`
+        @keyframes hero-line-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes hero-breathe { 0%, 100% { opacity: 0.75; } 50% { opacity: 0.85; } }
+        @keyframes hero-scroll-hint {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50% { transform: translateY(8px); opacity: 0.8; }
+        }
+      `}</style>
 
-      {/* Vidéo plein écran (sans cadre gris) */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{ backgroundColor: hexColor }}
-      >
-        <div className="relative w-full h-full overflow-hidden">
+      {/* Video background */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ animation: 'hero-breathe 8s ease-in-out infinite', filter: 'sepia(0.15) saturate(0.9)' }}
+          poster="/images/Brand story background.jpeg"
+        >
+          <source src={content?.video_src || '/videos/hero-beach.mp4'} type="video/mp4" />
+        </video>
 
-          {/* Vidéo en arrière-plan (UX Recommandation : Contraste maîtrisé) */}
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover sepia-[0.2] opacity-80"
-            poster="/images/Brand story background.jpeg" // Optimisation LCP perçue
+        {/* Layered gradient overlays for depth */}
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(180deg, ${hexColor}90 0%, transparent 35%, transparent 60%, ${hexColor} 100%)`,
+        }} />
+        <div className="absolute inset-0" style={{
+          background: `radial-gradient(ellipse at 50% 30%, transparent 40%, ${hexColor}80 100%)`,
+        }} />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto flex flex-col items-center">
+
+        {/* Subtitle with animated lines */}
+        <div
+          className="flex items-center gap-5 mb-8"
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
+          }}
+        >
+          <span className="w-12 h-px bg-[#1B0B94]/40 origin-right" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
+          <span className="text-[10px] uppercase tracking-[0.5em] font-medium text-[#1B0B94]/70 font-[family-name:var(--font-montserrat)]">
+            Lolett
+          </span>
+          <span className="w-12 h-px bg-[#1B0B94]/40 origin-left" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
+        </div>
+
+        {/* Main title — cinematic stagger */}
+        <h1 className="font-[family-name:var(--font-newsreader)] leading-[0.85] font-light text-[#1B0B94] tracking-tight mb-14">
+          <span
+            className="block text-[clamp(4.5rem,11vw,10rem)]"
+            style={{
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
+            }}
           >
-            <source src={content?.video_src || "/videos/hero-beach.mp4"} type="video/mp4" />
-          </video>
+            {content?.title_line1 || "Porter &"}
+          </span>
+          <span
+            className="block text-[clamp(4.5rem,11vw,10rem)] italic text-[#B89547]"
+            style={{
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s',
+            }}
+          >
+            {content?.title_line2 || "vibrer le Sud"}
+          </span>
+        </h1>
 
-          {/* Overlay Gradient pour garantir la lisibilité (WCAG) - Fond hexColor */}
-          <div
-            className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t via-transparent to-transparent"
-            style={{ backgroundImage: `linear-gradient(to top, ${hexColor} 0%, ${hexColor}60 40%, transparent 100%)` }}
-          />
+        {/* CTAs with stagger */}
+        <div
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'translateY(0)' : 'translateY(30px)',
+            transition: 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s',
+          }}
+        >
+          <Link href={content?.cta1_href || '/shop/femme'} className="group relative flex items-center justify-center min-w-[300px] py-5 px-10 border border-[#1B0B94] text-[#1B0B94] overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.12)]" style={{ backgroundColor: `${hexColor}BB` }}>
+            <span className="absolute inset-0 bg-[#1B0B94] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+            <span className="relative z-10 text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-white transition-colors duration-500">
+              {content?.cta1_text || 'Vestiaire Femme'}
+            </span>
+          </Link>
+          <Link href={content?.cta2_href || '/shop/homme'} className="group relative flex items-center justify-center min-w-[300px] py-5 px-10 bg-[#1B0B94] text-white overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.25)]">
+            <span className="absolute inset-0 bg-[#B89547] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+            <span className="relative z-10 text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-[#1B0B94] transition-colors duration-500">
+              {content?.cta2_text || 'Vestiaire Homme'}
+            </span>
+          </Link>
         </div>
       </div>
 
-      <div className="relative z-10 text-center px-4 md:px-8 max-w-7xl mx-auto flex flex-col items-center">
-
-        <div className="flex items-center gap-4 mb-6">
-          <span className="w-8 h-px bg-[#1B0B94]/50" />
-          <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-[#1B0B94]">{content?.subtitle || "Atelier Bordeaux"}</span>
-          <span className="w-8 h-px bg-[#1B0B94]/50" />
-        </div>
-
-        {/* Titre Editorial Géant */}
-        <h1 className="font-[family-name:var(--font-newsreader)] text-[clamp(5rem,12vw,11rem)] leading-[0.85] font-light text-[#1B0B94] tracking-tight mb-8 whitespace-nowrap">
-          {content?.title_line1 || "L'Héritage"}<br />
-          <span className="italic text-[#B89547] pr-4">{content?.title_line2 || "Terroir"}</span>
-        </h1>
-
-        <p className="text-[#1B0B94]/70 text-xl max-w-md mx-auto mb-12 leading-relaxed font-[family-name:var(--font-montserrat)]">
-          {content?.description || "L'élégance sans effort. Le lin noble et la coupe juste, pour lui et pour elle."}
-        </p>
-
-        {/* Deux CTAs Primaires hyper visibles (UX Recommandation) */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <Link href="/shop/femme" className="group relative flex items-center justify-center min-w-[330px] py-6 px-12 border border-[#1B0B94] text-[#1B0B94] overflow-hidden transition-all duration-500 hover:shadow-lg" style={{ backgroundColor: `${hexColor}CC` }}>
-            <span className="absolute inset-0 w-full h-full bg-[#1B0B94] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)]" />
-            <span className="relative z-10 text-[15px] uppercase tracking-[0.2em] font-medium group-hover:text-white transition-colors duration-500">
-              {content?.cta1_text || "Le Vestiaire Femme"}
-            </span>
-          </Link>
-          <Link href="/shop/homme" className="group relative flex items-center justify-center min-w-[330px] py-6 px-12 border border-[#1B0B94] bg-[#1B0B94] text-[#F3EFEA] overflow-hidden transition-all duration-500 hover:shadow-[0_10px_30px_rgba(27,11,148,0.2)]">
-            <span className="absolute inset-0 w-full h-full bg-[#B89547] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)]" />
-            <span className="relative z-10 text-[15px] uppercase tracking-[0.2em] font-medium group-hover:text-[#1B0B94] transition-colors duration-500">
-              {content?.cta2_text || "L'Édition Homme"}
-            </span>
-          </Link>
-        </div>
+      {/* Scroll hint */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3"
+        style={{
+          opacity: mounted ? 0.6 : 0,
+          transition: 'opacity 1.5s ease 2s',
+        }}
+      >
+        <span className="text-[8px] uppercase tracking-[0.4em] text-[#1B0B94]/40 font-[family-name:var(--font-montserrat)]">Découvrir</span>
+        <div className="w-px h-8 bg-[#1B0B94]/30" style={{ animation: 'hero-scroll-hint 2.5s ease-in-out infinite' }} />
       </div>
     </section>
   );

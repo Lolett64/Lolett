@@ -6,6 +6,8 @@ import { AuthProvider } from '@/lib/auth/context';
 import { CartSync } from '@/features/cart/CartSync';
 import { getSiteContent } from '@/lib/cms/content';
 
+export const revalidate = 60;
+
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',

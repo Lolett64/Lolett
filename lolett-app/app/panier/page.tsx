@@ -170,7 +170,7 @@ export default function PanierPage() {
                 {[
                   { icon: <ShieldCheck size={14} />, label: 'Paiement 100% sécurisé' },
                   { icon: <Truck size={14} />, label: 'Livraison 3-5 jours ouvrés' },
-                  { icon: <RotateCcw size={14} />, label: 'Retours gratuits sous 30 jours' },
+                  { icon: <RotateCcw size={14} />, label: 'Retours gratuits sous 14 jours' },
                 ].map((t) => (
                   <span key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#9B8E82' }}>
                     {t.icon} {t.label}

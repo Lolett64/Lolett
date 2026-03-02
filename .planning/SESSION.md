@@ -1,26 +1,33 @@
-# Session State — 2026-03-02 22:15
+# Session State — 2026-03-02 23:30
 
 ## Branch
 main
 
 ## Completed This Session
-- Notre Histoire: refonte complète (titre "Mon histoire", texte perso Lola, citation styliste/pyjama, section Vision embellie)
-- Header: "Notre Histoire" → "Mon Histoire" dans navigation.ts
-- Matières: table Supabase + page admin /admin/materials (CRUD, toggle actif, icônes cliquables, aperçu)
-- CMS: connecté homepage (hero+newsletter) + Notre Histoire (tous textes) à site_content via getSiteContent()
-- Upload vidéo: bucket Supabase Storage "media", API /api/admin/upload, composant ContentVideoUpload avec drag&drop
-- Admin contenu: champ video remplacé par upload component
+- CMS sync: brand_story + contact sections synced to Supabase (migrations 4-6)
+- Contact: voix "je", téléphone supprimé, CMS connecté, 24-48h
+- FAQ: voix "je/tu" via CMS
+- BrandStorySection: connecté au CMS brand_story
+- LooksSection: fix look.occasion TypeScript error
+- Retours: unifié 14j partout (header, panier, shop, TrustBadges, CMS)
+- Hero: redesign cinématique, "Lolett" en subtitle, description supprimée
+- Landing: supprimé Témoignages + CTA final, redesign éditorial (NewArrivals, BrandStory, Looks)
+- Newsletter: remis design original (fond sable)
+- Revalidate 60s: ajouté sur toutes les pages (8 pages + layout)
+- Fix matières: bug filtre m.active dans notre-histoire/content.tsx
+- Fichiers morts supprimés: ContactPageV2.tsx
+- Body text brand_story: nouvelle phrase "On ne crée pas des vêtements..."
+- Pillar2 desc: "Lolett invite le sud... des matières qui voyagent, des coupes qui restent."
 
 ## Next Task
-1. Synchroniser données Supabase site_content avec textes actuels du site (une seule fois)
-2. Page Contact: passage au "je", supprimer téléphone, "envoyez-moi un message", réponse 24-48h
-3. FAQ: passage au "je"
-4. BrandStorySection: connecter au CMS (ignore actuellement le content prop)
+1. Stripe Checkout (API route + webhook + PaymentStep + page success)
+2. Emails transactionnels (Brevo + Resend)
+3. Flux commande complet (BDD, panier → commande, fidélité)
 
 ## Blockers
-- LooksSection.tsx:51 — erreur type `look.occasion` (pré-existante, non bloquante en dev)
+None
 
 ## Key Context
-- Le CMS est sens unique: Admin → Supabase → Pages. Fallbacks hardcodés si Supabase vide.
-- Migration 20260302000003 ajoutée pour textes Lola mais Supabase pas encore sync avec textes actuels
-- PDF retours: docs dans lolett-app/docs/Retour cliente v3.pdf
+- Admin auth redirige vers /admin-login quand session expire
+- CMS revalidate=60 sur toutes les pages, changements admin visibles en <60s
+- API /api/materials retourne déjà les actifs (pas besoin de filtrer côté client)

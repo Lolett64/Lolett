@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import NotreHistoireContent from './content';
 import { getSiteContent } from '@/lib/cms/content';
 
+export const revalidate = 60;
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 export const metadata: Metadata = {

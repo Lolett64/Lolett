@@ -8,18 +8,9 @@ const DARK = '#1a1510';
 const SECONDARY = '#5a4d3e';
 const MUTED = '#9B8E82';
 
-const faqItems = [
-  { q: 'Quels sont les délais de livraison ?', a: 'Comptez 3 à 5 jours ouvrés pour la France métropolitaine. La livraison est offerte dès 100 euros d\'achat.' },
-  { q: 'Quelle est votre politique de retours ?', a: 'Vous disposez de 14 jours après réception pour retourner vos articles dans leur état d\'origine. Le retour est simple et gratuit.' },
-  { q: 'Comment choisir ma taille ?', a: 'Un guide des tailles détaillé est disponible sur chaque fiche produit. En cas de doute, notre équipe est là pour vous conseiller.' },
-  { q: 'Où sont fabriquées vos pièces ?', a: 'Nos pièces sont confectionnées dans des ateliers familiaux au Portugal et en Italie, sélectionnés pour leur savoir-faire.' },
-];
-
-const contactCards = [
-  { icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', label: 'Email', value: 'hello@lolett.com', href: 'mailto:hello@lolett.com' },
-  { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Téléphone', value: '+33 6 00 00 00 00', href: 'tel:+33600000000' },
-  { icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', label: 'Adresse', value: 'Sud de la France', href: undefined },
-];
+interface ContactV2Props {
+  content?: Record<string, string>;
+}
 
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,13 +25,23 @@ function useReveal() {
   return { ref, style: { opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' } as React.CSSProperties };
 }
 
-export function ContactV2() {
+export function ContactV2({ content }: ContactV2Props) {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', honeypot: '' });
   const [newsletter, setNewsletter] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [focusField, setFocusField] = useState<string | null>(null);
+
+  const faqItems = [
+    { q: content?.faq1_q || 'Quels sont les délais de livraison ?', a: content?.faq1_a || 'Compte 3 à 5 jours ouvrés pour la France métropolitaine. La livraison est offerte dès 100€ d\'achat.' },
+    { q: content?.faq2_q || 'Comment faire un retour ?', a: content?.faq2_a || 'Tu as 14 jours après réception pour me retourner tes articles dans leur état d\'origine. Envoie-moi un email et je t\'envoie une étiquette retour.' },
+    { q: content?.faq3_q || 'Comment choisir ma taille ?', a: content?.faq3_a || 'Un guide des tailles détaillé est dispo sur chaque fiche produit. En cas de doute, écris-moi !' },
+    { q: content?.faq4_q || 'Où sont fabriquées les pièces ?', a: content?.faq4_a || 'Je travaille avec des ateliers familiaux au Portugal et en Italie, sélectionnés pour leur savoir-faire.' },
+  ];
+
+  const contactEmail = content?.email || 'hello@lolett.com';
+  const contactAddress = content?.address || 'Sud de la France';
 
   const r1 = useReveal();
   const r2 = useReveal();
@@ -120,57 +121,63 @@ export function ContactV2() {
             Contact
           </p>
           <h1 className="contact-c-hero-title" style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '48px', fontWeight: 400, color: '#fff', margin: 0 }}>
-            Ecris-nous
+            {content?.page_title || 'Écris-moi'}
           </h1>
         </div>
       </div>
 
-      {/* Contact cards */}
+      {/* Contact cards — email + address only (no phone) */}
       <div ref={r1.ref} style={r1.style}>
         <div className="contact-c-cards" style={{ display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', marginTop: '-40px', position: 'relative', zIndex: 1 }}>
-          {contactCards.map(c => (
-            <div key={c.label} style={{
-              background: SAND, border: `1px solid ${GOLD}33`,
-              padding: '32px 28px', textAlign: 'center', width: '220px',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-            }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '14px' }}>
-                <path d={c.icon} />
-              </svg>
-              <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '10px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: MUTED, marginBottom: '6px' }}>{c.label}</p>
-              {c.href ? (
-                <a href={c.href} style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: DARK, textDecoration: 'none' }}>{c.value}</a>
-              ) : (
-                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: DARK, margin: 0 }}>{c.value}</p>
-              )}
-            </div>
-          ))}
+          <div style={{
+            background: SAND, border: `1px solid ${GOLD}33`,
+            padding: '32px 28px', textAlign: 'center', width: '220px',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '14px' }}>
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '10px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: MUTED, marginBottom: '6px' }}>Email</p>
+            <a href={`mailto:${contactEmail}`} style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: DARK, textDecoration: 'none' }}>{contactEmail}</a>
+          </div>
+
+          <div style={{
+            background: SAND, border: `1px solid ${GOLD}33`,
+            padding: '32px 28px', textAlign: 'center', width: '220px',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '14px' }}>
+              <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '10px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: MUTED, marginBottom: '6px' }}>Adresse</p>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: DARK, margin: 0 }}>{contactAddress}</p>
+          </div>
         </div>
       </div>
 
       {/* Form */}
       <div ref={r2.ref} style={{ ...r2.style, maxWidth: '640px', margin: '0 auto', padding: '60px 24px 48px' }}>
         <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '32px', fontWeight: 400, color: DARK, textAlign: 'center', marginBottom: '8px' }}>
-          Envoyez-nous un message
+          {content?.form_title || 'Envoie-moi un message'}
         </h2>
         <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY, textAlign: 'center', marginBottom: '48px' }}>
-          Nous vous répondons sous 24 heures.
+          {content?.form_subtitle || 'Je te réponds sous 24-48h.'}
         </p>
 
         {sent ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '26px', color: DARK, marginBottom: '8px' }}>Merci !</p>
-            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY }}>Votre message a bien été envoyé.</p>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY }}>Ton message a bien été envoyé.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
               <input tabIndex={-1} name="hp" value={form.honeypot} onChange={e => setForm({ ...form, honeypot: e.target.value })} />
             </div>
-            {floatingField('name', 'Votre nom')}
-            {floatingField('email', 'Votre email', 'email')}
+            {floatingField('name', 'Ton nom')}
+            {floatingField('email', 'Ton email', 'email')}
             {floatingField('subject', 'Sujet')}
-            {floatingField('message', 'Votre message', 'text', true)}
+            {floatingField('message', 'Ton message', 'text', true)}
 
             <div style={{ textAlign: 'center', marginTop: '16px' }}>
               <button
@@ -235,18 +242,18 @@ export function ContactV2() {
           Newsletter
         </p>
         <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '28px', fontWeight: 400, color: DARK, marginBottom: '8px' }}>
-          Restez inspiré
+          Reste inspiré
         </h2>
         <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY, marginBottom: '32px', maxWidth: '400px', margin: '0 auto 32px' }}>
           Nouveautés, conseils style et offres exclusives.
         </p>
         {subscribed ? (
-          <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: GOLD }}>Merci pour votre inscription !</p>
+          <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: GOLD }}>Merci pour ton inscription !</p>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); if (newsletter) setSubscribed(true); }} className="contact-c-nl-row" style={{ display: 'flex', maxWidth: '440px', margin: '0 auto' }}>
             <input
               type="email"
-              placeholder="Votre email"
+              placeholder="Ton email"
               value={newsletter}
               onChange={e => setNewsletter(e.target.value)}
               required

@@ -102,9 +102,8 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
   useEffect(() => {
     fetch('/api/materials')
       .then(r => r.json())
-      .then((data: { name: string; icon: string; active: boolean }[]) => {
-        const active = data.filter(m => m.active);
-        if (active.length > 0) setMaterials(active.map(m => ({ name: m.name, icon: m.icon })));
+      .then((data: { name: string; icon: string }[]) => {
+        if (data.length > 0) setMaterials(data.map(m => ({ name: m.name, icon: m.icon })));
       })
       .catch(() => {});
   }, []);

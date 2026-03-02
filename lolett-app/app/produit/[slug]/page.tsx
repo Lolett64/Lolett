@@ -6,6 +6,8 @@ import { ProductLooks } from '@/components/product/ProductLooks';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { productRepository, lookRepository, categoryRepository } from '@/lib/adapters';
 
+export const revalidate = 60;
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 interface PageProps {

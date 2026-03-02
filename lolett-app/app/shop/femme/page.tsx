@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
 
+export const revalidate = 60;
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 export const metadata: Metadata = {

@@ -236,7 +236,7 @@ export default function ShopPage() {
           <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-3">
             {[
               { title: 'Livraison offerte', desc: "Dès 100€ d'achat en France" },
-              { title: 'Retours 30 jours', desc: 'Satisfait ou remboursé' },
+              { title: 'Retours 14 jours', desc: 'Satisfait ou remboursé' },
               { title: 'Qualité premium', desc: 'Matières nobles & durables' },
             ].map((item, i) => (
               <div key={i}>
