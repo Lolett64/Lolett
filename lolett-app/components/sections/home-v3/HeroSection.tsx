@@ -63,11 +63,11 @@ export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps)
             transition: 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
           }}
         >
-          <span className="w-12 h-px bg-[#1B0B94]/40 origin-right" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
-          <span className="text-[10px] uppercase tracking-[0.5em] font-medium text-[#1B0B94]/70 font-[family-name:var(--font-montserrat)]">
+          <span className="w-20 h-px bg-[#1B0B94]/40 origin-right" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
+          <span className="text-lg sm:text-xl uppercase tracking-[0.5em] font-medium text-[#1B0B94]/70 font-[family-name:var(--font-montserrat)]">
             Lolett
           </span>
-          <span className="w-12 h-px bg-[#1B0B94]/40 origin-left" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
+          <span className="w-20 h-px bg-[#1B0B94]/40 origin-left" style={{ animation: mounted ? 'hero-line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' : 'none' }} />
         </div>
 
         {/* Main title — cinematic stagger */}
