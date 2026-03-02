@@ -19,7 +19,6 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
         <ScrollReveal className="mb-20">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pb-8 border-b border-[#1B0B94]/8">
             <div className="flex items-start gap-6">
-              <span className="font-[family-name:var(--font-newsreader)] text-8xl md:text-9xl font-light text-[#1B0B94]/[0.07] leading-none select-none -mt-4">N</span>
               <div>
                 <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
                   Nouveautés

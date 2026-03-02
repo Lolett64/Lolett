@@ -38,7 +38,6 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
         {/* Section header */}
         <ScrollReveal className="mb-16 md:mb-20">
           <div className="flex items-start gap-6">
-            <span className="font-[family-name:var(--font-newsreader)] text-8xl md:text-9xl font-light text-[#1B0B94]/[0.07] leading-none select-none -mt-4">L</span>
             <div>
               <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
                 Prêt à sortir
