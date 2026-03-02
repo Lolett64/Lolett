@@ -12,6 +12,7 @@ import {
 } from '@/components/sections/home-v3';
 import { productRepository, lookRepository } from '@/lib/adapters';
 import { reviews } from '@/data/reviews';
+import { getSiteContent } from '@/lib/cms/content';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -40,19 +41,13 @@ export const metadata: Metadata = {
 
 const hexColor = "#FDF5E6";
 
-const content = {
-  title_line1: "Porter &",
-  title_line2: "vibrer le Sud",
-  subtitle: "Lolett",
-  description: "Pour lui, pour elle, pour vous.",
-  video_src: "/videos/hero-beach.mp4",
-  cta1_text: "Vestiaire Femme",
-  cta2_text: "Vestiaire Homme",
-};
-
 export default async function HomePage() {
-  const newProducts = (await productRepository.findMany({ isNew: true })).slice(0, 4);
-  const featuredLooks = (await lookRepository.findMany()).slice(0, 3);
+  const [heroContent, newsletterContent, newProducts, featuredLooks] = await Promise.all([
+    getSiteContent('hero'),
+    getSiteContent('newsletter'),
+    productRepository.findMany({ isNew: true }).then((p) => p.slice(0, 4)),
+    lookRepository.findMany().then((l) => l.slice(0, 3)),
+  ]);
 
   const lookProductsEntries = await Promise.all(
     featuredLooks.map(async (look) => {
@@ -68,17 +63,28 @@ export default async function HomePage() {
       style={{ backgroundColor: hexColor }}
     >
       <main>
-        <HeroSection content={content} hexColor={hexColor} />
+        <HeroSection content={{
+          video_src: heroContent?.video_src || '/videos/hero-beach.mp4',
+          subtitle: heroContent?.subtitle || 'Lolett',
+          title_line1: heroContent?.title_line1 || 'Porter &',
+          title_line2: heroContent?.title_line2 || 'vibrer le Sud',
+          description: heroContent?.description || 'Pour lui, pour elle, pour vous.',
+          cta1_text: heroContent?.cta1_text || 'Vestiaire Femme',
+          cta1_href: heroContent?.cta1_href || '/shop/femme',
+          cta2_text: heroContent?.cta2_text || 'Vestiaire Homme',
+          cta2_href: heroContent?.cta2_href || '/shop/homme',
+        }} hexColor={hexColor} />
         {/* <CollectionsSection content={content} hexColor={hexColor} /> */}
         <NewArrivalsSection products={newProducts} hexColor={hexColor} />
-        <BrandStorySection content={content} hexColor={hexColor} />
+        <BrandStorySection hexColor={hexColor} />
         <LooksSection looks={featuredLooks} lookProducts={lookProducts} hexColor={hexColor} />
         <TestimonialsSection reviews={reviews} hexColor={hexColor} />
         <NewsletterSection content={{
-          title: "Reste connecté",
-          description: "Nouveautés, exclusivités et inspirations du Sud-Ouest.",
-          placeholder_text: "ton@email.com",
-          button_text: "S'inscrire",
+          title: newsletterContent?.title || 'Reste connecté',
+          description: newsletterContent?.description || 'Nouveautés, exclusivités et inspirations du Sud-Ouest.',
+          placeholder_text: newsletterContent?.placeholder_text || 'ton@email.com',
+          button_text: newsletterContent?.button_text || "S'inscrire",
+          disclaimer: newsletterContent?.disclaimer || '',
         }} hexColor={hexColor} />
 
         {/* CTA Final */}

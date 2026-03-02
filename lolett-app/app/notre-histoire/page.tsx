@@ -1,19 +1,20 @@
 import type { Metadata } from 'next';
 import NotreHistoireContent from './content';
+import { getSiteContent } from '@/lib/cms/content';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
 export const metadata: Metadata = {
-  title: 'Notre Histoire',
+  title: 'Mon Histoire',
   description:
-    'LOLETT est née d\'une évidence : on mérite tous d\'être bien habillés sans y passer trois heures. Découvrez notre histoire, pensée au Sud.',
+    'Moi c\'est Lola. Découvrez l\'histoire derrière LOLETT, une marque construite avec le cœur depuis le Sud-Ouest.',
   alternates: {
     canonical: `${BASE_URL}/notre-histoire`,
   },
   openGraph: {
-    title: 'Notre Histoire — LOLETT',
+    title: 'Mon Histoire — LOLETT',
     description:
-      'Mode du Sud-Ouest pensée au Sud, portée partout. Découvrez l\'histoire de LOLETT.',
+      'Moi c\'est Lola. Découvrez l\'histoire derrière LOLETT, une marque construite avec le cœur.',
     url: `${BASE_URL}/notre-histoire`,
     type: 'website',
     images: [
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Notre Histoire — LOLETT',
+    title: 'Mon Histoire — LOLETT',
     description:
       'Mode du Sud-Ouest pensée au Sud, portée partout.',
   },
@@ -36,9 +37,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: 'Notre Histoire — LOLETT',
+  name: 'Mon Histoire — LOLETT',
   description:
-    'LOLETT est née d\'une évidence : on mérite tous d\'être bien habillés sans y passer trois heures.',
+    'Moi c\'est Lola. Découvrez l\'histoire derrière LOLETT, une marque construite avec le cœur.',
   url: `${BASE_URL}/notre-histoire`,
   publisher: {
     '@type': 'Organization',
@@ -47,14 +48,16 @@ const jsonLd = {
   },
 };
 
-export default function NotreHistoirePage() {
+export default async function NotreHistoirePage() {
+  const content = await getSiteContent('notre_histoire');
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <NotreHistoireContent />
+      <NotreHistoireContent content={content} />
     </>
   );
 }

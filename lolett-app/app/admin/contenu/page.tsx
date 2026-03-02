@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, Clock, Link as LinkIcon, Save, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ContentImageUpload } from '@/components/admin/ContentImageUpload';
+import { ContentVideoUpload } from '@/components/admin/ContentVideoUpload';
 import { HistoryDrawer } from '@/components/admin/HistoryDrawer';
 
 interface ContentItem {
@@ -208,14 +209,11 @@ export default function AdminContenuPage() {
                     )}
 
                     {item.type === 'video' && (
-                      <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700">{item.label}</label>
-                        <Input
-                          value={getDisplayValue(item)}
-                          onChange={(e) => handleFieldChange(item.id, e.target.value)}
-                        />
-                        <p className="text-xs text-gray-400">Chemin video</p>
-                      </div>
+                      <ContentVideoUpload
+                        label={item.label}
+                        value={getDisplayValue(item)}
+                        onChange={(url) => handleFieldChange(item.id, url)}
+                      />
                     )}
 
                     {item.type === 'url' && (
