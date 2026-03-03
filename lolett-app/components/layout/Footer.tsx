@@ -15,9 +15,9 @@ const footerLinks = {
     { name: 'Retours', href: '/contact' },
   ],
   legal: [
-    { name: 'CGV', href: '/contact' },
-    { name: 'Mentions légales', href: '/contact' },
-    { name: 'Confidentialité', href: '/contact' },
+    { name: 'CGV', href: '/cgv' },
+    { name: 'Mentions légales', href: '/mentions-legales' },
+    { name: 'Confidentialité', href: '/confidentialite' },
   ],
 };
 

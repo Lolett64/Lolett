@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ShoppingBag, Heart, AtSign, ChevronDown, User } from 'lucide-react';
+import { ShoppingBag, Heart, Mail, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { useCartStore } from '@/features/cart';
 import { useFavoritesStore } from '@/features/favorites';
@@ -107,7 +107,7 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                     <div className="flex items-center gap-5 xl:gap-8 shrink-0">
                         <div className="flex items-center gap-4 text-[#1B0B94]">
                             <Link href="/contact" className="hover:text-[#B89547] transition-colors hidden sm:block" aria-label="Contact">
-                                <AtSign size={16} strokeWidth={1.5} />
+                                <Mail size={16} strokeWidth={1.5} />
                             </Link>
 
                             {!loading && (
