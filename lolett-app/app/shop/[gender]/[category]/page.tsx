@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ShopContentV2 } from '@/components/product/ShopContentV2';
+import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
 
 export const revalidate = 60;
@@ -52,7 +52,7 @@ export default async function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="pt-20 sm:pt-24 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
-      <ShopContentV2
+      <ShopContentV4
         gender={gender}
         products={products}
         categories={categories}
