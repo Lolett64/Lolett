@@ -1,94 +1,36 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Look, Size, Product } from '@/types';
-import { useCartStore } from '@/features/cart';
+import type { Look, Product } from '@/types';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { STOCK } from '@/lib/constants';
-import { getFirstAvailableColor } from '@/lib/product-utils';
+import { useLookState } from './looks/useLookState';
+import { ProductLooksPieceCard } from './looks/ProductLooksPieceCard';
 
 interface ProductLooksProps {
   looks: Look[];
   lookProducts: Record<string, Product[]>;
 }
 
-interface PieceState {
-  selectedSize: Size | null;
-  addedToCart: boolean;
-}
-
 export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lookAddedToCart, setLookAddedToCart] = useState(false);
-  const [pieceStates, setPieceStates] = useState<Record<string, PieceState>>({});
-
-  const addItem = useCartStore((state) => state.addItem);
+  const {
+    currentIndex,
+    lookAddedToCart,
+    pieceStates,
+    goTo,
+    handlePrev,
+    handleNext,
+    handleSelectSize,
+    handleAddPiece,
+    handleAddFullLook,
+  } = useLookState(looks.length);
 
   const currentLook = looks[currentIndex];
   const products = lookProducts[currentLook.id] ?? [];
   const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
-
   const availableProducts = products.filter((p) => p.stock > 0);
-
-  const handleSelectSize = (productId: string, size: Size) => {
-    setPieceStates((prev) => ({
-      ...prev,
-      [productId]: { ...prev[productId], selectedSize: size, addedToCart: false },
-    }));
-  };
-
-  const handleAddPiece = (productId: string) => {
-    const state = pieceStates[productId];
-    if (!state?.selectedSize) return;
-
-    const product = products.find((p) => p.id === productId);
-    const color = product ? getFirstAvailableColor(product) : undefined;
-
-    addItem(productId, state.selectedSize, 1, color);
-    setPieceStates((prev) => ({
-      ...prev,
-      [productId]: { ...prev[productId], addedToCart: true },
-    }));
-
-    setTimeout(() => {
-      setPieceStates((prev) => ({
-        ...prev,
-        [productId]: { ...prev[productId], addedToCart: false },
-      }));
-    }, 3000);
-  };
-
-  const handleAddFullLook = () => {
-    availableProducts.forEach((product) => {
-      const pieceState = pieceStates[product.id];
-      const size: Size =
-        pieceState?.selectedSize ??
-        (product.sizes.includes('M') ? 'M' : product.sizes[0]);
-      const color = getFirstAvailableColor(product);
-      addItem(product.id, size, 1, color);
-    });
-
-    setLookAddedToCart(true);
-    setTimeout(() => setLookAddedToCart(false), 3000);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + looks.length) % looks.length);
-    setLookAddedToCart(false);
-    setPieceStates({});
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % looks.length);
-    setLookAddedToCart(false);
-    setPieceStates({});
-  };
 
   return (
     <section className="border-lolett-gray-200 mt-12 border-t pt-10 sm:mt-20 sm:pt-16">
@@ -119,11 +61,7 @@ export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
             {looks.map((_, i) => (
               <button
                 key={i}
-                onClick={() => {
-                  setCurrentIndex(i);
-                  setLookAddedToCart(false);
-                  setPieceStates({});
-                }}
+                onClick={() => goTo(i)}
                 aria-label={`Look ${i + 1}`}
                 className={cn(
                   'h-2 rounded-full transition-all',
@@ -166,119 +104,15 @@ export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
 
         <div className="flex flex-col gap-6">
           <div className="space-y-4">
-            {products.map((product) => {
-              const isOutOfStock = product.stock === 0;
-              const isLowStock = product.stock > 0 && product.stock < STOCK.LOW_THRESHOLD;
-              const pieceState = pieceStates[product.id];
-              const selectedSize = pieceState?.selectedSize ?? null;
-              const addedToCart = pieceState?.addedToCart ?? false;
-
-              return (
-                <div
-                  key={product.id}
-                  className={cn(
-                    'rounded-xl border p-4 transition-opacity',
-                    isOutOfStock
-                      ? 'border-lolett-gray-200 opacity-50'
-                      : 'border-lolett-gray-200'
-                  )}
-                >
-                  <div className="flex gap-4">
-                    <Link
-                      href={`/produit/${product.slug}`}
-                      className="relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-lg sm:h-24 sm:w-20"
-                    >
-                      <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        className={cn('object-cover', isOutOfStock && 'grayscale')}
-                        sizes="80px"
-                      />
-                      {isOutOfStock && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                          <span className="text-[10px] font-medium text-white">Épuisé</span>
-                        </div>
-                      )}
-                    </Link>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <Link
-                          href={`/produit/${product.slug}`}
-                          className="text-lolett-gray-900 text-sm font-medium hover:underline"
-                        >
-                          {product.name}
-                        </Link>
-                        <span className="text-lolett-gray-900 text-sm font-semibold">
-                          {product.price.toFixed(2)} €
-                        </span>
-                      </div>
-
-                      {isLowStock && (
-                        <Badge
-                          className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100"
-                          variant="outline"
-                        >
-                          Dernières pièces !
-                        </Badge>
-                      )}
-
-                      {!isOutOfStock && (
-                        <div className="mt-3">
-                          <p className="text-lolett-gray-600 mb-2 text-xs">Taille</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {product.sizes.map((size) => (
-                              <button
-                                key={size}
-                                onClick={() => handleSelectSize(product.id, size)}
-                                aria-pressed={selectedSize === size}
-                                className={cn(
-                                  'h-8 min-w-[32px] rounded-md px-2 text-xs font-medium transition-all',
-                                  selectedSize === size
-                                    ? 'bg-lolett-gold text-white'
-                                    : 'bg-lolett-gray-100 text-lolett-gray-700 hover:bg-lolett-gray-200'
-                                )}
-                              >
-                                {size}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {!isOutOfStock && (
-                    <div className="mt-3">
-                      <button
-                        onClick={() => handleAddPiece(product.id)}
-                        disabled={!selectedSize || addedToCart}
-                        className={cn(
-                          'w-full rounded-full px-4 py-2 text-sm font-medium transition-all',
-                          addedToCart
-                            ? 'bg-green-500 text-white'
-                            : selectedSize
-                              ? 'bg-lolett-gold text-white hover:opacity-90'
-                              : 'bg-lolett-gray-100 text-lolett-gray-400 cursor-not-allowed'
-                        )}
-                      >
-                        {addedToCart ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <Check className="h-4 w-4" />
-                            Ajouté au panier
-                          </span>
-                        ) : selectedSize ? (
-                          'Ajouter cette pièce'
-                        ) : (
-                          'Choisir une taille'
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {products.map((product) => (
+              <ProductLooksPieceCard
+                key={product.id}
+                product={product}
+                pieceState={pieceStates[product.id]}
+                onSizeChange={handleSelectSize}
+                onAdd={(id) => handleAddPiece(id, products)}
+              />
+            ))}
           </div>
 
           <div className="border-lolett-gray-200 border-t pt-4">
@@ -290,7 +124,7 @@ export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
             </div>
 
             <Button
-              onClick={handleAddFullLook}
+              onClick={() => handleAddFullLook(availableProducts)}
               disabled={availableProducts.length === 0 || lookAddedToCart}
               size="lg"
               className={cn(

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { ContactFaq } from './ContactFaq';
+import { ContactNewsletter } from './ContactNewsletter';
 
 const GOLD = '#B89547';
 const SAND = '#FDF5E6';
@@ -27,10 +29,7 @@ function useReveal() {
 
 export function ContactV2({ content }: ContactV2Props) {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', honeypot: '' });
-  const [newsletter, setNewsletter] = useState('');
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
   const [focusField, setFocusField] = useState<string | null>(null);
 
   const faqItems = [
@@ -126,26 +125,17 @@ export function ContactV2({ content }: ContactV2Props) {
         </div>
       </div>
 
-      {/* Contact cards — email + address only (no phone) */}
+      {/* Contact cards */}
       <div ref={r1.ref} style={r1.style}>
         <div className="contact-c-cards" style={{ display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', marginTop: '-40px', position: 'relative', zIndex: 1 }}>
-          <div style={{
-            background: SAND, border: `1px solid ${GOLD}33`,
-            padding: '32px 28px', textAlign: 'center', width: '220px',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-          }}>
+          <div style={{ background: SAND, border: `1px solid ${GOLD}33`, padding: '32px 28px', textAlign: 'center', width: '220px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '14px' }}>
               <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '10px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: MUTED, marginBottom: '6px' }}>Email</p>
             <a href={`mailto:${contactEmail}`} style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: DARK, textDecoration: 'none' }}>{contactEmail}</a>
           </div>
-
-          <div style={{
-            background: SAND, border: `1px solid ${GOLD}33`,
-            padding: '32px 28px', textAlign: 'center', width: '220px',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-          }}>
+          <div style={{ background: SAND, border: `1px solid ${GOLD}33`, padding: '32px 28px', textAlign: 'center', width: '220px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '14px' }}>
               <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -163,7 +153,6 @@ export function ContactV2({ content }: ContactV2Props) {
         <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY, textAlign: 'center', marginBottom: '48px' }}>
           {content?.form_subtitle || 'Je te réponds sous 24-48h.'}
         </p>
-
         {sent ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '26px', color: DARK, marginBottom: '8px' }}>Merci !</p>
@@ -178,16 +167,13 @@ export function ContactV2({ content }: ContactV2Props) {
             {floatingField('email', 'Ton email', 'email')}
             {floatingField('subject', 'Sujet')}
             {floatingField('message', 'Ton message', 'text', true)}
-
             <div style={{ textAlign: 'center', marginTop: '16px' }}>
-              <button
-                type="submit"
-                style={{
-                  fontFamily: 'var(--font-montserrat), sans-serif',
-                  fontSize: '12px', fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase',
-                  background: GOLD, color: '#fff', border: 'none',
-                  padding: '16px 52px', cursor: 'pointer', transition: 'opacity 0.3s',
-                }}
+              <button type="submit" style={{
+                fontFamily: 'var(--font-montserrat), sans-serif',
+                fontSize: '12px', fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase',
+                background: GOLD, color: '#fff', border: 'none',
+                padding: '16px 52px', cursor: 'pointer', transition: 'opacity 0.3s',
+              }}
                 onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
                 onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
               >
@@ -205,75 +191,8 @@ export function ContactV2({ content }: ContactV2Props) {
         <div style={{ width: '60px', height: '1px', background: MUTED }} />
       </div>
 
-      {/* FAQ */}
-      <div ref={r3.ref} style={{ ...r3.style, maxWidth: '700px', margin: '0 auto', padding: '0 24px 48px' }}>
-        <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '11px', fontWeight: 500, letterSpacing: '3px', textTransform: 'uppercase', color: GOLD, textAlign: 'center', marginBottom: '16px' }}>
-          FAQ
-        </p>
-        <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '28px', fontWeight: 400, color: DARK, textAlign: 'center', marginBottom: '48px' }}>
-          Questions fréquentes
-        </h2>
-        {faqItems.map((item, i) => (
-          <div key={i} style={{ borderBottom: '1px solid #e0d9cf' }}>
-            <button
-              onClick={() => setOpenFaq(openFaq === i ? null : i)}
-              style={{
-                width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '22px 0', background: 'none', border: 'none', cursor: 'pointer',
-                fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', fontWeight: 500,
-                color: DARK, textAlign: 'left',
-              }}
-            >
-              {item.q}
-              <svg width="16" height="16" viewBox="0 0 16 16" style={{ transform: openFaq === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s', flexShrink: 0, marginLeft: '16px' }}>
-                <path d="M4 6l4 4 4-4" stroke={MUTED} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-              </svg>
-            </button>
-            <div style={{ maxHeight: openFaq === i ? '200px' : '0', overflow: 'hidden', transition: 'max-height 0.4s ease' }}>
-              <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '13px', color: SECONDARY, lineHeight: 1.8, padding: '0 0 22px' }}>{item.a}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Newsletter */}
-      <div ref={r4.ref} style={{ ...r4.style, background: '#f3ece0', padding: '48px 24px', textAlign: 'center' }}>
-        <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '11px', fontWeight: 500, letterSpacing: '3px', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
-          Newsletter
-        </p>
-        <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '28px', fontWeight: 400, color: DARK, marginBottom: '8px' }}>
-          Reste inspiré
-        </h2>
-        <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: SECONDARY, marginBottom: '32px', maxWidth: '400px', margin: '0 auto 32px' }}>
-          Nouveautés, conseils style et offres exclusives.
-        </p>
-        {subscribed ? (
-          <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px', color: GOLD }}>Merci pour ton inscription !</p>
-        ) : (
-          <form onSubmit={(e) => { e.preventDefault(); if (newsletter) setSubscribed(true); }} className="contact-c-nl-row" style={{ display: 'flex', maxWidth: '440px', margin: '0 auto' }}>
-            <input
-              type="email"
-              placeholder="Ton email"
-              value={newsletter}
-              onChange={e => setNewsletter(e.target.value)}
-              required
-              style={{
-                flex: 1, padding: '14px 20px', border: '1px solid #d5cfc6',
-                fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '14px',
-                color: DARK, background: SAND, outline: 'none',
-              }}
-            />
-            <button type="submit" style={{
-              fontFamily: 'var(--font-montserrat), sans-serif',
-              fontSize: '11px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase',
-              background: GOLD, color: '#fff', border: 'none',
-              padding: '14px 28px', cursor: 'pointer', whiteSpace: 'nowrap',
-            }}>
-              S&apos;inscrire
-            </button>
-          </form>
-        )}
-      </div>
+      <ContactFaq items={faqItems} revealRef={r3.ref} revealStyle={r3.style} />
+      <ContactNewsletter revealRef={r4.ref} revealStyle={r4.style} />
     </main>
   );
 }

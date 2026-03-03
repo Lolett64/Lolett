@@ -11,6 +11,7 @@ import { useCartStore } from '@/features/cart';
 import { useFavoritesStore } from '@/features/favorites';
 import { STOCK } from '@/lib/constants';
 import { getFirstAvailableColor } from '@/lib/product-utils';
+import { useTouchSwipe } from '@/hooks/useTouchSwipe';
 
 interface ProductCardProps {
   product: Product;
@@ -20,23 +21,14 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
   const toggleFavorite = useFavoritesStore((state) => state.toggleItem);
   const isFavorite = useFavoritesStore((state) => state.isFavorite(product.id));
 
-  // Calculer le stock disponible (utiliser variantes si disponibles)
-  const getProductStock = (): number => {
-    if (product.variants && product.variants.length > 0) {
-      return product.variants.reduce((sum, v) => sum + v.stock, 0);
-    }
-    return product.stock;
-  };
-
-  const totalStock = getProductStock();
+  const totalStock = (product.variants && product.variants.length > 0)
+    ? product.variants.reduce((sum, v) => sum + v.stock, 0)
+    : product.stock;
   const isLowStock = totalStock > 0 && totalStock <= STOCK.LOW_THRESHOLD;
   const isOutOfStock = totalStock === 0;
   const isSingleSize = product.sizes.length === 1 && product.sizes[0] === 'TU';
@@ -72,39 +64,22 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleFavorite(product.id);
   };
 
-  // Gestion du swipe mobile pour les images
-  const minSwipeDistance = 50;
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && product.images.length > currentImageIndex + 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
-    if (isRightSwipe && currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1);
-    }
-  };
+  const {
+    currentIndex: currentImageIndex,
+    setCurrentIndex: setCurrentImageIndex,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+  } = useTouchSwipe({ maxIndex: product.images.length - 1 });
 
   // Réinitialiser l'index d'image au hover (desktop)
   const handleMouseEnter = () => {
     setIsHovered(true);
-    if (product.images.length > 1) {
-      setCurrentImageIndex(1); // Afficher la 2e image au hover
-    }
+    if (product.images.length > 1) setCurrentImageIndex(1);
   };
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setCurrentImageIndex(0); // Revenir à la première image
+    setCurrentImageIndex(0);
     setShowSizeSelector(false);
   };
 

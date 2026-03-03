@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,124 +12,27 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
-
-interface Category {
-  id: string;
-  gender: string;
-  slug: string;
-  label: string;
-  seo_title: string | null;
-  seo_description: string | null;
-}
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
+import { useCategoryForm } from '@/components/admin/categories/useCategoryForm';
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  const [form, setForm] = useState({
-    gender: '',
-    slug: '',
-    label: '',
-    seo_title: '',
-    seo_description: '',
-  });
-
-  async function fetchCategories() {
-    const res = await fetch('/api/admin/categories');
-    if (res.ok) {
-      const data = await res.json();
-      setCategories(data.categories ?? []);
-    }
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    void fetchCategories();
-  }, []);
-
-  function resetForm() {
-    setForm({ gender: '', slug: '', label: '', seo_title: '', seo_description: '' });
-    setShowForm(false);
-    setEditingId(null);
-  }
-
-  function startEdit(cat: Category) {
-    setForm({
-      gender: cat.gender,
-      slug: cat.slug,
-      label: cat.label,
-      seo_title: cat.seo_title ?? '',
-      seo_description: cat.seo_description ?? '',
-    });
-    setEditingId(cat.id);
-    setShowForm(true);
-  }
-
-  function startCreate() {
-    resetForm();
-    setShowForm(true);
-  }
-
-  function handleLabelChange(label: string) {
-    setForm((f) => ({
-      ...f,
-      label,
-      slug: editingId ? f.slug : slugify(label),
-    }));
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-
-    try {
-      const url = editingId
-        ? `/api/admin/categories/${editingId}`
-        : '/api/admin/categories';
-      const method = editingId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (res.ok) {
-        await fetchCategories();
-        resetForm();
-      }
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete(id: string) {
-    setDeleting(id);
-    try {
-      const res = await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        await fetchCategories();
-      }
-    } finally {
-      setDeleting(null);
-    }
-  }
-
-  const homme = categories.filter((c) => c.gender === 'homme');
-  const femme = categories.filter((c) => c.gender === 'femme');
+  const {
+    categories,
+    loading,
+    showForm,
+    editingId,
+    deleting,
+    saving,
+    form,
+    homme,
+    femme,
+    resetForm,
+    startEdit,
+    startCreate,
+    handleLabelChange,
+    setFormField,
+    handleSubmit,
+    handleDelete,
+  } = useCategoryForm();
 
   if (loading) {
     return <div className="h-48 rounded-xl bg-lolett-gray-200 animate-pulse" />;
@@ -170,7 +72,7 @@ export default function AdminCategoriesPage() {
                 <Label>Genre *</Label>
                 <Select
                   value={form.gender}
-                  onValueChange={(v) => setForm((f) => ({ ...f, gender: v }))}
+                  onValueChange={(v) => setFormField('gender', v)}
                   required
                 >
                   <SelectTrigger className="w-full">
@@ -197,7 +99,7 @@ export default function AdminCategoriesPage() {
                 <Input
                   id="cat-slug"
                   value={form.slug}
-                  onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                  onChange={(e) => setFormField('slug', e.target.value)}
                   placeholder="chemises"
                 />
               </div>
@@ -208,7 +110,7 @@ export default function AdminCategoriesPage() {
                 <Input
                   id="cat-seo-title"
                   value={form.seo_title}
-                  onChange={(e) => setForm((f) => ({ ...f, seo_title: e.target.value }))}
+                  onChange={(e) => setFormField('seo_title', e.target.value)}
                   placeholder="Chemises Homme | LOLETT"
                 />
               </div>
@@ -217,7 +119,7 @@ export default function AdminCategoriesPage() {
                 <Input
                   id="cat-seo-desc"
                   value={form.seo_description}
-                  onChange={(e) => setForm((f) => ({ ...f, seo_description: e.target.value }))}
+                  onChange={(e) => setFormField('seo_description', e.target.value)}
                   placeholder="Découvrez nos chemises..."
                 />
               </div>
