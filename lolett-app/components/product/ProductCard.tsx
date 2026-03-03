@@ -15,9 +15,10 @@ import { useTouchSwipe } from '@/hooks/useTouchSwipe';
 
 interface ProductCardProps {
   product: Product;
+  hideNewBadge?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -137,7 +138,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:top-3 sm:left-3 sm:gap-2 z-10">
             {isOutOfStock && <BrandBadge variant="soldOut">Victime de son succès</BrandBadge>}
-            {product.isNew && !isOutOfStock && <BrandBadge variant="new">Nouveau</BrandBadge>}
+            {product.isNew && !isOutOfStock && !hideNewBadge && <BrandBadge variant="new">Nouveau</BrandBadge>}
             {isLowStock && <BrandBadge variant="lowStock">Plus que {totalStock}</BrandBadge>}
           </div>
 

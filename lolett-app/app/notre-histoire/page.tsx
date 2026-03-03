@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import NotreHistoireContent from './content';
 import { getSiteContent } from '@/lib/cms/content';
+import { getVisibleSectionKeys } from '@/lib/cms/sections';
 
 export const revalidate = 60;
 
@@ -51,7 +52,10 @@ const jsonLd = {
 };
 
 export default async function NotreHistoirePage() {
-  const content = await getSiteContent('notre_histoire');
+  const [content, visibleSections] = await Promise.all([
+    getSiteContent('notre_histoire'),
+    getVisibleSectionKeys('notre-histoire'),
+  ]);
 
   return (
     <>
@@ -59,7 +63,7 @@ export default async function NotreHistoirePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <NotreHistoireContent content={content} />
+      <NotreHistoireContent content={content} visibleSections={visibleSections} />
     </>
   );
 }

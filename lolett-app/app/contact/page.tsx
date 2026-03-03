@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ContactV2 } from '@/components/contact/ContactV2';
 import { getSiteContent } from '@/lib/cms/content';
+import { getVisibleSectionKeys } from '@/lib/cms/sections';
 
 export const revalidate = 60;
 
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const content = await getSiteContent('contact');
-  return <ContactV2 content={content} />;
+  const [content, visibleSections] = await Promise.all([
+    getSiteContent('contact'),
+    getVisibleSectionKeys('contact'),
+  ]);
+  return <ContactV2 content={content} visibleSections={visibleSections} />;
 }

@@ -74,10 +74,10 @@ function NavLink({
       href={href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+        'flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors border-l-2',
         isActive
-          ? 'bg-lolett-blue text-white'
-          : 'text-lolett-gray-600 hover:bg-lolett-gray-200 hover:text-lolett-gray-900'
+          ? 'border-[#B89547] text-[#B89547]'
+          : 'border-transparent text-white/70 hover:text-white'
       )}
     >
       <Icon className="size-4 shrink-0" />
@@ -94,7 +94,7 @@ export function AdminSidebar() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-40 rounded-lg bg-white p-2 shadow-md lg:hidden"
+        className="fixed top-4 left-4 z-40 rounded-lg bg-[#1B0B94] p-2 text-white shadow-md lg:hidden"
         aria-label="Ouvrir menu"
       >
         <Menu className="size-5" />
@@ -111,16 +111,21 @@ export function AdminSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-white shadow-sm transition-transform duration-200 lg:static lg:translate-x-0 lg:shadow-none lg:border-r lg:border-lolett-gray-200',
+          'fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-gradient-to-b from-[#1B0B94] to-[#130866] shadow-sm transition-transform duration-200 lg:static lg:translate-x-0 lg:shadow-none',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between border-b border-lolett-gray-200 px-4 py-4">
-          <span className="text-lg font-bold tracking-widest text-lolett-blue">LOLETT</span>
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <div>
+            <span className="font-[Montserrat] text-lg font-bold uppercase tracking-[0.3em] text-[#B89547]">
+              LOLETT
+            </span>
+            <div className="mt-2 h-px w-full bg-[#B89547]/40" />
+          </div>
           <button
             onClick={() => setMobileOpen(false)}
-            className="rounded p-1 hover:bg-lolett-gray-100 lg:hidden"
+            className="rounded p-1 text-white/60 hover:text-white lg:hidden"
             aria-label="Fermer menu"
           >
             <X className="size-4" />
@@ -128,11 +133,11 @@ export function AdminSidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex flex-1 flex-col gap-0.5 p-3">
+        <nav className="flex flex-1 flex-col gap-0.5 px-2 pt-2">
           {navGroups.map((group) => (
             <div key={group.label || 'top'}>
               {group.label && (
-                <p className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-lolett-gray-400">
+                <p className="mt-5 mb-1.5 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B89547]/80">
                   {group.label}
                 </p>
               )}
@@ -148,10 +153,10 @@ export function AdminSidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-lolett-gray-200 p-3">
+        <div className="border-t border-white/10 p-4">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-lolett-gray-500 hover:text-lolett-gray-900"
+            className="flex items-center gap-2 px-2 py-2 text-xs text-[#B89547]/70 transition-colors hover:text-[#B89547]"
           >
             Voir la boutique
           </Link>

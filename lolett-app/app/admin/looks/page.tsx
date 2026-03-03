@@ -32,11 +32,11 @@ async function LooksContent() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-lolett-gray-900">Looks</h2>
-          <p className="text-sm text-lolett-gray-500 mt-1">{looks.length} look(s)</p>
+          <h2 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510]">Looks</h2>
+          <p className="text-sm text-[#B89547] mt-1">{looks.length} look(s)</p>
         </div>
         <Link href="/admin/looks/new">
-          <Button className="gap-2">
+          <Button className="gap-2 bg-[#1B0B94] text-white hover:bg-[#130970]">
             <Plus className="size-4" />
             Nouveau look
           </Button>
@@ -44,15 +44,15 @@ async function LooksContent() {
       </div>
 
       {looks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-lolett-gray-300 p-12 text-center">
-          <p className="text-lolett-gray-400">Aucun look pour le moment</p>
+        <div className="rounded-xl border border-dashed border-[#B89547]/30 bg-[#B89547]/5 p-12 text-center">
+          <p className="text-[#1a1510]/40">Aucun look pour le moment</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {looks.map((look) => (
             <div
               key={look.id}
-              className="rounded-xl border border-lolett-gray-200 bg-white overflow-hidden"
+              className="rounded-xl border border-gray-200/50 bg-white overflow-hidden hover:shadow-md hover:border-[#B89547]/30 transition-all duration-300"
             >
               {look.cover_image ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -62,28 +62,28 @@ async function LooksContent() {
                   className="aspect-[4/3] w-full object-cover"
                 />
               ) : (
-                <div className="aspect-[4/3] w-full bg-lolett-gray-100 flex items-center justify-center">
-                  <span className="text-xs text-lolett-gray-400">Pas d&apos;image</span>
+                <div className="aspect-[4/3] w-full bg-[#FDF5E6] flex items-center justify-center">
+                  <span className="text-xs text-[#1a1510]/30">Pas d&apos;image</span>
                 </div>
               )}
               <div className="p-4 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-medium text-lolett-gray-900 truncate">{look.title}</p>
+                    <p className="font-[family-name:var(--font-montserrat)] font-medium text-[#1a1510] truncate">{look.title}</p>
                     {look.vibe && (
-                      <p className="text-xs text-lolett-gray-500 truncate">{look.vibe}</p>
+                      <p className="text-xs text-[#1a1510]/50 truncate">{look.vibe}</p>
                     )}
                   </div>
-                  <Badge variant="outline" className="shrink-0 capitalize text-xs">
+                  <Badge variant="outline" className="shrink-0 capitalize text-xs bg-[#B89547]/10 text-[#B89547] border-[#B89547]/20">
                     {look.gender}
                   </Badge>
                 </div>
                 {look.short_pitch && (
-                  <p className="text-xs text-lolett-gray-600 line-clamp-2">{look.short_pitch}</p>
+                  <p className="text-xs text-[#1a1510]/60 line-clamp-2">{look.short_pitch}</p>
                 )}
                 <div className="flex items-center gap-2 mt-1">
                   <Link href={`/admin/looks/${look.id}/edit`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full gap-1">
+                    <Button variant="outline" size="sm" className="w-full gap-1 border-gray-200 text-[#1a1510] hover:border-[#B89547] hover:text-[#B89547] transition-colors">
                       <Pencil className="size-3.5" />
                       Modifier
                     </Button>
@@ -101,7 +101,7 @@ async function LooksContent() {
 
 export default function AdminLooksPage() {
   return (
-    <Suspense fallback={<div className="h-48 rounded-xl bg-lolett-gray-200 animate-pulse" />}>
+    <Suspense fallback={<div className="h-48 rounded-xl bg-[#FDF5E6] animate-pulse" />}>
       <LooksContent />
     </Suspense>
   );

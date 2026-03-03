@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { getEmailSettings } from '@/lib/cms/emails';
 import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmation-v3';
+import { renderOrderShippedV3 } from '@/lib/email/templates/order-shipped-v3';
+import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
 import { sendHtmlEmail } from '@/lib/email-provider';
 
@@ -53,6 +55,20 @@ export async function POST(request: Request) {
       html = renderOrderConfirmationV3(MOCK_ORDER_DATA);
       subject = settings?.subject_template?.replace('{orderNumber}', 'LOL-20260220-TEST')
         || 'Confirmation de commande — LOLETT';
+    } else if (template_key === 'order_shipped') {
+      html = renderOrderShippedV3({
+        ...MOCK_ORDER_DATA,
+        trackingNumber: 'FR123456789',
+      });
+      subject = settings?.subject_template?.replace('{orderNumber}', 'LOL-20260220-TEST')
+        || 'Votre commande est en route — LOLETT';
+    } else if (template_key === 'order_delivered') {
+      html = renderOrderDeliveredV3({
+        firstName: 'Marie',
+        orderNumber: 'LOL-20260220-TEST',
+      });
+      subject = settings?.subject_template?.replace('{orderNumber}', 'LOL-20260220-TEST')
+        || 'Votre commande est arrivée — LOLETT';
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
       subject = settings?.subject_template || 'Bienvenue chez LOLETT';

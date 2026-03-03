@@ -154,7 +154,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
               />
             ) : (
               <>
-                <ProductGrid products={paginated} columns={3} />
+                <ProductGrid products={paginated} columns={3} hideNewBadge />
                 {hasMore && (
                   <div className="mt-10 flex justify-center">
                     <button

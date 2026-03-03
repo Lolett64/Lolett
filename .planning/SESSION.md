@@ -1,24 +1,20 @@
-# Session State — 2026-03-03 23:00
+# Session State — 2026-03-04 00:30
 
 ## Branch
 v3
 
 ## Completed This Session
-- Header UX: icône @ remplacée par Mail (enveloppe)
-- Pages légales: /mentions-legales, /cgv, /confidentialite créées avec placeholders
-- Footer: liens légaux pointent vers les bonnes pages
-- Stripe webhook: fulfillOrder helper extrait + /api/webhook/stripe créé
-- Emails transactionnels: templates shipped + delivered + senders + hook admin PATCH
-- Migration Supabase: email_settings shipped/delivered poussée
+- Dynamic sections: page_sections table + CMS helper + API + admin SectionsManager (toggle/reorder) + frontend (Home, Notre Histoire, Contact)
+- Admin restyle luxury éditorial: sidebar bleu profond, fond sable, accents or, Newsreader serif. Toutes les pages refaites.
+- Email fix: preview + test routes supportent maintenant order_shipped et order_delivered
 
 ## Next Task
-Refactorisation code: chaque page/composant ≤ 250 lignes. Utiliser /superpowers:writing-plans pour planifier.
+Test visuel admin restyle + vérifier email preview shipped/delivered. Puis continuer refactorisation Tasks 2-12.
 
 ## Blockers
-- Stripe CLI: Homebrew installé mais pas dans PATH. Besoin infos Stripe de la cliente.
-- STRIPE_WEBHOOK_SECRET vide — à configurer quand Stripe CLI fonctionnel
+None
 
 ## Key Context
-- fulfillOrder helper dans lib/checkout/fulfill-order.ts (idempotent, utilisé par webhook + session route)
-- Emails shipped/delivered se déclenchent sur admin PATCH /api/admin/orders/[id] (fire-and-forget)
-- Panier abandonné abandonné (pas implémenté)
+- Migration page_sections déjà appliquée sur Supabase
+- Admin palette: sidebar #1B0B94, bg #FDF5E6, accents #B89547, titres Newsreader serif
+- SectionsManager: badges numérotés + flash or au reorder

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { getEmailSettings, type EmailSettings } from '@/lib/cms/emails';
 import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmation-v3';
+import { renderOrderShippedV3 } from '@/lib/email/templates/order-shipped-v3';
+import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
 
 const MOCK_ORDER_DATA = {
@@ -27,6 +29,22 @@ const MOCK_ORDER_DATA = {
 const MOCK_WELCOME_DATA = {
   firstName: 'Marie',
   promoCode: 'BIENVENUE10',
+};
+
+const MOCK_SHIPPED_DATA = {
+  firstName: 'Marie',
+  orderNumber: 'LOL-20260220-DEMO',
+  items: MOCK_ORDER_DATA.items,
+  subtotal: 238.00,
+  shipping: 0,
+  total: 238.00,
+  address: MOCK_ORDER_DATA.address,
+  trackingNumber: 'FR123456789',
+};
+
+const MOCK_DELIVERED_DATA = {
+  firstName: 'Marie',
+  orderNumber: 'LOL-20260220-DEMO',
 };
 
 function applyOverrides(html: string, settings: Partial<EmailSettings>): string {
@@ -80,6 +98,10 @@ export async function POST(request: Request) {
     let html: string;
     if (template_key === 'order_confirmation') {
       html = renderOrderConfirmationV3(MOCK_ORDER_DATA);
+    } else if (template_key === 'order_shipped') {
+      html = renderOrderShippedV3(MOCK_SHIPPED_DATA);
+    } else if (template_key === 'order_delivered') {
+      html = renderOrderDeliveredV3(MOCK_DELIVERED_DATA);
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
     } else {

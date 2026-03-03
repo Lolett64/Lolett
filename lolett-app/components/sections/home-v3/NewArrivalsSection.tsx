@@ -49,7 +49,7 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
                     <span className="text-[8px] uppercase tracking-[0.2em] font-semibold text-[#B89547]">New</span>
                   </div>
                 )}
-                <ProductCard product={product} />
+                <ProductCard product={product} hideNewBadge />
               </div>
             </ScrollReveal>
           ))}

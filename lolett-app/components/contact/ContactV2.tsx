@@ -12,6 +12,7 @@ const MUTED = '#9B8E82';
 
 interface ContactV2Props {
   content?: Record<string, string>;
+  visibleSections?: string[];
 }
 
 function useReveal() {
@@ -27,7 +28,8 @@ function useReveal() {
   return { ref, style: { opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' } as React.CSSProperties };
 }
 
-export function ContactV2({ content }: ContactV2Props) {
+export function ContactV2({ content, visibleSections }: ContactV2Props) {
+  const show = (key: string) => !visibleSections?.length || visibleSections.includes(key);
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', honeypot: '' });
   const [sent, setSent] = useState(false);
   const [focusField, setFocusField] = useState<string | null>(null);
@@ -108,7 +110,7 @@ export function ContactV2({ content }: ContactV2Props) {
       `}</style>
 
       {/* Hero */}
-      <div style={{
+      {show('hero') && <div style={{
         height: '25vh', minHeight: '200px',
         backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80)',
         backgroundSize: 'cover', backgroundPosition: 'center 40%',
@@ -123,9 +125,10 @@ export function ContactV2({ content }: ContactV2Props) {
             {content?.page_title || 'Écris-moi'}
           </h1>
         </div>
-      </div>
+      </div>}
 
       {/* Contact cards */}
+      {show('form') && <>
       <div ref={r1.ref} style={r1.style}>
         <div className="contact-c-cards" style={{ display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', marginTop: '-40px', position: 'relative', zIndex: 1 }}>
           <div style={{ background: SAND, border: `1px solid ${GOLD}33`, padding: '32px 28px', textAlign: 'center', width: '220px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
@@ -190,9 +193,10 @@ export function ContactV2({ content }: ContactV2Props) {
         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: GOLD }} />
         <div style={{ width: '60px', height: '1px', background: MUTED }} />
       </div>
+      </>}
 
-      <ContactFaq items={faqItems} revealRef={r3.ref} revealStyle={r3.style} />
-      <ContactNewsletter revealRef={r4.ref} revealStyle={r4.style} />
+      {show('faq') && <ContactFaq items={faqItems} revealRef={r3.ref} revealStyle={r3.style} />}
+      {show('newsletter') && <ContactNewsletter revealRef={r4.ref} revealStyle={r4.style} />}
     </main>
   );
 }

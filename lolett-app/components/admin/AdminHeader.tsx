@@ -14,15 +14,15 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-lolett-gray-200 bg-white px-6">
-      <h1 className="text-sm font-semibold text-lolett-gray-600 lg:text-base">
+    <header className="flex h-14 items-center justify-between bg-[#FDF5E6] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <h1 className="font-[Newsreader] text-base italic text-[#B89547] lg:text-lg">
         Administration
       </h1>
       <Button
         variant="ghost"
         size="sm"
         onClick={handleLogout}
-        className="gap-2 text-lolett-gray-500 hover:text-lolett-gray-900"
+        className="gap-2 text-[#B89547]/70 hover:text-[#B89547] hover:bg-transparent"
       >
         <LogOut className="size-4" />
         <span className="hidden sm:inline">Déconnexion</span>

@@ -18,10 +18,12 @@ const FALLBACK_MATERIALS = [
 
 interface NotreHistoireProps {
   content?: Record<string, string>;
+  visibleSections?: string[];
 }
 
-export default function NotreHistoireContent({ content = {} }: NotreHistoireProps) {
+export default function NotreHistoireContent({ content = {}, visibleSections }: NotreHistoireProps) {
   const c = (key: string, fallback: string) => content[key] || fallback;
+  const show = (key: string) => !visibleSections?.length || visibleSections.includes(key);
   const [materials, setMaterials] = useState(FALLBACK_MATERIALS);
 
   useEffect(() => {
@@ -35,10 +37,10 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
 
   return (
     <main style={{ background: SAND, color: BROWN }}>
-      <HeroSection title={c('hero_title', 'Mon histoire')} />
+      {show('hero') && <HeroSection title={c('hero_title', 'Mon histoire')} />}
 
       {/* TEXTE PERSO LOLA */}
-      <section style={{ padding: 'clamp(40px, 6vw, 80px) 24px', maxWidth: 800, margin: '0 auto' }}>
+      {show('lola') && <section style={{ padding: 'clamp(40px, 6vw, 80px) 24px', maxWidth: 800, margin: '0 auto' }}>
         <Reveal>
           <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 'clamp(20px, 3vw, 26px)', lineHeight: 1.8, fontWeight: 400, color: BROWN, marginBottom: 28 }}>
             {c('lola_intro', 'Moi c\u2019est Lola, je suis de celles qui ont toujours \u201cun projet en route\u201d.')}
@@ -67,20 +69,20 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
             {c('lola_merci', 'Merci d\u2019\u00eatre l\u00e0')}
           </p>
         </Reveal>
-      </section>
+      </section>}
 
       <div style={{ width: 60, height: 1, background: GOLD, margin: '0 auto 24px', opacity: 0.4 }} />
 
-      <OrigineSection
+      {show('origine') && <OrigineSection
         label={c('origine_label', 'L\u2019origine')}
         title={c('origine_title', 'N\u00e9e dans le Sud-Ouest')}
         text1={c('origine_text1', 'C\u2019est parti d\u2019une id\u00e9e simple \u2014 on m\u00e9rite tous d\u2019\u00eatre bien habill\u00e9s sans y passer trois heures. Des coupes qui tombent bien, des mati\u00e8res qu\u2019on a envie de toucher, et des prix qui ne font pas grimacer.')}
         quote={c('origine_quote', 'Je s\u00e9lectionne chaque pi\u00e8ce comme si c\u2019\u00e9tait pour moi.')}
         text2={c('origine_text2', 'Ici, pas de tendances \u00e9ph\u00e9m\u00e8res ni de collections \u00e0 rallonge. Juste des pi\u00e8ces qui fonctionnent ensemble, pour que tu sortes de chez toi en te disant \u2014 ouais, je suis bien l\u00e0.')}
-      />
+      />}
 
       {/* MATERIALS BAR */}
-      <section style={{ padding: '24px 24px', maxWidth: 1100, margin: '0 auto' }}>
+      {show('materials') && <section style={{ padding: '24px 24px', maxWidth: 1100, margin: '0 auto' }}>
         <Reveal>
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'clamp(20px, 4vw, 48px)' }}>
             {materials.map((m, i) => (
@@ -97,19 +99,19 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
             ))}
           </div>
         </Reveal>
-      </section>
+      </section>}
 
       <div style={{ width: 60, height: 1, background: GOLD, margin: '24px auto', opacity: 0.4 }} />
 
-      <VisionSection
+      {show('vision') && <VisionSection
         label={c('vision_label', 'Notre Vision')}
         title={c('vision_title', 'La plupart des sites te vendent des pi\u00e8ces. Nous, on te propose des looks complets.')}
         goldText={c('vision_gold_text', 'Nous, on te propose des looks complets.')}
         aside={c('vision_aside', 'C\u2019est comme avoir une amie styliste qui te dit \u00ab\u00a0fais-moi confiance, prends \u00e7a\u00a0\u00bb. Sauf que c\u2019est un site, et tu peux le faire en pyjama.')}
-      />
+      />}
 
       {/* CAROUSEL */}
-      <section style={{ padding: 'clamp(24px, 4vw, 48px) 0' }}>
+      {show('carousel') && <section style={{ padding: 'clamp(24px, 4vw, 48px) 0' }}>
         <Reveal style={{ marginBottom: 32, textAlign: 'center' }}>
           <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: GOLD, fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>
             Inspirations
@@ -122,10 +124,10 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
         <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', textAlign: 'center', marginTop: 16, fontSize: 12, color: 'rgba(26,21,16,0.4)', letterSpacing: 1 }}>
           &larr; Glissez pour explorer &rarr;
         </p>
-      </section>
+      </section>}
 
       {/* CTA */}
-      <section style={{ padding: 'clamp(40px, 6vw, 72px) 24px', textAlign: 'center', background: WARM_CREAM }}>
+      {show('cta') && <section style={{ padding: 'clamp(40px, 6vw, 72px) 24px', textAlign: 'center', background: WARM_CREAM }}>
         <Reveal>
           <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 400, marginBottom: 20, color: BROWN }}>
             Explorez nos collections
@@ -147,7 +149,7 @@ export default function NotreHistoireContent({ content = {} }: NotreHistoireProp
             Voir la boutique
           </a>
         </Reveal>
-      </section>
+      </section>}
     </main>
   );
 }

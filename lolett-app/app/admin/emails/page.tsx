@@ -31,7 +31,7 @@ export default function AdminEmailsPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={editor.goBack}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1B0B94] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-[#1a1510]/50 hover:text-[#1B0B94] transition-colors"
         >
           <ArrowLeft className="size-4" />
           Retour aux emails
@@ -50,8 +50,8 @@ export default function AdminEmailsPage() {
       </div>
 
       <div>
-        <h1 className="font-display text-2xl font-semibold text-gray-900">{editor.selected.label}</h1>
-        <p className="text-sm text-gray-500 mt-1">Template : {editor.selected.template_key}</p>
+        <h1 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510]">{editor.selected.label}</h1>
+        <p className="text-sm text-[#B89547] mt-1">Template : {editor.selected.template_key}</p>
       </div>
 
       {/* Two-column layout */}

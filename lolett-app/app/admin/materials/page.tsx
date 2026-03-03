@@ -74,7 +74,7 @@ export default function MaterialsAdminPage() {
     setMaterials(prev => prev.filter(m => m.id !== id));
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-400">Chargement...</div>;
+  if (loading) return <div className="p-8 text-center text-[#1a1510]/30">Chargement...</div>;
 
   const activeMaterials = materials.filter(m => m.active);
   const inactiveMaterials = materials.filter(m => !m.active);
@@ -82,17 +82,17 @@ export default function MaterialsAdminPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Matières</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510]">Matières</h1>
+        <p className="text-sm text-[#B89547] mt-1">
           Gérez les matières affichées sur la page &ldquo;Mon Histoire&rdquo;. Activez/désactivez selon vos collections.
         </p>
       </div>
 
       {/* Active materials */}
-      <Card>
+      <Card className="border-gray-200/50 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-base font-medium flex items-center gap-2 text-[#1a1510]">
+            <span className="w-2 h-2 rounded-full bg-[#B89547]" />
             Actives ({activeMaterials.length})
           </CardTitle>
         </CardHeader>
@@ -100,15 +100,15 @@ export default function MaterialsAdminPage() {
           {activeMaterials.map(m => (
             <MaterialRow key={m.id} material={m} saving={saving === m.id} onToggle={() => toggle(m)} onUpdate={updateField} onDelete={() => remove(m.id)} />
           ))}
-          {activeMaterials.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Aucune matière active</p>}
+          {activeMaterials.length === 0 && <p className="text-sm text-[#1a1510]/30 text-center py-4">Aucune matière active</p>}
         </CardContent>
       </Card>
 
       {/* Inactive / available */}
-      <Card>
+      <Card className="border-gray-200/50 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-gray-300" />
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-base font-medium flex items-center gap-2 text-[#1a1510]">
+            <span className="w-2 h-2 rounded-full bg-[#1a1510]/20" />
             Disponibles ({inactiveMaterials.length})
           </CardTitle>
         </CardHeader>
@@ -120,32 +120,32 @@ export default function MaterialsAdminPage() {
       </Card>
 
       {/* Add new */}
-      <Card>
+      <Card className="border-gray-200/50 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base">Ajouter une matière</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-base font-medium text-[#1a1510]">Ajouter une matière</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3 items-end">
             <div className="flex-1">
-              <label className="text-xs text-gray-500 mb-1 block">Nom</label>
-              <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ex: Cachemire" />
+              <label className="text-xs text-[#1a1510]/50 mb-1 block">Nom</label>
+              <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ex: Cachemire" className="text-[#1a1510]" />
             </div>
             <div className="w-24">
-              <label className="text-xs text-gray-500 mb-1 block">Icône</label>
-              <Input value={newIcon} onChange={e => setNewIcon(e.target.value)} placeholder="◉" className="text-center text-lg" />
+              <label className="text-xs text-[#1a1510]/50 mb-1 block">Icône</label>
+              <Input value={newIcon} onChange={e => setNewIcon(e.target.value)} placeholder="◉" className="text-center text-lg text-[#1a1510]" />
             </div>
-            <Button onClick={add} disabled={!newName.trim()} className="gap-1">
+            <Button onClick={add} disabled={!newName.trim()} className="gap-1 bg-[#1B0B94] text-white hover:bg-[#130970]">
               <Plus className="w-4 h-4" /> Ajouter
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-4 mb-2">Cliquez sur une icône pour la copier :</p>
+          <p className="text-xs text-[#1a1510]/50 mt-4 mb-2">Cliquez sur une icône pour la copier :</p>
           <div className="flex flex-wrap gap-2">
             {['≡','❛','〰','◉','⌘','◎','❖','▣','◇','∿','⊞','▤','●','○','◆','◈','✦','✧','❀','✿','♦','⬡','⬟','☀','♡','✕','⊕','⊗','⊙','⋈','⌂','☁','♢','◐','◑','▲','△','◌','⊶','⋮'].map(icon => (
               <button
                 key={icon}
                 type="button"
                 onClick={() => { navigator.clipboard.writeText(icon); setNewIcon(icon); }}
-                className="w-10 h-10 rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 flex items-center justify-center text-lg transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-lg border border-gray-200/50 hover:border-[#B89547] hover:bg-[#B89547]/5 flex items-center justify-center text-lg transition-colors cursor-pointer text-[#1a1510]"
                 title={`Copier ${icon}`}
               >
                 {icon}
@@ -156,9 +156,9 @@ export default function MaterialsAdminPage() {
       </Card>
 
       {/* Preview */}
-      <Card>
+      <Card className="border-gray-200/50 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base">Aperçu</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-base font-medium text-[#1a1510]">Aperçu</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center flex-wrap gap-8 py-4" style={{ background: '#FDF5E6', borderRadius: 8, padding: '24px 16px' }}>
@@ -188,20 +188,20 @@ function MaterialRow({ material: m, saving, onToggle, onUpdate, onDelete }: {
   const [icon, setIcon] = useState(m.icon);
 
   return (
-    <div className="flex items-center gap-3 py-2 px-3 rounded-lg border bg-white">
-      <GripVertical className="w-4 h-4 text-gray-300 flex-shrink-0" />
+    <div className="flex items-center gap-3 py-2 px-3 rounded-lg border border-gray-200/50 bg-white">
+      <GripVertical className="w-4 h-4 text-[#1a1510]/20 flex-shrink-0" />
       <div className="w-10 h-10 rounded-full border flex items-center justify-center text-lg flex-shrink-0" style={{ borderColor: '#B89547', color: '#B89547' }}>
         {m.icon}
       </div>
-      <Input value={name} onChange={e => setName(e.target.value)} className="flex-1 h-8 text-sm" />
-      <Input value={icon} onChange={e => setIcon(e.target.value)} className="w-14 h-8 text-center text-lg" />
+      <Input value={name} onChange={e => setName(e.target.value)} className="flex-1 h-8 text-sm text-[#1a1510]" />
+      <Input value={icon} onChange={e => setIcon(e.target.value)} className="w-14 h-8 text-center text-lg text-[#1a1510]" />
       {(name !== m.name || icon !== m.icon) && (
-        <Button size="sm" variant="outline" onClick={() => { onUpdate(m, 'name', name); onUpdate(m, 'icon', icon); }} disabled={saving}>
+        <Button size="sm" variant="outline" onClick={() => { onUpdate(m, 'name', name); onUpdate(m, 'icon', icon); }} disabled={saving} className="border-gray-200 hover:border-[#B89547] hover:text-[#B89547]">
           <Save className="w-3 h-3" />
         </Button>
       )}
       <Switch checked={m.active} onCheckedChange={onToggle} disabled={saving} />
-      <button onClick={onDelete} className="text-red-400 hover:text-red-600 p-1" disabled={saving}>
+      <button onClick={onDelete} className="text-red-400 hover:text-red-600 p-1 transition-colors" disabled={saving}>
         <Trash2 className="w-4 h-4" />
       </button>
     </div>
