@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
-import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { fulfillOrder } from '@/lib/checkout/fulfill-order';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ orderId: existingOrder.id, status: 'paid' });
     }
 
-    // Order doesn't exist yet — create it inline instead of waiting for webhook
+    // Order doesn't exist yet — create it via fulfillOrder helper
     const metadata = session.metadata;
     if (!metadata?.items || !metadata?.customer) {
       return NextResponse.json({ error: 'Missing session metadata' }, { status: 500 });
@@ -50,60 +49,17 @@ export async function GET(req: NextRequest) {
     const shipping = parseFloat(metadata.shipping || '0');
     const userId = metadata.userId || undefined;
 
-    const orderRepo = new SupabaseOrderRepository();
-    const order = await orderRepo.create({
+    const orderId = await fulfillOrder({
       items,
       customer,
       total,
       shipping,
       userId,
       paymentProvider: 'stripe',
+      paymentId: paymentIntent,
     });
 
-    // Mark as paid with payment_id
-    await admin
-      .from('orders')
-      .update({
-        status: 'paid',
-        payment_id: paymentIntent,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', order.id);
-
-    // Clear cart
-    if (userId) {
-      await admin.from('cart_items').delete().eq('user_id', userId);
-    }
-
-    // Loyalty points
-    if (userId) {
-      const points = Math.floor(total);
-      if (points > 0) {
-        await admin.rpc('increment_loyalty_points', {
-          p_user_id: userId,
-          p_points: points,
-        });
-      }
-    }
-
-    // Confirmation email (fire-and-forget)
-    sendOrderConfirmation({
-      to: customer.email,
-      orderNumber: order.orderNumber,
-      items: items.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
-        productName: i.productName,
-        size: i.size,
-        quantity: i.quantity,
-        price: i.price,
-      })),
-      customer,
-      subtotal: total - shipping,
-      shipping,
-      total,
-    }).catch((err) => console.error('[session] Email error:', err));
-
-    console.log(`[session] Order ${order.orderNumber} created inline`);
-    return NextResponse.json({ orderId: order.id, status: 'paid' });
+    return NextResponse.json({ orderId, status: 'paid' });
   } catch (error) {
     console.error('[GET /api/checkout/stripe/session]', error);
     return NextResponse.json({ error: 'Session not found' }, { status: 404 });
