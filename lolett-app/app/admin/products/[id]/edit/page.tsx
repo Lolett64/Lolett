@@ -117,21 +117,21 @@ export default async function EditProductPage({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col items-center w-full">
+      <div className="w-full max-w-3xl flex flex-col gap-6">
         <Link
           href="/admin/products"
-          className="flex items-center gap-1 text-sm text-lolett-gray-500 hover:text-lolett-gray-900"
+          className="font-[family-name:var(--font-montserrat)] flex items-center gap-1.5 text-sm text-[#1a1510]/40 hover:text-[#B89547] transition-colors"
         >
           <ChevronLeft className="size-4" />
           Produits
         </Link>
+        <div>
+          <h2 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510] tracking-tight">Modifier le produit</h2>
+          <p className="font-[family-name:var(--font-montserrat)] text-sm text-[#B89547]/70 mt-1.5 tracking-wide">{product.name}</p>
+        </div>
+        <ProductForm mode="edit" productId={id} initialData={initialData} />
       </div>
-      <div>
-        <h2 className="text-2xl font-bold text-lolett-gray-900">Modifier le produit</h2>
-        <p className="text-sm text-lolett-gray-500 mt-1">{product.name}</p>
-      </div>
-      <ProductForm mode="edit" productId={id} initialData={initialData} />
     </div>
   );
 }

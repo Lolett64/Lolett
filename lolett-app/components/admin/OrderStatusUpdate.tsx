@@ -64,15 +64,15 @@ export function OrderStatusUpdate({ orderId, currentStatus }: OrderStatusUpdateP
   }
 
   return (
-    <Card>
+    <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
       <CardHeader>
-        <CardTitle className="text-base">Mettre à jour le statut</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Mettre à jour le statut</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <Label>Statut</Label>
+          <Label className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Statut</Label>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full font-[family-name:var(--font-montserrat)] text-sm text-[#1a1510] focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -87,7 +87,7 @@ export function OrderStatusUpdate({ orderId, currentStatus }: OrderStatusUpdateP
 
         {status === 'shipped' && (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="tracking">Numéro de suivi (optionnel)</Label>
+            <Label htmlFor="tracking" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Numéro de suivi (optionnel)</Label>
             <Input
               id="tracking"
               value={trackingNumber}
@@ -104,7 +104,7 @@ export function OrderStatusUpdate({ orderId, currentStatus }: OrderStatusUpdateP
         <Button
           onClick={handleUpdate}
           disabled={saving || !isDirty}
-          className="w-fit"
+          className="w-fit bg-[#1B0B94] text-white hover:bg-[#130970] font-[family-name:var(--font-montserrat)]"
         >
           {saving ? 'Mise à jour...' : 'Mettre à jour'}
         </Button>

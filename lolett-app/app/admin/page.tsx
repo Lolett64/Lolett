@@ -1,16 +1,23 @@
 import { Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Package, ShoppingBag, Clock, Layers } from 'lucide-react';
+import { Package, ShoppingBag, Clock, Layers, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/admin/utils';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { getDashboardStats } from '@/components/admin/dashboard/getDashboardStats';
+import { DashboardCharts } from '@/components/admin/dashboard/DashboardCharts';
 
 async function DashboardContent() {
   const stats = await getDashboardStats();
 
   const statCards = [
+    {
+      label: 'Chiffre d\'affaires',
+      value: formatPrice(stats.totalRevenue),
+      icon: TrendingUp,
+      href: '/admin/orders',
+    },
     {
       label: 'Produits',
       value: stats.totalProducts,
@@ -50,7 +57,7 @@ async function DashboardContent() {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-5">
         {statCards.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="bg-white border border-gray-200/50 shadow-none hover:shadow-md hover:border-[#B89547]/30 transition-all duration-300 cursor-pointer">
@@ -71,6 +78,12 @@ async function DashboardContent() {
           </Link>
         ))}
       </div>
+
+      {/* Charts */}
+      <DashboardCharts
+        ordersByDay={stats.ordersByDay}
+        ordersByStatus={stats.ordersByStatus}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent orders */}
@@ -188,10 +201,14 @@ function DashboardSkeleton() {
         <div className="h-9 w-40 rounded bg-[#B89547]/10 animate-pulse" />
         <div className="h-4 w-60 rounded bg-[#B89547]/10 animate-pulse mt-2" />
       </div>
-      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-        {[...Array<undefined>(4)].map((_, i) => (
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-5">
+        {[...Array<undefined>(5)].map((_, i) => (
           <div key={i} className="h-32 rounded-xl bg-[#B89547]/10 animate-pulse" />
         ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="h-80 rounded-xl bg-[#B89547]/10 animate-pulse" />
+        <div className="h-80 rounded-xl bg-[#B89547]/10 animate-pulse" />
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="h-64 rounded-xl bg-[#B89547]/10 animate-pulse" />

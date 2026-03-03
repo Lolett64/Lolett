@@ -35,7 +35,7 @@ export function ProductFilters() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="relative flex-1 min-w-48">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-lolett-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#1a1510]/30" />
         <Input
           placeholder="Rechercher un produit..."
           defaultValue={searchParams.get('search') ?? ''}

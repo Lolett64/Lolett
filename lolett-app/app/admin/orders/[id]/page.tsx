@@ -63,11 +63,11 @@ export default async function OrderDetailPage({
   const subtotal = order.total - order.shipping;
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl">
+    <div className="flex flex-col gap-6 max-w-4xl">
       <div className="flex items-center gap-3">
         <Link
           href="/admin/orders"
-          className="flex items-center gap-1 text-sm text-lolett-gray-500 hover:text-lolett-gray-900"
+          className="font-[family-name:var(--font-montserrat)] flex items-center gap-1.5 text-sm text-[#1a1510]/40 hover:text-[#B89547] transition-colors"
         >
           <ChevronLeft className="size-4" />
           Commandes
@@ -76,8 +76,8 @@ export default async function OrderDetailPage({
 
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-lolett-gray-900">{order.order_number}</h2>
-          <p className="text-sm text-lolett-gray-500 mt-1">
+          <h2 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510] tracking-tight">{order.order_number}</h2>
+          <p className="font-[family-name:var(--font-montserrat)] text-sm text-[#B89547]/70 mt-1.5 tracking-wide">
             Créée le {formatDate(order.created_at)}
             {order.updated_at !== order.created_at &&
               ` · Mise à jour le ${formatDate(order.updated_at)}`}
@@ -88,27 +88,27 @@ export default async function OrderDetailPage({
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Customer info */}
-        <Card>
+        <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
           <CardHeader>
-            <CardTitle className="text-base">Client</CardTitle>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Client</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-1 text-sm">
-            <p className="font-medium text-lolett-gray-900">
+          <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-1 text-sm">
+            <p className="font-medium text-[#1a1510]">
               {order.customer.firstName} {order.customer.lastName}
             </p>
-            <p className="text-lolett-gray-600">{order.customer.email}</p>
+            <p className="text-[#1a1510]/60">{order.customer.email}</p>
             {order.customer.phone && (
-              <p className="text-lolett-gray-600">{order.customer.phone}</p>
+              <p className="text-[#1a1510]/60">{order.customer.phone}</p>
             )}
           </CardContent>
         </Card>
 
         {/* Shipping address */}
-        <Card>
+        <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
           <CardHeader>
-            <CardTitle className="text-base">Adresse de livraison</CardTitle>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Adresse de livraison</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-1 text-sm text-lolett-gray-600">
+          <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-1 text-sm text-[#1a1510]/60">
             <p>{order.customer.address}</p>
             <p>
               {order.customer.postalCode} {order.customer.city}
@@ -119,18 +119,18 @@ export default async function OrderDetailPage({
       </div>
 
       {/* Order items */}
-      <Card>
+      <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
         <CardHeader>
-          <CardTitle className="text-base">Articles</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Articles</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-0">
+        <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-0">
           {order.items.map((item, idx) => (
             <div key={item.id}>
               {idx > 0 && <Separator className="my-3" />}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-lolett-gray-900">{item.product_name}</p>
-                  <p className="text-xs text-lolett-gray-500">
+                  <p className="font-medium text-[#1a1510]">{item.product_name}</p>
+                  <p className="text-xs text-[#1a1510]/40">
                     Taille : {item.size} · Quantité : {item.quantity}
                   </p>
                 </div>
@@ -143,15 +143,15 @@ export default async function OrderDetailPage({
 
           <Separator className="my-4" />
           <div className="flex flex-col gap-1">
-            <div className="flex justify-between text-sm text-lolett-gray-600">
+            <div className="flex justify-between text-sm text-[#1a1510]/60">
               <span>Sous-total</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm text-lolett-gray-600">
+            <div className="flex justify-between text-sm text-[#1a1510]/60">
               <span>Livraison</span>
               <span>{order.shipping === 0 ? 'Gratuite' : formatPrice(order.shipping)}</span>
             </div>
-            <div className="flex justify-between font-semibold text-lolett-gray-900 mt-1">
+            <div className="flex justify-between font-semibold text-[#1a1510] mt-1">
               <span>Total</span>
               <span>{formatPrice(order.total)}</span>
             </div>
@@ -160,11 +160,11 @@ export default async function OrderDetailPage({
       </Card>
 
       {/* Payment info */}
-      <Card>
+      <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
         <CardHeader>
-          <CardTitle className="text-base">Paiement</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Paiement</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-1 text-sm text-lolett-gray-600">
+        <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-1 text-sm text-[#1a1510]/60">
           <div className="flex justify-between">
             <span>Fournisseur</span>
             <span className="capitalize font-medium">{order.payment_provider ?? '—'}</span>
