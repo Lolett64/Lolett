@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendOrderShipped } from '@/lib/email/order-shipped';
+import { sendOrderDelivered } from '@/lib/email/order-delivered';
 
 export async function GET(
   request: Request,
@@ -68,6 +70,45 @@ export async function PATCH(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Send transactional emails on status change (fire-and-forget)
+  if (body.status === 'shipped' || body.status === 'delivered') {
+    const customer = data.customer as { firstName: string; lastName: string; email: string; address: string; city: string; postalCode: string; country?: string };
+
+    if (customer?.email) {
+      if (body.status === 'shipped') {
+        // Fetch order items for shipped email
+        const { data: orderItems } = await supabase
+          .from('order_items')
+          .select('product_name, size, quantity, price')
+          .eq('order_id', id);
+
+        sendOrderShipped({
+          to: customer.email,
+          orderNumber: data.order_number,
+          items: (orderItems || []).map((i: { product_name: string; size: string; quantity: number; price: number }) => ({
+            productName: i.product_name,
+            size: i.size,
+            quantity: i.quantity,
+            price: i.price,
+          })),
+          customer,
+          subtotal: data.total - data.shipping,
+          shipping: data.shipping,
+          total: data.total,
+          trackingNumber: body.trackingNumber || data.tracking_number,
+        }).catch((err: unknown) => console.error('[Admin] Shipped email error:', err));
+      }
+
+      if (body.status === 'delivered') {
+        sendOrderDelivered({
+          to: customer.email,
+          orderNumber: data.order_number,
+          firstName: customer.firstName,
+        }).catch((err: unknown) => console.error('[Admin] Delivered email error:', err));
+      }
+    }
   }
 
   return NextResponse.json({ order: data });
