@@ -110,22 +110,6 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                                 <Mail size={16} strokeWidth={1.5} />
                             </Link>
 
-                            {!loading && (
-                                user ? (
-                                    <Link href="/compte" className="hover:scale-105 transition-transform flex items-center justify-center" aria-label="Mon compte">
-                                        <div className="w-[24px] h-[24px] rounded-full bg-[#1B0B94] flex items-center justify-center text-[#F3EFEA] text-[10px] font-bold">
-                                            {initials}
-                                        </div>
-                                    </Link>
-                                ) : (
-                                    <Link href="/connexion" className="hover:scale-105 transition-transform flex items-center justify-center hidden sm:flex" aria-label="Se connecter">
-                                        <div className="w-[24px] h-[24px] rounded-full bg-[#1B0B94]/20 flex items-center justify-center text-[#1B0B94]">
-                                            <User size={13} />
-                                        </div>
-                                    </Link>
-                                )
-                            )}
-
                             <Link href="/favoris" className="relative hover:text-[#B89547] transition-colors flex items-center justify-center" aria-label="Favoris">
                                 <Heart size={16} strokeWidth={1.5} />
                                 {favCount > 0 && (
@@ -143,6 +127,22 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                                     </span>
                                 )}
                             </Link>
+
+                            {!loading && (
+                                user ? (
+                                    <Link href="/compte" className="hover:scale-105 transition-transform flex items-center justify-center" aria-label="Mon compte">
+                                        <div className="w-[24px] h-[24px] rounded-full bg-[#1B0B94] flex items-center justify-center text-[#F3EFEA] text-[10px] font-bold">
+                                            {initials}
+                                        </div>
+                                    </Link>
+                                ) : (
+                                    <Link href="/connexion" className="hover:scale-105 transition-transform flex items-center justify-center hidden sm:flex" aria-label="Se connecter">
+                                        <div className="w-[24px] h-[24px] rounded-full bg-[#1B0B94]/20 flex items-center justify-center text-[#1B0B94]">
+                                            <User size={13} />
+                                        </div>
+                                    </Link>
+                                )
+                            )}
                         </div>
 
                         <MobileMenu
