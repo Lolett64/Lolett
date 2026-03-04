@@ -52,7 +52,7 @@ export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps)
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto flex flex-col items-center" style={{ marginTop: '-100px' }}>
+      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto flex flex-col items-center" style={{ marginTop: '-170px' }}>
 
         {/* Subtitle with animated lines */}
         <div
