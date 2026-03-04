@@ -57,8 +57,8 @@ function FooterPreview({ bg, textColor, mutedColor, borderColor, socialBg, label
               </p>
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                 {[InstagramIcon, TikTokIcon, FacebookIcon].map((Icon, i) => (
-                  <div key={i} style={{ width: 40, height: 40, borderRadius: '50%', background: socialBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon className="h-5 w-5" style={{ color: textColor }} />
+                  <div key={i} style={{ width: 40, height: 40, borderRadius: '50%', background: socialBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: textColor }}>
+                    <Icon className="h-5 w-5" />
                   </div>
                 ))}
                 <div style={{ width: 40, height: 40, borderRadius: '50%', background: socialBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
