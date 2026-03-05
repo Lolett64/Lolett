@@ -58,11 +58,8 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                     {/* Left : Logo Dynamic "T-Tilt" */}
                     <Link href="/" className="flex shrink-0 group">
                         <div className="flex items-center justify-center text-[#1B0B94] transition-all duration-500">
-                            <span className="font-[family-name:var(--font-montserrat)] text-lg md:text-xl font-black tracking-[-0.02em] flex items-center">
-                                LOLET
-                                <span className="inline-block transform rotate-[15deg] origin-bottom-left transition-transform group-hover:rotate-[0deg] duration-500">
-                                    T
-                                </span>
+                            <span className="font-[family-name:var(--font-montserrat)] text-lg md:text-xl font-black tracking-[-0.02em]">
+                                LOLETT
                             </span>
                         </div>
                     </Link>
