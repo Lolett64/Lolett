@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ShoppingBag, Heart, Mail, ChevronDown, User } from 'lucide-react';
+import { ShoppingBag, Heart, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { useCartStore } from '@/features/cart';
 import { useFavoritesStore } from '@/features/favorites';
@@ -58,8 +58,11 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                     {/* Left : Logo Dynamic "T-Tilt" */}
                     <Link href="/" className="flex shrink-0 group">
                         <div className="flex items-center justify-center text-[#1B0B94] transition-all duration-500">
-                            <span className="font-[family-name:var(--font-montserrat)] text-lg md:text-xl font-black tracking-[-0.02em]">
-                                LOLETT
+                            <span className="font-[family-name:var(--font-montserrat)] text-lg md:text-xl font-black tracking-[-0.02em] flex items-center">
+                                LOLET
+                                <span className="inline-block transform rotate-[15deg] origin-bottom-left transition-transform group-hover:rotate-[0deg] duration-500">
+                                    T
+                                </span>
                             </span>
                         </div>
                     </Link>
@@ -103,10 +106,6 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                     {/* Right : Icônes */}
                     <div className="flex items-center gap-5 xl:gap-8 shrink-0">
                         <div className="flex items-center gap-4 text-[#1B0B94]">
-                            <Link href="/contact" className="hover:text-[#B89547] transition-colors hidden sm:block" aria-label="Contact">
-                                <Mail size={16} strokeWidth={1.5} />
-                            </Link>
-
                             <Link href="/favoris" className="relative hover:text-[#B89547] transition-colors flex items-center justify-center" aria-label="Favoris">
                                 <Heart size={16} strokeWidth={1.5} />
                                 {favCount > 0 && (
