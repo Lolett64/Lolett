@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ScrollReveal } from '@/components/editorial/ScrollReveal';
-import { Gem, Sun, Sparkles } from 'lucide-react';
+import { Gem, Sun } from 'lucide-react';
 
 interface BrandStorySectionProps {
   content?: Record<string, string>;
@@ -12,11 +12,9 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
   const quoteAuthor = content?.quote_author || "L'esprit du Sud";
   const bodyText = content?.body_text || "On ne crée pas des vêtements. On crée la sensation d'être prêt, d'être soi, sans y penser.";
   const p1Title = content?.pillar1_title || 'Matières Nobles';
-  const p1Desc = content?.pillar1_desc || 'Lin pur, coton biologique et fibres naturelles sélectionnées pour leur tombé parfait.';
+  const p1Desc = 'Je privilégie des matières nobles et soigneusement choisies pour offrir à chacun un confort authentique et durable.';
   const p2Title = content?.pillar2_title || 'Style du Sud-Ouest';
   const p2Desc = content?.pillar2_desc || 'Lolett invite le sud dans ton dressing : des matières qui voyagent, des coupes qui restent.';
-  const p3Title = content?.pillar3_title || 'Coupe Parfaite';
-  const p3Desc = content?.pillar3_desc || 'Prototypage exclusif dans nos ateliers de Bordeaux. Une architecture du vêtement sans compromis.';
   const ctaText = content?.cta_text || 'Découvrir la Maison';
   const ctaHref = content?.cta_href || '/notre-histoire';
 
@@ -28,7 +26,6 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
   const pillars = [
     { icon: Gem, title: p1Title, desc: p1Desc },
     { icon: Sun, title: p2Title, desc: p2Desc },
-    { icon: Sparkles, title: p3Title, desc: p3Desc },
   ];
 
   return (
@@ -69,7 +66,7 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
         </ScrollReveal>
 
         {/* Pillars — three columns with gold icons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-6 lg:gap-16 mt-16 pt-12 border-t border-[#1B0B94]/8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24 max-w-[900px] mx-auto mt-16 pt-12 border-t border-[#1B0B94]/8">
           {pillars.map((pillar, i) => (
             <ScrollReveal key={i} delay={i * 150 + 200} className="flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded-full border border-[#B89547]/20 flex items-center justify-center mb-6 bg-[#B89547]/[0.04]">

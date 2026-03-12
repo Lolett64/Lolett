@@ -104,10 +104,10 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
       <div style={{ width: 60, height: 1, background: GOLD, margin: '24px auto', opacity: 0.4 }} />
 
       {show('vision') && <VisionSection
-        label={c('vision_label', 'Notre Vision')}
+        label="Ma Vision"
         title={c('vision_title', 'La plupart des sites te vendent des pi\u00e8ces. Nous, on te propose des looks complets.')}
-        goldText={c('vision_gold_text', 'Nous, on te propose des looks complets.')}
-        aside={c('vision_aside', 'C\u2019est comme avoir une amie styliste qui te dit \u00ab\u00a0fais-moi confiance, prends \u00e7a\u00a0\u00bb. Sauf que c\u2019est un site, et tu peux le faire en pyjama.')}
+        goldText={"C\u2019est comme avoir une amie styliste qui te dit \u00ab\u00a0fais-moi confiance, prends \u00e7a\u00a0\u00bb.\nSauf que c\u2019est un site, et tu peux le faire en pyjama."}
+        aside=""
       />}
 
       {/* CAROUSEL */}
@@ -117,7 +117,7 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
             Inspirations
           </p>
           <h2 style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 400 }}>
-            Nos univers
+            Mon univers
           </h2>
         </Reveal>
         <DragCarousel />
