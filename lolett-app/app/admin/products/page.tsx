@@ -25,6 +25,7 @@ interface Product {
   gender: string;
   category_slug: string;
   price: number;
+  compare_at_price: number | null;
   stock: number;
   is_new: boolean;
   images: string[];
@@ -56,7 +57,7 @@ async function getProducts(params: SearchParams): Promise<Product[]> {
   const supabase = createAdminClient();
   let query = supabase
     .from('products')
-    .select('id, name, slug, gender, category_slug, price, stock, is_new, images, created_at');
+    .select('id, name, slug, gender, category_slug, price, compare_at_price, stock, is_new, images, created_at');
 
   if (params.gender) query = query.eq('gender', params.gender);
   if (params.category) query = query.eq('category_slug', params.category);
@@ -158,8 +159,18 @@ function ProductRow({ product }: { product: Product }) {
           )}
         </div>
       </td>
-      <td className="px-4 py-3 text-right font-[family-name:var(--font-montserrat)] font-medium text-[#1a1510]">
-        {formatPrice(product.price)}
+      <td className="px-4 py-3 text-right font-[family-name:var(--font-montserrat)] font-medium">
+        {product.compare_at_price && product.compare_at_price > product.price ? (
+          <div>
+            <span className="line-through text-[#999] text-xs mr-1">{formatPrice(product.compare_at_price)}</span>
+            <span className="text-red-600 font-semibold">{formatPrice(product.price)}</span>
+            <span className="ml-1 text-[10px] font-bold text-red-600 bg-red-50 rounded px-1 py-0.5">
+              -{Math.round((1 - product.price / product.compare_at_price) * 100)}%
+            </span>
+          </div>
+        ) : (
+          <span className="text-[#1a1510]">{formatPrice(product.price)}</span>
+        )}
       </td>
       <td className="px-4 py-3 text-center">
         <ProductStockInput productId={product.id} initialStock={product.stock} />

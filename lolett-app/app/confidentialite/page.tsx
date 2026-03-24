@@ -20,8 +20,9 @@ export default function ConfidentialitePage() {
           <section>
             <h2 className="text-lg font-bold mb-3">1. Responsable du traitement</h2>
             <p>
-              Le responsable du traitement des données personnelles est <strong>[À COMPLÉTER — Raison sociale]</strong>,
-              dont le siège social est situé au [À COMPLÉTER — Adresse].
+              Le responsable du traitement des données personnelles est <strong>LOLETT</strong>,
+              dont le siège social est situé au 30 avenue Honoré Baradat, 64000 Pau, France.
+              Contact : <a href="mailto:contact.lolett@gmail.com" className="underline hover:text-[#B89547] transition-colors">contact.lolett@gmail.com</a>.
             </p>
           </section>
 

@@ -65,10 +65,10 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
           />
         </div>
 
-        {/* Prix + Stock */}
+        {/* Prix + Soldes + Stock */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div>
-            <label htmlFor="price" className={fieldLabel}>Prix (€) *</label>
+            <label htmlFor="price" className={fieldLabel}>Prix original (€) *</label>
             <input
               id="price"
               type="number"
@@ -82,7 +82,7 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
             />
           </div>
           <div>
-            <label htmlFor="stock" className={fieldLabel}>Stock total (calculé automatiquement)</label>
+            <label htmlFor="stock" className={fieldLabel}>Stock total (auto)</label>
             <input
               id="stock"
               type="number"
@@ -95,6 +95,112 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
             />
           </div>
         </div>
+
+        {/* Prix soldé */}
+        {form.price && parseFloat(form.price) > 0 && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 16 }}>
+            <label className={fieldLabel} style={{ color: '#dc2626', marginBottom: 8, display: 'block' }}>
+              Prix soldé
+              {form.compare_at_price && parseFloat(form.compare_at_price) > 0 && (
+                <span style={{ fontWeight: 400, marginLeft: 8 }}>
+                  (le client verra <strong>{form.compare_at_price} €</strong> barré → <strong style={{ color: '#dc2626' }}>{form.price} €</strong>)
+                </span>
+              )}
+            </label>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'end' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'block' }}>Réduction (%)</label>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {[10, 20, 30, 40, 50].map(pct => {
+                    const originalPrice = form.compare_at_price && parseFloat(form.compare_at_price) > 0
+                      ? parseFloat(form.compare_at_price)
+                      : parseFloat(form.price);
+                    const isActive = form.compare_at_price && parseFloat(form.compare_at_price) > 0
+                      && Math.round((1 - parseFloat(form.price) / parseFloat(form.compare_at_price)) * 100) === pct;
+                    return (
+                      <button
+                        key={pct}
+                        type="button"
+                        onClick={() => {
+                          const original = parseFloat(form.price);
+                          if (form.compare_at_price && parseFloat(form.compare_at_price) > 0) {
+                            // Already on sale: recalculate from original (compare_at_price)
+                            const base = parseFloat(form.compare_at_price);
+                            const newPrice = Math.round(base * (1 - pct / 100) * 100) / 100;
+                            setForm(f => ({ ...f, price: String(newPrice) }));
+                          } else {
+                            // Not on sale: set compare_at_price to current price, reduce price
+                            const newPrice = Math.round(original * (1 - pct / 100) * 100) / 100;
+                            setForm(f => ({ ...f, compare_at_price: String(original), price: String(newPrice) }));
+                          }
+                        }}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: 6,
+                          border: isActive ? '2px solid #dc2626' : '1px solid #d1d5db',
+                          background: isActive ? '#fef2f2' : 'white',
+                          color: isActive ? '#dc2626' : '#374151',
+                          fontWeight: isActive ? 700 : 500,
+                          fontSize: 13,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        -{pct}%
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{ width: 140 }}>
+                <label style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'block' }}>Prix soldé (€)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.compare_at_price && parseFloat(form.compare_at_price) > 0 ? form.price : ''}
+                  onChange={(e) => {
+                    const salePrice = e.target.value;
+                    if (!salePrice || parseFloat(salePrice) <= 0) {
+                      // Remove sale
+                      if (form.compare_at_price && parseFloat(form.compare_at_price) > 0) {
+                        setForm(f => ({ ...f, price: f.compare_at_price, compare_at_price: '' }));
+                      }
+                    } else {
+                      const original = form.compare_at_price && parseFloat(form.compare_at_price) > 0
+                        ? form.compare_at_price
+                        : form.price;
+                      setForm(f => ({
+                        ...f,
+                        compare_at_price: original,
+                        price: salePrice,
+                      }));
+                    }
+                  }}
+                  placeholder="Laisser vide = pas de solde"
+                  className={inputBase}
+                  style={{ borderColor: '#fecaca' }}
+                />
+              </div>
+              {form.compare_at_price && parseFloat(form.compare_at_price) > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, price: f.compare_at_price, compare_at_price: '' }))}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 6,
+                    border: '1px solid #d1d5db',
+                    background: 'white',
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Retirer solde
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Genre + Catégorie */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

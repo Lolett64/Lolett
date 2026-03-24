@@ -17,6 +17,7 @@ export interface ProductFormData {
   slug: string;
   description: string;
   price: string;
+  compare_at_price: string;
   gender: string;
   category_slug: string;
   sizes: string[];
@@ -38,14 +39,16 @@ export const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string 
   homme: [
     { slug: 'hauts', label: 'Hauts' },
     { slug: 'bas', label: 'Bas' },
-    { slug: 'chaussures', label: 'Chaussures' },
+    { slug: 'vestes', label: 'Vestes' },
     { slug: 'accessoires', label: 'Accessoires' },
   ],
   femme: [
     { slug: 'hauts', label: 'Hauts' },
     { slug: 'bas', label: 'Bas' },
+    { slug: 'robes', label: 'Robes & Combinaisons' },
+    { slug: 'bijoux', label: 'Bijoux' },
     { slug: 'chaussures', label: 'Chaussures' },
-    { slug: 'accessoires', label: 'Accessoires' },
+    { slug: 'sacs', label: 'Sacs' },
   ],
 };
 

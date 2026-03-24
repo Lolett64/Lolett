@@ -9,6 +9,7 @@ export interface Product {
   gender: Gender;
   categorySlug: string;
   price: number;
+  compareAtPrice?: number | null;
   images: string[];
   description: string;
   sizes: Size[];

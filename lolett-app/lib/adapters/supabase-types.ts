@@ -7,6 +7,7 @@ export type DbProduct = {
   gender: string;
   category_slug: string;
   price: number;
+  compare_at_price: number | null;
   images: string[];
   description: string | null;
   sizes: string[];

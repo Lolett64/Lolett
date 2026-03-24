@@ -40,7 +40,7 @@ const categories: CategorySeed[] = [
     label: 'Hauts',
     seo_title: 'Hauts Homme — LOLETT',
     seo_description:
-      'Chemises, polos et t-shirts homme LOLETT. Des hauts pensés pour les journées ensoleillées et les soirées en terrasse.',
+      'T-shirts, sweats et chemises homme LOLETT. Des hauts pensés pour les journées ensoleillées et les soirées en terrasse.',
   },
   {
     gender: 'homme',
@@ -48,15 +48,15 @@ const categories: CategorySeed[] = [
     label: 'Bas',
     seo_title: 'Bas Homme — LOLETT',
     seo_description:
-      'Pantalons et shorts homme LOLETT. Coupes décontractées et matières respirantes pour un style du Sud-Ouest au quotidien.',
+      'Jeans et pantalons homme LOLETT. Coupes décontractées et matières de qualité pour un style au quotidien.',
   },
   {
     gender: 'homme',
-    slug: 'chaussures',
-    label: 'Chaussures',
-    seo_title: 'Chaussures Homme — LOLETT',
+    slug: 'vestes',
+    label: 'Vestes',
+    seo_title: 'Vestes Homme — LOLETT',
     seo_description:
-      'Chaussures homme LOLETT. Sandales, espadrilles et sneakers pour compléter vos looks estivaux avec style.',
+      'Vestes et blousons homme LOLETT. Des pièces légères et élégantes pour les soirées fraîches.',
   },
   {
     gender: 'homme',
@@ -64,7 +64,7 @@ const categories: CategorySeed[] = [
     label: 'Accessoires',
     seo_title: 'Accessoires Homme — LOLETT',
     seo_description:
-      'Accessoires homme LOLETT. Ceintures, lunettes et sacs pour finaliser chaque look et sortir prêt.',
+      'Sacoches et accessoires homme LOLETT. Les détails qui font la différence.',
   },
   // ── Femme ──────────────────────────────────────────────────────────────────
   {
@@ -81,7 +81,23 @@ const categories: CategorySeed[] = [
     label: 'Bas',
     seo_title: 'Bas Femme — LOLETT',
     seo_description:
-      'Jupes, robes courtes et pantalons femme LOLETT. Des bas fluides et féminins pour chaque occasion estivale.',
+      'Jeans, pantalons et shorts femme LOLETT. Des bas fluides et féminins pour chaque occasion.',
+  },
+  {
+    gender: 'femme',
+    slug: 'robes',
+    label: 'Robes & Combinaisons',
+    seo_title: 'Robes & Combinaisons Femme — LOLETT',
+    seo_description:
+      'Robes et combinaisons femme LOLETT. Des pièces féminines et légères pour toutes les occasions.',
+  },
+  {
+    gender: 'femme',
+    slug: 'bijoux',
+    label: 'Bijoux',
+    seo_title: 'Bijoux Femme — LOLETT',
+    seo_description:
+      'Bagues, boucles d\'oreilles, bracelets et colliers LOLETT. Des bijoux dorés et raffinés pour sublimer chaque tenue.',
   },
   {
     gender: 'femme',
@@ -89,15 +105,15 @@ const categories: CategorySeed[] = [
     label: 'Chaussures',
     seo_title: 'Chaussures Femme — LOLETT',
     seo_description:
-      'Chaussures femme LOLETT. Mules, sandales et espadrilles pour sublimer vos tenues avec une touche du Sud-Ouest.',
+      'Mules, espadrilles et mocassins femme LOLETT. Des chaussures confortables et stylées pour l\'été.',
   },
   {
     gender: 'femme',
-    slug: 'accessoires',
-    label: 'Accessoires',
-    seo_title: 'Accessoires Femme — LOLETT',
+    slug: 'sacs',
+    label: 'Sacs',
+    seo_title: 'Sacs Femme — LOLETT',
     seo_description:
-      'Accessoires femme LOLETT. Sacs, foulards et bijoux pour parfaire chaque look et sortir prête.',
+      'Mini sacs et sacs bandoulière femme LOLETT. Les compagnons indispensables de votre style.',
   },
 ];
 

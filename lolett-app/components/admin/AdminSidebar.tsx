@@ -48,6 +48,7 @@ const navGroups: NavGroup[] = [
     label: 'Gestion',
     items: [
       { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false },
+      { href: '/admin/promos', label: 'Codes Promo', icon: Tag, exact: false },
       { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
     ],
   },

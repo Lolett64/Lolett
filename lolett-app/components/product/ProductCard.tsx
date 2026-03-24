@@ -33,6 +33,8 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
   const isLowStock = totalStock > 0 && totalStock <= STOCK.LOW_THRESHOLD;
   const isOutOfStock = totalStock === 0;
   const isSingleSize = product.sizes.length === 1 && product.sizes[0] === 'TU';
+  const isOnSale = product.compareAtPrice && product.compareAtPrice > product.price;
+  const discountPercent = isOnSale ? Math.round((1 - product.price / product.compareAtPrice!) * 100) : 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -102,7 +104,7 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
       <Link href={`/produit/${product.slug}`} className="block">
         <div
           className={cn(
-            "relative aspect-[3/4] overflow-hidden rounded-xl transition-shadow duration-700 ease-out group-hover:shadow-luxury bg-[#1B0B94]/5",
+            "relative aspect-[3/4] overflow-hidden rounded-xl transition-shadow duration-700 ease-out group-hover:shadow-luxury bg-[#f5f0e8]",
             isOutOfStock && "opacity-75"
           )}
           onTouchStart={onTouchStart}
@@ -117,7 +119,7 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
               alt={index === 0 ? product.name : `${product.name} - Vue ${index + 1}`}
               fill
               className={cn(
-                'absolute inset-0 object-cover transition-all duration-700 ease-out',
+                'absolute inset-0 object-contain transition-all duration-700 ease-out',
                 // Mobile: afficher l'image actuelle selon swipe
                 // Desktop: hover sur 2e image, sinon première
                 index === currentImageIndex || (index === 1 && isHovered && currentImageIndex === 0)
@@ -138,7 +140,8 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
 
           <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:top-3 sm:left-3 sm:gap-2 z-10">
             {isOutOfStock && <BrandBadge variant="soldOut">Victime de son succès</BrandBadge>}
-            {product.isNew && !isOutOfStock && !hideNewBadge && <BrandBadge variant="new">Nouveau</BrandBadge>}
+            {isOnSale && !isOutOfStock && <BrandBadge variant="sale">-{discountPercent}%</BrandBadge>}
+            {product.isNew && !isOutOfStock && !isOnSale && !hideNewBadge && <BrandBadge variant="new">Nouveau</BrandBadge>}
             {isLowStock && <BrandBadge variant="lowStock">Plus que {totalStock}</BrandBadge>}
           </div>
 
@@ -211,9 +214,16 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
             <h3 className="text-lolett-gray-900 group-hover:text-lolett-gold line-clamp-1 text-sm font-medium transition-colors duration-500 sm:text-base font-display">
               {product.name}
             </h3>
-            <p className="text-lolett-gray-900 text-sm font-semibold sm:text-base">
-              {product.price} €
-            </p>
+            <div className="flex items-center gap-2">
+              {isOnSale && (
+                <p className="text-lolett-gray-400 text-xs line-through sm:text-sm">
+                  {product.compareAtPrice} €
+                </p>
+              )}
+              <p className={cn("text-sm font-semibold sm:text-base", isOnSale ? "text-red-600" : "text-lolett-gray-900")}>
+                {product.price} €
+              </p>
+            </div>
           </div>
 
           {/* Swatches de couleur */}

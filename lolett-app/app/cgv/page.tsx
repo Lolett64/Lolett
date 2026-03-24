@@ -21,7 +21,9 @@ export default function CGVPage() {
             <h2 className="text-lg font-bold mb-3">1. Objet</h2>
             <p>
               Les présentes Conditions Générales de Vente (CGV) régissent l'ensemble des ventes réalisées sur le site
-              <strong> lolett.fr</strong>, édité par <strong>[À COMPLÉTER — Raison sociale]</strong>.
+              <strong> lolett.fr</strong>, édité par <strong>LOLETT</strong>,
+              dont le siège social est situé au 30 avenue Honoré Baradat, 64000 Pau, France.
+              SIRET : 999 609 332 00013 — RCS Pau.
               Toute commande implique l'acceptation sans réserve des présentes CGV.
             </p>
           </section>
@@ -38,9 +40,10 @@ export default function CGVPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">3. Prix</h2>
             <p>
-              Les prix sont indiqués en euros toutes taxes comprises (TTC). Ils ne comprennent pas les frais de
-              livraison, qui sont précisés lors de la validation de la commande. LOLETT se réserve le droit de modifier
-              ses prix à tout moment, les produits étant facturés au prix en vigueur au moment de la commande.
+              Les prix sont indiqués en euros. TVA non applicable, article 293 B du CGI (franchise en base de TVA).
+              Ils ne comprennent pas les frais de livraison, qui sont précisés lors de la validation de la commande.
+              LOLETT se réserve le droit de modifier ses prix à tout moment, les produits étant facturés au prix en
+              vigueur au moment de la commande.
             </p>
           </section>
 
@@ -56,7 +59,8 @@ export default function CGVPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">5. Paiement</h2>
             <p>
-              Le paiement s'effectue en ligne par carte bancaire (Visa, Mastercard) via la plateforme sécurisée Stripe.
+              Le paiement s'effectue en ligne par carte bancaire (Visa, Mastercard) via la plateforme sécurisée Stripe,
+              ou par PayPal.
               Le paiement est débité au moment de la confirmation de commande. Les données bancaires ne sont jamais
               stockées sur nos serveurs.
             </p>
@@ -122,10 +126,13 @@ export default function CGVPage() {
             <h2 className="text-lg font-bold mb-3">12. Litiges et médiation</h2>
             <p>
               Les présentes CGV sont soumises au droit français. En cas de litige, une solution amiable sera recherchée
-              avant toute action judiciaire. À défaut, les tribunaux compétents seront ceux de [À COMPLÉTER — Ville].
+              avant toute action judiciaire. À défaut, les tribunaux compétents seront ceux de Pau.
             </p>
             <p className="mt-2">
-              Médiateur de la consommation : [À COMPLÉTER — Nom et site web du médiateur]
+              Conformément aux articles L.616-1 et R.616-1 du Code de la consommation, LOLETT propose un dispositif
+              de médiation de la consommation. Le médiateur retenu est MEDICYS — Centre de médiation et règlement
+              amiable des huissiers de justice :{' '}
+              <a href="https://www.medicys.fr" className="underline hover:text-[#B89547] transition-colors" target="_blank" rel="noopener noreferrer">www.medicys.fr</a>
             </p>
             <p className="mt-2">
               Plateforme de règlement en ligne des litiges :{' '}

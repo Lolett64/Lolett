@@ -7,14 +7,17 @@ export const revalidate = 60;
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
-const HERO_IMAGES = {
-  homme: 'https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80',
-  femme: 'https://plus.unsplash.com/premium_photo-1683141076955-bddd5efbb03c?w=1600&q=80',
-} as const;
-
-const HERO_POSITIONS = {
-  homme: 'center 65%',
-  femme: 'center center',
+const HERO_CONFIG = {
+  homme: {
+    image: 'https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80',
+    position: '50% 60%',
+    scale: 1.0,
+  },
+  femme: {
+    image: 'https://plus.unsplash.com/premium_photo-1683141076955-bddd5efbb03c?w=1600&q=80',
+    position: '50% 50%',
+    scale: 1,
+  },
 } as const;
 
 interface PageProps {
@@ -51,14 +54,16 @@ export default async function CategoryPage({ params }: PageProps) {
   const genderLabel = gender === 'homme' ? 'Homme' : 'Femme';
 
   return (
-    <div className="pt-20 sm:pt-24 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
       <ShopContentV4
         gender={gender}
         products={products}
         categories={categories}
         activeCategory={categorySlug}
-        heroImage={HERO_IMAGES[gender]}
-        heroImagePosition={HERO_POSITIONS[gender]}
+        heroImage={HERO_CONFIG[gender].image}
+        heroImagePosition={HERO_CONFIG[gender].position}
+        heroImageScale={HERO_CONFIG[gender].scale}
+        heroHeight="h-[35vh] min-h-[300px]"
         heroTitle={`${category.label} ${genderLabel}`}
         heroSubtitle={category.seoDescription || `Découvrez notre sélection ${category.label.toLowerCase()} pour ${gender === 'homme' ? 'lui' : 'elle'}.`}
       />

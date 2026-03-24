@@ -111,9 +111,23 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           {product.name}
         </h1>
 
-        <p className="text-lolett-gray-900 mt-3 text-xl font-semibold sm:mt-4 sm:text-2xl">
-          {product.price} €
-        </p>
+        {product.compareAtPrice && product.compareAtPrice > product.price ? (
+          <div className="mt-3 flex items-center gap-3 sm:mt-4">
+            <p className="text-lolett-gray-400 text-lg line-through sm:text-xl">
+              {product.compareAtPrice} €
+            </p>
+            <p className="text-red-600 text-xl font-semibold sm:text-2xl">
+              {product.price} €
+            </p>
+            <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs font-bold text-white uppercase">
+              -{Math.round((1 - product.price / product.compareAtPrice) * 100)}%
+            </span>
+          </div>
+        ) : (
+          <p className="text-lolett-gray-900 mt-3 text-xl font-semibold sm:mt-4 sm:text-2xl">
+            {product.price} €
+          </p>
+        )}
 
         <p className="text-lolett-gray-600 mt-4 max-w-[55ch] text-sm leading-relaxed sm:mt-6 sm:text-base">
           {product.description}

@@ -22,6 +22,7 @@ export function mapProduct(row: DbProduct, variants?: ProductVariant[]): Product
     gender: row.gender as Gender,
     categorySlug: row.category_slug,
     price: Number(row.price),
+    compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : null,
     images: row.images ?? [],
     description: row.description ?? '',
     sizes: (row.sizes ?? []) as Size[],

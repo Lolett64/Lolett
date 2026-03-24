@@ -25,12 +25,12 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="bg-lolett-gray-100 relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl">
+      <div className="bg-[#f5f0e8] relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl">
         <Image
           src={images[selectedImage]}
           alt={name}
           fill
-          className="object-cover"
+          className="object-contain"
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
