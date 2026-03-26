@@ -1,25 +1,23 @@
-# Session State — 2026-03-24 21:35
+# Session State — 2026-03-26 21:15
 
 ## Branch
 preview
 
 ## Completed This Session
-- Catalogue réel: 56 produits avec photos cliente, noms retravaillés, catégories mises à jour
-- Produits mixtes: Emoticoeurs dupliqués homme/femme avec photos appropriées
-- Pages légales: mentions légales, CGV, confidentialité complétées (infos micro-entreprise Pau)
-- Promotions: système prix soldés (compare_at_price) + admin soldes avec boutons %
-- Codes promo: table DB + admin /admin/promos + API validation /api/promo/validate
-- UI: photos object-contain, hero catégories aligné, badge -X% rouge
+- Prix FR: formatPrice() avec virgule (31,20 €) appliqué sur 15+ composants
+- Filtres shop: sidebar → drawer caché (tailles + prix), couleurs supprimées
+- Login client: redesign centré minimal premium (carte glass, séparateur doré)
+- Login admin: redesign dark luxe (carte translucide, bouton or)
+- Newsletter: placeholder email centré
+- Select UI: fix contraste texte blanc sur accent
 
 ## Next Task
-- Intégrer champ code promo dans le checkout (OrderSummary) côté client
-- Tester flow soldes: appliquer un solde depuis admin et vérifier affichage
-- Vérifier que admin product edit charge bien compare_at_price depuis la DB
+Revoir page inscription (/inscription) pour cohérence avec nouveau login client
 
 ## Blockers
 None
 
 ## Key Context
-- Migration SQL 20250101000005 appliquée sur Supabase (compare_at_price + promo_codes)
-- Git config hooksPath corrigé (pointait vers mauvais chemin)
-- Stripe checkout a déjà allow_promotion_codes: true
+- formatPrice() dans lib/utils.ts — attention: shop/data.ts a des prix string ("89€"), ne pas appeler formatPrice dessus
+- FilterState n'a plus de champ `colors` — tout composant utilisant colors doit être mis à jour
+- Visual companion brainstorm files dans .superpowers/brainstorm/ (pas committé)
