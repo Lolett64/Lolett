@@ -9,14 +9,14 @@ import type { Product, Size } from '@/types';
 export function useNouveautesFilters(products: Product[]) {
   const [activeGender, setActiveGender] = useState<'femme' | 'homme'>('femme');
   const [sort, setSort] = useState<SortOption>('newest');
-  const [filters, setFilters] = useState<FilterState>({ colors: [], sizes: [] });
+  const [filters, setFilters] = useState<FilterState>({ sizes: [] });
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
   const [page, setPage] = useState(1);
   const PRODUCTS_PER_PAGE = 12;
 
   const handleGenderChange = (gender: 'femme' | 'homme') => {
     setActiveGender(gender);
-    setFilters({ colors: [], sizes: [] });
+    setFilters({ sizes: [] });
     setSort('newest');
     setPage(1);
   };
@@ -30,10 +30,6 @@ export function useNouveautesFilters(products: Product[]) {
     return genderProducts.filter((product) => {
       if (filters.priceMin !== undefined && product.price < filters.priceMin) return false;
       if (filters.priceMax !== undefined && product.price > filters.priceMax) return false;
-      if (filters.colors.length > 0) {
-        const productColors = product.colors?.map((c) => c.name) ?? [];
-        if (!filters.colors.some((color) => productColors.includes(color))) return false;
-      }
       if (filters.sizes.length > 0) {
         if (!filters.sizes.some((size) => product.sizes.includes(size as Size))) return false;
       }
@@ -69,7 +65,6 @@ export function useNouveautesFilters(products: Product[]) {
     const active: ActiveFilter[] = [];
     if (filters.priceMin !== undefined) active.push({ key: 'priceMin', label: 'Prix min', value: `${filters.priceMin}\u20AC` });
     if (filters.priceMax !== undefined) active.push({ key: 'priceMax', label: 'Prix max', value: `${filters.priceMax}\u20AC` });
-    filters.colors.forEach((color) => active.push({ key: `color-${color}`, label: 'Couleur', value: color }));
     filters.sizes.forEach((size) => active.push({ key: `size-${size}`, label: 'Taille', value: size }));
     return active;
   }, [filters]);
@@ -77,11 +72,10 @@ export function useNouveautesFilters(products: Product[]) {
   const handleRemoveFilter = (key: string) => {
     if (key === 'priceMin') setFilters((prev) => ({ ...prev, priceMin: undefined }));
     else if (key === 'priceMax') setFilters((prev) => ({ ...prev, priceMax: undefined }));
-    else if (key.startsWith('color-')) setFilters((prev) => ({ ...prev, colors: prev.colors.filter((c) => c !== key.replace('color-', '')) }));
     else if (key.startsWith('size-')) setFilters((prev) => ({ ...prev, sizes: prev.sizes.filter((s) => s !== key.replace('size-', '')) }));
   };
 
-  const handleClearAllFilters = () => setFilters({ colors: [], sizes: [] });
+  const handleClearAllFilters = () => setFilters({ sizes: [] });
 
   return {
     activeGender,

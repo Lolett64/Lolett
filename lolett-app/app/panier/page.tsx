@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Minus, Plus, X, Truck, ShieldCheck, RotateCcw } from 'lucide-react';
 import { useCartStore, useCartCalculation } from '@/features/cart';
 import { SHIPPING } from '@/lib/constants';
+import { formatPrice } from '@/lib/utils';
 
 const suggestions = [
   { name: 'Polo Lin Riviera', price: 79, image: '/images/chemise-lin-mediterranee.png', slug: 'polo-lin-riviera' },
@@ -103,7 +104,7 @@ export default function PanierPage() {
                           </button>
                         </div>
                         <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 500 }}>
-                          {(item.product.price * item.quantity).toFixed(2)} &euro;
+                          {formatPrice(item.product.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -126,7 +127,7 @@ export default function PanierPage() {
               {!isFreeShipping && (
                 <div style={{ marginBottom: 20 }}>
                   <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#5a4d3e', marginBottom: 6 }}>
-                    Plus que <strong style={{ color: '#B89547' }}>{amountUntilFreeShipping.toFixed(2)} &euro;</strong> pour la livraison gratuite
+                    Plus que <strong style={{ color: '#B89547' }}>{formatPrice(amountUntilFreeShipping)}</strong> pour la livraison gratuite
                   </p>
                   <div style={{ height: 3, background: 'rgba(184,149,71,0.12)', borderRadius: 2 }}>
                     <div style={{ height: '100%', width: `${Math.min(100, (subtotal / SHIPPING.FREE_THRESHOLD) * 100)}%`, background: '#B89547', borderRadius: 2, transition: 'width 0.4s ease' }} />
@@ -136,17 +137,17 @@ export default function PanierPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e' }}>Sous-total</span>
-                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#1a1510' }}>{subtotal.toFixed(2)} &euro;</span>
+                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#1a1510' }}>{formatPrice(subtotal)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e' }}>Livraison</span>
                 <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: shipping === 0 ? '#B89547' : '#1a1510' }}>
-                  {shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} \u20AC`}
+                  {shipping === 0 ? 'Offerte' : formatPrice(shipping)}
                 </span>
               </div>
               <div style={{ borderTop: '1px solid rgba(184,149,71,0.2)', paddingTop: 16, marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>Total</span>
-                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>{total.toFixed(2)} &euro;</span>
+                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>{formatPrice(total)}</span>
               </div>
 
               <Link href="/checkout" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
@@ -201,7 +202,7 @@ export default function PanierPage() {
                       <Image src={s.image} alt={s.name} fill style={{ objectFit: 'cover' }} sizes="200px" />
                     </div>
                     <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 15, color: '#1a1510' }}>{s.name}</p>
-                    <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e', marginTop: 2 }}>{s.price} &euro;</p>
+                    <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e', marginTop: 2 }}>{formatPrice(s.price)}</p>
                   </div>
                 </Link>
               ))}

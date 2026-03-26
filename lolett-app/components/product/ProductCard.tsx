@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ShoppingBag, Check } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import type { Product, Size } from '@/types';
 import { BrandBadge } from '@/components/brand/BrandBadge';
 import { useCartStore } from '@/features/cart';
@@ -86,13 +86,6 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
     setShowSizeSelector(false);
   };
 
-  // Obtenir les couleurs uniques disponibles
-  const availableColors = product.colors?.filter((color) => {
-    if (!product.variants || product.variants.length === 0) return true;
-    return product.variants.some((v) => v.colorName === color.name && v.stock > 0);
-  }) ?? [];
-
-  const hasMultipleColors = availableColors.length > 1;
   const hasMultipleImages = product.images.length > 1;
 
   return (
@@ -217,39 +210,15 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
             <div className="flex items-center gap-2">
               {isOnSale && (
                 <p className="text-lolett-gray-400 text-xs line-through sm:text-sm">
-                  {product.compareAtPrice} €
+                  {formatPrice(product.compareAtPrice!)}
                 </p>
               )}
               <p className={cn("text-sm font-semibold sm:text-base", isOnSale ? "text-red-600" : "text-lolett-gray-900")}>
-                {product.price} €
+                {formatPrice(product.price)}
               </p>
             </div>
           </div>
 
-          {/* Swatches de couleur */}
-          {hasMultipleColors && (
-            <div className="flex items-center gap-1.5 mt-2">
-              <div className="flex gap-1.5 flex-wrap">
-                {availableColors.slice(0, 4).map((color) => (
-                  <div
-                    key={color.hex}
-                    className="w-4 h-4 rounded-full border border-lolett-gray-300 shadow-sm"
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name}
-                    aria-label={`Couleur ${color.name}`}
-                  />
-                ))}
-                {availableColors.length > 4 && (
-                  <div className="w-4 h-4 rounded-full border border-lolett-gray-300 bg-lolett-gray-100 flex items-center justify-center text-[10px] text-lolett-gray-600 font-medium">
-                    +{availableColors.length - 4}
-                  </div>
-                )}
-              </div>
-              <span className="text-xs text-lolett-gray-500 ml-1">
-                {availableColors.length} couleur{availableColors.length > 1 ? 's' : ''}
-              </span>
-            </div>
-          )}
         </div>
       </Link>
     </div>

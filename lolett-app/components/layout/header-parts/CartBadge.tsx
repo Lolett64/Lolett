@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag } from 'lucide-react';
 import { useCartStore, useCartCalculation } from '@/features/cart';
+import { formatPrice } from '@/lib/utils';
 
 export function CartBadge() {
   const cartCount = useCartStore((state) => state.getItemCount());
@@ -108,7 +109,7 @@ export function CartBadge() {
                           {item.color ? ` — ${item.color}` : ''} — Qté {item.quantity}
                         </p>
                         <p className="text-sm font-medium text-[#1a1510]">
-                          {(item.product.price * item.quantity).toFixed(2)} €
+                          {formatPrice(item.product.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -124,7 +125,7 @@ export function CartBadge() {
                 <div className="mt-3 flex items-center justify-between border-t border-[#c4b49c]/15 pt-3">
                   <span className="text-sm text-[#5a4d3e]">Sous-total</span>
                   <span className="text-sm font-semibold text-[#1a1510]">
-                    {subtotal.toFixed(2)} €
+                    {formatPrice(subtotal)}
                   </span>
                 </div>
 

@@ -1,175 +1,186 @@
-import { FilterState } from './ProductFilters';
-import { Product, Size } from '@/types';
-import { useMemo, useState } from 'react';
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import { X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { X, ChevronDown, Check } from 'lucide-react';
+import type { FilterState } from './ProductFilters';
+import type { Product, Size } from '@/types';
 
 interface ProductFiltersV3Props {
-    products: Product[];
-    filters: FilterState;
-    onFiltersChange: (filters: FilterState) => void;
-    onClose?: () => void;
-    isMobile?: boolean;
-    variant?: 'sidebar' | 'horizontal' | 'drawer';
+  products: Product[];
+  filters: FilterState;
+  onFiltersChange: (filters: FilterState) => void;
+  onClose: () => void;
 }
 
 export function ProductFiltersV3({
-    products,
-    filters,
-    onFiltersChange,
-    onClose,
-    isMobile = false,
-    variant = 'sidebar',
+  products,
+  filters,
+  onFiltersChange,
+  onClose,
 }: ProductFiltersV3Props) {
-    const [localFilters, setLocalFilters] = useState<FilterState>(filters);
+  const [localFilters, setLocalFilters] = useState<FilterState>(filters);
+  const [isVisible, setIsVisible] = useState(false);
 
-    const availableColors = useMemo(() => {
-        const colors = new Set<string>();
-        products.forEach((p) => {
-            p.colors?.forEach((c) => colors.add(c.name));
-        });
-        return Array.from(colors).sort();
-    }, [products]);
-
-    const availableSizes = useMemo(() => {
-        const sizes = new Set<string>();
-        products.forEach((p) => {
-            p.sizes.forEach((s) => sizes.add(s));
-        });
-        return Array.from(sizes).sort();
-    }, [products]);
-
-    const priceRange = useMemo(() => {
-        const prices = products.map((p) => p.price);
-        return { min: Math.min(...prices), max: Math.max(...prices) };
-    }, [products]);
-
-    const toggleFilter = (key: 'colors' | 'sizes', value: string) => {
-        setLocalFilters((prev) => ({
-            ...prev,
-            [key]: prev[key].includes(value)
-                ? prev[key].filter((v) => v !== value)
-                : [...prev[key], value],
-        }));
+  useEffect(() => {
+    requestAnimationFrame(() => setIsVisible(true));
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
     };
+  }, []);
 
-    const handleApply = () => {
-        onFiltersChange(localFilters);
-        if (onClose) onClose();
-    };
+  const availableSizes = useMemo(() => {
+    const sizes = new Set<string>();
+    products.forEach((p) => {
+      p.sizes.forEach((s) => sizes.add(s));
+    });
+    return Array.from(sizes).sort();
+  }, [products]);
 
-    const colorMap = useMemo(() => {
-        const map: Record<string, string> = {};
-        products.forEach(p => p.colors?.forEach(c => map[c.name] = c.hex));
-        return map;
-    }, [products]);
+  const toggleSize = (size: string) => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      sizes: prev.sizes.includes(size)
+        ? prev.sizes.filter((s) => s !== size)
+        : [...prev.sizes, size],
+    }));
+  };
 
-    const renderFiltresContent = () => (
-        <div className={cn("flex flex-col gap-10", variant === 'horizontal' && "flex-row gap-12")}>
-            {/* Prix */}
-            <div className={cn("min-w-[180px]", variant === 'horizontal' && "flex-1")}>
-                <h4 className="font-[family-name:var(--font-newsreader)] text-xl italic text-[#1B0B94] mb-4">Budget</h4>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="number"
-                        placeholder="Min"
-                        className="w-full bg-transparent border-b border-[#1B0B94]/20 py-2 text-xs focus:border-[#1B0B94] outline-none transition-colors"
-                        value={localFilters.priceMin ?? ''}
-                        onChange={e => setLocalFilters(p => ({ ...p, priceMin: e.target.value ? Number(e.target.value) : undefined }))}
-                    />
-                    <span className="text-[#1B0B94]/30">-</span>
-                    <input
-                        type="number"
-                        placeholder="Max"
-                        className="w-full bg-transparent border-b border-[#1B0B94]/20 py-2 text-xs focus:border-[#1B0B94] outline-none transition-colors"
-                        value={localFilters.priceMax ?? ''}
-                        onChange={e => setLocalFilters(p => ({ ...p, priceMax: e.target.value ? Number(e.target.value) : undefined }))}
-                    />
-                </div>
-            </div>
+  const handleApply = () => {
+    onFiltersChange(localFilters);
+    handleClose();
+  };
 
-            {/* Couleurs */}
-            <div className={cn(variant === 'horizontal' && "flex-[2]")}>
-                <h4 className="font-[family-name:var(--font-newsreader)] text-xl italic text-[#1B0B94] mb-4">Nuances</h4>
-                <div className="flex flex-wrap gap-2">
-                    {availableColors.map((color) => {
-                        const isSelected = localFilters.colors.includes(color);
-                        return (
-                            <button
-                                key={color}
-                                onClick={() => toggleFilter('colors', color)}
-                                className={cn(
-                                    "group flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border transition-all duration-300",
-                                    isSelected
-                                        ? "bg-[#1B0B94] border-[#1B0B94] text-white shadow-md"
-                                        : "border-[#1B0B94]/10 bg-white/50 text-[#1B0B94]/70 hover:border-[#1B0B94]/40"
-                                )}
-                            >
-                                <span
-                                    className="w-4 h-4 rounded-full border border-black/5"
-                                    style={{ backgroundColor: colorMap[color] || '#ccc' }}
-                                />
-                                <span className="text-[10px] uppercase tracking-wider font-medium">{color}</span>
-                                {isSelected && <X size={10} className="ml-1 opacity-60" />}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+  const handleReset = () => {
+    const reset: FilterState = { priceMin: undefined, priceMax: undefined, sizes: [] };
+    setLocalFilters(reset);
+  };
 
-            {/* Tailles */}
-            <div className={cn(variant === 'horizontal' && "flex-1")}>
-                <h4 className="font-[family-name:var(--font-newsreader)] text-xl italic text-[#1B0B94] mb-4">Tailles</h4>
-                <div className="flex flex-wrap gap-2">
-                    {availableSizes.map((size) => {
-                        const isSelected = localFilters.sizes.includes(size);
-                        return (
-                            <button
-                                key={size}
-                                onClick={() => toggleFilter('sizes', size)}
-                                className={cn(
-                                    "w-10 h-10 flex items-center justify-center rounded-lg border text-[10px] uppercase font-bold transition-all duration-300",
-                                    isSelected
-                                        ? "bg-[#1B0B94] border-[#1B0B94] text-white shadow-md scale-105"
-                                        : "border-[#1B0B94]/10 bg-white/30 text-[#1B0B94]/60 hover:bg-[#1B0B94]/5 hover:border-[#1B0B94]/30"
-                                )}
-                            >
-                                {size}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(onClose, 300);
+  };
 
-            {/* Bouton Appliquer (Sidebar/Drawer only) */}
-            {variant !== 'horizontal' && (
-                <button
-                    onClick={handleApply}
-                    className="mt-4 w-full bg-[#1B0B94] text-white py-4 rounded-xl text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#B89547] transition-all duration-500 shadow-lg hover:shadow-xl active:scale-[0.98]"
-                >
-                    Afficher les résultats
-                </button>
-            )}
+  const hasActiveFilters = localFilters.sizes.length > 0 || localFilters.priceMin !== undefined || localFilters.priceMax !== undefined;
+
+  return (
+    <div className="fixed inset-0 z-[100]">
+      {/* Overlay */}
+      <div
+        className={cn(
+          'absolute inset-0 bg-[#1B0B94]/10 backdrop-blur-[2px] transition-opacity duration-300',
+          isVisible ? 'opacity-100' : 'opacity-0'
+        )}
+        onClick={handleClose}
+      />
+
+      {/* Drawer */}
+      <div
+        className={cn(
+          'absolute top-0 right-0 h-full w-full max-w-sm flex flex-col transition-transform duration-300 ease-out',
+          isVisible ? 'translate-x-0' : 'translate-x-full'
+        )}
+        style={{ backgroundColor: '#FDF5E6' }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-6">
+          <div className="flex items-center gap-2.5">
+            <SlidersHorizontal size={15} className="text-[#1B0B94]/35" />
+            <span className="text-[10px] uppercase tracking-[0.15em] font-medium text-[#1B0B94]/35">
+              Filtres
+            </span>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-1.5 hover:bg-[#1B0B94]/5 rounded-full transition-colors"
+            aria-label="Fermer les filtres"
+          >
+            <X size={18} className="text-[#1B0B94]/30" />
+          </button>
         </div>
-    );
 
-    if (variant === 'drawer') {
-        return (
-            <div className="fixed inset-0 z-[100] bg-[#1B0B94]/20 backdrop-blur-sm flex justify-end">
-                <div className="w-full max-w-sm bg-[#FDF5E6] h-full shadow-2xl p-8 flex flex-col">
-                    <div className="flex items-center justify-between mb-12">
-                        <h2 className="font-[family-name:var(--font-newsreader)] text-4xl italic text-[#1B0B94]">Filtres</h2>
-                        <button onClick={onClose} className="p-2 hover:bg-[#1B0B94]/5 rounded-full transition-colors">
-                            <X size={24} className="text-[#1B0B94]" />
-                        </button>
-                    </div>
-                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                        {renderFiltresContent()}
-                    </div>
-                </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8">
+          {/* Tailles */}
+          <div className="mb-8">
+            <h4 className="text-[11px] uppercase tracking-[0.1em] font-medium text-[#1B0B94] mb-4">
+              Tailles
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes.map((size) => {
+                const isSelected = localFilters.sizes.includes(size);
+                return (
+                  <button
+                    key={size}
+                    onClick={() => toggleSize(size)}
+                    className={cn(
+                      'flex items-center justify-center w-[38px] h-[38px] text-[11px] font-medium tracking-wide transition-all duration-200',
+                      isSelected
+                        ? 'bg-[#1B0B94] text-white'
+                        : 'border border-[#1B0B94]/12 text-[#1B0B94] hover:border-[#1B0B94]/30'
+                    )}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
             </div>
-        );
-    }
+          </div>
 
-    return renderFiltresContent();
+          {/* Prix */}
+          <div className="mb-8">
+            <h4 className="text-[11px] uppercase tracking-[0.1em] font-medium text-[#1B0B94] mb-4">
+              Prix
+            </h4>
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                className="flex-1 bg-transparent border-b border-[#1B0B94]/12 pb-2 text-[11px] text-[#1B0B94] placeholder:text-[#1B0B94]/25 focus:border-[#1B0B94]/40 outline-none transition-colors"
+                value={localFilters.priceMin ?? ''}
+                onChange={(e) =>
+                  setLocalFilters((p) => ({
+                    ...p,
+                    priceMin: e.target.value ? Number(e.target.value) : undefined,
+                  }))
+                }
+              />
+              <span className="text-[#1B0B94]/15 text-xs">—</span>
+              <input
+                type="number"
+                placeholder="Max"
+                className="flex-1 bg-transparent border-b border-[#1B0B94]/12 pb-2 text-[11px] text-[#1B0B94] placeholder:text-[#1B0B94]/25 focus:border-[#1B0B94]/40 outline-none transition-colors"
+                value={localFilters.priceMax ?? ''}
+                onChange={(e) =>
+                  setLocalFilters((p) => ({
+                    ...p,
+                    priceMax: e.target.value ? Number(e.target.value) : undefined,
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-5 sm:px-8 sm:py-6 border-t border-[#1B0B94]/6">
+          <button
+            onClick={handleApply}
+            className="w-full py-3.5 bg-[#1B0B94] text-white text-[10px] uppercase tracking-[0.15em] font-bold hover:bg-[#130970] transition-colors"
+          >
+            Appliquer
+          </button>
+          {hasActiveFilters && (
+            <button
+              onClick={handleReset}
+              className="w-full mt-3 text-[10px] text-[#1B0B94]/40 hover:text-[#1B0B94]/60 uppercase tracking-[0.1em] transition-colors"
+            >
+              Réinitialiser
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

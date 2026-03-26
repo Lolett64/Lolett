@@ -6,7 +6,7 @@ import { ArrowLeft, Package } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getOrderById } from '@/lib/adapters/supabase-user';
 import type { Order } from '@/types';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 
 const statusSteps = ['pending', 'confirmed', 'paid', 'shipped', 'delivered'];
 const statusLabels: Record<string, string> = {
@@ -112,7 +112,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                   </p>
                 </div>
                 <span className="text-sm font-medium text-[#1a1510] font-body">
-                  {(item.price * item.quantity).toFixed(2)} &euro;
+                  {formatPrice(item.price * item.quantity)}
                 </span>
               </div>
             ))}
@@ -123,15 +123,15 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         <div className="border-t border-[#c4b49c]/10 pt-4 mb-6">
           <div className="flex justify-between text-sm font-body text-[#5a4d3e] mb-1">
             <span>Sous-total</span>
-            <span>{(order.total - order.shipping).toFixed(2)} &euro;</span>
+            <span>{formatPrice(order.total - order.shipping)}</span>
           </div>
           <div className="flex justify-between text-sm font-body text-[#5a4d3e] mb-2">
             <span>Livraison</span>
-            <span>{order.shipping === 0 ? 'Offerte' : `${order.shipping.toFixed(2)} \u20ac`}</span>
+            <span>{order.shipping === 0 ? 'Offerte' : formatPrice(order.shipping)}</span>
           </div>
           <div className="flex justify-between text-base font-semibold font-body text-[#1a1510]">
             <span>Total</span>
-            <span>{order.total.toFixed(2)} &euro;</span>
+            <span>{formatPrice(order.total)}</span>
           </div>
         </div>
 

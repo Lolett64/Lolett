@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { TrustBadges } from '@/components/ui/TrustBadges';
+import { formatPrice } from '@/lib/utils';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutForm } from './CheckoutForm';
 import { PaymentStep } from './PaymentStep';
@@ -97,7 +98,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                       </p>
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', flexShrink: 0 }}>
-                      {(item.product.price * item.quantity).toFixed(2)} &euro;
+                      {formatPrice(item.product.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -108,7 +109,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62' }}>
                   <span>Sous-total</span>
-                  <span>{subtotal.toFixed(2)} &euro;</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62' }}>
                   <span>Livraison</span>
@@ -116,7 +117,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                     {shipping === 0 ? (
                       <span style={{ fontWeight: 500, color: '#7B9E6B' }}>Offerte</span>
                     ) : (
-                      `${shipping.toFixed(2)} \u20AC`
+                      formatPrice(shipping)
                     )}
                   </span>
                 </div>
@@ -126,7 +127,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#2C2420' }}>Total</span>
-                <span style={{ fontSize: 18, fontWeight: 600, color: '#2C2420', fontFamily: "'Cormorant Garamond', serif" }}>{total.toFixed(2)} &euro;</span>
+                <span style={{ fontSize: 18, fontWeight: 600, color: '#2C2420', fontFamily: "'Cormorant Garamond', serif" }}>{formatPrice(total)}</span>
               </div>
 
               <div style={{ marginTop: 20 }}>

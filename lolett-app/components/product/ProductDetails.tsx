@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Bell } from 'lucide-react';
 import type { Product, Size } from '@/types';
+import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/features/cart';
 import { STOCK } from '@/lib/constants';
 import { MICROCOPY, getRandomMicrocopy } from '@/lib/microcopy';
@@ -114,10 +115,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {product.compareAtPrice && product.compareAtPrice > product.price ? (
           <div className="mt-3 flex items-center gap-3 sm:mt-4">
             <p className="text-lolett-gray-400 text-lg line-through sm:text-xl">
-              {product.compareAtPrice} €
+              {formatPrice(product.compareAtPrice!)}
             </p>
             <p className="text-red-600 text-xl font-semibold sm:text-2xl">
-              {product.price} €
+              {formatPrice(product.price)}
             </p>
             <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs font-bold text-white uppercase">
               -{Math.round((1 - product.price / product.compareAtPrice) * 100)}%
@@ -125,7 +126,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         ) : (
           <p className="text-lolett-gray-900 mt-3 text-xl font-semibold sm:mt-4 sm:text-2xl">
-            {product.price} €
+            {formatPrice(product.price)}
           </p>
         )}
 

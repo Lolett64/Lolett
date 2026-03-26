@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { STOCK } from '@/lib/constants';
 import type { Product, Size } from '@/types';
@@ -62,7 +62,7 @@ export function ProductLooksPieceCard({
               {product.name}
             </Link>
             <span className="text-lolett-gray-900 text-sm font-semibold">
-              {product.price.toFixed(2)} €
+              {formatPrice(product.price)}
             </span>
           </div>
 

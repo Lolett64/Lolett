@@ -34,7 +34,7 @@ export function NewsletterSection({ content, hexColor = '#FFFFFF' }: NewsletterS
               <input
                 type="email"
                 placeholder={content?.placeholder_text || "VOTRE ADRESSE ÉLECTRONIQUE"}
-                className="flex-1 bg-transparent py-4 text-[#1B0B94] text-[10px] tracking-[0.2em] placeholder:text-[#1B0B94]/30 focus:outline-none min-w-0 uppercase w-full sm:w-auto"
+                className="flex-1 bg-transparent py-4 text-[#1B0B94] text-[10px] tracking-[0.2em] placeholder:text-[#1B0B94]/30 focus:outline-none min-w-0 uppercase w-full sm:w-auto text-center"
                 aria-label="Adresse email"
               />
               <button

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Check, X } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import type { Look, Size, Product } from '@/types';
 import { useCartStore } from '@/features/cart';
 import { getFirstAvailableColor } from '@/lib/product-utils';
@@ -58,7 +58,7 @@ export function LookCard({ look, products, showProducts = true }: LookCardProps)
 
           <div className="flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
             <span className="text-lg font-semibold whitespace-nowrap text-white">
-              {totalPrice} €
+              {formatPrice(totalPrice)}
             </span>
             <button
               onClick={handleAddLook}
@@ -117,7 +117,7 @@ export function LookCard({ look, products, showProducts = true }: LookCardProps)
                 )}
               </div>
               <p className="text-lolett-gray-600 mt-1 max-w-[64px] truncate text-xs sm:max-w-[80px]">
-                {product.price} €
+                {formatPrice(product.price)}
               </p>
             </Link>
           ))}

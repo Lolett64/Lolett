@@ -13,6 +13,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import type { DailyRevenue, StatusCount } from './getDashboardStats';
+import { formatPrice } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#B89547',
@@ -92,7 +93,7 @@ export function DashboardCharts({ ordersByDay, ordersByStatus }: Props) {
                   fontSize: 12,
                   fontFamily: 'var(--font-montserrat)',
                 }}
-                formatter={(value: number | undefined) => [`${(value ?? 0).toFixed(2)} €`, 'Revenu']}
+                formatter={(value: number | undefined) => [formatPrice(value ?? 0), 'Revenu']}
                 labelFormatter={(label: unknown) => formatDay(String(label))}
               />
               <Area

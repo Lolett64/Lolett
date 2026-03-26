@@ -6,6 +6,7 @@ import { ArrowRight, Truck, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { SHIPPING } from '@/lib/constants';
+import { formatPrice } from '@/lib/utils';
 import { useCartCalculation, type CartProductItem } from '../hooks';
 import type { CartItem } from '@/types';
 
@@ -45,7 +46,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
       <div className={isCheckout ? 'space-y-3' : 'space-y-4'}>
         <div className={`text-lolett-gray-600 flex justify-between ${isCheckout ? 'text-sm' : ''}`}>
           <span>Sous-total</span>
-          <span>{subtotal.toFixed(2)} €</span>
+          <span>{formatPrice(subtotal)}</span>
         </div>
         <div className={`text-lolett-gray-600 flex justify-between ${isCheckout ? 'text-sm' : ''}`}>
           <span>Livraison</span>
@@ -53,7 +54,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
             {shipping === 0 ? (
               <span className="text-green-600">Offerte</span>
             ) : (
-              `${shipping.toFixed(2)} €`
+              formatPrice(shipping)
             )}
           </span>
         </div>
@@ -78,7 +79,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
                 <span>
                   Plus que{' '}
                   <span className="text-lolett-gray-900 font-semibold">
-                    {amountUntilFreeShipping.toFixed(2)} €
+                    {formatPrice(amountUntilFreeShipping)}
                   </span>{' '}
                   pour la livraison offerte !
                 </span>
@@ -102,7 +103,7 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
 
         <div className="text-lolett-gray-900 flex justify-between text-lg font-semibold">
           <span>Total</span>
-          <span>{total.toFixed(2)} €</span>
+          <span>{formatPrice(total)}</span>
         </div>
       </div>
 
@@ -145,7 +146,7 @@ function OrderSummaryItem({ item }: { item: CartProductItem }) {
         <p className="text-lolett-gray-900 line-clamp-1 text-sm font-medium">{item.product.name}</p>
         <p className="text-lolett-gray-500 text-xs">Taille : {item.size}</p>
         <p className="text-lolett-gray-900 mt-1 text-sm font-medium">
-          {(item.product.price * item.quantity).toFixed(2)} €
+          {formatPrice(item.product.price * item.quantity)}
         </p>
       </div>
     </div>

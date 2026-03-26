@@ -1,6 +1,7 @@
 'use client';
 
 import { Lock } from 'lucide-react';
+import { formatPrice } from '@/lib/utils';
 
 interface PaymentStepProps {
   onBack: () => void;
@@ -187,7 +188,7 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
           ) : (
             <>
               <Lock size={14} style={{ marginRight: 8 }} />
-              Payer {total.toFixed(2)} &euro;
+              Payer {formatPrice(total)}
             </>
           )}
         </button>

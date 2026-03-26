@@ -39,17 +39,13 @@ export function ShopContentV4({
     heroHeight = "h-[45vh] min-h-[400px]",
 }: ShopContentV4Props) {
     const [sort, setSort] = useState<SortOption>('newest');
-    const [filters, setFilters] = useState<FilterState>({ colors: [], sizes: [] });
-    const [showFiltersMobile, setShowFiltersMobile] = useState(false);
+    const [filters, setFilters] = useState<FilterState>({ sizes: [] });
+    const [showFilters, setShowFilters] = useState(false);
 
     const filtered = useMemo(() => {
         return products.filter((product) => {
             if (filters.priceMin !== undefined && product.price < filters.priceMin) return false;
             if (filters.priceMax !== undefined && product.price > filters.priceMax) return false;
-            if (filters.colors.length > 0) {
-                const productColors = product.colors?.map((c) => c.name) ?? [];
-                if (!filters.colors.some((color) => productColors.includes(color))) return false;
-            }
             if (filters.sizes.length > 0) {
                 if (!filters.sizes.some((size) => product.sizes.includes(size as Size))) return false;
             }
@@ -74,15 +70,25 @@ export function ShopContentV4({
         const active: ActiveFilter[] = [];
         if (filters.priceMin) active.push({ key: 'priceMin', label: 'Prix min', value: `${filters.priceMin}€` });
         if (filters.priceMax) active.push({ key: 'priceMax', label: 'Prix max', value: `${filters.priceMax}€` });
-        filters.colors.forEach(c => active.push({ key: `color-${c}`, label: 'Nuance', value: c }));
         filters.sizes.forEach(s => active.push({ key: `size-${s}`, label: 'Taille', value: s }));
         return active;
     }, [filters]);
 
+    const handleRemoveFilter = (key: string) => {
+        if (key === 'priceMin') {
+            setFilters(prev => ({ ...prev, priceMin: undefined }));
+        } else if (key === 'priceMax') {
+            setFilters(prev => ({ ...prev, priceMax: undefined }));
+        } else if (key.startsWith('size-')) {
+            const size = key.replace('size-', '');
+            setFilters(prev => ({ ...prev, sizes: prev.sizes.filter(s => s !== size) }));
+        }
+    };
+
     return (
         <div className="min-h-screen pb-20" style={{ background: '#FDF5E6' }}>
 
-            {/* ═══ HERO : Hauteur dynamique ═══ */}
+            {/* ═══ HERO ═══ */}
             <div className={cn("relative overflow-hidden", heroHeight)}>
                 <Image
                     src={heroImage}
@@ -95,8 +101,6 @@ export function ShopContentV4({
                     }}
                     priority
                 />
-
-                {/* Deep Gradient for Title Readability (V1 style refined) */}
                 <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                 <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
@@ -117,7 +121,7 @@ export function ShopContentV4({
                 </div>
             </div>
 
-            {/* ═══ BARRE : Style V2 (Éditorial) ═══ */}
+            {/* ═══ CATEGORIES ═══ */}
             <div className="max-w-[1600px] mx-auto px-6 md:px-20 py-10 flex flex-col items-center">
                 <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
                     <Link href={`/shop/${gender}`} className={cn("relative group font-[family-name:var(--font-newsreader)] text-2xl italic", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}>
@@ -137,66 +141,47 @@ export function ShopContentV4({
                 </div>
             </div>
 
-            {/* ═══ CONTENT AREA : Style V1 (Sidebar + Grid) ═══ */}
-            <div className="max-w-[1600px] mx-auto mt-10 px-6 lg:px-12">
+            {/* ═══ CONTENT ═══ */}
+            <div className="max-w-[1600px] mx-auto mt-4 px-6 lg:px-12">
 
-                <div className="flex flex-col lg:flex-row gap-12">
+                {/* Toolbar */}
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#1B0B94]/8">
+                    <button
+                        onClick={() => setShowFilters(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 border border-[#1B0B94]/15 text-[10px] uppercase tracking-[0.12em] font-medium text-[#1B0B94] hover:border-[#1B0B94]/30 transition-colors"
+                    >
+                        <SlidersHorizontal size={13} />
+                        Filtres
+                    </button>
 
-                    {/* Sidebar Filtres (V3 partagée) */}
-                    <aside className="hidden lg:block w-72 shrink-0">
-                        <div className="sticky top-32">
-                            <ProductFiltersV3
-                                products={products}
-                                filters={filters}
-                                onFiltersChange={setFilters}
-                                variant="sidebar"
-                            />
-                        </div>
-                    </aside>
-
-                    <main className="flex-1">
-                        {/* Toolbar */}
-                        <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#1B0B94]/10">
-                            <div className="flex items-center gap-4">
-                                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#1B0B94]/40">
-                                    {sorted.length} Modèles
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <ProductSorting value={sort} onChange={setSort} />
-                                <button
-                                    onClick={() => setShowFiltersMobile(true)}
-                                    className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-[#1B0B94]/20 text-[10px] uppercase font-bold text-[#1B0B94]"
-                                >
-                                    <SlidersHorizontal size={14} /> Filtres
-                                </button>
-                            </div>
-                        </div>
-
-                        <ActiveFilters
-                            filters={activeFilters}
-                            onRemove={k => setFilters(prev => ({ ...prev, [k.includes('color') ? 'colors' : k.includes('size') ? 'sizes' : k]: undefined }))}
-                            onClearAll={() => setFilters({ colors: [], sizes: [] })}
-                        />
-
-                        {sorted.length === 0 ? (
-                            <EmptyState title="Aucun résultat" message="Ajustez vos filtres pour découvrir notre collection." />
-                        ) : (
-                            <ProductGrid products={sorted} columns={3} />
-                        )}
-                    </main>
+                    <div className="flex items-center gap-6">
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#1B0B94]/35">
+                            {sorted.length} Modèle{sorted.length > 1 ? 's' : ''}
+                        </span>
+                        <ProductSorting value={sort} onChange={setSort} />
+                    </div>
                 </div>
+
+                <ActiveFilters
+                    filters={activeFilters}
+                    onRemove={handleRemoveFilter}
+                    onClearAll={() => setFilters({ sizes: [] })}
+                />
+
+                {sorted.length === 0 ? (
+                    <EmptyState title="Aucun résultat" message="Ajustez vos filtres pour découvrir notre collection." />
+                ) : (
+                    <ProductGrid products={sorted} columns={3} />
+                )}
             </div>
 
-            {/* Mobile Drawer */}
-            {showFiltersMobile && (
+            {/* Drawer */}
+            {showFilters && (
                 <ProductFiltersV3
                     products={products}
                     filters={filters}
                     onFiltersChange={setFilters}
-                    onClose={() => setShowFiltersMobile(false)}
-                    variant="drawer"
+                    onClose={() => setShowFilters(false)}
                 />
             )}
         </div>

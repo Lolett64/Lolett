@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useOrderLoader } from './useOrderLoader';
 import { SuccessSkeleton } from './SuccessSkeleton';
 import { SuccessStyles } from './SuccessStyles';
+import { formatPrice } from '@/lib/utils';
 
 export function SuccessContent() {
   const { order, loading, error, orderId } = useOrderLoader();
@@ -84,7 +85,7 @@ export function SuccessContent() {
                         </p>
                       </div>
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', flexShrink: 0 }}>
-                        {(item.price * item.quantity).toFixed(2)}&nbsp;&euro;
+                        {formatPrice(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -96,15 +97,15 @@ export function SuccessContent() {
                 <div style={{ textAlign: 'left' as const }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62', marginBottom: 6 }}>
                     <span>Sous-total</span>
-                    <span>{subtotal.toFixed(2)}&nbsp;&euro;</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62', marginBottom: 12 }}>
                     <span>Livraison</span>
-                    <span>{order.shipping === 0 ? 'Offerte' : `${order.shipping.toFixed(2)} \u20AC`}</span>
+                    <span>{order.shipping === 0 ? 'Offerte' : formatPrice(order.shipping)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16, fontWeight: 600, color: '#2C2420' }}>
                     <span>Total</span>
-                    <span style={{ fontFamily: "'Cormorant Garamond', serif" }}>{order.total.toFixed(2)}&nbsp;&euro;</span>
+                    <span style={{ fontFamily: "'Cormorant Garamond', serif" }}>{formatPrice(order.total)}</span>
                   </div>
                 </div>
 

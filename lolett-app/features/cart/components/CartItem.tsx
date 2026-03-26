@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, Minus, Plus } from 'lucide-react';
 import type { Size } from '@/types';
+import { formatPrice } from '@/lib/utils';
 import type { CartProductItem } from '../hooks';
 
 interface CartItemProps {
@@ -35,7 +36,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
           {item.product.name}
         </Link>
         <p className="text-lolett-gray-500 mt-1 text-sm">Taille : {item.size}</p>
-        <p className="text-lolett-gray-900 mt-2 font-semibold">{item.product.price} €</p>
+        <p className="text-lolett-gray-900 mt-2 font-semibold">{formatPrice(item.product.price)}</p>
 
         <div className="mt-3 flex items-center justify-between sm:mt-4">
           <div className="border-lolett-gray-200 inline-flex items-center rounded-lg border">

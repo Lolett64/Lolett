@@ -6,7 +6,7 @@ import { Package, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getUserOrders } from '@/lib/adapters/supabase-user';
 import type { Order } from '@/types';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
@@ -89,7 +89,7 @@ export function OrderList() {
                       {status.label}
                     </span>
                     <span className="text-sm font-semibold text-[#1a1510] font-body">
-                      {order.total.toFixed(2)} &euro;
+                      {formatPrice(order.total)}
                     </span>
                   </div>
                 </div>

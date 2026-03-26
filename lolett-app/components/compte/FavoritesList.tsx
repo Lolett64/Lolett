@@ -6,6 +6,7 @@ import { Heart, Trash2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getFavorites, removeFavorite } from '@/lib/adapters/supabase-user';
 import { createClient } from '@/lib/supabase/client';
+import { formatPrice } from '@/lib/utils';
 
 interface FavProduct {
   id: string;
@@ -101,7 +102,7 @@ export function FavoritesList() {
                   <h3 className="text-sm font-medium text-[#1a1510] font-body hover:text-[#1B0B94] transition-colors">{p.name}</h3>
                 </Link>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm font-semibold text-[#1a1510] font-body">{p.price.toFixed(2)} &euro;</span>
+                  <span className="text-sm font-semibold text-[#1a1510] font-body">{formatPrice(p.price)}</span>
                   <button
                     onClick={() => handleRemove(p.id)}
                     className="p-1.5 text-[#8a7d6b] hover:text-red-500 transition-colors"

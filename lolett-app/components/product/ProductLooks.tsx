@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import type { Look, Product } from '@/types';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Button } from '@/components/ui/button';
@@ -119,7 +119,7 @@ export function ProductLooks({ looks, lookProducts }: ProductLooksProps) {
             <div className="mb-4 flex items-center justify-between">
               <span className="text-lolett-gray-600 text-sm">Total du look</span>
               <span className="text-lolett-gray-900 text-lg font-semibold">
-                {totalPrice.toFixed(2)} €
+                {formatPrice(totalPrice)}
               </span>
             </div>
 
