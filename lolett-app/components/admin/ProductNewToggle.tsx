@@ -21,7 +21,7 @@ export function ProductNewToggle({ productId, initialIsNew }: ProductNewTogglePr
     setIsNew(next);
     try {
       await fetch(`/api/admin/products/${productId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_new: next }),
       });
