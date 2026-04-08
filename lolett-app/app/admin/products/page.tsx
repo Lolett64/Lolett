@@ -7,6 +7,7 @@ import { Plus, Pencil, Package } from 'lucide-react';
 import { formatPrice } from '@/lib/admin/utils';
 import { ProductDeleteButton } from '@/components/admin/ProductDeleteButton';
 import { ProductStockInput } from '@/components/admin/ProductStockInput';
+import { ProductNewToggle } from '@/components/admin/ProductNewToggle';
 import { ProductFilters } from '@/components/admin/ProductFilters';
 import { ProductCategoryAccordion } from '@/components/admin/ProductCategoryAccordion';
 
@@ -152,11 +153,7 @@ function ProductRow({ product }: { product: Product }) {
               {product.slug}
             </div>
           </div>
-          {product.is_new && (
-            <Badge className="bg-[#B89547]/10 text-[#B89547] border-[#B89547]/20 text-[10px] uppercase tracking-wider shrink-0">
-              New
-            </Badge>
-          )}
+          <ProductNewToggle productId={product.id} initialIsNew={product.is_new} />
         </div>
       </td>
       <td className="px-4 py-3 text-right font-[family-name:var(--font-montserrat)] font-medium">

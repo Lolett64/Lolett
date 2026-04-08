@@ -55,7 +55,7 @@ export default async function HomePage() {
     getSiteContent('hero'),
     getSiteContent('newsletter'),
     getSiteContent('brand_story'),
-    productRepository.findMany({ limit: 4 }),
+    productRepository.findMany({ isNew: true }).then((p) => p.slice(0, 4)),
     lookRepository.findMany().then((l) => l.slice(0, 3)),
     getPageSections('home'),
   ]);
