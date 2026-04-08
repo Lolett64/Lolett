@@ -1,67 +1,32 @@
 import type { MetadataRoute } from 'next';
-import { productRepository, categoryRepository } from '@/lib/adapters';
+import { productRepository } from '@/lib/adapters';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lolett.fr';
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+
+  const products = await productRepository.findMany();
+
+  const productUrls: MetadataRoute.Sitemap = products.map((p) => ({
+    url: `${BASE_URL}/produit/${p.slug}`,
+    lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
 
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: BASE_URL,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/shop`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/shop/homme`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/shop/femme`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/nouveautes`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/contact`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+    { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: `${BASE_URL}/shop`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/shop/femme`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/shop/homme`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/nouveautes`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/notre-histoire`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/cgv`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
+    { url: `${BASE_URL}/mentions-legales`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
+    { url: `${BASE_URL}/confidentialite`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
   ];
 
-  // Category pages
-  const allCategories = await categoryRepository.findMany();
-  const categoryPages: MetadataRoute.Sitemap = allCategories.map((cat) => ({
-    url: `${BASE_URL}/shop/${cat.gender}/${cat.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
-
-  // Product pages
-  const allProducts = await productRepository.findMany();
-  const productPages: MetadataRoute.Sitemap = allProducts.map((product) => ({
-    url: `${BASE_URL}/produit/${product.slug}`,
-    lastModified: product.createdAt ? new Date(product.createdAt) : now,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }));
-
-  return [...staticPages, ...categoryPages, ...productPages];
+  return [...staticPages, ...productUrls];
 }

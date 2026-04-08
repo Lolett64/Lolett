@@ -8,7 +8,6 @@ const SAND = '#FDF5E6';
 const GOLD = '#B89547';
 const BROWN = '#1A1510';
 const WARM_CREAM = '#F5EDE0';
-const BLUE = '#1B0B94';
 
 // Fonts
 const serif = "var(--font-newsreader), 'Newsreader', serif";

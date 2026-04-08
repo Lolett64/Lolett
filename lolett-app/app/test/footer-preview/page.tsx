@@ -5,7 +5,6 @@ import { Mail } from 'lucide-react';
 import { TikTokIcon, InstagramIcon, FacebookIcon } from '@/components/icons';
 
 const BLUE = '#1B0B94';
-const GOLD = '#B89547';
 
 const footerLinks = {
   shop: [

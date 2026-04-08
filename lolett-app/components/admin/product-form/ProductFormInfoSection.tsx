@@ -112,9 +112,6 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
                 <label style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'block' }}>Réduction (%)</label>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {[10, 20, 30, 40, 50].map(pct => {
-                    const originalPrice = form.compare_at_price && parseFloat(form.compare_at_price) > 0
-                      ? parseFloat(form.compare_at_price)
-                      : parseFloat(form.price);
                     const isActive = form.compare_at_price && parseFloat(form.compare_at_price) > 0
                       && Math.round((1 - parseFloat(form.price) / parseFloat(form.compare_at_price)) * 100) === pct;
                     return (

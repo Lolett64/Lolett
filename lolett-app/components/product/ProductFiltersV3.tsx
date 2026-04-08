@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterState } from './ProductFilters';
-import type { Product, Size } from '@/types';
+import type { Product } from '@/types';
 
 interface ProductFiltersV3Props {
   products: Product[];

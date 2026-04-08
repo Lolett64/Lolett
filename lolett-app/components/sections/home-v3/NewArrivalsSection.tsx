@@ -29,7 +29,7 @@ export function NewArrivalsSection({ products, hexColor = '#FFFFFF' }: NewArriva
               </div>
             </div>
             <Link
-              href="/shop/nouveautes"
+              href="/nouveautes"
               className="group hidden md:inline-flex items-center gap-4 text-[#1B0B94]/60 hover:text-[#B89547] transition-colors duration-500"
             >
               <span className="text-[9px] uppercase tracking-[0.25em] font-medium">Voir toute la sélection</span>

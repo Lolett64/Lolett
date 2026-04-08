@@ -29,7 +29,6 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
     setFilters,
     showFiltersMobile,
     setShowFiltersMobile,
-    page,
     setPage,
     genderProducts,
     sorted,

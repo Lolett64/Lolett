@@ -41,6 +41,10 @@ export const metadata: Metadata = {
     'LOLETT - Mode du Sud-Ouest pour homme et femme. Née ici, portée partout. Découvrez nos collections solaires.',
   keywords: ['mode', 'vêtements', 'sud-ouest', 'sud', 'été', 'français'],
   authors: [{ name: 'LOLETT' }],
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
   openGraph: {
     type: 'website',
     locale: 'fr_FR',

@@ -1,14 +1,15 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
-
 export default function robots(): MetadataRoute.Robots {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/checkout', '/checkout/', '/panier', '/favoris', '/api', '/admin'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin', '/admin-login', '/api/', '/test/'],
+      },
+    ],
     sitemap: `${BASE_URL}/sitemap.xml`,
   };
 }

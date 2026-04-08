@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { HeroSection } from '@/components/sections/notre-histoire/HeroSection';
 import { OrigineSection } from '@/components/sections/notre-histoire/OrigineSection';
 import { VisionSection } from '@/components/sections/notre-histoire/VisionSection';
@@ -135,7 +136,7 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
           <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 36px', color: 'rgba(26,21,16,0.65)' }}>
             Des looks complets, des mati&egrave;res nobles, l&rsquo;esprit du Sud.
           </p>
-          <a
+          <Link
             href="/shop"
             style={{
               display: 'inline-block', padding: '16px 52px',
@@ -147,7 +148,7 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
             }}
           >
             Voir la boutique
-          </a>
+          </Link>
         </Reveal>
       </section>}
     </main>

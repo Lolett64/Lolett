@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
     // Upload to Supabase Storage
     const supabase = createAdminClient();
-    const { error: uploadError, data: uploadData } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('media')
       .upload(filePath, buffer, {
         contentType: file.type,

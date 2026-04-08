@@ -28,11 +28,20 @@ export const metadata: Metadata = {
     siteName: 'LOLETT',
     locale: 'fr_FR',
     type: 'website',
+    images: [
+      {
+        url: `${BASE_URL}/og-lolett.jpg`,
+        width: 800,
+        height: 1000,
+        alt: 'LOLETT — Mode Méditerranéenne',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'LOLETT — Mode Homme & Femme | Looks complets prêt à sortir',
     description: 'Des looks complets pensés au Sud. Pour lui, pour elle.',
+    images: [`${BASE_URL}/og-lolett.jpg`],
   },
 };
 
@@ -103,7 +112,7 @@ export default async function HomePage() {
       style={{ backgroundColor: hexColor }}
     >
       <main>
-        {visibleSections.map((s, i) => {
+        {visibleSections.map((s) => {
           const el = sectionElements[s.section_key];
           if (!el) return null;
           return <Fragment key={s.section_key}>{el}</Fragment>;
