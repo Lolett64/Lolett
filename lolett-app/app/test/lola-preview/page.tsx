@@ -50,8 +50,3 @@ export default function LolaPreview() {
     </div>
   );
 }
-))}
-      </div>
-    </div>
-  );
-}
