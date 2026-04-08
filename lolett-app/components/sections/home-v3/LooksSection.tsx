@@ -77,9 +77,9 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
               {products.length > 0 && (
                 <div className="flex gap-3 mb-8">
                   {products.slice(0, 4).map((p) => (
-                    <div key={p.id} className="w-16 h-20 relative rounded-sm overflow-hidden border border-[#1B0B94]/8 bg-white/50">
+                    <Link key={p.id} href={`/produit/${p.slug}`} className="w-16 h-20 relative rounded-sm overflow-hidden border border-[#1B0B94]/8 bg-white/50 hover:border-[#B89547] hover:scale-105 transition-all duration-300 block">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="64px" />
-                    </div>
+                    </Link>
                   ))}
                   {products.length > 4 && (
                     <div className="w-16 h-20 rounded-sm border border-[#1B0B94]/8 flex items-center justify-center bg-white/30">

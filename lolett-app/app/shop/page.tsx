@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ChevronRight } from 'lucide-react';
-import { hommeProducts, femmeProducts } from './data';
+import { productRepository } from '@/lib/adapters';
+
+export const revalidate = 60;
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
 
@@ -19,7 +21,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const [femmeProducts, hommeProducts, accessoiresProducts] = await Promise.all([
+    productRepository.findMany({ gender: 'femme', limit: 2 }),
+    productRepository.findMany({ gender: 'homme', limit: 1 }),
+    productRepository.findMany({ category: 'accessoires', limit: 1 }),
+  ]);
+
+  const newArrivals = [
+    ...femmeProducts.slice(0, 2),
+    ...hommeProducts.slice(0, 1),
+    ...accessoiresProducts.slice(0, 1),
+  ];
   return (
     <div className="relative min-h-screen text-[#1B0B94]" style={{ backgroundColor: '#FDF5E6' }}>
 
@@ -124,12 +137,12 @@ export default function ShopPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
-            {[...hommeProducts.slice(0, 2), ...femmeProducts.slice(0, 2)].map((p, i) => (
-              <Link key={i} href="/shop" className="group">
+            {newArrivals.map((p) => (
+              <Link key={p.id} href={`/produit/${p.slug}`} className="group">
                 <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#e8e2d8]">
                   <Image
-                    src={p.src}
-                    alt={p.alt}
+                    src={p.images[0]}
+                    alt={p.name}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                     sizes="(max-width: 640px) 47vw, 23vw"
@@ -139,7 +152,7 @@ export default function ShopPage() {
                   <p className="truncate text-sm font-semibold text-[#1e1610] transition-colors group-hover:text-[#130970]">
                     {p.name}
                   </p>
-                  <p className="mt-0.5 text-sm font-medium text-[#7a6f63]">{p.price}</p>
+                  <p className="mt-0.5 text-sm font-medium text-[#7a6f63]">{p.price.toLocaleString('fr-FR')} €</p>
                 </div>
               </Link>
             ))}

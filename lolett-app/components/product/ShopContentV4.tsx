@@ -128,7 +128,7 @@ export function ShopContentV4({
                         Tout voir
                         <div className={cn("absolute -bottom-2 left-0 h-[1px] bg-[#B89547] transition-all duration-500", !activeCategory ? "w-full" : "w-0 group-hover:w-full")} />
                     </Link>
-                    {categories.map(cat => (
+                    {[...categories].sort((a, b) => a.slug === 'hauts' ? -1 : b.slug === 'hauts' ? 1 : 0).map(cat => (
                         <Link
                             key={cat.id}
                             href={`/shop/${gender}/${cat.slug}`}

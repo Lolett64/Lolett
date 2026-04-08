@@ -3,6 +3,8 @@ export function CheckoutStyles() {
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
+      @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
       .ckv-page {
         min-height: 100vh;
         background-color: #FDF5E6;

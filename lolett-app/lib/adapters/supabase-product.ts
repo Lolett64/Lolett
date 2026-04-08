@@ -37,6 +37,8 @@ export class SupabaseProductRepository implements ProductRepository {
     if (options?.isNew) {
       query = query.eq('is_new', true);
     }
+    query = query.order('created_at', { ascending: false });
+
     if (options?.limit) {
       query = query.limit(options.limit);
     }

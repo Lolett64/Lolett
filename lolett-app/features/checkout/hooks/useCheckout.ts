@@ -101,11 +101,15 @@ export function useCheckout() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    // If user edits address fields, deselect saved address
     if (['address', 'city', 'postalCode'].includes(e.target.name)) {
       setSelectedAddressId(null);
     }
   };
+
+  const setAddressFields = useCallback((fields: { address: string; postalCode: string; city: string }) => {
+    setFormData((prev) => ({ ...prev, ...fields }));
+    setSelectedAddressId(null);
+  }, []);
 
   const goToPayment = () => {
     if (isFormValid) setStep(2);
@@ -177,7 +181,6 @@ export function useCheckout() {
     formData.firstName &&
     formData.lastName &&
     formData.email &&
-    formData.phone &&
     formData.address &&
     formData.city &&
     formData.postalCode
@@ -196,6 +199,7 @@ export function useCheckout() {
     paymentMethod,
     setPaymentMethod,
     handleChange,
+    setAddressFields,
     handleSubmit,
     goToPayment,
     goBackToShipping,

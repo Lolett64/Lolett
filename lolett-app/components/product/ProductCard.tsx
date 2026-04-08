@@ -112,7 +112,7 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
               alt={index === 0 ? product.name : `${product.name} - Vue ${index + 1}`}
               fill
               className={cn(
-                'absolute inset-0 object-contain transition-all duration-700 ease-out',
+                'absolute inset-0 object-cover object-top transition-all duration-700 ease-out',
                 // Mobile: afficher l'image actuelle selon swipe
                 // Desktop: hover sur 2e image, sinon première
                 index === currentImageIndex || (index === 1 && isHovered && currentImageIndex === 0)

@@ -54,6 +54,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                   selectedAddressId={checkout.selectedAddressId}
                   loadingAddresses={checkout.loadingAddresses}
                   handleChange={checkout.handleChange}
+                  setAddressFields={checkout.setAddressFields}
                   goToPayment={checkout.goToPayment}
                   selectAddress={checkout.selectAddress}
                 />
