@@ -20,7 +20,7 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
           <ScrollReveal className="relative">
             <div className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-[0_20px_80px_rgba(27,11,148,0.10)]">
               <Image
-                src="/images/wetransfer_lolett_2026-03-18_1501/Lola noir/1.jpg"
+                src="/images/fondatrice.jpg"
                 alt="Lola, fondatrice de LOLETT"
                 fill
                 className="object-cover object-top"
