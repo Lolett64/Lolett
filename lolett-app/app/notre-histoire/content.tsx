@@ -80,6 +80,7 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
         text1={c('origine_text1', 'C\u2019est parti d\u2019une id\u00e9e simple \u2014 on m\u00e9rite tous d\u2019\u00eatre bien habill\u00e9s sans y passer trois heures. Des coupes qui tombent bien, des mati\u00e8res qu\u2019on a envie de toucher, et des prix qui ne font pas grimacer.')}
         quote={c('origine_quote', 'Je s\u00e9lectionne chaque pi\u00e8ce comme si c\u2019\u00e9tait pour moi.')}
         text2={c('origine_text2', 'Ici, pas de tendances \u00e9ph\u00e9m\u00e8res ni de collections \u00e0 rallonge. Juste des pi\u00e8ces qui fonctionnent ensemble, pour que tu sortes de chez toi en te disant \u2014 ouais, je suis bien l\u00e0.')}
+        founderImage={content?.founder_image}
       />}
 
       {/* MATERIALS BAR */}
