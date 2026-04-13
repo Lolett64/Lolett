@@ -212,6 +212,7 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
               <option value="">Choisir...</option>
               <option value="homme">Homme</option>
               <option value="femme">Femme</option>
+              <option value="both">Unisexe (Homme &amp; Femme)</option>
             </select>
           </div>
           <div>

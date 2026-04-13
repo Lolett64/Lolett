@@ -28,8 +28,8 @@ export class SupabaseProductRepository implements ProductRepository {
     const supabase = await createClient();
     let query = supabase.from('products').select('*');
 
-    if (options?.gender) {
-      query = query.eq('gender', options.gender);
+    if (options?.gender && options.gender !== 'both') {
+      query = query.in('gender', [options.gender, 'both']);
     }
     if (options?.category) {
       query = query.eq('category_slug', options.category);

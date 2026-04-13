@@ -1,4 +1,4 @@
-export type Gender = 'homme' | 'femme';
+export type Gender = 'homme' | 'femme' | 'both';
 
 export type Size =
   | 'TU' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'

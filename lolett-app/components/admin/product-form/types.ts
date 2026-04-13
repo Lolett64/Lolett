@@ -55,6 +55,11 @@ export const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string 
     { slug: 'chaussures', label: 'Chaussures' },
     { slug: 'sacs', label: 'Sacs' },
   ],
+  both: [
+    { slug: 'hauts', label: 'Hauts' },
+    { slug: 'bas', label: 'Bas' },
+    { slug: 'accessoires', label: 'Accessoires' },
+  ],
 };
 
 /* ── Shared styles ─────────────────────────────────────── */
