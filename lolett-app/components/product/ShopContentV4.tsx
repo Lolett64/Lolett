@@ -17,7 +17,8 @@ interface ShopContentV4Props {
     gender: 'homme' | 'femme';
     products: Product[];
     categories: Category[];
-    heroImage: string;
+    heroImage?: string;
+    heroColor?: string;
     heroImagePosition?: string;
     heroImageScale?: number;
     heroTitle: string;
@@ -31,12 +32,13 @@ export function ShopContentV4({
     products,
     categories,
     heroImage,
+    heroColor = '#2418a6',
     heroImagePosition = 'center 65%',
     heroImageScale = 1,
     heroTitle,
     heroSubtitle,
     activeCategory,
-    heroHeight = "h-[45vh] min-h-[400px]",
+    heroHeight = "h-[35vh] min-h-[280px]",
 }: ShopContentV4Props) {
     const [sort, setSort] = useState<SortOption>('newest');
     const [filters, setFilters] = useState<FilterState>({ sizes: [] });
@@ -89,21 +91,28 @@ export function ShopContentV4({
         <div className="min-h-screen pb-20" style={{ background: '#FDF5E6' }}>
 
             {/* ═══ HERO ═══ */}
-            <div className={cn("relative overflow-hidden", heroHeight)}>
-                <Image
-                    src={heroImage}
-                    alt={heroTitle}
-                    fill
-                    className="object-cover"
-                    style={{
-                        objectPosition: heroImagePosition,
-                        transform: `scale(${heroImageScale})`
-                    }}
-                    priority
-                />
-                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div
+                className={cn("relative overflow-hidden", heroHeight)}
+                style={{ backgroundColor: heroColor }}
+            >
+                {heroImage && (
+                    <>
+                        <Image
+                            src={heroImage}
+                            alt={heroTitle}
+                            fill
+                            className="object-cover"
+                            style={{
+                                objectPosition: heroImagePosition,
+                                transform: `scale(${heroImageScale})`
+                            }}
+                            priority
+                        />
+                        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    </>
+                )}
 
-                <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
+                <div className="absolute inset-0 flex flex-col justify-end pb-12 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
                         <span className="font-sans text-sm uppercase tracking-[0.4em] text-[#B89547] font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">

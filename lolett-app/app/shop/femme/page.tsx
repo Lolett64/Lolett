@@ -29,9 +29,8 @@ export default async function ShopFemmePage() {
         gender="femme"
         products={products}
         categories={categories}
-        heroImage="https://plus.unsplash.com/premium_photo-1683141076955-bddd5efbb03c?w=1600&q=80"
-        heroImagePosition="50% 50%"
-        heroHeight="h-[35vh] min-h-[300px]"
+        heroColor="#2418a6"
+        heroHeight="h-[35vh] min-h-[280px]"
         heroTitle="Collection Femme"
         heroSubtitle="Robes fluides, tops en lin. L'art de vivre à la mode du Sud-Ouest."
       />

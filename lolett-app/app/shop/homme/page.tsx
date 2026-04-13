@@ -29,10 +29,8 @@ export default async function ShopHommePage() {
         gender="homme"
         products={products}
         categories={categories}
-        heroImage="https://images.unsplash.com/photo-1771148885935-c57afa2726bc?w=1600&q=80"
-        heroImagePosition="50% 60%"
-        heroImageScale={1.0}
-        heroHeight="h-[35vh] min-h-[300px]"
+        heroColor="#2418a6"
+        heroHeight="h-[35vh] min-h-[280px]"
         heroTitle="Collection Homme"
         heroSubtitle="Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud."
       />
