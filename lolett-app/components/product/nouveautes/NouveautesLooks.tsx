@@ -22,7 +22,7 @@ export function NouveautesLooks({ looks, lookProducts }: NouveautesLooksProps) {
             className="text-lg font-bold sm:text-xl"
             style={{ fontFamily: 'var(--font-display, serif)', color: '#1B0B94' }}
           >
-            Nos Looks du Moment
+            Looks du Moment
           </h2>
         </div>
       </div>
@@ -35,7 +35,7 @@ export function NouveautesLooks({ looks, lookProducts }: NouveautesLooksProps) {
             return (
               <Link
                 key={look.id}
-                href={`/look/${look.id}`}
+                href={`/looks/${look.id}`}
                 className="group relative flex-shrink-0 w-[300px] sm:w-[340px] overflow-hidden rounded-xl snap-start"
               >
                 <div className="relative aspect-[3/4] w-full overflow-hidden">
