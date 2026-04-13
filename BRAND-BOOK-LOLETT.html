@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LOLETT — Brand Book 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ─── Reset & Base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:        #1B0B94;
+    --blue-light:  #3228c4;
+    --blue-mid:    #4a3fd4;
+    --blue-pale:   #6a5fd4;
+    --blue-dark:   #130970;
+    --cream:       #FDF5E6;
+    --warm:        #F9F7F2;
+    --g100:        #F9F7F2;
+    --g200:        #F2EFE8;
+    --g300:        #E4DFD3;
+    --g400:        #9999a8;
+    --g500:        #6b6b7a;
+    --g600:        #4a4a56;
+    --g900:        #1a1a24;
+    --white:       #ffffff;
+    --red:         #e53935;
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+    --font-label:   'Montserrat', system-ui, sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--cream);
+    color: var(--blue);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ─── Page layout (screen) ──────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 32px;
+    background: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Print ─────────────────────────────────────────────────── */
+  @media print {
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    body { background: var(--cream); }
+    .page {
+      margin: 0;
+      page-break-after: always;
+      page-break-inside: avoid;
+      width: 210mm;
+      min-height: 297mm;
+    }
+    .page:last-child { page-break-after: auto; }
+  }
+
+  /* ─── Shared ─────────────────────────────────────────────────── */
+  .label {
+    font-family: var(--font-label);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--g400);
+  }
+
+  .section-num {
+    font-family: var(--font-label);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--g400);
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--blue);
+    margin: 16px 0;
+  }
+
+  .divider-full {
+    width: 100%;
+    height: 1px;
+    background: var(--g300);
+    margin: 24px 0;
+  }
+
+  /* ─── Page footer ────────────────────────────────────────────── */
+  .page-footer {
+    position: absolute;
+    bottom: 20mm;
+    left: 20mm;
+    right: 20mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .page-footer span {
+    font-family: var(--font-label);
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--g400);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+  ══════════════════════════════════════════════════════════════ */
+  .cover {
+    background: var(--blue);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24mm 20mm;
+  }
+
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .cover-top-label {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .cover-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20mm 0;
+  }
+
+  .cover-eyebrow {
+    font-family: var(--font-label);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 20px;
+  }
+
+  .cover-title {
+    font-family: var(--font-display);
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  .cover-subtitle {
+    font-family: var(--font-display);
+    font-size: 96px;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: rgba(253,245,230,0.35);
+    margin-bottom: 40px;
+  }
+
+  .cover-tagline {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    font-style: italic;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.02em;
+  }
+
+  .cover-line {
+    width: 60px;
+    height: 1px;
+    background: rgba(255,255,255,0.25);
+    margin: 20px 0;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-meta {
+    font-family: var(--font-label);
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.8;
+  }
+
+  .cover-deco {
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cover-deco::before {
+    content: '';
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+  }
+
+  .cover-deco-inner {
+    font-family: var(--font-label);
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* Grain overlay sur la cover */
+  .cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 2 — IDENTITÉ
+  ══════════════════════════════════════════════════════════════ */
+  .page-inner {
+    padding: 20mm;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--g300);
+  }
+
+  .page-header-brand {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  .section-intro {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--g500);
+    line-height: 1.6;
+    max-width: 420px;
+  }
+
+  /* Identité cards */
+  .identity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .identity-card {
+    background: var(--warm);
+    border: 1px solid var(--g200);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .identity-card-label {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--g400);
+    margin-bottom: 10px;
+  }
+
+  .identity-card-value {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--blue);
+    line-height: 1.4;
+  }
+
+  .identity-card-value em {
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .identity-card.full {
+    grid-column: 1 / -1;
+  }
+
+  .valeurs-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .valeur-badge {
+    background: var(--blue);
+    color: var(--cream);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-family: var(--font-label);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .tagline-block {
+    background: var(--blue);
+    border-radius: 8px;
+    padding: 28px 24px;
+    margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tagline-block::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    font-family: var(--font-display);
+    font-size: 120px;
+    color: rgba(255,255,255,0.06);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .tagline-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+
+  .tagline-sub {
+    margin-top: 10px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: rgba(253,245,230,0.5);
+    letter-spacing: 0.05em;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 3 — COULEURS
+  ══════════════════════════════════════════════════════════════ */
+  .color-hero {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+    height: 100px;
+  }
+
+  .color-swatch {
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px 12px;
+    min-height: 72px;
+  }
+
+  .color-swatch-name {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .color-swatch-hex {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+  }
+
+  .color-swatch.on-dark .color-swatch-name,
+  .color-swatch.on-dark .color-swatch-hex { color: rgba(255,255,255,0.9); }
+  .color-swatch.on-light .color-swatch-name { color: var(--blue); }
+  .color-swatch.on-light .color-swatch-hex { color: var(--g500); }
+  .color-swatch.on-mid .color-swatch-name,
+  .color-swatch.on-mid .color-swatch-hex { color: var(--blue); }
+
+  .color-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .color-row-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .color-row-7 {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .gradient-block {
+    border-radius: 6px;
+    height: 56px;
+    background: linear-gradient(135deg, #1B0B94 0%, #3228c4 50%, #6a5fd4 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .gradient-block-label {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  .gradient-block-value {
+    font-family: var(--font-body);
+    font-size: 9px;
+    color: rgba(255,255,255,0.55);
+    font-style: italic;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 4 — TYPOGRAPHIE
+  ══════════════════════════════════════════════════════════════ */
+  .typo-specimen-hero {
+    margin-bottom: 24px;
+  }
+
+  .typo-hero-text {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    color: var(--blue);
+  }
+
+  .typo-hero-italic {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    color: var(--g300);
+  }
+
+  .typo-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 20px 0;
+    border-top: 1px solid var(--g200);
+    border-bottom: 1px solid var(--g200);
+    margin-bottom: 20px;
+  }
+
+  .typo-scale-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 4px 0;
+  }
+
+  .typo-scale-meta {
+    width: 90px;
+    flex-shrink: 0;
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--g400);
+    padding-top: 2px;
+  }
+
+  .typo-scale-sample {
+    flex: 1;
+    color: var(--blue);
+    line-height: 1.2;
+  }
+
+  .font-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .font-card {
+    background: var(--warm);
+    border: 1px solid var(--g200);
+    border-radius: 8px;
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  .font-card-name {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--g400);
+    margin-bottom: 8px;
+  }
+
+  .font-card-sample {
+    line-height: 1.2;
+    color: var(--blue);
+  }
+
+  .font-card-chars {
+    font-family: var(--font-label);
+    font-size: 8px;
+    color: var(--g400);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 5 — OMBRES & EFFETS
+  ══════════════════════════════════════════════════════════════ */
+  .shadow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .shadow-demo {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .shadow-demo-label {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--g400);
+  }
+
+  .shadow-demo-value {
+    font-family: var(--font-body);
+    font-size: 9px;
+    color: var(--g500);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .effects-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .effect-demo {
+    border-radius: 8px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .effect-demo-label {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .effect-demo-desc {
+    font-family: var(--font-body);
+    font-size: 9.5px;
+    line-height: 1.5;
+  }
+
+  .radius-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .radius-demo {
+    background: var(--blue);
+    height: 48px;
+    display: flex;
+    align-items: flex-end;
+    padding: 6px 8px;
+  }
+
+  .radius-demo-label {
+    font-family: var(--font-label);
+    font-size: 7px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1em;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 6 — VOIX & TON
+  ══════════════════════════════════════════════════════════════ */
+  .voice-card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .voice-card-header {
+    padding: 10px 16px;
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .voice-card-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .voice-card-body {
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .voice-example {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .voice-example-label {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .voice-example-text {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .keywords-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .keyword-chip {
+    border: 1px solid var(--g300);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--g600);
+    text-transform: lowercase;
+  }
+
+  .keyword-chip.highlight {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: var(--cream);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 7 — PRODUITS & NOMMAGE
+  ══════════════════════════════════════════════════════════════ */
+  .product-category {
+    margin-bottom: 20px;
+  }
+
+  .product-category-label {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--g400);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--g200);
+  }
+
+  .product-names-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .product-name-card {
+    background: var(--warm);
+    border: 1px solid var(--g200);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+
+  .product-name-card-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .product-name-card-variant {
+    font-family: var(--font-body);
+    font-size: 9px;
+    color: var(--g400);
+    margin-top: 2px;
+  }
+
+  .naming-rules {
+    background: var(--blue);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+
+  .naming-rule {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .naming-rule:last-child { border-bottom: none; }
+
+  .naming-rule-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-label);
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .naming-rule-text {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: rgba(253,245,230,0.8);
+    line-height: 1.5;
+  }
+
+  .naming-rule-text strong {
+    color: var(--cream);
+    font-weight: 600;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 8 — CHECKLIST & E-COMMERCE
+  ══════════════════════════════════════════════════════════════ */
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .checklist-group {
+    background: var(--warm);
+    border: 1px solid var(--g200);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .checklist-group-title {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--g400);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--g200);
+  }
+
+  .checklist-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--g200);
+  }
+
+  .checklist-item:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--g300);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .checklist-item-text {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--g600);
+    line-height: 1.5;
+  }
+
+  .checklist-item-text strong {
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  .ecom-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .ecom-card {
+    background: var(--blue);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ecom-card-val {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+
+  .ecom-card-label {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(253,245,230,0.5);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 9 — ANIMATIONS
+  ══════════════════════════════════════════════════════════════ */
+  .anim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .anim-card {
+    border: 1px solid var(--g200);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--warm);
+  }
+
+  .anim-card-title {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--g400);
+    margin-bottom: 8px;
+  }
+
+  .anim-preview {
+    height: 40px;
+    background: var(--blue);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .anim-preview-bar {
+    height: 3px;
+    background: var(--cream);
+    border-radius: 2px;
+    animation: shimmer-bar 2s ease-in-out infinite;
+    width: 60%;
+  }
+
+  @keyframes shimmer-bar {
+    0%   { width: 20%; opacity: 0.3; }
+    50%  { width: 80%; opacity: 1;   }
+    100% { width: 20%; opacity: 0.3; }
+  }
+
+  .anim-preview-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--cream);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50%       { transform: scale(1.4); opacity: 1; }
+  }
+
+  .anim-preview-line {
+    height: 1px;
+    background: var(--cream);
+    width: 0%;
+    animation: grow-line 2s ease-out infinite;
+  }
+
+  @keyframes grow-line {
+    0%   { width: 0%;   opacity: 0; }
+    50%  { width: 80%;  opacity: 1; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  .anim-preview-box {
+    width: 30px;
+    height: 30px;
+    border: 1.5px solid var(--cream);
+    border-radius: 4px;
+    animation: reveal-box 2s cubic-bezier(0.77,0,0.175,1) infinite;
+  }
+
+  @keyframes reveal-box {
+    0%   { clip-path: inset(100% 0 0 0); }
+    50%  { clip-path: inset(0 0 0 0);    }
+    100% { clip-path: inset(0 0 100% 0); }
+  }
+
+  .anim-desc {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--g600);
+    line-height: 1.5;
+  }
+
+  .anim-code {
+    display: inline-block;
+    background: var(--g100);
+    border: 1px solid var(--g200);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: var(--blue);
+    margin-top: 4px;
+  }
+
+  .easing-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--g200);
+  }
+
+  .easing-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .easing-label {
+    font-family: var(--font-label);
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--g400);
+  }
+
+  .easing-val {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: var(--blue);
+    background: var(--warm);
+    border: 1px solid var(--g200);
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+
+  .easing-dur {
+    font-family: var(--font-body);
+    font-size: 9px;
+    color: var(--g500);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE 10 — BACKMATTER
+  ══════════════════════════════════════════════════════════════ */
+  .back-cover {
+    background: var(--blue);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24mm 20mm;
+  }
+
+  .back-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    flex: 1;
+    padding: 16mm 0;
+  }
+
+  .back-section-title {
+    font-family: var(--font-label);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .back-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .back-item:last-child { border-bottom: none; }
+
+  .back-item-key {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .back-item-val {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--cream);
+    text-align: right;
+  }
+
+  .back-final {
+    text-align: center;
+  }
+
+  .back-final-logo {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    opacity: 0.2;
+    line-height: 1;
+  }
+
+  .back-final-tagline {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(253,245,230,0.4);
+    margin-top: 8px;
+  }
+
+  .back-version {
+    font-family: var(--font-label);
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     PRINT BUTTON (screen only)
+  ══════════════════════════════════════════════════════════════ */
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--blue);
+    color: var(--cream);
+    border: none;
+    border-radius: 100px;
+    padding: 12px 24px;
+    font-family: var(--font-label);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(27,11,148,0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
+  }
+
+  .print-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(27,11,148,0.45);
+  }
+
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 1 — COVER
+═══════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top">
+    <span class="cover-top-label">Brand Book — Document interne</span>
+    <span class="cover-top-label">Confidentiel</span>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Mode du Sud-Ouest · France</div>
+    <div class="cover-title">LOLETT</div>
+    <div class="cover-subtitle">Brand</div>
+    <div class="cover-line"></div>
+    <div class="cover-tagline">Née ici, portée partout.</div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-meta">
+      Version 1.0<br />
+      Avril 2026<br />
+      Usage interne uniquement
+    </div>
+    <div class="cover-deco">
+      <div class="cover-deco-inner">Sud<br />Ouest</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 2 — TABLE DES MATIÈRES + IDENTITÉ
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">01 — Identité de marque</span>
+    </div>
+
+    <div class="section-title">Identité</div>
+    <div class="divider"></div>
+    <p class="section-intro">LOLETT est une marque de mode ancrée dans le Sud-Ouest. Elle incarne la liberté du bord de mer, la chaleur du soleil, et une élégance décontractée — pour homme et pour femme.</p>
+
+    <div class="identity-grid">
+      <div class="identity-card">
+        <div class="identity-card-label">Nom de marque</div>
+        <div class="identity-card-value">LOLETT<br /><em>Toujours en majuscules</em></div>
+      </div>
+      <div class="identity-card">
+        <div class="identity-card-label">Positionnement</div>
+        <div class="identity-card-value">Mode du Sud-Ouest<br /><em>Homme &amp; Femme</em></div>
+      </div>
+      <div class="identity-card">
+        <div class="identity-card-label">Territoire</div>
+        <div class="identity-card-value">Méditerranée · Atlantique<br /><em>Solaire, artisanal, ancré</em></div>
+      </div>
+      <div class="identity-card">
+        <div class="identity-card-label">Langue de marque</div>
+        <div class="identity-card-value">Français exclusivement<br /><em>Ton poétique et chaleureux</em></div>
+      </div>
+
+      <div class="identity-card full">
+        <div class="identity-card-label">Tagline officielle</div>
+        <div class="tagline-block">
+          <div class="tagline-text">"Née ici, portée partout."</div>
+          <div class="tagline-sub">Utilisée dans les communications officielles, la bio Instagram, les emails transactionnels et la page d'accueil.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="valeurs-row">
+      <div class="valeur-badge">Ancrage local</div>
+      <div class="valeur-badge">Solaire</div>
+      <div class="valeur-badge">Artisanal</div>
+      <div class="valeur-badge">Accessible</div>
+      <div class="valeur-badge">Poétique</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>02</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 3 — COULEURS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">02 — Palette de couleurs</span>
+    </div>
+
+    <div class="section-title">Couleurs</div>
+    <div class="divider"></div>
+
+    <!-- Hero swatches -->
+    <div class="color-hero">
+      <div class="color-swatch on-dark" style="background:#1B0B94; height:100px;">
+        <div class="color-swatch-name">Lolett Blue — Primary</div>
+        <div class="color-swatch-hex">#1B0B94</div>
+      </div>
+      <div class="color-swatch on-light" style="background:#FDF5E6; height:100px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name">Cream — Background</div>
+        <div class="color-swatch-hex">#FDF5E6</div>
+      </div>
+      <div class="color-swatch on-light" style="background:#F9F7F2; height:100px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name">Warm — Secondary</div>
+        <div class="color-swatch-hex">#F9F7F2</div>
+      </div>
+    </div>
+
+    <!-- Blue variations -->
+    <div class="color-row" style="margin-top:8px;">
+      <div class="color-swatch on-dark" style="background:#130970; height:56px;">
+        <div class="color-swatch-name">Blue Dark</div>
+        <div class="color-swatch-hex">#130970</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#1B0B94; height:56px;">
+        <div class="color-swatch-name">Blue</div>
+        <div class="color-swatch-hex">#1B0B94</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#3228c4; height:56px;">
+        <div class="color-swatch-name">Blue Light</div>
+        <div class="color-swatch-hex">#3228c4</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#6a5fd4; height:56px;">
+        <div class="color-swatch-name">Blue Pale</div>
+        <div class="color-swatch-hex">#6a5fd4</div>
+      </div>
+    </div>
+
+    <!-- Gray scale -->
+    <div class="color-row-7" style="margin-top:8px;">
+      <div class="color-swatch on-mid" style="background:#F9F7F2; height:48px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 100</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#F9F7F2</div>
+      </div>
+      <div class="color-swatch on-mid" style="background:#F2EFE8; height:48px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 200</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#F2EFE8</div>
+      </div>
+      <div class="color-swatch on-mid" style="background:#E4DFD3; height:48px;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 300</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#E4DFD3</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#9999a8; height:48px;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 400</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#9999a8</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#6b6b7a; height:48px;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 500</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#6b6b7a</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#4a4a56; height:48px;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 600</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#4a4a56</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#1a1a24; height:48px;">
+        <div class="color-swatch-name" style="font-size:7px;">Gray 900</div>
+        <div class="color-swatch-hex" style="font-size:8px;">#1a1a24</div>
+      </div>
+    </div>
+
+    <!-- Gradient -->
+    <div class="gradient-block">
+      <div>
+        <div class="gradient-block-label">Dégradé signature</div>
+        <div class="gradient-block-value">linear-gradient(135deg, #1B0B94 → #3228c4 → #6a5fd4)</div>
+      </div>
+    </div>
+
+    <!-- Utility swatches -->
+    <div class="color-row" style="margin-top:8px;">
+      <div class="color-swatch on-dark" style="background:#e53935; height:48px;">
+        <div class="color-swatch-name">Destructive</div>
+        <div class="color-swatch-hex">#e53935</div>
+      </div>
+      <div class="color-swatch on-light" style="background:#f7f5f0; height:48px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name">Muted</div>
+        <div class="color-swatch-hex">#f7f5f0</div>
+      </div>
+      <div class="color-swatch on-light" style="background:#e8e8ef; height:48px;">
+        <div class="color-swatch-name">Border / Input</div>
+        <div class="color-swatch-hex">#e8e8ef</div>
+      </div>
+      <div class="color-swatch on-dark" style="background:#ffffff; height:48px; border:1px solid #E4DFD3;">
+        <div class="color-swatch-name" style="color:#1B0B94;">White</div>
+        <div class="color-swatch-hex" style="color:#9999a8;">#FFFFFF</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>03</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 4 — TYPOGRAPHIE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">03 — Typographie</span>
+    </div>
+
+    <div class="section-title">Typographie</div>
+    <div class="divider"></div>
+
+    <!-- Hero specimen -->
+    <div class="typo-specimen-hero">
+      <div class="typo-hero-text">Mode du Sud.</div>
+      <div class="typo-hero-italic">Née ici.</div>
+    </div>
+
+    <!-- Scale -->
+    <div class="typo-scale">
+      <div class="typo-scale-row">
+        <div class="typo-scale-meta">H1 · 48px · 700</div>
+        <div class="typo-scale-sample" style="font-family:'Playfair Display',serif; font-size:36px; font-weight:700; letter-spacing:-0.02em;">Collection été</div>
+      </div>
+      <div class="typo-scale-row">
+        <div class="typo-scale-meta">H2 · 32px · 600</div>
+        <div class="typo-scale-sample" style="font-family:'Playfair Display',serif; font-size:26px; font-weight:600; letter-spacing:-0.02em;">Nouvelle arrivée</div>
+      </div>
+      <div class="typo-scale-row">
+        <div class="typo-scale-meta">H3 · 24px · 600</div>
+        <div class="typo-scale-sample" style="font-family:'Playfair Display',serif; font-size:20px; font-weight:600;">Robe Midi Provençale</div>
+      </div>
+      <div class="typo-scale-row">
+        <div class="typo-scale-meta">Body · 14px · 400</div>
+        <div class="typo-scale-sample" style="font-family:'DM Sans',sans-serif; font-size:13px; font-weight:400; color:#6b6b7a; line-height:1.6;">Une silhouette solaire aux reflets de garrigues — livrée partout en France.</div>
+      </div>
+      <div class="typo-scale-row">
+        <div class="typo-scale-meta">Label · 9px · 600 CAPS</div>
+        <div class="typo-scale-sample" style="font-family:'Montserrat',sans-serif; font-size:9px; font-weight:600; letter-spacing:0.25em; text-transform:uppercase; color:#9999a8;">Nouveauté · Collection</div>
+      </div>
+    </div>
+
+    <!-- Font cards -->
+    <div class="font-cards">
+      <div class="font-card">
+        <div class="font-card-name">Playfair Display — Display / Titres</div>
+        <div class="font-card-sample" style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; letter-spacing:-0.02em;">Abcdefgh<br /><span style="font-style:italic; font-weight:400;">Ijklmnop</span></div>
+        <div class="font-card-chars">Regular · Italic · Bold · Black</div>
+      </div>
+      <div class="font-card">
+        <div class="font-card-name">DM Sans — Corps / UI</div>
+        <div class="font-card-sample" style="font-family:'DM Sans',sans-serif; font-size:22px; font-weight:400; letter-spacing:-0.01em;">Abcdefgh<br /><span style="font-weight:300;">Ijklmnop</span></div>
+        <div class="font-card-chars">Light · Regular · Medium · Semibold</div>
+      </div>
+      <div class="font-card">
+        <div class="font-card-name">Montserrat — Labels / Uppercase</div>
+        <div class="font-card-sample" style="font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase;">MODE &amp; STYLE<br /><span style="letter-spacing:0.3em; font-size:11px; opacity:0.5;">LOLETT 2026</span></div>
+        <div class="font-card-chars">Regular · Medium · Semibold · Bold</div>
+      </div>
+      <div class="font-card">
+        <div class="font-card-name">Newsreader — Éditorial / Longform</div>
+        <div class="font-card-sample" style="font-family:'Playfair Display',serif; font-size:15px; font-style:italic; font-weight:400; line-height:1.5; color:#6b6b7a;">"Une mode ancrée dans la lumière du Sud-Ouest."</div>
+        <div class="font-card-chars">Pour textes longs &amp; éditions spéciales</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>04</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 5 — OMBRES & EFFETS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">04 — Ombres &amp; Effets</span>
+    </div>
+
+    <div class="section-title">Ombres &amp; Effets</div>
+    <div class="divider"></div>
+
+    <div class="shadow-grid">
+      <div class="shadow-demo" style="box-shadow:0 1px 3px 0 rgb(0 0 0 / 0.02);">
+        <div class="shadow-demo-label">Shadow SM</div>
+        <div class="shadow-demo-value">0 1px 3px 0<br />rgb(0 0 0 / 0.02)</div>
+      </div>
+      <div class="shadow-demo" style="box-shadow:0 4px 12px -1px rgb(0 0 0 / 0.04), 0 2px 8px -2px rgb(0 0 0 / 0.04);">
+        <div class="shadow-demo-label">Shadow MD</div>
+        <div class="shadow-demo-value">0 4px 12px -1px<br />rgb(0 0 0 / 0.04)</div>
+      </div>
+      <div class="shadow-demo" style="box-shadow:0 12px 24px -4px rgb(0 0 0 / 0.05);">
+        <div class="shadow-demo-label">Shadow LG</div>
+        <div class="shadow-demo-value">0 12px 24px -4px<br />rgb(0 0 0 / 0.05)</div>
+      </div>
+      <div class="shadow-demo" style="box-shadow:0 25px 50px -12px rgb(0 0 0 / 0.06);">
+        <div class="shadow-demo-label">Shadow XL</div>
+        <div class="shadow-demo-value">0 25px 50px -12px<br />rgb(0 0 0 / 0.06)</div>
+      </div>
+      <div class="shadow-demo" style="box-shadow:0 30px 60px -12px rgb(36 24 166 / 0.12);">
+        <div class="shadow-demo-label">Shadow Luxury ★</div>
+        <div class="shadow-demo-value">0 30px 60px -12px<br />rgb(36 24 166 / 0.12)</div>
+      </div>
+      <div class="shadow-demo" style="box-shadow:0 0 70px rgb(27 11 148 / 0.25);">
+        <div class="shadow-demo-label">Shadow Glow</div>
+        <div class="shadow-demo-value">0 0 70px<br />rgb(27 11 148 / 0.25)</div>
+      </div>
+    </div>
+
+    <!-- Effects -->
+    <div class="label" style="margin-bottom:8px;">Effets spéciaux</div>
+    <div class="effects-row">
+      <div class="effect-demo" style="background:rgba(255,255,255,0.7); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.4); box-shadow:0 4px 12px rgb(0 0 0 / 0.04);">
+        <div class="effect-demo-label" style="color:#1B0B94;">Glass</div>
+        <div class="effect-demo-desc" style="color:#6b6b7a;">rgba(255,255,255,0.7)<br />backdrop-blur(20px)</div>
+      </div>
+      <div class="effect-demo" style="background:linear-gradient(135deg, #1B0B94, #3228c4, #6a5fd4);">
+        <div class="effect-demo-label" style="color:white;">Gradient</div>
+        <div class="effect-demo-desc" style="color:rgba(255,255,255,0.6);">135deg<br />#1B0B94 → #6a5fd4</div>
+      </div>
+      <div class="effect-demo" style="background:#1B0B94; position:relative; overflow:hidden;">
+        <div style="position:absolute; inset:0; opacity:0.06; background-image:url('data:image/svg+xml,%3Csvg viewBox=&quot;0 0 256 256&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cfilter id=&quot;noise&quot;%3E%3CfeTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.9&quot; numOctaves=&quot;4&quot; stitchTiles=&quot;stitch&quot;/%3E%3C/filter%3E%3Crect width=&quot;100%25&quot; height=&quot;100%25&quot; filter=&quot;url(%23noise)&quot;/%3E%3C/svg%3E'); background-size:200px;"></div>
+        <div class="effect-demo-label" style="color:white; position:relative;">Grain</div>
+        <div class="effect-demo-desc" style="color:rgba(255,255,255,0.6); position:relative;">Noise overlay<br />opacity 0.045</div>
+      </div>
+    </div>
+
+    <!-- Border radius -->
+    <div class="label" style="margin-top:20px; margin-bottom:8px;">Rayons de bordure</div>
+    <div class="radius-row">
+      <div class="radius-demo" style="border-radius:4px; background:#E4DFD3;">
+        <div class="radius-demo-label" style="color:#6b6b7a;">sm · 4px</div>
+      </div>
+      <div class="radius-demo" style="border-radius:6px; background:#9999a8;">
+        <div class="radius-demo-label">md · 6px</div>
+      </div>
+      <div class="radius-demo" style="border-radius:8px; background:#6b6b7a;">
+        <div class="radius-demo-label">lg · 8px</div>
+      </div>
+      <div class="radius-demo" style="border-radius:12px; background:#3228c4;">
+        <div class="radius-demo-label">xl · 12px</div>
+      </div>
+      <div class="radius-demo" style="border-radius:100px; background:#1B0B94;">
+        <div class="radius-demo-label">pill · 100px</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>05</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 6 — VOIX & TON
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">05 — Voix &amp; Ton</span>
+    </div>
+
+    <div class="section-title">Voix &amp; Ton</div>
+    <div class="divider"></div>
+    <p class="section-intro">LOLETT parle en français, avec chaleur et poésie. Jamais corporate, jamais anglicisé. Le ton est celui d'un ami du Sud qui te conseille avec goût.</p>
+
+    <!-- DO -->
+    <div class="voice-card" style="margin-top:20px;">
+      <div class="voice-card-header" style="background:#F9F7F2; color:#1B0B94;">
+        <div class="voice-card-dot" style="background:#1B0B94;"></div>
+        À utiliser
+      </div>
+      <div class="voice-card-body" style="background:white; border:1px solid #E4DFD3; border-top:none; border-radius:0 0 8px 8px;">
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#9999a8;">Slogan</div>
+          <div class="voice-example-text" style="color:#1B0B94;">"Née ici, portée partout."</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#9999a8;">Produit</div>
+          <div class="voice-example-text" style="color:#1B0B94;">"Un bermuda en lin à l'esprit Mistral."</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#9999a8;">CTA</div>
+          <div class="voice-example-text" style="color:#1B0B94;">"Découvrir la collection"</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#9999a8;">Email</div>
+          <div class="voice-example-text" style="color:#1B0B94;">"Bonjour [Prénom],"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DON'T -->
+    <div class="voice-card">
+      <div class="voice-card-header" style="background:#fff7f7; color:#e53935;">
+        <div class="voice-card-dot" style="background:#e53935;"></div>
+        À éviter
+      </div>
+      <div class="voice-card-body" style="background:white; border:1px solid #fde8e8; border-top:none; border-radius:0 0 8px 8px;">
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#e53935;">Slogan</div>
+          <div class="voice-example-text" style="color:#9999a8; text-decoration:line-through;">"La meilleure marque du Sud"</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#e53935;">Produit</div>
+          <div class="voice-example-text" style="color:#9999a8; text-decoration:line-through;">"Bermuda homme bleu taille M"</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#e53935;">CTA</div>
+          <div class="voice-example-text" style="color:#9999a8; text-decoration:line-through;">"Shop Now" / "Acheter maintenant"</div>
+        </div>
+        <div class="voice-example">
+          <div class="voice-example-label" style="color:#e53935;">Email</div>
+          <div class="voice-example-text" style="color:#9999a8; text-decoration:line-through;">"Cher(e) client(e),"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mots-clés -->
+    <div class="label" style="margin-top:20px; margin-bottom:10px;">Univers sémantique</div>
+    <div class="keywords-wrap">
+      <div class="keyword-chip highlight">soleil</div>
+      <div class="keyword-chip highlight">été</div>
+      <div class="keyword-chip highlight">Sud</div>
+      <div class="keyword-chip highlight">lumière</div>
+      <div class="keyword-chip">artisanal</div>
+      <div class="keyword-chip">ancré</div>
+      <div class="keyword-chip">collection</div>
+      <div class="keyword-chip">découvrir</div>
+      <div class="keyword-chip">solaire</div>
+      <div class="keyword-chip">bord de mer</div>
+      <div class="keyword-chip">garrigue</div>
+      <div class="keyword-chip">méditerranée</div>
+      <div class="keyword-chip">liberté</div>
+      <div class="keyword-chip">chaleur</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>06</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 7 — PRODUITS & NOMMAGE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">06 — Nommage produits</span>
+    </div>
+
+    <div class="section-title">Produits &amp; Nommage</div>
+    <div class="divider"></div>
+    <p class="section-intro">Chaque produit porte un nom propre — prénom, mot latin ou espagnol, terme évoquant le soleil, la mer ou la lumière. Jamais un nom générique.</p>
+
+    <div class="product-category" style="margin-top:20px;">
+      <div class="product-category-label">Bijoux &amp; Accessoires</div>
+      <div class="product-names-grid">
+        <div class="product-name-card"><div class="product-name-card-name">Amor</div><div class="product-name-card-variant">rose · blanc</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Solea</div><div class="product-name-card-variant">bleu · jaune</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Mao</div><div class="product-name-card-variant">or · argent</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Aida</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Lumen</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Alto</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Stria</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Keur</div><div class="product-name-card-variant">—</div></div>
+      </div>
+    </div>
+
+    <div class="product-category">
+      <div class="product-category-label">Vêtements</div>
+      <div class="product-names-grid">
+        <div class="product-name-card"><div class="product-name-card-name">Mission</div><div class="product-name-card-variant">rose</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Karl</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Joy</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Floria</div><div class="product-name-card-variant">jaune</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Isa</div><div class="product-name-card-variant">marron</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Lola</div><div class="product-name-card-variant">noir</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Didi</div><div class="product-name-card-variant">—</div></div>
+        <div class="product-name-card"><div class="product-name-card-name">Fefe</div><div class="product-name-card-variant">—</div></div>
+      </div>
+    </div>
+
+    <div class="naming-rules">
+      <div class="naming-rule">
+        <div class="naming-rule-icon">1</div>
+        <div class="naming-rule-text"><strong>Prénom ou nom propre</strong> — évocateur, chaleureux, mémorable. Ex : Pia, Ayma, Zoe, Léo, Solène.</div>
+      </div>
+      <div class="naming-rule">
+        <div class="naming-rule-icon">2</div>
+        <div class="naming-rule-text"><strong>Mot latin ou espagnol</strong> évoquant lumière, soleil, mer. Ex : Amor (amour), Lumen (lumière), Solea (solaire).</div>
+      </div>
+      <div class="naming-rule">
+        <div class="naming-rule-icon">3</div>
+        <div class="naming-rule-text"><strong>Variante de couleur</strong> ajoutée après le nom quand nécessaire. Ex : Solea bleu · Solea jaune · Mao or · Mao argent.</div>
+      </div>
+      <div class="naming-rule">
+        <div class="naming-rule-icon">✕</div>
+        <div class="naming-rule-text"><strong>Jamais</strong> de nom générique (Robe bleue M, Top lin 001). Le nom doit exister seul, sans descripteur.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>07</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 8 — ANIMATIONS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">07 — Animations &amp; Motion</span>
+    </div>
+
+    <div class="section-title">Motion Design</div>
+    <div class="divider"></div>
+    <p class="section-intro">Les animations LOLETT sont cinématiques et douces. Elles révèlent, ne surgissent pas. Durée 0.6–1.2s, toujours avec un easing smooth.</p>
+
+    <div class="anim-grid" style="margin-top:16px;">
+      <div class="anim-card">
+        <div class="anim-card-title">Scroll Reveal</div>
+        <div class="anim-preview">
+          <div class="anim-preview-bar"></div>
+        </div>
+        <div class="anim-desc">Apparition depuis le bas au scroll<br /><span class="anim-code">translateY(40px) → 0</span></div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-card-title">Pulse Glow</div>
+        <div class="anim-preview">
+          <div class="anim-preview-dot"></div>
+        </div>
+        <div class="anim-desc">Pulsation lumineuse bleue<br /><span class="anim-code">pulseGlow · 3s infinite</span></div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-card-title">Link Underline</div>
+        <div class="anim-preview">
+          <div class="anim-preview-line"></div>
+        </div>
+        <div class="anim-desc">Soulignement animé au hover<br /><span class="anim-code">width: 0 → 100% · 0.4s</span></div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-card-title">Clip Reveal (Hero)</div>
+        <div class="anim-preview">
+          <div class="anim-preview-box"></div>
+        </div>
+        <div class="anim-desc">Révélation par clip-path pour les images hero<br /><span class="anim-code">inset(100%) → inset(0) · 1.2s</span></div>
+      </div>
+    </div>
+
+    <div class="easing-row">
+      <div class="easing-item">
+        <div class="easing-label">Standard</div>
+        <div class="easing-val">cubic-bezier(0.33, 1, 0.68, 1)</div>
+        <div class="easing-dur">0.8s · Scroll reveals, transitions</div>
+      </div>
+      <div class="easing-item">
+        <div class="easing-label">Cinématique</div>
+        <div class="easing-val">cubic-bezier(0.77, 0, 0.175, 1)</div>
+        <div class="easing-dur">1–1.2s · Hero reveal, images</div>
+      </div>
+      <div class="easing-item">
+        <div class="easing-label">Micro</div>
+        <div class="easing-val">ease-out</div>
+        <div class="easing-dur">0.2–0.4s · Hover, focus states</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>08</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 9 — E-COMMERCE & CHECKLIST
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-brand">LOLETT</span>
+      <span class="section-num">08 — E-commerce &amp; Checklist</span>
+    </div>
+
+    <div class="section-title">E-commerce</div>
+    <div class="divider"></div>
+
+    <div class="ecom-cards">
+      <div class="ecom-card">
+        <div class="ecom-card-val">5,90 €</div>
+        <div class="ecom-card-label">Coût de livraison standard</div>
+      </div>
+      <div class="ecom-card">
+        <div class="ecom-card-val">100 €</div>
+        <div class="ecom-card-label">Seuil livraison offerte</div>
+      </div>
+      <div class="ecom-card">
+        <div class="ecom-card-val">≤ 3</div>
+        <div class="ecom-card-label">Seuil alerte stock faible</div>
+      </div>
+    </div>
+
+    <div class="divider-full" style="margin-top:24px;"></div>
+
+    <div class="section-title" style="font-size:28px; margin-bottom:4px;">Checklist intégration</div>
+    <div class="divider"></div>
+
+    <div class="checklist-grid" style="margin-top:12px;">
+      <div class="checklist-group">
+        <div class="checklist-group-title">Couleurs &amp; Fonds</div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Fond <strong>#FDF5E6</strong> (cream), jamais blanc pur</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Aucun texte en <strong>noir pur</strong> — utiliser #1a1a24 max</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Ombres à <strong>opacité &lt; 0.06</strong> pour les ombres noires</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Préférer <strong>shadow-luxury</strong> (teinte bleue) sur les éléments mis en avant</div></div>
+      </div>
+      <div class="checklist-group">
+        <div class="checklist-group-title">Typographie</div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Police <strong>Playfair Display</strong> sur tous les titres</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Letter-spacing corps <strong>≤ 0.05em</strong></div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Titres avec <strong>white-space: normal</strong> — jamais vertical</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text"><strong>min-width: 0</strong> sur enfants flex/grid</div></div>
+      </div>
+      <div class="checklist-group">
+        <div class="checklist-group-title">Animation</div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Durée <strong>≤ 1.2s</strong> pour toutes les animations</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Easing <strong>cubic-bezier smooth</strong>, jamais linéaire</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Pas d'animations clignotantes ou agressives</div></div>
+      </div>
+      <div class="checklist-group">
+        <div class="checklist-group-title">Contenu &amp; Langue</div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Copie entièrement <strong>en français</strong></div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Prix format <strong>XX,XX €</strong> (virgule + espace)</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">Noms produits <strong>poétiques</strong> — jamais génériques</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="checklist-item-text">CTA : <strong>"Découvrir"</strong> plutôt que "Acheter"</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LOLETT — Brand Book 2026</span>
+    <span>09</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 10 — BACK COVER
+═══════════════════════════════════════════════ -->
+<div class="page back-cover">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <span style="font-family:'Montserrat',sans-serif; font-size:8px; font-weight:600; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.3);">LOLETT</span>
+    <span style="font-family:'Montserrat',sans-serif; font-size:8px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.2);">Brand Book 2026</span>
+  </div>
+
+  <div class="back-grid">
+    <div>
+      <div class="back-section-title">Couleurs clés</div>
+      <div class="back-item"><span class="back-item-key">Primary Blue</span><span class="back-item-val">#1B0B94</span></div>
+      <div class="back-item"><span class="back-item-key">Background Cream</span><span class="back-item-val">#FDF5E6</span></div>
+      <div class="back-item"><span class="back-item-key">Warm Secondary</span><span class="back-item-val">#F9F7F2</span></div>
+      <div class="back-item"><span class="back-item-key">Text Muted</span><span class="back-item-val">#6b6b7a</span></div>
+      <div class="back-item"><span class="back-item-key">Border</span><span class="back-item-val">#E4DFD3</span></div>
+
+      <div class="back-section-title" style="margin-top:24px;">Typographies</div>
+      <div class="back-item"><span class="back-item-key">Display</span><span class="back-item-val">Playfair Display</span></div>
+      <div class="back-item"><span class="back-item-key">Corps / UI</span><span class="back-item-val">DM Sans</span></div>
+      <div class="back-item"><span class="back-item-key">Labels</span><span class="back-item-val">Montserrat</span></div>
+      <div class="back-item"><span class="back-item-key">Éditorial</span><span class="back-item-val">Newsreader</span></div>
+    </div>
+
+    <div>
+      <div class="back-section-title">E-commerce</div>
+      <div class="back-item"><span class="back-item-key">Livraison standard</span><span class="back-item-val">5,90 €</span></div>
+      <div class="back-item"><span class="back-item-key">Livraison offerte</span><span class="back-item-val">dès 100 €</span></div>
+      <div class="back-item"><span class="back-item-key">Alerte stock faible</span><span class="back-item-val">≤ 3 articles</span></div>
+      <div class="back-item"><span class="back-item-key">Format prix</span><span class="back-item-val">XX,XX €</span></div>
+
+      <div class="back-section-title" style="margin-top:24px;">Motion</div>
+      <div class="back-item"><span class="back-item-key">Standard</span><span class="back-item-val">0.8s · ease-out smooth</span></div>
+      <div class="back-item"><span class="back-item-key">Cinématique</span><span class="back-item-val">1.2s · clip-path</span></div>
+      <div class="back-item"><span class="back-item-key">Micro</span><span class="back-item-val">0.2–0.4s · hover</span></div>
+      <div class="back-item"><span class="back-item-key">Max durée</span><span class="back-item-val">1.2s</span></div>
+    </div>
+  </div>
+
+  <div class="back-final">
+    <div class="back-final-logo">LOLETT</div>
+    <div class="back-final-tagline">Née ici, portée partout.</div>
+    <div class="back-version">Document interne · Version 1.0 · Avril 2026</div>
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">Exporter en PDF</button>
+
+</body>
+</html>

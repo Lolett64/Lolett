@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOLETT — Login Variants</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #1a1510; color: #FDF5E6; }
+
+  .header {
+    text-align: center;
+    padding: 48px 24px 24px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 13px;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .variants {
+    display: flex;
+    gap: 32px;
+    padding: 24px 32px 48px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .variant {
+    flex: 0 0 420px;
+    scroll-snap-align: start;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  .variant:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .variant.selected {
+    outline: 3px solid #B89547;
+    outline-offset: 4px;
+  }
+  .variant.selected::after {
+    content: '✓ Sélectionné';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #B89547;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    z-index: 10;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .variant-label {
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .variant-label h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .variant-label p {
+    font-size: 12px;
+    opacity: 0.5;
+    line-height: 1.5;
+  }
+
+  /* ═══ VARIANT A: Split Screen ═══ */
+  .va-container {
+    display: flex;
+    height: 560px;
+  }
+  .va-left {
+    width: 45%;
+    background: linear-gradient(135deg, #1B0B94 0%, #0a0550 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .va-left::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(184,149,71,0.15) 0%, transparent 50%);
+  }
+  .va-left .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    letter-spacing: 0.3em;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+  .va-left .tagline {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .va-left .deco-line {
+    width: 40px;
+    height: 1px;
+    background: #B89547;
+    margin: 24px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .va-left .quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+    max-width: 160px;
+  }
+  .va-right {
+    width: 55%;
+    background: #FDF5E6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px;
+  }
+  .va-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #1a1510;
+    margin-bottom: 28px;
+  }
+  .va-field {
+    margin-bottom: 18px;
+  }
+  .va-field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8a7d6b;
+    margin-bottom: 6px;
+  }
+  .va-field .input {
+    width: 100%;
+    height: 42px;
+    border: none;
+    border-bottom: 1px solid rgba(27,11,148,0.12);
+    background: transparent;
+    font-size: 13px;
+    color: #1a1510;
+    padding: 0 2px;
+  }
+  .va-field .input::placeholder { color: rgba(27,11,148,0.2); }
+  .va-forgot {
+    text-align: right;
+    margin-bottom: 24px;
+  }
+  .va-forgot a {
+    font-size: 10px;
+    color: #1B0B94;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+  .va-btn {
+    width: 100%;
+    height: 44px;
+    background: #1B0B94;
+    color: white;
+    border: none;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .va-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .va-divider span { font-size: 10px; color: #8a7d6b; }
+  .va-divider::before, .va-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(27,11,148,0.08);
+  }
+  .va-google {
+    width: 100%;
+    height: 42px;
+    border: 1px solid rgba(27,11,148,0.12);
+    background: transparent;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #1B0B94;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .va-register {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11px;
+    color: #8a7d6b;
+  }
+  .va-register a { color: #1B0B94; text-decoration: none; font-weight: 500; }
+
+  /* ═══ VARIANT B: Centered Minimal ═══ */
+  .vb-container {
+    height: 560px;
+    background: #FDF5E6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 48px;
+    position: relative;
+  }
+  .vb-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, #B89547, transparent);
+  }
+  .vb-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    letter-spacing: 0.4em;
+    color: #1B0B94;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+  .vb-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-style: italic;
+    color: #1B0B94;
+    margin-bottom: 32px;
+  }
+  .vb-form {
+    width: 100%;
+    max-width: 280px;
+  }
+  .vb-field {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .vb-field .input {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-bottom: 1px solid rgba(27,11,148,0.1);
+    background: transparent;
+    font-size: 12px;
+    color: #1B0B94;
+    text-align: center;
+    letter-spacing: 0.08em;
+    outline: none;
+  }
+  .vb-field .input::placeholder { color: rgba(27,11,148,0.2); text-transform: uppercase; font-size: 10px; letter-spacing: 0.15em; }
+  .vb-forgot {
+    text-align: center;
+    margin: 4px 0 24px;
+  }
+  .vb-forgot a {
+    font-size: 9px;
+    color: rgba(27,11,148,0.35);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .vb-btn {
+    width: 100%;
+    height: 44px;
+    background: #1B0B94;
+    color: white;
+    border: none;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .vb-google {
+    width: 100%;
+    height: 42px;
+    border: 1px solid rgba(27,11,148,0.1);
+    background: transparent;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(27,11,148,0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .vb-register {
+    margin-top: 28px;
+    font-size: 10px;
+    color: rgba(27,11,148,0.3);
+    letter-spacing: 0.08em;
+  }
+  .vb-register a { color: #1B0B94; text-decoration: none; }
+  .vb-deco-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to top, #B89547, transparent);
+  }
+
+  /* ═══ VARIANT C: Dark Luxe ═══ */
+  .vc-container {
+    height: 560px;
+    background: #0C0A1E;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vc-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(184,149,71,0.08) 0%, transparent 60%);
+  }
+  .vc-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    letter-spacing: 0.35em;
+    color: #B89547;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .vc-tagline {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(184,149,71,0.4);
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 1;
+  }
+  .vc-card {
+    width: 100%;
+    max-width: 300px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(184,149,71,0.1);
+    border-radius: 2px;
+    padding: 32px 28px;
+    backdrop-filter: blur(20px);
+    position: relative;
+    z-index: 1;
+  }
+  .vc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+  .vc-field {
+    margin-bottom: 18px;
+  }
+  .vc-field label {
+    display: block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(184,149,71,0.5);
+    margin-bottom: 8px;
+  }
+  .vc-field .input {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-bottom: 1px solid rgba(184,149,71,0.15);
+    background: transparent;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    padding: 0;
+  }
+  .vc-field .input::placeholder { color: rgba(255,255,255,0.15); }
+  .vc-forgot {
+    text-align: right;
+    margin-bottom: 24px;
+  }
+  .vc-forgot a {
+    font-size: 9px;
+    color: rgba(184,149,71,0.4);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+  }
+  .vc-btn {
+    width: 100%;
+    height: 42px;
+    background: linear-gradient(135deg, #B89547, #D4AF37);
+    color: #0C0A1E;
+    border: none;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .vc-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .vc-divider span { font-size: 9px; color: rgba(255,255,255,0.15); }
+  .vc-divider::before, .vc-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(184,149,71,0.08);
+  }
+  .vc-google {
+    width: 100%;
+    height: 40px;
+    border: 1px solid rgba(184,149,71,0.12);
+    background: transparent;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .vc-register {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+  }
+  .vc-register a { color: #B89547; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Page de connexion — 3 variantes premium</h1>
+  <p>Clique sur ta préférée</p>
+</div>
+
+<div class="variants">
+
+  <!-- ═══ VARIANT A: Split Screen ═══ -->
+  <div class="variant" onclick="this.classList.toggle('selected')" data-choice="a">
+    <div class="va-container">
+      <div class="va-left">
+        <div class="logo">LOLETT</div>
+        <div class="tagline">Mode du Sud-Ouest</div>
+        <div class="deco-line"></div>
+        <div class="quote">"Le style, c'est savoir<br>qui on est."</div>
+      </div>
+      <div class="va-right">
+        <div class="va-title">Bienvenue</div>
+        <div class="va-field">
+          <label>Adresse email</label>
+          <div class="input" style="border-bottom: 1px solid rgba(27,11,148,0.12); height: 36px; display: flex; align-items: center; font-size: 12px; color: rgba(27,11,148,0.25);">vous@exemple.com</div>
+        </div>
+        <div class="va-field">
+          <label>Mot de passe</label>
+          <div class="input" style="border-bottom: 1px solid rgba(27,11,148,0.12); height: 36px; display: flex; align-items: center; font-size: 12px; color: rgba(27,11,148,0.25);">••••••••</div>
+        </div>
+        <div class="va-forgot"><a href="#">Mot de passe oublié ?</a></div>
+        <button class="va-btn">Se connecter</button>
+        <div class="va-divider"><span>ou</span></div>
+        <button class="va-google">G &nbsp; Google</button>
+        <div class="va-register">Pas de compte ? <a href="#">Créer un compte</a></div>
+      </div>
+    </div>
+    <div class="variant-label">
+      <h3>A — Split Screen</h3>
+      <p>Panneau gauche marque bleu + citation, formulaire à droite. Haut de gamme éditorial.</p>
+    </div>
+  </div>
+
+  <!-- ═══ VARIANT B: Centered Minimal ═══ -->
+  <div class="variant" onclick="this.classList.toggle('selected')" data-choice="b">
+    <div class="vb-container">
+      <div class="vb-logo">Lolett</div>
+      <div class="vb-title">Se connecter</div>
+      <div class="vb-form">
+        <div class="vb-field">
+          <div class="input" style="border-bottom: 1px solid rgba(27,11,148,0.1); height: 40px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(27,11,148,0.2);">Adresse email</div>
+        </div>
+        <div class="vb-field">
+          <div class="input" style="border-bottom: 1px solid rgba(27,11,148,0.1); height: 40px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(27,11,148,0.2);">Mot de passe</div>
+        </div>
+        <div class="vb-forgot"><a href="#">Mot de passe oublié</a></div>
+        <button class="vb-btn">Entrer</button>
+        <button class="vb-google">G &nbsp; Continuer avec Google</button>
+        <div class="vb-register">Nouveau ? <a href="#">Créer un compte</a></div>
+      </div>
+      <div class="vb-deco-bottom"></div>
+    </div>
+    <div class="variant-label">
+      <h3>B — Centré Minimal</h3>
+      <p>Tout centré, inputs centrés, typographie italique. Décorations or en haut/bas. Ultra épuré.</p>
+    </div>
+  </div>
+
+  <!-- ═══ VARIANT C: Dark Luxe ═══ -->
+  <div class="variant" onclick="this.classList.toggle('selected')" data-choice="c">
+    <div class="vc-container">
+      <div class="vc-logo">LOLETT</div>
+      <div class="vc-tagline">Mode du Sud-Ouest</div>
+      <div class="vc-card">
+        <div class="vc-title">Connexion</div>
+        <div class="vc-field">
+          <label>Email</label>
+          <div class="input" style="border-bottom: 1px solid rgba(184,149,71,0.15); height: 36px; display: flex; align-items: center; font-size: 12px; color: rgba(255,255,255,0.15);">vous@exemple.com</div>
+        </div>
+        <div class="vc-field">
+          <label>Mot de passe</label>
+          <div class="input" style="border-bottom: 1px solid rgba(184,149,71,0.15); height: 36px; display: flex; align-items: center; font-size: 12px; color: rgba(255,255,255,0.15);">••••••••</div>
+        </div>
+        <div class="vc-forgot"><a href="#">Mot de passe oublié ?</a></div>
+        <button class="vc-btn">Entrer</button>
+        <div class="vc-divider"><span>ou</span></div>
+        <button class="vc-google">G &nbsp; Google</button>
+        <div class="vc-register">Pas de compte ? <a href="#">S'inscrire</a></div>
+      </div>
+    </div>
+    <div class="variant-label">
+      <h3>C — Dark Luxe</h3>
+      <p>Fond sombre, accents or, carte translucide. Ambiance bijouterie/haute couture nocturne.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.variant').forEach(v => {
+  v.addEventListener('click', () => {
+    document.querySelectorAll('.variant').forEach(o => { if (o !== v) o.classList.remove('selected'); });
+  });
+});
+</script>
+</body>
+</html>

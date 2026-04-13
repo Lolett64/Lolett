@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOLETT — Login Centré Minimal v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #FDF5E6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 64px;
+    background: linear-gradient(to bottom, #B89547, transparent);
+  }
+
+  body::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 64px;
+    background: linear-gradient(to top, #B89547, transparent);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.45em;
+    color: #1B0B94;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    font-weight: 400;
+  }
+
+  .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-style: italic;
+    color: #1B0B94;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  .form {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .field input {
+    width: 100%;
+    height: 52px;
+    border: 1px solid rgba(27,11,148,0.08);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.7);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #1B0B94;
+    text-align: center;
+    letter-spacing: 0.06em;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .field input:focus {
+    border-color: rgba(27,11,148,0.25);
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 2px 12px rgba(27,11,148,0.06);
+  }
+  .field input::placeholder {
+    color: rgba(27,11,148,0.22);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    font-weight: 400;
+  }
+
+  .forgot {
+    margin: 4px 0 28px;
+    text-align: center;
+  }
+  .forgot a {
+    font-size: 9px;
+    color: rgba(27,11,148,0.3);
+    text-decoration: none;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 400;
+    transition: color 0.3s;
+  }
+  .forgot a:hover { color: #1B0B94; }
+
+  .btn-primary {
+    width: 100%;
+    height: 50px;
+    background: #1B0B94;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.4s;
+    margin-bottom: 16px;
+  }
+  .btn-primary:hover { background: #130970; }
+
+  .btn-google {
+    width: 100%;
+    height: 48px;
+    border: 1px solid rgba(27,11,148,0.08);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.5);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(27,11,148,0.45);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+  }
+  .btn-google:hover {
+    border-color: rgba(27,11,148,0.2);
+    color: #1B0B94;
+    background: rgba(255,255,255,0.8);
+  }
+  .btn-google svg { width: 14px; height: 14px; opacity: 0.6; }
+
+  .register {
+    margin-top: 32px;
+    font-size: 11px;
+    color: rgba(27,11,148,0.25);
+    letter-spacing: 0.06em;
+    font-weight: 300;
+  }
+  .register a {
+    color: #1B0B94;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .register a:hover { color: #B89547; }
+
+  .deco-dots {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .deco-dots .dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(184,149,71,0.25);
+  }
+</style>
+</head>
+<body>
+
+  <div class="logo">Lolett</div>
+  <h1 class="title">Se connecter</h1>
+
+  <form class="form" onsubmit="return false">
+    <div class="field">
+      <input type="email" placeholder="Adresse email" />
+    </div>
+    <div class="field">
+      <input type="password" placeholder="Mot de passe" />
+    </div>
+    <div class="forgot">
+      <a href="#">Mot de passe oublié</a>
+    </div>
+    <button type="button" class="btn-primary">Entrer</button>
+    <button type="button" class="btn-google">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuer avec Google
+    </button>
+  </form>
+
+  <p class="register">Nouveau ? <a href="#">Créer un compte</a></p>
+
+  <div class="deco-dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+</body>
+</html>

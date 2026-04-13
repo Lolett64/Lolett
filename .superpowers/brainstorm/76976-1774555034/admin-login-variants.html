@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOLETT — Admin Login — 3 Variantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #0e0c20; color: #FDF5E6; }
+
+  .header { text-align: center; padding: 48px 24px 24px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .header p { font-size: 13px; opacity: 0.4; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .variants { display: flex; gap: 28px; padding: 24px 28px 48px; overflow-x: auto; scroll-snap-type: x mandatory; }
+
+  .variant {
+    flex: 0 0 480px;
+    scroll-snap-align: start;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    border: 1px solid rgba(184,149,71,0.08);
+  }
+  .variant:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .variant.selected { outline: 3px solid #B89547; outline-offset: 4px; }
+  .variant.selected::after {
+    content: '✓ Sélectionné';
+    position: absolute; top: 12px; right: 12px;
+    background: #B89547; color: #0C0A1E;
+    font-size: 10px; font-weight: 600; padding: 4px 12px; border-radius: 20px; z-index: 10;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  .variant-label { padding: 16px 20px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(184,149,71,0.06); }
+  .variant-label h3 { font-family: 'Playfair Display', serif; font-size: 15px; margin-bottom: 4px; color: #B89547; }
+  .variant-label p { font-size: 11px; opacity: 0.35; line-height: 1.5; }
+
+  /* ═══════════════════════════════════════
+     VARIANT A — Dark Split (Or & Nuit)
+     ═══════════════════════════════════════ */
+  .va { display: flex; height: 560px; }
+
+  .va-left {
+    width: 42%; background: linear-gradient(160deg, #0C0A1E 0%, #12102a 100%);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 40px; position: relative; border-right: 1px solid rgba(184,149,71,0.06);
+  }
+  .va-left::before {
+    content: ''; position: absolute; top: -30%; left: -20%; width: 140%; height: 140%;
+    background: radial-gradient(circle at 30% 70%, rgba(184,149,71,0.08) 0%, transparent 50%);
+  }
+  .va-corner { position: absolute; width: 36px; height: 36px; }
+  .va-corner.tl { top: 24px; left: 24px; border-top: 1px solid rgba(184,149,71,0.12); border-left: 1px solid rgba(184,149,71,0.12); }
+  .va-corner.br { bottom: 24px; right: 24px; border-bottom: 1px solid rgba(184,149,71,0.12); border-right: 1px solid rgba(184,149,71,0.12); }
+
+  .va-logo { font-family: 'Playfair Display', serif; font-size: 32px; letter-spacing: 0.3em; color: #B89547; position: relative; z-index: 1; }
+  .va-sub { font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,149,71,0.3); margin-top: 6px; position: relative; z-index: 1; }
+  .va-div { width: 36px; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,149,71,0.3), transparent); margin: 32px 0; position: relative; z-index: 1; }
+  .va-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px;
+    border: 1px solid rgba(184,149,71,0.1); border-radius: 4px; position: relative; z-index: 1;
+  }
+  .va-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: #B89547; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .va-badge span { font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(184,149,71,0.45); }
+
+  .va-right {
+    width: 58%; background: #0C0A1E;
+    display: flex; flex-direction: column; justify-content: center; padding: 40px;
+  }
+  .va-title { font-family: 'Playfair Display', serif; font-size: 24px; color: rgba(255,255,255,0.85); margin-bottom: 4px; }
+  .va-desc { font-size: 11px; color: rgba(255,255,255,0.2); margin-bottom: 32px; }
+  .va-field { margin-bottom: 16px; }
+  .va-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(184,149,71,0.4); margin-bottom: 6px; }
+  .va-field .inp {
+    width: 100%; height: 44px; border: 1px solid rgba(184,149,71,0.1); border-radius: 5px;
+    background: rgba(255,255,255,0.025); display: flex; align-items: center; padding: 0 14px;
+    font-size: 12px; color: rgba(255,255,255,0.15);
+  }
+  .va-btn {
+    width: 100%; height: 46px; margin-top: 24px;
+    background: linear-gradient(135deg, #B89547, #D4AF37); color: #0C0A1E; border: none; border-radius: 5px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  }
+  .va-ssl { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; }
+  .va-ssl span { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+
+  /* ═══════════════════════════════════════
+     VARIANT B — Centré Minimal Dark
+     ═══════════════════════════════════════ */
+  .vb {
+    height: 560px; background: #0C0A1E;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; position: relative; overflow: hidden;
+  }
+  .vb::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 48px; background: linear-gradient(to bottom, #B89547, transparent);
+  }
+  .vb::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 48px; background: linear-gradient(to top, rgba(184,149,71,0.3), transparent);
+  }
+  .vb-glow {
+    position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+    width: 100%; height: 70%;
+    background: radial-gradient(ellipse at center, rgba(27,11,148,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .vb-logo { font-family: 'Playfair Display', serif; font-size: 14px; letter-spacing: 0.4em; color: #B89547; text-transform: uppercase; margin-bottom: 6px; position: relative; z-index: 1; }
+  .vb-admin { font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,149,71,0.25); margin-bottom: 36px; position: relative; z-index: 1; }
+
+  .vb-card {
+    width: 300px; background: rgba(255,255,255,0.025); border: 1px solid rgba(184,149,71,0.07);
+    border-radius: 10px; padding: 32px 28px; backdrop-filter: blur(16px);
+    position: relative; z-index: 1;
+  }
+  .vb-title { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 28px; }
+  .vb-field { margin-bottom: 14px; }
+  .vb-field .inp {
+    width: 100%; height: 46px; border: none; border-bottom: 1px solid rgba(184,149,71,0.1);
+    background: transparent; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: rgba(255,255,255,0.12); text-align: center; letter-spacing: 0.08em;
+  }
+  .vb-btn {
+    width: 100%; height: 44px; margin-top: 24px;
+    background: #B89547; color: #0C0A1E; border: none; border-radius: 4px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600; cursor: pointer;
+  }
+  .vb-ssl { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; }
+  .vb-ssl span { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.08); }
+
+  /* ═══════════════════════════════════════
+     VARIANT C — Crème Épuré (même esprit client)
+     ═══════════════════════════════════════ */
+  .vc {
+    height: 560px; background: #FDF5E6;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; position: relative; overflow: hidden;
+  }
+  .vc::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03; pointer-events: none;
+  }
+  .vc-topline { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 1px; height: 48px; background: linear-gradient(to bottom, #B89547, transparent); }
+
+  .vc-card {
+    width: 400px; background: rgba(255,255,255,0.5); border: 1px solid rgba(27,11,148,0.05);
+    border-radius: 14px; padding: 44px 40px; backdrop-filter: blur(12px);
+    box-shadow: 0 8px 40px rgba(27,11,148,0.04); position: relative; z-index: 1;
+  }
+
+  .vc-logo { font-family: 'Playfair Display', serif; font-size: 28px; letter-spacing: 0.35em; color: #1B0B94; text-align: center; margin-bottom: 4px; }
+  .vc-badge {
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 28px;
+  }
+  .vc-badge .line { width: 20px; height: 1px; background: rgba(27,11,148,0.1); }
+  .vc-badge span { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(27,11,148,0.3); }
+
+  .vc-sep { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .vc-sep::before, .vc-sep::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,149,71,0.2), transparent); }
+  .vc-sep .dia { width: 4px; height: 4px; background: rgba(184,149,71,0.35); transform: rotate(45deg); }
+
+  .vc-title { font-family: 'Playfair Display', serif; font-size: 26px; font-style: italic; color: #1B0B94; text-align: center; margin-bottom: 6px; }
+  .vc-desc { font-size: 11px; color: #5a4d3e; text-align: center; margin-bottom: 28px; }
+
+  .vc-field { margin-bottom: 12px; }
+  .vc-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.14em; color: #5a4d3e; margin-bottom: 6px; font-weight: 500; padding-left: 2px; }
+  .vc-field .inp {
+    width: 100%; height: 46px; border: 1px solid rgba(27,11,148,0.07); border-radius: 7px;
+    background: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: rgba(27,11,148,0.18);
+  }
+  .vc-btn {
+    width: 100%; height: 46px; margin-top: 20px;
+    background: #1B0B94; color: white; border: none; border-radius: 7px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  }
+  .vc-ssl { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; }
+  .vc-ssl span { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(27,11,148,0.18); }
+
+  .vc-bottom { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; }
+  .vc-bottom .ln { width: 20px; height: 1px; background: rgba(184,149,71,0.12); }
+  .vc-bottom .dt { width: 3px; height: 3px; border-radius: 50%; background: rgba(184,149,71,0.25); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Admin Login — 3 variantes</h1>
+  <p>Clique sur ta préférée</p>
+</div>
+
+<div class="variants">
+
+  <!-- ═══ A — Dark Split ═══ -->
+  <div class="variant" data-choice="a" onclick="select(this)">
+    <div class="va">
+      <div class="va-left">
+        <div class="va-corner tl"></div>
+        <div class="va-corner br"></div>
+        <div class="va-logo">LOLETT</div>
+        <div class="va-sub">Mode du Sud-Ouest</div>
+        <div class="va-div"></div>
+        <div class="va-badge"><div class="dot"></div><span>Administration</span></div>
+      </div>
+      <div class="va-right">
+        <div class="va-title">Administration</div>
+        <div class="va-desc">Accédez au tableau de bord LOLETT</div>
+        <div class="va-field"><label>Email</label><div class="inp">admin@lolett.fr</div></div>
+        <div class="va-field"><label>Mot de passe</label><div class="inp">••••••••</div></div>
+        <div class="va-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Se connecter
+        </div>
+        <div class="va-ssl">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(184,149,71,0.25)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>Connexion sécurisée</span>
+        </div>
+      </div>
+    </div>
+    <div class="variant-label">
+      <h3>A — Dark Split (Or & Nuit)</h3>
+      <p>Panneau gauche branding doré, formulaire à droite sur fond nuit. Premium, très distinct du site client.</p>
+    </div>
+  </div>
+
+  <!-- ═══ B — Centré Minimal Dark ═══ -->
+  <div class="variant" data-choice="b" onclick="select(this)">
+    <div class="vb">
+      <div class="vb-glow"></div>
+      <div class="vb-logo">Lolett</div>
+      <div class="vb-admin">Administration</div>
+      <div class="vb-card">
+        <div class="vb-title">Se connecter</div>
+        <div class="vb-field"><div class="inp">admin@lolett.fr</div></div>
+        <div class="vb-field"><div class="inp">••••••••</div></div>
+        <div class="vb-btn">Entrer</div>
+        <div class="vb-ssl">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(184,149,71,0.2)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>SSL sécurisé</span>
+        </div>
+      </div>
+    </div>
+    <div class="variant-label">
+      <h3>B — Centré Minimal Dark</h3>
+      <p>Carte flottante translucide sur fond nuit, inputs underline centrés. Minimaliste et élégant.</p>
+    </div>
+  </div>
+
+  <!-- ═══ C — Crème Épuré ═══ -->
+  <div class="variant" data-choice="c" onclick="select(this)">
+    <div class="vc">
+      <div class="vc-topline"></div>
+      <div class="vc-card">
+        <div class="vc-logo">Lolett</div>
+        <div class="vc-badge"><div class="line"></div><span>Admin</span><div class="line"></div></div>
+        <div class="vc-sep"><div class="dia"></div></div>
+        <div class="vc-title">Se connecter</div>
+        <div class="vc-desc">Tableau de bord administration</div>
+        <div class="vc-field"><label>Email</label><div class="inp">admin@lolett.fr</div></div>
+        <div class="vc-field"><label>Mot de passe</label><div class="inp">••••••••</div></div>
+        <div class="vc-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Se connecter
+        </div>
+        <div class="vc-ssl">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(27,11,148,0.2)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>Connexion sécurisée</span>
+        </div>
+      </div>
+      <div class="vc-bottom"><div class="ln"></div><div class="dt"></div><div class="ln"></div></div>
+    </div>
+    <div class="variant-label">
+      <h3>C — Crème Épuré</h3>
+      <p>Même esprit que le login client (fond crème, carte glass), mais avec badge "Admin". Cohérent avec le site.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function select(el) {
+  document.querySelectorAll('.variant').forEach(v => { if (v !== el) v.classList.remove('selected'); });
+  el.classList.toggle('selected');
+}
+</script>
+</body>
+</html>
