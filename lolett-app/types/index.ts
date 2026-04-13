@@ -1,6 +1,10 @@
 export type Gender = 'homme' | 'femme';
 
-export type Size = 'TU' | 'XS' | 'S' | 'M' | 'L' | 'XL';
+export type Size =
+  | 'TU' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'
+  | '29' | '30' | '31' | '32' | '33' | '34' | '35' | '36' | '37' | '38'
+  | '39' | '40' | '41' | '42' | '43' | '44'
+  | 'S/M' | 'M/L';
 
 export interface Product {
   id: string;

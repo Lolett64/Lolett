@@ -89,7 +89,7 @@ export function HeroProductPanel({ product, tagline, description, composition, t
       <div className="space-y-1.5">
         <p className="text-[0.6rem] uppercase tracking-[0.15em] text-[#9d6f44]">Taille</p>
         <div className="flex flex-wrap gap-1.5">
-          {(['XS', 'S', 'M', 'L', 'XL'] as Size[]).map((size) => (
+          {product.sizes.map((size) => (
             <button
               key={size}
               onClick={() => setSelectedSize(size)}
