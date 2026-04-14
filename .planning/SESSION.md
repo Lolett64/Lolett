@@ -1,26 +1,29 @@
-# Session State — 2026-04-09 01:00
+# Session State — 2026-04-14 12:00
 
 ## Branch
-preview (pushé sur main pour Vercel)
+preview (local) → pousse sur remote "client" (Lolett64/Lolett) pour Vercel
 
 ## Completed This Session
-- BrandStorySection : photo fondatrice Lola C + layout 2 colonnes
-- LooksSection : miniatures produits cliquables vers /produit/[slug]
-- ShopContentV4 : catégorie Hauts en premier
-- Shop /shop : nouvelles arrivées avec vrais produits DB
-- ProductCard : object-cover + object-top (cadrage buste)
-- Checkout : autocomplete adresse, tel non obligatoire, pays libre
-- Admin : toggle is_new pour gérer les nouveautés homepage
-- Fix Vercel : rootDirectory=lolett-app, .vercelignore wetransfer
+- Migration DB client : 28 migrations appliquées sur Supabase client (qczdwrudgmozyxkdidmr) ✅
+- Code pushé sur GitHub client (Lolett64/Lolett) ✅
+- Fix Resend lazy-init (lolett-app/lib/email-provider.ts) ✅
+- Fix Supabase placeholder fallbacks (client.ts, server.ts, admin.ts) ✅
 
 ## Next Task
-Domaine personnalisé Vercel (lolett.fr) — Settings → Domains dans le dashboard Vercel.
-Ensuite : sections homepage manquantes (VisionSection, BandeauLolett, FeaturesSection, UniversSection, DisclaimerBanner)
+Vérifier que le build Vercel du commit 31b6929 a réussi, puis configurer les variables
+manquantes dans Vercel UI (projet lolett64s-projects) :
+- NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY + SUPABASE_SERVICE_ROLE_KEY
+- NEXT_PUBLIC_SITE_URL (ex: https://lolett.fr)
+- RESEND_API_KEY, ADMIN_EMAIL, ADMIN_PASSWORD
+- Stripe : STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+- Brevo : BREVO_SMTP_HOST, BREVO_SMTP_PORT, BREVO_SMTP_USER, BREVO_SMTP_PASSWORD
 
 ## Blockers
-Disque système à 100% — wetransfer 300MB local (exclu Vercel)
+Vercel MCP ne peut pas setter les env vars — doit se faire manuellement dans l'UI Vercel.
+Stripe/Resend/Brevo : comptes encore sur les creds du développeur, à migrer vers client.
 
 ## Key Context
-- Vercel prod : https://lolett-app-lyes-projects-5027365b.vercel.app
-- Admin : admin@lolett.fr / Lolett2025
-- Photo fondatrice : /public/images/fondatrice.jpg
+Root directory Vercel = "lolett-app" (sans espace). Déjà configuré manuellement.
+Remote "client" = https://github.com/Lolett64/Lolett.git (remote "origin" = repo dev)
+Supabase client project ID = qczdwrudgmozyxkdidmr
+Valeurs .env.local du dev contiennent toutes les clés à copier/remplacer pour la cliente.
