@@ -12,8 +12,10 @@ const brevoTransport = nodemailer.createTransport({
   },
 });
 
-// --- Resend (fallback) ---
-const resend = new Resend(process.env.RESEND_API_KEY);
+// --- Resend (fallback) — instancié lazily pour éviter l'erreur au build ---
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 const DEFAULT_FROM =
   process.env.NODE_ENV === 'production'
@@ -56,7 +58,7 @@ async function sendViaBrevo(opts: SendOptions): Promise<{ success: boolean; erro
 
 async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResendClient().emails.send({
       from: opts.from || DEFAULT_FROM,
       to: opts.to,
       subject: opts.subject,
