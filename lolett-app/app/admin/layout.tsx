@@ -3,6 +3,8 @@ import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'LOLETT Admin',
   robots: { index: false, follow: false },
