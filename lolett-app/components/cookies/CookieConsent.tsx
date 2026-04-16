@@ -74,40 +74,40 @@ export function CookieConsent() {
 
       {/* Bandeau */}
       <div
-        className="relative w-full max-w-[520px] rounded-xl border pointer-events-auto animate-in slide-in-from-bottom-4 duration-500"
+        className="relative w-full max-w-[520px] rounded-xl border shadow-lg pointer-events-auto animate-in slide-in-from-bottom-4 duration-500"
         style={{
-          background: '#0C0A1E',
-          borderColor: 'rgba(184,149,71,0.15)',
+          background: '#FDF5E6',
+          borderColor: 'rgba(27,11,148,0.1)',
         }}
       >
         {/* Bouton fermer */}
         <button
           onClick={refuseAll}
-          className="absolute top-3 right-3 p-1.5 rounded-full transition-colors hover:bg-white/10"
+          className="absolute top-3 right-3 p-1.5 rounded-full transition-colors hover:bg-[#1B0B94]/5"
           aria-label="Fermer"
         >
-          <X size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <X size={14} style={{ color: '#1B0B94', opacity: 0.35 }} />
         </button>
 
         <div className="px-6 py-5">
           {/* Titre */}
           <p
-            className="text-[10px] tracking-[0.3em] uppercase mb-3"
-            style={{ color: '#B89547' }}
+            className="font-[family-name:var(--font-newsreader)] italic text-[15px] mb-3"
+            style={{ color: '#1B0B94' }}
           >
             Cookies
           </p>
 
           <p
             className="text-[13px] leading-relaxed mb-4"
-            style={{ color: 'rgba(255,255,255,0.7)' }}
+            style={{ color: 'rgba(27,11,148,0.6)' }}
           >
             Nous utilisons des cookies pour analyser le trafic et améliorer votre expérience.
             Vous pouvez choisir les cookies que vous acceptez.{' '}
             <a
               href="/confidentialite"
               className="underline transition-colors hover:text-[#B89547]"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
+              style={{ color: 'rgba(27,11,148,0.45)' }}
             >
               En savoir plus
             </a>
@@ -118,9 +118,9 @@ export function CookieConsent() {
             <div className="mb-4 space-y-2.5">
               {/* Technique — toujours actif */}
               <label className="flex items-center gap-3 cursor-default">
-                <input type="checkbox" checked disabled className="accent-[#B89547] w-3.5 h-3.5" />
-                <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Essentiels</strong> — fonctionnement du site (toujours actifs)
+                <input type="checkbox" checked disabled className="accent-[#1B0B94] w-3.5 h-3.5" />
+                <span className="text-[12px]" style={{ color: 'rgba(27,11,148,0.55)' }}>
+                  <strong style={{ color: '#1B0B94' }}>Essentiels</strong> — fonctionnement du site (toujours actifs)
                 </span>
               </label>
 
@@ -130,10 +130,10 @@ export function CookieConsent() {
                   type="checkbox"
                   checked={analytics}
                   onChange={(e) => setAnalytics(e.target.checked)}
-                  className="accent-[#B89547] w-3.5 h-3.5"
+                  className="accent-[#1B0B94] w-3.5 h-3.5"
                 />
-                <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Analytiques</strong> — mesure d&apos;audience (Google Analytics)
+                <span className="text-[12px]" style={{ color: 'rgba(27,11,148,0.55)' }}>
+                  <strong style={{ color: '#1B0B94' }}>Analytiques</strong> — mesure d&apos;audience (Google Analytics)
                 </span>
               </label>
 
@@ -143,10 +143,10 @@ export function CookieConsent() {
                   type="checkbox"
                   checked={marketing}
                   onChange={(e) => setMarketing(e.target.checked)}
-                  className="accent-[#B89547] w-3.5 h-3.5"
+                  className="accent-[#1B0B94] w-3.5 h-3.5"
                 />
-                <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Marketing</strong> — publicités ciblées (Meta Pixel)
+                <span className="text-[12px]" style={{ color: 'rgba(27,11,148,0.55)' }}>
+                  <strong style={{ color: '#1B0B94' }}>Marketing</strong> — publicités ciblées (Meta Pixel)
                 </span>
               </label>
             </div>
@@ -156,22 +156,22 @@ export function CookieConsent() {
           <div className="flex gap-2.5">
             <button
               onClick={acceptAll}
-              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:shadow-[0_4px_20px_rgba(184,149,71,0.25)] hover:-translate-y-px"
-              style={{ background: '#B89547', color: '#0C0A1E' }}
+              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:shadow-[0_4px_20px_rgba(27,11,148,0.15)] hover:-translate-y-px"
+              style={{ background: '#1B0B94', color: '#FDF5E6' }}
             >
               Tout accepter
             </button>
             <button
               onClick={refuseAll}
-              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] border transition-all hover:bg-white/5"
-              style={{ borderColor: 'rgba(184,149,71,0.2)', color: 'rgba(255,255,255,0.6)' }}
+              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] border transition-all hover:bg-[#1B0B94]/5"
+              style={{ borderColor: 'rgba(27,11,148,0.15)', color: 'rgba(27,11,148,0.5)' }}
             >
               Tout refuser
             </button>
             <button
               onClick={() => showDetails ? acceptSelected() : setShowDetails(true)}
-              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] border transition-all hover:bg-white/5"
-              style={{ borderColor: 'rgba(184,149,71,0.2)', color: '#B89547' }}
+              className="flex-1 rounded-md py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] border transition-all hover:bg-[#1B0B94]/5"
+              style={{ borderColor: 'rgba(27,11,148,0.15)', color: '#1B0B94' }}
             >
               {showDetails ? 'Confirmer' : 'Personnaliser'}
             </button>
