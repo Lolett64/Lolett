@@ -103,15 +103,15 @@ export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps)
             transition: 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s',
           }}
         >
-          <Link href={content?.cta1_href || '/shop/femme'} className="group relative flex items-center justify-center min-w-[300px] py-5 px-10 border border-[#1B0B94] text-[#1B0B94] overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.12)]" style={{ backgroundColor: `${hexColor}BB` }}>
+          <Link href={content?.cta1_href || '/shop/femme'} className="group relative flex items-center justify-center w-full sm:min-w-[300px] py-4 sm:py-5 px-6 sm:px-10 border border-[#1B0B94] text-[#1B0B94] overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.12)]" style={{ backgroundColor: `${hexColor}BB` }}>
             <span className="absolute inset-0 bg-[#1B0B94] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
-            <span className="relative z-10 text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-white transition-colors duration-500">
+            <span className="relative z-10 text-[11px] sm:text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-white transition-colors duration-500">
               {content?.cta1_text || 'Vestiaire Femme'}
             </span>
           </Link>
-          <Link href={content?.cta2_href || '/shop/homme'} className="group relative flex items-center justify-center min-w-[300px] py-5 px-10 bg-[#1B0B94] text-white overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.25)]">
+          <Link href={content?.cta2_href || '/shop/homme'} className="group relative flex items-center justify-center w-full sm:min-w-[300px] py-4 sm:py-5 px-6 sm:px-10 bg-[#1B0B94] text-white overflow-hidden transition-all duration-700 hover:shadow-[0_8px_40px_rgba(27,11,148,0.25)]">
             <span className="absolute inset-0 bg-[#B89547] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
-            <span className="relative z-10 text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-[#1B0B94] transition-colors duration-500">
+            <span className="relative z-10 text-[11px] sm:text-[13px] uppercase tracking-[0.25em] font-medium group-hover:text-[#1B0B94] transition-colors duration-500">
               {content?.cta2_text || 'Vestiaire Homme'}
             </span>
           </Link>

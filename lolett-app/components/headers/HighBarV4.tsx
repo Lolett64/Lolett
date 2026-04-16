@@ -38,9 +38,9 @@ export function HighBarV4({ hexColor = '#FDF5E6' }: HighBarV4Props) {
                 }}
             >
                 {/* Top Bar — Réassurance */}
-                <div className="w-full bg-[#1B0B94] text-white text-[11px] font-medium tracking-wide">
-                    <div className="w-full flex items-center justify-center px-6 md:px-8 py-2">
-                        <div className="flex items-center gap-2">
+                <div className="w-full bg-[#1B0B94] text-white text-[9px] sm:text-[10px] md:text-[11px] font-medium tracking-wide">
+                    <div className="w-full flex items-center justify-center px-3 sm:px-6 md:px-8 py-1.5 sm:py-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <span>Livraison offerte dès {SHIPPING.FREE_THRESHOLD}€</span>
                             <span className="w-1 h-1 rounded-full bg-[#B89547]"></span>
                             <span>24/48h</span>

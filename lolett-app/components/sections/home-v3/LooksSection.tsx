@@ -42,7 +42,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
               <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
                 Prêt à sortir
               </span>
-              <h2 className="font-[family-name:var(--font-newsreader)] text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95]">
+              <h2 className="font-[family-name:var(--font-newsreader)] text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95]">
                 Le Look Complet
               </h2>
               <p className="text-[#1B0B94]/50 text-base mt-4 max-w-md font-[family-name:var(--font-montserrat)]">
@@ -75,14 +75,14 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
 
               {/* Product thumbnails */}
               {products.length > 0 && (
-                <div className="flex gap-3 mb-8">
+                <div className="flex gap-2 sm:gap-3 mb-8 overflow-x-auto pb-1">
                   {products.slice(0, 4).map((p) => (
-                    <Link key={p.id} href={`/produit/${p.slug}`} className="w-16 h-20 relative rounded-sm overflow-hidden border border-[#1B0B94]/8 bg-white/50 hover:border-[#B89547] hover:scale-105 transition-all duration-300 block">
+                    <Link key={p.id} href={`/produit/${p.slug}`} className="w-12 sm:w-16 h-16 sm:h-20 flex-shrink-0 relative rounded-sm overflow-hidden border border-[#1B0B94]/8 bg-white/50 hover:border-[#B89547] hover:scale-105 transition-all duration-300 block">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="64px" />
                     </Link>
                   ))}
                   {products.length > 4 && (
-                    <div className="w-16 h-20 rounded-sm border border-[#1B0B94]/8 flex items-center justify-center bg-white/30">
+                    <div className="w-12 sm:w-16 h-16 sm:h-20 flex-shrink-0 rounded-sm border border-[#1B0B94]/8 flex items-center justify-center bg-white/30">
                       <span className="text-xs text-[#1B0B94]/40 font-medium">+{products.length - 4}</span>
                     </div>
                   )}
@@ -106,10 +106,10 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
               </div>
 
               {/* Navigation */}
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-3 sm:gap-5">
                 <button
                   onClick={() => navigate('prev')}
-                  className="w-11 h-11 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
+                  className="w-9 sm:w-11 h-9 sm:h-11 flex-shrink-0 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
                   aria-label="Look précédent"
                 >
                   <ChevronLeft size={18} />
@@ -131,7 +131,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
                 </div>
                 <button
                   onClick={() => navigate('next')}
-                  className="w-11 h-11 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
+                  className="w-9 sm:w-11 h-9 sm:h-11 flex-shrink-0 border border-[#1B0B94]/15 flex items-center justify-center text-[#1B0B94]/50 hover:bg-[#1B0B94] hover:text-white hover:border-[#1B0B94] transition-all duration-400"
                   aria-label="Look suivant"
                 >
                   <ChevronRight size={18} />
