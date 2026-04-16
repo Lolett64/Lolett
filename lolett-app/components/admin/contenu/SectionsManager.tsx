@@ -14,6 +14,7 @@ interface SectionItem {
 
 const PAGES = [
   { slug: 'home', label: 'Accueil', icon: '🏠' },
+  { slug: 'shop', label: 'Boutique', icon: '🛍️' },
   { slug: 'notre-histoire', label: 'Notre Histoire', icon: '📖' },
   { slug: 'contact', label: 'Contact', icon: '✉️' },
 ];

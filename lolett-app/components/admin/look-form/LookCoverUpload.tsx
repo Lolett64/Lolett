@@ -14,18 +14,25 @@ const sectionTitle = 'text-base font-semibold text-[#1a1a24] mb-4';
 export function LookCoverUpload({ coverUrl, onUpload }: LookCoverUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCoverUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
+    setError(null);
     try {
       const formData = new FormData();
       formData.append('file', files[0]);
       const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = (await res.json()) as { url: string };
-        onUpload(data.url);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || `Erreur upload (${res.status})`);
+        return;
       }
+      if (data.url) onUpload(data.url);
+      else setError('Réponse invalide du serveur');
+    } catch {
+      setError('Erreur réseau — vérifiez votre connexion');
     } finally {
       setUploading(false);
     }
@@ -80,6 +87,11 @@ export function LookCoverUpload({ coverUrl, onUpload }: LookCoverUploadProps) {
           <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>Cliquer pour uploader une image</p>
           {uploading && <p style={{ fontSize: '0.75rem', color: '#1B0B94' }}>Upload en cours...</p>}
         </div>
+      )}
+      {error && (
+        <p style={{ fontSize: '0.875rem', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.5rem', padding: '0.5rem 0.75rem' }}>
+          {error}
+        </p>
       )}
       <input
         ref={fileInputRef}
