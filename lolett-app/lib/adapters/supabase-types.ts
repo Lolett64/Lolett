@@ -15,6 +15,8 @@ export type DbProduct = {
   stock: number;
   is_new: boolean;
   tags: string[];
+  composition: string | null;
+  model_info: string | null;
   created_at: string;
   updated_at: string;
 };

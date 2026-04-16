@@ -18,6 +18,8 @@ interface ProductRow {
   is_new: boolean;
   tags: string[];
   images: string[];
+  composition?: string;
+  model_info?: string;
   variants?: Array<{
     colorName: string;
     colorHex: string;
@@ -104,6 +106,8 @@ export default async function EditProductPage({
     name: product.name,
     slug: product.slug,
     description: product.description,
+    composition: product.composition ?? '',
+    model_info: product.model_info ?? '',
     price: String(product.price),
     gender: product.gender,
     category_slug: product.category_slug,

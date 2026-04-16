@@ -20,6 +20,8 @@ export interface Product {
   colors: ProductColor[];
   stock: number; // Stock total (somme des variantes) - conservé pour rétrocompatibilité
   variants?: ProductVariant[]; // Stock détaillé par variante (couleur + taille)
+  composition?: string;
+  modelInfo?: string;
   isNew: boolean;
   tags: string[];
   createdAt?: string;

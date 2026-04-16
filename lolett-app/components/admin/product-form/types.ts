@@ -21,6 +21,8 @@ export interface ProductFormData {
   name: string;
   slug: string;
   description: string;
+  composition: string;
+  model_info: string;
   price: string;
   compare_at_price: string;
   gender: string;

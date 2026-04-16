@@ -38,7 +38,7 @@ export function ProductFormImageSection({
         >
           <Upload style={{ width: 32, height: 32, color: '#9999a8' }} />
           <p style={{ fontSize: '0.875rem', color: '#6b6b7a' }}>
-            Cliquer pour uploader des images (JPEG, PNG, WebP — max 5MB)
+            Cliquer pour uploader des images (JPEG, PNG, WebP, AVIF — max 50MB)
           </p>
           {uploading && <p style={{ fontSize: '0.75rem', color: '#1B0B94' }}>Upload en cours...</p>}
         </div>

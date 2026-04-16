@@ -130,9 +130,27 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </p>
         )}
 
-        <p className="text-lolett-gray-600 mt-4 max-w-[55ch] text-sm leading-relaxed sm:mt-6 sm:text-base">
-          {product.description}
-        </p>
+        <div className="text-lolett-gray-600 mt-4 max-w-[55ch] text-sm leading-relaxed sm:mt-6 sm:text-base space-y-2">
+          {product.description.split('\n').map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+
+        {(product.composition || product.modelInfo) && (
+          <div className="mt-4 max-w-[55ch] space-y-2 text-sm leading-relaxed">
+            {product.composition && (
+              <p className="text-lolett-gray-500">
+                <span className="font-medium text-lolett-gray-700">Composition : </span>
+                {product.composition}
+              </p>
+            )}
+            {product.modelInfo && (
+              <p className="text-lolett-gray-500 italic">
+                {product.modelInfo}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="mt-6 rounded-xl p-3 sm:mt-8 sm:p-4" style={{ background: 'rgba(27,11,148,0.08)', border: '1px solid rgba(27,11,148,0.2)' }}>
           <p className="text-sm" style={{ color: '#3a2e1e' }}>

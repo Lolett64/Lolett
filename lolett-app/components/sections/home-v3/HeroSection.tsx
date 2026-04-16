@@ -73,7 +73,7 @@ export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps)
         {/* Main title — cinematic stagger */}
         <h1 className="font-[family-name:var(--font-newsreader)] leading-[0.85] font-light text-[#1B0B94] tracking-tight mb-14">
           <span
-            className="block text-[clamp(3rem,7vw,6.5rem)]"
+            className="block text-[clamp(2.5rem,5.5vw,5rem)]"
             style={{
               opacity: mounted ? 1 : 0,
               transform: mounted ? 'translateY(0)' : 'translateY(50px)',
@@ -83,7 +83,7 @@ export function HeroSection({ content, hexColor = '#FFFFFF' }: HeroSectionProps)
             {content?.title_line1 || "Porter &"}
           </span>
           <span
-            className="block text-[clamp(3rem,7vw,6.5rem)] italic text-[#B89547]"
+            className="block text-[clamp(2.5rem,5.5vw,5rem)] italic text-[#B89547]"
             style={{
               opacity: mounted ? 1 : 0,
               transform: mounted ? 'translateY(0)' : 'translateY(50px)',

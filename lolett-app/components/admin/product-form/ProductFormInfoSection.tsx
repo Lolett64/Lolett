@@ -65,6 +65,34 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
           />
         </div>
 
+        {/* Composition */}
+        <div>
+          <label htmlFor="composition" className={fieldLabel}>Composition</label>
+          <textarea
+            id="composition"
+            value={form.composition}
+            onChange={(e) => setForm((f) => ({ ...f, composition: e.target.value }))}
+            placeholder="Ex : 100% coton biologique, doublure polyester..."
+            rows={2}
+            className={inputBase}
+            style={{ resize: 'vertical' }}
+          />
+        </div>
+
+        {/* Infos mannequin */}
+        <div>
+          <label htmlFor="model_info" className={fieldLabel}>Tailles mannequin</label>
+          <textarea
+            id="model_info"
+            value={form.model_info}
+            onChange={(e) => setForm((f) => ({ ...f, model_info: e.target.value }))}
+            placeholder="Ex : Le mannequin mesure 1m78 et porte une taille S"
+            rows={2}
+            className={inputBase}
+            style={{ resize: 'vertical' }}
+          />
+        </div>
+
         {/* Prix + Soldes + Stock */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div>

@@ -33,10 +33,10 @@ export default async function LookPage({ params }: Props) {
 
         {/* Retour */}
         <Link
-          href="/nouveautes"
+          href="/looks"
           className="inline-flex items-center gap-2 text-sm text-[#1B0B94]/60 hover:text-[#1B0B94] mb-10 transition-colors"
         >
-          ← Retour aux Nouveautés
+          ← Retour aux Looks
         </Link>
 
         {/* Cover */}
