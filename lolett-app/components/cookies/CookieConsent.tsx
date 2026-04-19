@@ -65,6 +65,21 @@ export function CookieConsent() {
   const refuseAll = () => accept({ analytics: false, marketing: false });
   const acceptSelected = () => accept({ analytics, marketing });
 
+  // Allow reopening from footer link
+  useEffect(() => {
+    const handler = () => {
+      const stored = getStoredConsent();
+      if (stored) {
+        setAnalytics(stored.analytics);
+        setMarketing(stored.marketing);
+        setShowDetails(true);
+      }
+      setVisible(true);
+    };
+    window.addEventListener('lolett-open-cookie-settings', handler);
+    return () => window.removeEventListener('lolett-open-cookie-settings', handler);
+  }, []);
+
   if (!visible) return null;
 
   return (

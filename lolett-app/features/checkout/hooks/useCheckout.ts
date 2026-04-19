@@ -43,7 +43,7 @@ export function useCheckout() {
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal' | 'demo'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'demo'>('card');
 
   // Load user profile + addresses if logged in
   useEffect(() => {
@@ -157,13 +157,13 @@ export function useCheckout() {
         throw new Error('No Stripe URL returned');
       }
 
-      // Demo / PayPal fallback: create order directly
+      // Demo fallback: create order directly
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...payload,
-          paymentProvider: paymentMethod === 'paypal' ? 'paypal' : 'demo',
+          paymentProvider: 'demo',
         }),
       });
 

@@ -72,14 +72,14 @@ export function ProfileForm() {
 
       {success && (
         <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm text-center font-body">
-          Profil mis a jour avec succes.
+          Profil mis à jour avec succès.
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prenom</label>
+            <label htmlFor="firstName" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prénom</label>
             <input
               id="firstName"
               type="text"
@@ -109,11 +109,11 @@ export function ProfileForm() {
             disabled
             className="w-full px-4 py-3 rounded-lg bg-[#f3efe8] border border-[#c4b49c]/20 text-[#8a7d6b] font-body text-sm cursor-not-allowed"
           />
-          <p className="text-xs text-[#8a7d6b] mt-1 font-body">L&apos;email ne peut pas etre modifie.</p>
+          <p className="text-xs text-[#8a7d6b] mt-1 font-body">L&apos;email ne peut pas être modifié.</p>
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Telephone</label>
+          <label htmlFor="phone" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Téléphone</label>
           <input
             id="phone"
             type="tel"
@@ -127,7 +127,7 @@ export function ProfileForm() {
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? 'Enregistrement...' : 'Enregistrer'}
         </button>

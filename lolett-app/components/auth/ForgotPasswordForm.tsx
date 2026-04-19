@@ -40,9 +40,9 @@ export default function ForgotPasswordForm() {
         </div>
 
         <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
-          <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-4">Mot de passe oublie</h2>
+          <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-4">Mot de passe oublié</h2>
           <p className="text-[#5a4d3e] font-body text-sm text-center mb-8">
-            Entrez votre adresse email et nous vous enverrons un lien de reinitialisation.
+            Entrez votre adresse email et nous vous enverrons un lien de réinitialisation.
           </p>
 
           {error && (
@@ -55,13 +55,13 @@ export default function ForgotPasswordForm() {
             <div className="text-center">
               <div className="mb-4 text-[#1B0B94] text-4xl">&#9993;</div>
               <p className="text-[#5a4d3e] font-body text-sm mb-6">
-                Un email de reinitialisation vous a ete envoye. Verifiez votre boite de reception.
+                Un email de réinitialisation vous a été envoyé. Vérifiez votre boîte de réception.
               </p>
               <Link
                 href="/connexion"
-                className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
+                className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors"
               >
-                Retour a la connexion
+                Retour à la connexion
               </Link>
             </div>
           ) : (
@@ -82,7 +82,7 @@ export default function ForgotPasswordForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
@@ -93,8 +93,8 @@ export default function ForgotPasswordForm() {
               </button>
 
               <p className="text-center text-sm text-[#5a4d3e] font-body">
-                <Link href="/connexion" className="text-[#1B0B94] hover:text-[#b3933d] transition-colors">
-                  Retour a la connexion
+                <Link href="/connexion" className="text-[#1B0B94] hover:text-[#B89547] transition-colors">
+                  Retour à la connexion
                 </Link>
               </p>
             </form>

@@ -45,7 +45,7 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
 
   return (
     <div>
-      <button onClick={onCancel} className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#b3933d] font-body mb-4 transition-colors">
+      <button onClick={onCancel} className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#B89547] font-body mb-4 transition-colors">
         <ArrowLeft className="h-4 w-4" />
         Retour
       </button>
@@ -63,7 +63,7 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prenom</label>
+              <label className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prénom</label>
               <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required className={inputCls} />
             </div>
             <div>
@@ -106,7 +106,7 @@ export function AddressForm({ address, onSaved, onCancel }: AddressFormProps) {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors disabled:opacity-50"
+              className="px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm transition-colors disabled:opacity-50"
             >
               {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>

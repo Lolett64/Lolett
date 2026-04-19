@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   keywords: ['mode', 'vêtements', 'sud-ouest', 'sud', 'été', 'français'],
   authors: [{ name: 'LOLETT' }],
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {

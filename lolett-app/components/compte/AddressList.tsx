@@ -66,7 +66,7 @@ export function AddressList() {
         <h1 className="font-playfair text-xl text-[#1a1510]">Mes adresses</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white text-sm font-body font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white text-sm font-body font-semibold transition-colors"
         >
           <Plus className="h-4 w-4" />
           Ajouter

@@ -49,7 +49,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
     return (
       <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-12 text-center">
         <p className="text-[#5a4d3e] font-body">Commande introuvable.</p>
-        <Link href="/compte/commandes" className="text-[#1B0B94] hover:text-[#b3933d] text-sm font-body mt-3 inline-block">
+        <Link href="/compte/commandes" className="text-[#1B0B94] hover:text-[#B89547] text-sm font-body mt-3 inline-block">
           Retour aux commandes
         </Link>
       </div>
@@ -60,7 +60,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   return (
     <div>
-      <Link href="/compte/commandes" className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#b3933d] font-body mb-4 transition-colors">
+      <Link href="/compte/commandes" className="inline-flex items-center gap-1 text-sm text-[#1B0B94] hover:text-[#B89547] font-body mb-4 transition-colors">
         <ArrowLeft className="h-4 w-4" />
         Retour aux commandes
       </Link>

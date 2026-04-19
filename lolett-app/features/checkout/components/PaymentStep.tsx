@@ -8,8 +8,8 @@ interface PaymentStepProps {
   onConfirm: () => void;
   isSubmitting: boolean;
   total: number;
-  paymentMethod: 'card' | 'paypal' | 'demo';
-  onMethodChange: (method: 'card' | 'paypal' | 'demo') => void;
+  paymentMethod: 'card' | 'demo';
+  onMethodChange: (method: 'card' | 'demo') => void;
 }
 
 export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMethod, onMethodChange }: PaymentStepProps) {
@@ -80,69 +80,7 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
             border: '1px solid #E8E0D6',
           }}>
             <p style={{ fontSize: 12, color: '#7A6E62', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
-              Vous serez redirige vers une page securisee Stripe pour saisir vos informations de carte.
-            </p>
-          </div>
-        )}
-
-        {/* PayPal option */}
-        <label
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: '18px 20px',
-            borderRadius: 8,
-            border: '1px solid #E8E0D6',
-            borderLeft: paymentMethod === 'paypal' ? '3px solid #C4956A' : '1px solid #E8E0D6',
-            backgroundColor: paymentMethod === 'paypal' ? '#FFFBF7' : '#fff',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <input
-            type="radio"
-            name="payment"
-            value="paypal"
-            checked={paymentMethod === 'paypal'}
-            onChange={() => onMethodChange('paypal')}
-            style={{ display: 'none' }}
-          />
-          <div
-            style={{
-              width: 18,
-              height: 18,
-              borderRadius: '50%',
-              border: `2px solid ${paymentMethod === 'paypal' ? '#C4956A' : '#D4CBC0'}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {paymentMethod === 'paypal' && (
-              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#C4956A' }} />
-            )}
-          </div>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#003087' }}>Pay</span>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#009cde', marginLeft: -10 }}>Pal</span>
-        </label>
-
-        {paymentMethod === 'paypal' && (
-          <div style={{
-            marginLeft: 32,
-            padding: '14px 18px',
-            borderRadius: 6,
-            backgroundColor: '#FAF7F2',
-            border: '1px solid #E8E0D6',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#D4A853', animation: 'pulse 1.5s infinite' }} />
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#9B8E82', fontFamily: "'DM Sans', sans-serif" }}>Bientot disponible</span>
-            </div>
-            <p style={{ fontSize: 12, color: '#9B8E82', fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
-              PayPal sera active prochainement.
+              Vous serez redirigé vers une page sécurisée Stripe pour saisir vos informations de carte.
             </p>
           </div>
         )}
@@ -163,7 +101,7 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
         fontFamily: "'DM Sans', sans-serif",
       }}>
         <Lock size={14} color="#C4956A" />
-        Paiement securise SSL 256-bit
+        Paiement sécurisé SSL 256-bit
       </div>
 
       {/* Buttons */}
@@ -177,14 +115,12 @@ export function PaymentStep({ onBack, onConfirm, isSubmitting, total, paymentMet
         </button>
         <button
           onClick={onConfirm}
-          disabled={isSubmitting || paymentMethod === 'paypal'}
+          disabled={isSubmitting}
           className="ckv-btn-primary"
           style={{ flex: 1 }}
         >
           {isSubmitting ? (
             'Redirection vers Stripe...'
-          ) : paymentMethod === 'paypal' ? (
-            'Bientot disponible'
           ) : (
             <>
               <Lock size={14} style={{ marginRight: 8 }} />

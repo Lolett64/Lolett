@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { CompteNav } from '@/components/compte/CompteNav';
 
-export const metadata: Metadata = { title: 'Mon Espace' };
+export const metadata: Metadata = {
+  title: 'Mon Espace',
+  description: 'Gérez votre compte LOLETT : commandes, adresses, favoris et programme fidélité.',
+  robots: { index: false, follow: false },
+};
 
 export default function CompteLayout({ children }: { children: React.ReactNode }) {
   return (

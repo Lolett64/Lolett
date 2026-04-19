@@ -70,7 +70,7 @@ export function AccountBadge() {
           </Link>
           <button onClick={handleLogout} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#5a4d3e] hover:bg-[#f3efe8] transition-colors">
             <LogOut className="h-4 w-4" />
-            Deconnexion
+            Déconnexion
           </button>
         </div>
       )}
