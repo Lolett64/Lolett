@@ -10,13 +10,32 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const look = await lookRepository.findById(id);
   if (!look) return { title: 'Look introuvable' };
+
+  const lookUrl = `${BASE_URL}/looks/${id}`;
+
   return {
     title: `${look.title} — LOLETT`,
-    description: look.shortPitch,
+    description: look.shortPitch || `Découvrez le look "${look.title}" par LOLETT — des pièces coordonnées pour un style complet.`,
+    alternates: { canonical: lookUrl },
+    openGraph: {
+      title: `${look.title} — LOLETT`,
+      description: look.shortPitch || `Look complet par LOLETT`,
+      url: lookUrl,
+      type: 'article',
+      images: look.coverImage ? [{ url: look.coverImage, alt: look.title }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${look.title} — LOLETT`,
+      description: look.shortPitch || `Look complet par LOLETT`,
+      images: look.coverImage ? [look.coverImage] : undefined,
+    },
   };
 }
 

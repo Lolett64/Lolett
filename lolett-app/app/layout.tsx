@@ -66,6 +66,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable} ${montserrat.variable} ${newsreader.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://utgwrfqnaoggckfruzzo.supabase.co" />
+      </head>
       <body className="font-body antialiased">
         <GoogleTagManager />
         <AuthProvider>

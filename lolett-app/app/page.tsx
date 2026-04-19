@@ -50,6 +50,33 @@ export const revalidate = 60;
 
 const hexColor = "#FDF5E6";
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'LOLETT',
+  url: BASE_URL,
+  logo: `${BASE_URL}/og-lolett.jpg`,
+  description: 'Mode du Sud-Ouest pour homme et femme. Née ici, portée partout.',
+  foundingDate: '2024',
+  founder: { '@type': 'Person', name: 'Lola Senfft Von Pilsach' },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Pau',
+    addressCountry: 'FR',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'hello@lolett.com',
+    contactType: 'customer service',
+    availableLanguage: 'French',
+  },
+  sameAs: [
+    'https://instagram.com/lolett',
+    'https://tiktok.com/@lolett',
+    'https://facebook.com/lolett',
+  ],
+};
+
 export default async function HomePage() {
   const [heroContent, newsletterContent, brandStoryContent, newProducts, featuredLooks, pageSections] = await Promise.all([
     getSiteContent('hero'),
@@ -111,6 +138,7 @@ export default async function HomePage() {
       className="min-h-screen relative font-[family-name:var(--font-montserrat)] text-[#1B0B94]"
       style={{ backgroundColor: hexColor }}
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <main>
         {visibleSections.map((s) => {
           const el = sectionElements[s.section_key];

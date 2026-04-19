@@ -81,6 +81,17 @@ export default async function ProductPage({ params }: PageProps) {
   const allGenderProducts = await productRepository.findMany({ gender: product.gender });
   const relatedProducts = allGenderProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Shop', item: `${BASE_URL}/shop` },
+      { '@type': 'ListItem', position: 2, name: genderLabel, item: `${BASE_URL}/shop/${product.gender}` },
+      ...(category ? [{ '@type': 'ListItem', position: 3, name: category.label, item: `${BASE_URL}/shop/${product.gender}/${category.slug}` }] : []),
+      { '@type': 'ListItem', position: category ? 4 : 3, name: product.name },
+    ],
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -107,6 +118,7 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <div className="pt-20 pb-16 sm:pt-24 sm:pb-20 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="container">
         <Breadcrumbs
