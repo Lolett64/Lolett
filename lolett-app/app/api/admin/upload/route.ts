@@ -100,7 +100,7 @@ export async function POST(request: Request) {
 
     // Construct public URL
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/media/${fileName}`;
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/media/${filePath}`;
 
     return NextResponse.json(
       {
