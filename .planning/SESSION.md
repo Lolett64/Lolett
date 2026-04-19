@@ -1,17 +1,21 @@
-# Session State — 2026-04-19 15:00
+# Session State — 2026-04-19 18:00
 
 ## Branch
 preview
 
 ## Completed This Session
-- Audit pré-livraison : deep research 3 agents (UX, e-commerce, design)
-- 12 corrections Tier 1+2 : accents, test pages, PayPal, error.tsx, favicon, JSON-LD, metadata, cookies, couleur or, Zod checkout, SiteChrome cleanup
+- Audit pré-livraison : 12 corrections (accents, test pages, PayPal, error.tsx, favicon, JSON-LD, metadata, cookies, couleur or, Zod checkout)
+- SEO : Organization JSON-LD, BreadcrumbList, sitemap complet, preconnect, OG looks
+- Fix formulaire contact : ajout fetch API (était fake), templates emails Luxe Whisper
+- Fix upload images : chemin Supabase corrigé (media/media/)
+- ADMIN_EMAIL → contact.lolett@gmail.com
+- Refonte admin complète : sidebar "Mon site", 5 pages CMS, SitePageEditor, recherche commandes/looks, auto-slug catégories, promos Tailwind
 
 ## Next Task
-Configurer STRIPE_WEBHOOK_SECRET (Lola doit fournir le secret depuis Dashboard Stripe → Webhooks). Puis tester un achat complet.
+Tester l'admin refondu dans le navigateur. Vérifier que chaque page CMS charge/sauvegarde correctement. Ajouter les screenshots miniatures dans /public/admin/screenshots/.
 
 ## Blockers
-Pas d'accès Stripe — Lola doit configurer le webhook secret dans Vercel.
+STRIPE_WEBHOOK_SECRET — Lola doit configurer depuis Dashboard Stripe.
 
 ## Key Context
-Build Next.js OK. 34 fichiers modifiés, -2226 lignes (pages test supprimées). PayPal retiré du checkout (type 'card' | 'demo' seulement).
+SitePageEditor supporte multi-sections via composite keys (section::field). Anciennes pages /admin/contenu et /admin/materials redirigent vers les nouvelles. Build OK.
