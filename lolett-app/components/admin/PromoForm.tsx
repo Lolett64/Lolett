@@ -22,44 +22,61 @@ interface PromoFormProps {
   onSubmit: (e: FormEvent) => void;
 }
 
+function generateCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
 export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
   return (
-    <form onSubmit={onSubmit} className={card} style={{ marginBottom: 24 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+    <form onSubmit={onSubmit} className={`${card} mb-6`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Code *</label>
-          <input
-            value={form.code}
-            onChange={(e) => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
-            placeholder="ETE2026"
-            required
-            className={inputBase}
-            style={{ textTransform: 'uppercase' }}
-          />
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Code *</label>
+          <div className="flex gap-2">
+            <input
+              value={form.code}
+              onChange={(e) => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
+              placeholder="ETE2026"
+              required
+              className={`${inputBase} uppercase flex-1`}
+            />
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, code: generateCode() }))}
+              className="shrink-0 rounded-md border border-[#B89547]/30 bg-[#FDF5E6] px-3 py-2 text-xs font-medium text-[#B89547] hover:bg-[#B89547]/20 transition-colors"
+            >
+              Generer
+            </button>
+          </div>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Description</label>
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Description</label>
           <input
             value={form.description}
             onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-            placeholder="Soldes d'été 2026"
+            placeholder="Soldes d'ete 2026"
             className={inputBase}
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Type *</label>
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Type *</label>
           <select
             value={form.type}
             onChange={(e) => setForm(f => ({ ...f, type: e.target.value as 'percentage' | 'fixed' }))}
             className={inputBase}
           >
             <option value="percentage">Pourcentage (%)</option>
-            <option value="fixed">Montant fixe (€)</option>
+            <option value="fixed">Montant fixe (&#8364;)</option>
           </select>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>
-            Valeur * ({form.type === 'percentage' ? '%' : '€'})
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">
+            Valeur * ({form.type === 'percentage' ? '%' : '\u20AC'})
           </label>
           <input
             type="number"
@@ -73,7 +90,7 @@ export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Commande minimum (€)</label>
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Commande minimum (&#8364;)</label>
           <input
             type="number"
             min="0"
@@ -85,18 +102,18 @@ export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Limite d&apos;utilisation</label>
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Limite d&apos;utilisation</label>
           <input
             type="number"
             min="0"
             value={form.usage_limit}
             onChange={(e) => setForm(f => ({ ...f, usage_limit: e.target.value }))}
-            placeholder="Illimité"
+            placeholder="Illimite"
             className={inputBase}
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4a4a56', marginBottom: 4 }}>Date d&apos;expiration</label>
+          <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Date d&apos;expiration</label>
           <input
             type="date"
             value={form.expires_at}
@@ -104,9 +121,9 @@ export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
             className={inputBase}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'end' }}>
-          <button type="submit" className={btnPrimary} style={{ width: '100%' }}>
-            Créer le code promo
+        <div className="flex items-end">
+          <button type="submit" className={`${btnPrimary} w-full`}>
+            Creer le code promo
           </button>
         </div>
       </div>

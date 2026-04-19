@@ -1,10 +1,7 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderFilters } from '@/components/admin/OrderFilters';
-import { formatPrice, formatDate } from '@/lib/admin/utils';
-import { ChevronRight } from 'lucide-react';
+import { OrdersTable } from '@/components/admin/OrdersTable';
 
 interface SearchParams {
   status?: string;
@@ -51,64 +48,7 @@ async function OrdersContent({ searchParams }: { searchParams: SearchParams }) {
 
       <OrderFilters />
 
-      {orders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#B89547]/30 p-12 text-center">
-          <p className="text-[#B89547]/60">Aucune commande trouvée</p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-gray-200/50 bg-white overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-gray-200/50 bg-[#FDF5E6]">
-                <tr>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Commande</th>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden md:table-cell">Client</th>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden lg:table-cell">Date</th>
-                  <th className="text-center px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Statut</th>
-                  <th className="text-right px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden sm:table-cell">Paiement</th>
-                  <th className="text-right px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Total</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100/50">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#FDF5E6] transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-[family-name:var(--font-montserrat)] font-medium text-[#1a1510]">{order.order_number}</div>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <div className="text-[#1a1510]/70">
-                        {order.customer?.firstName} {order.customer?.lastName}
-                      </div>
-                      <div className="text-xs text-[#1a1510]/40">{order.customer?.email}</div>
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell text-[#1a1510]/50 text-xs">
-                      {formatDate(order.created_at)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-4 py-3 text-right hidden sm:table-cell text-[#1a1510]/50 capitalize text-xs">
-                      {order.payment_provider ?? '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium text-[#1a1510]">
-                      {formatPrice(order.total)}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="inline-flex items-center text-[#1a1510]/30 hover:text-[#B89547] transition-colors"
-                      >
-                        <ChevronRight className="size-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <OrdersTable orders={orders} />
     </div>
   );
 }

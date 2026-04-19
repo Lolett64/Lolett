@@ -67,9 +67,9 @@ export default function PromosPage() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1a1a24' }}>Codes Promo</h1>
+    <div className="max-w-[900px] mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510]">Codes Promo</h1>
         <button className={btnPrimary} onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Annuler' : '+ Nouveau code'}
         </button>

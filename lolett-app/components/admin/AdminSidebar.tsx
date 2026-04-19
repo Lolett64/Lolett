@@ -8,63 +8,42 @@ import {
   Package,
   Image,
   Tag,
-  FileText,
   Mail,
-  Gem,
   X,
   Menu,
+  Home,
+  BookOpen,
+  ArrowDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-interface NavGroup {
+interface NavItem {
+  href: string;
   label: string;
-  items: { href: string; label: string; icon: React.ElementType; exact: boolean }[];
+  icon: React.ElementType;
+  exact: boolean;
+  badge?: number;
 }
 
-const navGroups: NavGroup[] = [
-  {
-    label: '',
-    items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    ],
-  },
-  {
-    label: 'Site',
-    items: [
-      { href: '/admin/contenu', label: 'Contenu', icon: FileText, exact: false },
-    ],
-  },
-  {
-    label: 'Catalogue',
-    items: [
-      { href: '/admin/products', label: 'Produits', icon: ShoppingBag, exact: false },
-      { href: '/admin/looks', label: 'Looks', icon: Image, exact: false },
-      { href: '/admin/categories', label: 'Catégories', icon: Tag, exact: false },
-      { href: '/admin/materials', label: 'Matières', icon: Gem, exact: false },
-    ],
-  },
-  {
-    label: 'Gestion',
-    items: [
-      { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false },
-      { href: '/admin/promos', label: 'Codes Promo', icon: Tag, exact: false },
-      { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
-    ],
-  },
-];
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
 
 function NavLink({
   href,
   label,
   icon: Icon,
   exact,
+  badge,
   onClick,
 }: {
   href: string;
   label: string;
   icon: React.ElementType;
   exact: boolean;
+  badge?: number;
   onClick?: () => void;
 }) {
   const pathname = usePathname();
@@ -83,12 +62,52 @@ function NavLink({
     >
       <Icon className="size-4 shrink-0" />
       {label}
+      {badge != null && badge > 0 && (
+        <span className="bg-[#C4956A] text-white text-[9px] px-1.5 rounded-full">
+          {badge}
+        </span>
+      )}
     </Link>
   );
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ pendingOrders = 0 }: { pendingOrders?: number }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navGroups: NavGroup[] = [
+    {
+      label: '',
+      items: [
+        { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+      ],
+    },
+    {
+      label: 'Mon site',
+      items: [
+        { href: '/admin/site/accueil', label: 'Accueil', icon: Home, exact: false },
+        { href: '/admin/site/boutique', label: 'Boutique', icon: ShoppingBag, exact: false },
+        { href: '/admin/site/notre-histoire', label: 'Notre histoire', icon: BookOpen, exact: false },
+        { href: '/admin/site/contact', label: 'Contact', icon: Mail, exact: false },
+        { href: '/admin/site/footer', label: 'Footer', icon: ArrowDown, exact: false },
+      ],
+    },
+    {
+      label: 'Catalogue',
+      items: [
+        { href: '/admin/products', label: 'Produits', icon: ShoppingBag, exact: false },
+        { href: '/admin/looks', label: 'Looks', icon: Image, exact: false },
+        { href: '/admin/categories', label: 'Catégories', icon: Tag, exact: false },
+      ],
+    },
+    {
+      label: 'Gestion',
+      items: [
+        { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false, badge: pendingOrders },
+        { href: '/admin/promos', label: 'Codes Promo', icon: Tag, exact: false },
+        { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -155,12 +174,13 @@ export function AdminSidebar() {
 
         {/* Footer */}
         <div className="border-t border-white/10 p-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-2 py-2 text-xs text-[#B89547]/70 transition-colors hover:text-[#B89547]"
-          >
-            Voir la boutique
-          </Link>
+          <div className="flex items-center gap-3 px-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C4956A] text-xs font-bold text-white">L</div>
+            <div>
+              <p className="text-xs font-medium text-white">Lola</p>
+              <p className="text-[9px] text-white/35">Fondatrice</p>
+            </div>
+          </div>
         </div>
       </aside>
     </>

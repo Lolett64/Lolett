@@ -1,20 +1,17 @@
-# Session State — 2026-04-17 12:00
+# Session State — 2026-04-19 15:00
 
 ## Branch
 preview
 
 ## Completed This Session
-- Tests unitaires : Vitest + React Testing Library setup, 53 tests (7 fichiers) — uploads, shop CMS, cart
-- Tests E2E : Playwright + Chromium setup, 30 tests (6 fichiers) — navigation, shop, panier, checkout, contact, responsive mobile
-- Scripts : npm test, npm run test:watch, npm run test:e2e, npm run test:e2e:ui
+- Audit pré-livraison : deep research 3 agents (UX, e-commerce, design)
+- 12 corrections Tier 1+2 : accents, test pages, PayPal, error.tsx, favicon, JSON-LD, metadata, cookies, couleur or, Zod checkout, SiteChrome cleanup
 
 ## Next Task
-Vérifier build Vercel du push. Préparer récap admin pour Lola.
+Configurer STRIPE_WEBHOOK_SECRET (Lola doit fournir le secret depuis Dashboard Stripe → Webhooks). Puis tester un achat complet.
 
 ## Blockers
-None
+Pas d'accès Stripe — Lola doit configurer le webhook secret dans Vercel.
 
 ## Key Context
-Cookie consent overlay bloque les clics Playwright — résolu via helpers.ts (dismissCookieConsent).
-FloatingInput contact/checkout n'a pas de label for — sélecteurs par input[name="..."].
-Retry=1 dans playwright.config.ts pour stabiliser les tests flaky.
+Build Next.js OK. 34 fichiers modifiés, -2226 lignes (pages test supprimées). PayPal retiré du checkout (type 'card' | 'demo' seulement).

@@ -28,19 +28,19 @@ export function PromoTable({ promos, loading, onToggleActive, onDelete }: PromoT
   return (
     <div className={card}>
       {loading ? (
-        <p style={{ color: '#9999a8', textAlign: 'center', padding: 24 }}>Chargement...</p>
+        <p className="text-[#1a1510]/40 text-center p-6">Chargement...</p>
       ) : promos.length === 0 ? (
-        <p style={{ color: '#9999a8', textAlign: 'center', padding: 24 }}>Aucun code promo</p>
+        <p className="text-[#1a1510]/40 text-center p-6">Aucun code promo</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+        <table className="w-full border-collapse text-sm">
           <thead>
-            <tr style={{ borderBottom: '1px solid #e5e5ea', textAlign: 'left' }}>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Code</th>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Réduction</th>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Min.</th>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Utilisations</th>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Statut</th>
-              <th style={{ padding: '8px 12px', fontWeight: 600, color: '#4a4a56' }}>Actions</th>
+            <tr className="border-b border-gray-200 text-left">
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Code</th>
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Reduction</th>
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Min.</th>
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Utilisations</th>
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Statut</th>
+              <th className="px-3 py-2 font-semibold text-[#1a1510]">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -48,42 +48,42 @@ export function PromoTable({ promos, loading, onToggleActive, onDelete }: PromoT
               const isExpired = p.expires_at && new Date(p.expires_at) < new Date();
               const isExhausted = p.usage_limit && p.used_count >= p.usage_limit;
               return (
-                <tr key={p.id} style={{ borderBottom: '1px solid #f0f0f5' }}>
-                  <td style={{ padding: '10px 12px' }}>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }}>{p.code}</span>
-                    {p.description && <span style={{ display: 'block', fontSize: 12, color: '#9999a8' }}>{p.description}</span>}
+                <tr key={p.id} className="border-b border-gray-100">
+                  <td className="px-3 py-2.5">
+                    <span className="font-mono font-bold tracking-wider">{p.code}</span>
+                    {p.description && <span className="block text-xs text-[#1a1510]/40">{p.description}</span>}
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
-                    {p.type === 'percentage' ? `${p.value}%` : `${p.value} €`}
+                  <td className="px-3 py-2.5">
+                    {p.type === 'percentage' ? `${p.value}%` : `${p.value} \u20AC`}
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
-                    {p.min_order > 0 ? `${p.min_order} €` : '—'}
+                  <td className="px-3 py-2.5">
+                    {p.min_order > 0 ? `${p.min_order} \u20AC` : '\u2014'}
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
+                  <td className="px-3 py-2.5">
                     {p.used_count}{p.usage_limit ? ` / ${p.usage_limit}` : ''}
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
+                  <td className="px-3 py-2.5">
                     {isExpired ? (
-                      <span style={{ color: '#999', fontSize: 12, fontWeight: 500 }}>Expiré</span>
+                      <span className="text-xs font-medium text-[#1a1510]/40">Expire</span>
                     ) : isExhausted ? (
-                      <span style={{ color: '#e74c3c', fontSize: 12, fontWeight: 500 }}>Épuisé</span>
+                      <span className="text-xs font-medium text-red-500">Epuise</span>
                     ) : p.active ? (
-                      <span style={{ color: '#27ae60', fontSize: 12, fontWeight: 500 }}>Actif</span>
+                      <span className="text-xs font-medium text-green-600">Actif</span>
                     ) : (
-                      <span style={{ color: '#999', fontSize: 12, fontWeight: 500 }}>Inactif</span>
+                      <span className="text-xs font-medium text-[#1a1510]/40">Inactif</span>
                     )}
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                  <td className="px-3 py-2.5">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => onToggleActive(p.id, p.active)}
-                        style={{ fontSize: 12, color: '#1B0B94', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+                        className="text-xs text-[#1B0B94] underline bg-transparent border-none cursor-pointer hover:text-[#130970] transition-colors"
                       >
-                        {p.active ? 'Désactiver' : 'Activer'}
+                        {p.active ? 'Desactiver' : 'Activer'}
                       </button>
                       <button
                         onClick={() => onDelete(p.id)}
-                        style={{ fontSize: 12, color: '#e74c3c', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+                        className="text-xs text-red-500 underline bg-transparent border-none cursor-pointer hover:text-red-700 transition-colors"
                       >
                         Supprimer
                       </button>
