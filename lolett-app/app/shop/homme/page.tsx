@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
+import { getSiteContent } from '@/lib/cms/content';
 
 export const revalidate = 60;
 
@@ -20,8 +21,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopHommePage() {
-  const products = await productRepository.findMany({ gender: 'homme' });
-  const categories = await categoryRepository.findByGender('homme');
+  const [products, categories, cms] = await Promise.all([
+    productRepository.findMany({ gender: 'homme' }),
+    categoryRepository.findByGender('homme'),
+    getSiteContent('shop_homme'),
+  ]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
@@ -31,8 +35,8 @@ export default async function ShopHommePage() {
         categories={categories}
         heroColor="#2418a6"
         heroHeight="h-[35vh] min-h-[280px]"
-        heroTitle="Collection Homme"
-        heroSubtitle="Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud."
+        heroTitle={cms.hero_title || 'Collection Homme'}
+        heroSubtitle={cms.hero_subtitle || "Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud."}
       />
     </div>
   );

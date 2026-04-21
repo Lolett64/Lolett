@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { lookRepository } from '@/lib/adapters';
+import { getSiteContent } from '@/lib/cms/content';
 
 export const revalidate = 60;
 
@@ -21,7 +22,10 @@ export const metadata: Metadata = {
 };
 
 export default async function LooksPage() {
-  const looks = await lookRepository.findMany();
+  const [looks, cms] = await Promise.all([
+    lookRepository.findMany(),
+    getSiteContent('looks_page'),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#FDF5E6] py-16 px-6">
@@ -30,13 +34,13 @@ export default async function LooksPage() {
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="text-[10px] font-medium tracking-wider uppercase text-[#B89547]">
-            Inspiration
+            {cms.badge || 'Inspiration'}
           </p>
           <h1 className="font-[family-name:var(--font-newsreader)] mt-3 text-4xl font-light text-[#1B0B94] sm:text-5xl">
-            Looks du moment
+            {cms.hero_title || 'Looks du moment'}
           </h1>
           <p className="mt-4 text-sm text-[#1B0B94]/60 max-w-md mx-auto">
-            Des tenues complètes, pensées pour vous. Cliquez sur un look pour découvrir les pièces.
+            {cms.hero_subtitle || 'Des tenues complètes, pensées pour vous. Cliquez sur un look pour découvrir les pièces.'}
           </p>
         </div>
 

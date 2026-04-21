@@ -14,6 +14,8 @@ import {
   Home,
   BookOpen,
   ArrowDown,
+  Sparkles,
+  Shirt,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -86,6 +88,8 @@ export function AdminSidebar({ pendingOrders = 0 }: { pendingOrders?: number }) 
       items: [
         { href: '/admin/site/accueil', label: 'Accueil', icon: Home, exact: false },
         { href: '/admin/site/boutique', label: 'Boutique', icon: ShoppingBag, exact: false },
+        { href: '/admin/site/nouveautes', label: 'Nouveautés', icon: Sparkles, exact: false },
+        { href: '/admin/site/looks', label: 'Looks', icon: Shirt, exact: false },
         { href: '/admin/site/notre-histoire', label: 'Notre histoire', icon: BookOpen, exact: false },
         { href: '/admin/site/contact', label: 'Contact', icon: Mail, exact: false },
         { href: '/admin/site/footer', label: 'Footer', icon: ArrowDown, exact: false },

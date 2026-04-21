@@ -17,9 +17,12 @@ interface NouveautesContentV2Props {
   products: Product[];
   looks: Look[];
   lookProducts: Record<string, Product[]>;
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
 }
 
-export function NouveautesContentV2({ products, looks, lookProducts }: NouveautesContentV2Props) {
+export function NouveautesContentV2({ products, looks, lookProducts, heroBadge, heroTitle, heroSubtitle }: NouveautesContentV2Props) {
   const {
     activeGender,
     handleGenderChange,
@@ -42,7 +45,7 @@ export function NouveautesContentV2({ products, looks, lookProducts }: Nouveaute
   return (
     <div className="min-w-0">
       {/* 1. Hero */}
-      <NouveautesHero />
+      <NouveautesHero badge={heroBadge} title={heroTitle} subtitle={heroSubtitle} />
 
       {/* 2-3. Looks */}
       <NouveautesLooks looks={looks} lookProducts={lookProducts} />

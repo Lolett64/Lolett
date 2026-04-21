@@ -7,6 +7,8 @@ const tabs: TabConfig[] = [
   { key: 'shop', label: 'Hero Shop', sectionKey: 'shop' },
   { key: 'trust_bar', label: 'Barre de confiance', sectionKey: 'trust_bar' },
   { key: 'collections', label: 'Collections', sectionKey: 'collections' },
+  { key: 'shop_femme', label: 'Page Femme', sectionKey: 'shop_femme' },
+  { key: 'shop_homme', label: 'Page Homme', sectionKey: 'shop_homme' },
 ];
 
 export default function AdminBoutiquePage() {
