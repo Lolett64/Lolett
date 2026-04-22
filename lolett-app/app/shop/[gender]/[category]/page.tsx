@@ -49,7 +49,7 @@ export default async function CategoryPage({ params }: PageProps) {
         categories={categories}
         activeCategory={categorySlug}
         heroColor="#2418a6"
-        heroHeight="h-[35vh] min-h-[300px]"
+        heroHeight="h-[25vh] min-h-[190px]"
         heroTitle={`${category.label} ${genderLabel}`}
         heroSubtitle={category.seoDescription || `Découvrez notre sélection ${category.label.toLowerCase()} pour ${gender === 'homme' ? 'lui' : 'elle'}.`}
       />
