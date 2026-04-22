@@ -82,18 +82,27 @@ export default async function HomePage() {
     getSiteContent('hero'),
     getSiteContent('newsletter'),
     getSiteContent('brand_story'),
-    productRepository.findMany({ isNew: true }).then((p) => p.slice(0, 4)),
+    productRepository.findMany({ isNew: true, limit: 4 }),
     lookRepository.findMany().then((l) => l.slice(0, 3)),
     getPageSections('home'),
   ]);
 
-  const lookProductsEntries = await Promise.all(
-    featuredLooks.map(async (look) => {
-      const products = await productRepository.findByIds(look.productIds);
-      return [look.id, products] as const;
-    })
+  // Fetch all look products in a single query instead of N queries
+  const allProductIds = Array.from(
+    new Set(featuredLooks.flatMap((look) => look.productIds))
   );
-  const lookProducts = Object.fromEntries(lookProductsEntries);
+  const allProducts = await productRepository.findByIds(allProductIds);
+  const productsById = new Map(allProducts.map((p) => [p.id, p]));
+
+  const lookProducts: Record<string, typeof allProducts> = Object.fromEntries(
+    featuredLooks.map((look) => [
+      look.id,
+      look.productIds.flatMap((id) => {
+        const p = productsById.get(id);
+        return p ? [p] : [];
+      }),
+    ])
+  );
 
   // Build section elements
   const sectionElements: Record<string, React.ReactNode> = {

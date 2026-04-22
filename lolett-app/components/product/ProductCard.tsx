@@ -16,9 +16,10 @@ import { useTouchSwipe } from '@/hooks/useTouchSwipe';
 interface ProductCardProps {
   product: Product;
   hideNewBadge?: boolean;
+  priority?: boolean;
 }
 
-export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
+export function ProductCard({ product, hideNewBadge, priority }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -121,6 +122,7 @@ export function ProductCard({ product, hideNewBadge }: ProductCardProps) {
               )}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               loading={index === 0 ? 'eager' : 'lazy'}
+              priority={priority && index === 0}
             />
           ))}
 

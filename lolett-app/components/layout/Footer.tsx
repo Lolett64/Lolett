@@ -1,9 +1,8 @@
-'use client';
-
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { TikTokIcon, InstagramIcon, FacebookIcon } from '@/components/icons';
+import { CookieSettingsButton } from './CookieSettingsButton';
 
 const footerLinks = {
   shop: [
@@ -134,12 +133,7 @@ export function Footer({ content }: FooterProps) {
                 </li>
               ))}
               <li>
-                <button
-                  onClick={() => window.dispatchEvent(new Event('lolett-open-cookie-settings'))}
-                  className="text-lolett-gray-400 inline-block py-1 transition-colors hover:text-white"
-                >
-                  Gérer les cookies
-                </button>
+                <CookieSettingsButton />
               </li>
             </ul>
           </div>

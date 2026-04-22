@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default async function ShopHommePage() {
   const [products, categories, cms] = await Promise.all([
-    productRepository.findMany({ gender: 'homme' }),
+    productRepository.findMany({ gender: 'homme', limit: 24 }),
     categoryRepository.findByGender('homme'),
     getSiteContent('shop_homme'),
   ]);
