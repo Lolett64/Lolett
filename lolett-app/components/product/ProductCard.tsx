@@ -54,7 +54,9 @@ export function ProductCard({ product, hideNewBadge, priority }: ProductCardProp
     }
   };
 
-  const handleSizeSelect = (size: Size) => {
+  const handleSizeSelect = (e: React.MouseEvent, size: Size) => {
+    e.preventDefault();
+    e.stopPropagation();
     const color = getFirstAvailableColor(product);
     addItem(product.id, size, 1, color);
     setShowSizeSelector(false);
@@ -193,7 +195,7 @@ export function ProductCard({ product, hideNewBadge, priority }: ProductCardProp
                 {product.sizes.map((size) => (
                   <button
                     key={size}
-                    onClick={() => handleSizeSelect(size)}
+                    onClick={(e) => handleSizeSelect(e, size)}
                     className="text-lolett-gray-900 hover:bg-lolett-gold min-w-[36px] flex-1 rounded-md bg-white px-2 py-2 text-xs font-medium transition-all hover:text-white sm:min-w-[40px] sm:px-3 sm:text-sm"
                   >
                     {size}

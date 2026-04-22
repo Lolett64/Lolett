@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCartStore, useCartCalculation } from '@/features/cart';
 import { CartItem } from '@/components/cart/CartItem';
@@ -10,8 +11,14 @@ export default function PanierPage() {
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const { cartProducts, subtotal, shipping, total, isFreeShipping, itemCount, amountUntilFreeShipping } =
+  const { cartProducts, subtotal, shipping, total, isFreeShipping, itemCount, amountUntilFreeShipping, loading } =
     useCartCalculation(items);
+
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+
+  const isTrulyEmpty = hydrated && items.length === 0;
+  const isLoadingProducts = hydrated && items.length > 0 && (loading || cartProducts.length === 0);
 
   return (
     <div style={{ background: '#FDF5E6', minHeight: '100vh' }}>
@@ -23,7 +30,12 @@ export default function PanierPage() {
           {itemCount} article{itemCount > 1 ? 's' : ''}
         </p>
 
-        {cartProducts.length === 0 ? (
+        {!hydrated || isLoadingProducts ? (
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <div style={{ display: 'inline-block', width: 28, height: 28, border: '2px solid #e8dfd0', borderTopColor: '#B89547', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : isTrulyEmpty ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <p style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: 22, color: '#5a4d3e', marginBottom: 24 }}>Votre panier est vide</p>
             <Link href="/shop" style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#B89547', textDecoration: 'underline', textUnderlineOffset: 4 }}>

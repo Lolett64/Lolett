@@ -15,7 +15,6 @@ interface LooksSectionProps {
 
 export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }: LooksSectionProps) {
   const [current, setCurrent] = useState(0);
-  const [transitioning, setTransitioning] = useState(false);
 
   if (!looks || looks.length === 0) return null;
 
@@ -24,15 +23,18 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
   const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
 
   const navigate = (dir: 'prev' | 'next') => {
-    setTransitioning(true);
-    setTimeout(() => {
-      setCurrent(dir === 'prev' ? (current - 1 + looks.length) % looks.length : (current + 1) % looks.length);
-      setTransitioning(false);
-    }, 400);
+    setCurrent((c) => dir === 'prev' ? (c - 1 + looks.length) % looks.length : (c + 1) % looks.length);
   };
 
   return (
     <section className="py-24 md:py-32" style={{ backgroundColor: hexColor }}>
+      <style>{`
+        @keyframes lookFadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .look-fade { animation: lookFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+      `}</style>
       <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
 
         {/* Section header */}
@@ -57,12 +59,8 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
 
             {/* Left — Look details */}
             <div
-              className="flex flex-col justify-center order-2 lg:order-1"
-              style={{
-                opacity: transitioning ? 0 : 1,
-                transform: transitioning ? 'translateY(20px)' : 'translateY(0)',
-                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
+              key={`details-${current}`}
+              className="flex flex-col justify-center order-2 lg:order-1 look-fade"
             >
               <div className="mb-8">
                 <h3 className="font-[family-name:var(--font-newsreader)] text-3xl md:text-4xl lg:text-5xl font-bold text-[#1B0B94] mb-4 leading-tight">
@@ -118,7 +116,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
                   {looks.map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => { setTransitioning(true); setTimeout(() => { setCurrent(i); setTransitioning(false); }, 400); }}
+                      onClick={() => setCurrent(i)}
                       className="transition-all duration-500"
                       style={{
                         width: i === current ? 24 : 8,
@@ -139,23 +137,20 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
               </div>
             </div>
 
-            {/* Right — Look image */}
-            <div
-              className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)] bg-[#e5ddd2]"
-              style={{
-                opacity: transitioning ? 0.3 : 1,
-                transform: transitioning ? 'scale(0.97)' : 'scale(1)',
-                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
-            >
-              <Image
-                src={look.coverImage}
-                alt={look.title}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+            {/* Right — Look image (crossfade stack) */}
+            <div className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)] bg-[#e5ddd2]">
+              {looks.map((l, i) => (
+                <Image
+                  key={l.id}
+                  src={l.coverImage}
+                  alt={l.title}
+                  fill
+                  priority={i === 0}
+                  className="object-cover absolute inset-0 transition-opacity duration-700 ease-out"
+                  style={{ opacity: i === current ? 1 : 0 }}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              ))}
               {/* Subtle inner gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
             </div>
