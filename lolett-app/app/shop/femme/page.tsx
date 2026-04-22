@@ -34,7 +34,7 @@ export default async function ShopFemmePage() {
         products={products}
         categories={categories}
         heroColor="#2418a6"
-        heroHeight="h-[35vh] min-h-[280px]"
+        heroHeight="h-[25vh] min-h-[190px]"
         heroTitle={cms.hero_title || 'Collection Femme'}
         heroSubtitle={cms.hero_subtitle || "Robes fluides, tops en lin. L'art de vivre à la mode du Sud-Ouest."}
       />

@@ -34,7 +34,7 @@ export default async function ShopHommePage() {
         products={products}
         categories={categories}
         heroColor="#2418a6"
-        heroHeight="h-[35vh] min-h-[280px]"
+        heroHeight="h-[25vh] min-h-[190px]"
         heroTitle={cms.hero_title || 'Collection Homme'}
         heroSubtitle={cms.hero_subtitle || "Lin léger, coton premium. Tout ce qu'il faut pour un été au Sud."}
       />
