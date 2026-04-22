@@ -1,21 +1,22 @@
-# Session State — 2026-04-19 18:00
+# Session State — 2026-04-22
 
 ## Branch
 preview
 
 ## Completed This Session
-- Audit pré-livraison : 12 corrections (accents, test pages, PayPal, error.tsx, favicon, JSON-LD, metadata, cookies, couleur or, Zod checkout)
-- SEO : Organization JSON-LD, BreadcrumbList, sitemap complet, preconnect, OG looks
-- Fix formulaire contact : ajout fetch API (était fake), templates emails Luxe Whisper
-- Fix upload images : chemin Supabase corrigé (media/media/)
-- ADMIN_EMAIL → contact.lolett@gmail.com
-- Refonte admin complète : sidebar "Mon site", 5 pages CMS, SitePageEditor, recherche commandes/looks, auto-slug catégories, promos Tailwind
+- Bascule complète compte Lola : Supabase + Vercel env vars, prod stable
+- Perf TTFB −85 à −95% : middleware ciblé, Static ISR, Supabase public client sans cookies
+- Images hero : priority + sizes + bg color (évite flash vide)
+- UI shop : hero raccourci (-90px) + texte centré vertical + hauteur uniforme catégories
+- Audit sécurité : clés dev dans git inoffensives (projet dev à supprimer)
 
 ## Next Task
-Tester l'admin refondu dans le navigateur. Vérifier que chaque page CMS charge/sauvegarde correctement. Ajouter les screenshots miniatures dans /public/admin/screenshots/.
+Appliquer le plan d'optimisation images : sharp + script de compression + endpoint upload.
+Plan détaillé : ~/.claude/plans/quirky-watching-pnueli.md
 
 ## Blockers
-STRIPE_WEBHOOK_SECRET — Lola doit configurer depuis Dashboard Stripe.
+- Env vars Stripe + Brevo à récupérer quand Lola les envoie
+- Reset service_role key dev OU suppression projet Supabase dev (quand prod 100% stable)
 
 ## Key Context
-SitePageEditor supporte multi-sections via composite keys (section::field). Anciennes pages /admin/contenu et /admin/materials redirigent vers les nouvelles. Build OK.
+Modifs non commitées : ShopContentV4.tsx + package.json/lock (probablement sharp déjà ajouté). Vérifier avant de continuer.
