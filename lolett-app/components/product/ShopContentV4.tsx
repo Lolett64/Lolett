@@ -112,12 +112,13 @@ export function ShopContentV4({
                     </>
                 )}
 
-                <div className="absolute inset-0 flex flex-col justify-end pb-6 sm:pb-12 px-4 sm:px-8 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
-                    <div className="flex items-center gap-4 mb-4">
+                <div className="absolute inset-0 flex flex-col justify-end items-center text-center pb-6 sm:pb-12 px-4 sm:px-8 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+                    <div className="flex items-center justify-center gap-4 mb-4">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
                         <span className="font-sans text-sm uppercase tracking-[0.4em] text-[#B89547] font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
                             {gender === 'homme' ? 'Pour Lui' : 'Pour Elle'}
                         </span>
+                        <div className="w-12 h-[1px] bg-[#B89547]" />
                     </div>
 
                     <h1 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-5xl md:text-7xl text-white mb-4 leading-[0.9] tracking-tight">
