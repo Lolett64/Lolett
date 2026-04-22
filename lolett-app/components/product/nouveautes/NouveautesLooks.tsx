@@ -30,7 +30,7 @@ export function NouveautesLooks({ looks, lookProducts }: NouveautesLooksProps) {
       {/* Looks cards */}
       <section className="w-full py-8" style={{ backgroundColor: '#FDF5E6' }}>
         <div className="flex gap-4 justify-center flex-wrap px-6 sm:px-10 lg:px-14 pb-4">
-          {looks.map((look) => {
+          {looks.map((look, index) => {
             const lp = lookProducts[look.id] ?? [];
             return (
               <Link
@@ -38,11 +38,13 @@ export function NouveautesLooks({ looks, lookProducts }: NouveautesLooksProps) {
                 href={`/looks/${look.id}`}
                 className="group relative flex-shrink-0 w-[300px] sm:w-[340px] overflow-hidden rounded-xl snap-start"
               >
-                <div className="relative aspect-[3/4] w-full overflow-hidden">
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#e5ddd2]">
                   <Image
                     src={look.coverImage}
                     alt={look.title}
                     fill
+                    sizes="(max-width: 640px) 300px, 340px"
+                    priority={index < 3}
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div
@@ -68,7 +70,7 @@ export function NouveautesLooks({ looks, lookProducts }: NouveautesLooksProps) {
                             className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white/40"
                             style={{ zIndex: lp.length - i }}
                           >
-                            <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                            <Image src={product.images[0]} alt={product.name} fill sizes="32px" className="object-cover" />
                           </div>
                         ))}
                         {lp.length > 4 && (

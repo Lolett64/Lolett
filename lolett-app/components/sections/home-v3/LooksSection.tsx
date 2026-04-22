@@ -141,7 +141,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
 
             {/* Right — Look image */}
             <div
-              className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)]"
+              className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)] bg-[#e5ddd2]"
               style={{
                 opacity: transitioning ? 0.3 : 1,
                 transform: transitioning ? 'scale(0.97)' : 'scale(1)',
@@ -152,6 +152,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
                 src={look.coverImage}
                 alt={look.title}
                 fill
+                priority
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
