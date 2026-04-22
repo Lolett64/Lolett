@@ -1,22 +1,21 @@
-# Session State — 2026-04-22
+# Session State — 2026-04-22 22:00
 
 ## Branch
 preview
 
 ## Completed This Session
-- Bascule complète compte Lola : Supabase + Vercel env vars, prod stable
-- Perf TTFB −85 à −95% : middleware ciblé, Static ISR, Supabase public client sans cookies
-- Images hero : priority + sizes + bg color (évite flash vide)
-- UI shop : hero raccourci (-90px) + texte centré vertical + hauteur uniforme catégories
-- Audit sécurité : clés dev dans git inoffensives (projet dev à supprimer)
+- Script `scripts/optimize-images.mjs` : 277 images recompressées (660MB → 79MB, −88%)
+- Endpoint `api/admin/upload/route.ts` : conversion WebP auto (sharp, 1600px q82)
+- 3 commits push sur preview : `94430c3`, `4be2b2f`, `98d9e2e`
+- Tests auto : build OK, Vitest 53/53, Lighthouse Home 98/Shop 89 (desktop), image servie 68 KB
+- Récap commits préparé pour Lola
 
 ## Next Task
-Appliquer le plan d'optimisation images : sharp + script de compression + endpoint upload.
-Plan détaillé : ~/.claude/plans/quirky-watching-pnueli.md
+Attendre les env vars de Lola (Stripe + Brevo) + URL prod finale, puis tester upload admin + checkout.
 
 ## Blockers
-- Env vars Stripe + Brevo à récupérer quand Lola les envoie
-- Reset service_role key dev OU suppression projet Supabase dev (quand prod 100% stable)
+- Env vars Stripe (SECRET_KEY, WEBHOOK_SECRET, PUBLISHABLE_KEY) + Brevo
+- Mot de passe admin pour test upload WebP
 
 ## Key Context
-Modifs non commitées : ShopContentV4.tsx + package.json/lock (probablement sharp déjà ajouté). Vérifier avant de continuer.
+6 fichiers E2E Playwright cassent quand on run `npm test` (mix runners Vitest+Playwright) — non-bloquant mais à corriger plus tard. Reset service_role key du projet Supabase dev reste à faire quand prod 100% stable.
