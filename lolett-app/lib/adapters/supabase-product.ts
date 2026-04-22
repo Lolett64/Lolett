@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { ProductRepository } from './types';
 import type { Product, ProductVariant } from '@/types';
 import type { DbProduct, DbProductVariant } from './supabase-types';
 import { mapProduct, mapVariant } from './supabase-mappers';
 
-async function loadProductVariants(supabase: Awaited<ReturnType<typeof createClient>>, productId: string): Promise<ProductVariant[]> {
+async function loadProductVariants(supabase: ReturnType<typeof createPublicClient>, productId: string): Promise<ProductVariant[]> {
   const { data, error } = await supabase
     .from('product_variants')
     .select('*')
@@ -25,7 +25,7 @@ export class SupabaseProductRepository implements ProductRepository {
     isNew?: boolean;
     limit?: number;
   }): Promise<Product[]> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase.from('products').select('*');
 
     if (options?.gender && options.gender !== 'both') {
@@ -60,7 +60,7 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async findById(id: string): Promise<Product | null> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase.from('products').select('*').eq('id', id).maybeSingle();
     if (error) {
       console.error('[SupabaseProductRepository.findById]', error.message);
@@ -72,7 +72,7 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async findBySlug(slug: string): Promise<Product | null> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -88,7 +88,7 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async findByCategory(gender: string, categorySlug: string): Promise<Product[]> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -111,7 +111,7 @@ export class SupabaseProductRepository implements ProductRepository {
 
   async findByIds(ids: string[]): Promise<Product[]> {
     if (ids.length === 0) return [];
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase.from('products').select('*').in('id', ids);
     if (error) {
       console.error('[SupabaseProductRepository.findByIds]', error.message);
