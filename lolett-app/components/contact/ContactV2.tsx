@@ -164,7 +164,6 @@ export function ContactV2({ content, visibleSections }: ContactV2Props) {
   const faqItems = [
     { q: content?.faq1_q || 'Quels sont les délais de livraison ?', a: content?.faq1_a || 'Compte 3 à 5 jours ouvrés pour la France métropolitaine. La livraison est offerte dès 100€ d\u2019achat.' },
     { q: content?.faq2_q || 'Comment faire un retour ?', a: content?.faq2_a || 'Tu as 14 jours après réception pour me retourner tes articles dans leur état d\u2019origine. Envoie-moi un email et je t\u2019envoie une étiquette retour.' },
-    { q: content?.faq3_q || 'Comment choisir ma taille ?', a: content?.faq3_a || 'Un guide des tailles détaillé est dispo sur chaque fiche produit. En cas de doute, écris-moi !' },
     { q: content?.faq4_q || 'Où sont fabriquées les pièces ?', a: content?.faq4_a || 'Je travaille avec des ateliers familiaux au Portugal et en Italie, sélectionnés pour leur savoir-faire.' },
   ];
 
