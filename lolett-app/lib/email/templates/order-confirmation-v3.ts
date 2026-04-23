@@ -143,9 +143,14 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
                         <td colspan="2" style="padding: 14px 0 0;"><div style="height: 1px; background: #F0EBE4;"></div></td>
                       </tr>
                       <tr>
-                        <td style="padding: 14px 0 0; font-size: 14px; font-weight: 500; color: #2C2420;">Total</td>
+                        <td style="padding: 14px 0 0; font-size: 14px; font-weight: 500; color: #2C2420;">Total TTC</td>
                         <td style="padding: 14px 0 0; font-size: 22px; font-weight: 400; color: #2C2420; text-align: right; font-family: 'Cormorant Garamond', Georgia, serif;">
                           ${data.total.toFixed(2)}&nbsp;&euro;
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="padding: 4px 0 0; font-size: 11px; color: #B5A99A; text-align: right; letter-spacing: 0.03em;">
+                          Dont TVA 20&nbsp;% : ${(data.total - data.total / 1.20).toFixed(2)}&nbsp;&euro;
                         </td>
                       </tr>
                     </table>

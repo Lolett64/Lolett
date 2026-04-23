@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 
 const VALID_SIZES = [
   'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL',
@@ -16,6 +17,7 @@ const WebhookItemSchema = z.array(z.object({
   productId: z.string(),
   productName: z.string(),
   size: z.enum(VALID_SIZES),
+  color: z.string().optional(),
   quantity: z.number().int().positive(),
   price: z.number().positive(),
 }));
@@ -105,6 +107,9 @@ export async function POST(req: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', order.id);
+
+      // 2.5 Decrement stock atomically
+      await decrementStockForOrder(order.id);
 
       // 3. Clear cart
       if (userId) {

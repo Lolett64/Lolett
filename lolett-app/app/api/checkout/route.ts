@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { SHIPPING } from '@/lib/constants';
 import type { Size } from '@/types';
 
@@ -89,6 +90,9 @@ export async function POST(request: NextRequest) {
       .from('orders')
       .update({ status: 'paid', updated_at: new Date().toISOString() })
       .eq('id', order.id);
+
+    // 2.5 Decrement stock (after paid confirmation, before side effects)
+    await decrementStockForOrder(order.id);
 
     // 3. If userId: clear cart_items
     if (userId) {

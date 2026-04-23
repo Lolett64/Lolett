@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Truck, ShieldCheck, RotateCcw } from 'lucide-react';
-import { SHIPPING } from '@/lib/constants';
+import { SHIPPING, VAT, computeVAT } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
 
 interface CartSummaryProps {
@@ -14,6 +14,8 @@ interface CartSummaryProps {
 }
 
 export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountUntilFreeShipping }: CartSummaryProps) {
+  const { vat: vatAmount } = computeVAT(total);
+  const vatPercent = Math.round(VAT.RATE * 100);
   return (
     <div style={{
       flex: '0 0 320px', minWidth: 280,
@@ -47,9 +49,12 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
         </span>
       </div>
       <div style={{ borderTop: '1px solid rgba(184,149,71,0.2)', paddingTop: 16, marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>Total</span>
+        <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>Total TTC</span>
         <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 16, color: '#1a1510', fontWeight: 600 }}>{formatPrice(total)}</span>
       </div>
+      <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#9B8E82', marginTop: 6, textAlign: 'right' }}>
+        Dont TVA {vatPercent}% : {formatPrice(vatAmount)}
+      </p>
 
       <Link href="/checkout" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
         <button style={{

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { TrustBadges } from '@/components/ui/TrustBadges';
 import { formatPrice } from '@/lib/utils';
+import { VAT, computeVAT } from '@/lib/constants';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutForm } from './CheckoutForm';
 import { PaymentStep } from './PaymentStep';
@@ -127,8 +128,11 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
               <div className="ckv-divider" />
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#2C2420' }}>Total</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#2C2420' }}>Total TTC</span>
                 <span style={{ fontSize: 18, fontWeight: 600, color: '#2C2420', fontFamily: "'Cormorant Garamond', serif" }}>{formatPrice(total)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: 11, color: '#9B8E82', marginTop: 4 }}>
+                <span>Dont TVA {Math.round(VAT.RATE * 100)}% : {formatPrice(computeVAT(total).vat)}</span>
               </div>
 
               <div style={{ marginTop: 20 }}>

@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import type { Size } from '@/types';
 
 interface FulfillOrderParams {
@@ -8,6 +9,7 @@ interface FulfillOrderParams {
     productId: string;
     productName: string;
     size: Size;
+    color?: string;
     quantity: number;
     price: number;
   }>;
@@ -61,6 +63,8 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
       updated_at: new Date().toISOString(),
     })
     .eq('id', order.id);
+
+  await decrementStockForOrder(order.id);
 
   if (userId) {
     await admin.from('cart_items').delete().eq('user_id', userId);
