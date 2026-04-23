@@ -78,10 +78,12 @@ const organizationJsonLd = {
 };
 
 export default async function HomePage() {
-  const [heroContent, newsletterContent, brandStoryContent, newProducts, featuredLooks, pageSections] = await Promise.all([
+  const [heroContent, newsletterContent, brandStoryContent, looksContent, newArrivalsContent, newProducts, featuredLooks, pageSections] = await Promise.all([
     getSiteContent('hero'),
     getSiteContent('newsletter'),
     getSiteContent('brand_story'),
+    getSiteContent('looks'),
+    getSiteContent('new_arrivals'),
     productRepository.findMany({ isNew: true, limit: 4 }),
     lookRepository.findMany().then((l) => l.slice(0, 3)),
     getPageSections('home'),
@@ -119,9 +121,9 @@ export default async function HomePage() {
         cta2_href: heroContent?.cta2_href || '/shop/homme',
       }} hexColor={hexColor} />
     ),
-    new_arrivals: <NewArrivalsSection products={newProducts} hexColor={hexColor} />,
+    new_arrivals: <NewArrivalsSection products={newProducts} content={newArrivalsContent} hexColor={hexColor} />,
     brand_story: <BrandStorySection content={brandStoryContent} hexColor={hexColor} />,
-    looks: <LooksSection looks={featuredLooks} lookProducts={lookProducts} hexColor={hexColor} />,
+    looks: <LooksSection looks={featuredLooks} lookProducts={lookProducts} content={looksContent} hexColor={hexColor} />,
     newsletter: (
       <NewsletterSection content={{
         title: newsletterContent?.title || 'Reste connecté',

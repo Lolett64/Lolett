@@ -7,7 +7,8 @@ import type { TabConfig } from '@/components/admin/site/SitePageEditor';
 const tabs: TabConfig[] = [
   { key: 'hero', label: 'Hero', sectionKey: 'hero' },
   { key: 'brand_story', label: 'Notre marque', sectionKey: 'brand_story' },
-  { key: 'looks', label: 'Looks', sectionKey: 'looks' },
+  { key: 'new_arrivals', label: 'Nouveautés (homepage)', sectionKey: 'new_arrivals' },
+  { key: 'looks', label: 'Looks (homepage)', sectionKey: 'looks' },
   { key: 'newsletter', label: 'Newsletter', sectionKey: 'newsletter' },
 ];
 

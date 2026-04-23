@@ -10,10 +10,11 @@ import { ScrollReveal } from '@/components/editorial/ScrollReveal';
 interface LooksSectionProps {
   looks: Look[];
   lookProducts?: Record<string, Product[]>;
+  content?: Record<string, string>;
   hexColor?: string;
 }
 
-export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }: LooksSectionProps) {
+export function LooksSection({ looks, lookProducts = {}, content, hexColor = '#FFFFFF' }: LooksSectionProps) {
   const [current, setCurrent] = useState(0);
 
   if (!looks || looks.length === 0) return null;
@@ -42,13 +43,13 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
           <div className="flex items-start gap-6">
             <div>
               <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
-                Prêt à sortir
+                {content?.eyebrow || 'Prêt à sortir'}
               </span>
               <h2 className="font-[family-name:var(--font-newsreader)] text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95]">
-                Le Look Complet
+                {content?.title || 'Le Look Complet'}
               </h2>
               <p className="text-[#1B0B94]/50 text-base mt-4 max-w-md font-[family-name:var(--font-montserrat)]">
-                Pas envie de réfléchir ? On a composé des ensembles pour toi.
+                {content?.subtitle || 'Pas envie de réfléchir ? On a composé des ensembles pour toi.'}
               </p>
             </div>
           </div>
@@ -99,7 +100,7 @@ export function LooksSection({ looks, lookProducts = {}, hexColor = '#FFFFFF' }:
                   className="group inline-flex items-center gap-3 bg-[#B89547] text-white px-7 py-3.5 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#a6833d] transition-all duration-500 hover:shadow-[0_6px_24px_rgba(184,149,71,0.3)]"
                 >
                   <ShoppingBag size={14} />
-                  Adopter ce look
+                  {content?.cta_text || 'Adopter ce look'}
                 </Link>
               </div>
 
