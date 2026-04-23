@@ -1,0 +1,148 @@
+<h2>Placement des filtres</h2>
+<p class="subtitle">Tailles + Prix — où les positionner par rapport à la grille produits ?</p>
+
+<div class="cards">
+  <!-- Option A: Sidebar fine -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 0; background: #FDF5E6; height: 380px; overflow: hidden;">
+      <div style="display: flex; height: 100%;">
+        <!-- Sidebar -->
+        <div style="width: 160px; border-right: 1px solid rgba(27,11,148,0.08); padding: 24px 16px; flex-shrink: 0;">
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(27,11,148,0.3); margin-bottom: 20px;">Filtres</div>
+
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 11px; color: #1B0B94; margin-bottom: 10px; letter-spacing: 0.05em;">Tailles</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">S</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: #1B0B94; color: white; font-size: 10px;">M</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">L</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">XL</span>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; color: #1B0B94; margin-bottom: 10px; letter-spacing: 0.05em;">Prix</div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div style="flex: 1; border-bottom: 1px solid rgba(27,11,148,0.12); padding-bottom: 4px; font-size: 9px; color: rgba(27,11,148,0.3);">Min</div>
+              <span style="color: rgba(27,11,148,0.15); font-size: 8px;">—</span>
+              <div style="flex: 1; border-bottom: 1px solid rgba(27,11,148,0.12); padding-bottom: 4px; font-size: 9px; color: rgba(27,11,148,0.3);">Max</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div style="flex: 1; padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(27,11,148,0.3);">14 modèles</span>
+            <span style="font-size: 9px; color: rgba(27,11,148,0.3);">Nouveautés ▾</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="aspect-ratio: 3/4; background: #e8e4dc; border-radius: 6px;"></div>
+            <div style="aspect-ratio: 3/4; background: #ddd8ce; border-radius: 6px;"></div>
+            <div style="aspect-ratio: 3/4; background: #e2ded6; border-radius: 6px;"></div>
+            <div style="aspect-ratio: 3/4; background: #d8d4cc; border-radius: 6px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Sidebar fine</h3>
+      <p>Toujours visible, compacte. Style Sézane. Les filtres sont là sans prendre trop de place.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Barre horizontale -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 0; background: #FDF5E6; height: 380px; overflow: hidden;">
+      <div style="padding: 20px;">
+        <!-- Filter bar -->
+        <div style="display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(27,11,148,0.08); margin-bottom: 16px;">
+          <button style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid rgba(27,11,148,0.12); background: transparent; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #1B0B94; cursor: pointer;">Tailles <span style="font-size: 8px; opacity: 0.4;">▾</span></button>
+          <button style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid rgba(27,11,148,0.12); background: transparent; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #1B0B94; cursor: pointer;">Prix <span style="font-size: 8px; opacity: 0.4;">▾</span></button>
+          <div style="flex: 1;"></div>
+          <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(27,11,148,0.3);">14 modèles</span>
+          <span style="font-size: 9px; color: rgba(27,11,148,0.3);">Nouveautés ▾</span>
+        </div>
+
+        <!-- Dropdown expanded example -->
+        <div style="display: flex; gap: 6px; margin-bottom: 16px; padding: 12px 16px; background: white; border: 1px solid rgba(27,11,148,0.08); border-radius: 4px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">S</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #1B0B94; color: white; font-size: 10px;">M</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">L</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">XL</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">TU</span>
+        </div>
+
+        <!-- Grid full width -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div style="aspect-ratio: 3/4; background: #e8e4dc; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #ddd8ce; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #e2ded6; border-radius: 6px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Barre horizontale</h3>
+      <p>Boutons déroulants au-dessus de la grille. Style COS / Arket. Grille pleine largeur, filtres au clic.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Drawer caché -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 0; background: #FDF5E6; height: 380px; overflow: hidden; position: relative;">
+      <div style="padding: 20px;">
+        <!-- Top bar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid rgba(27,11,148,0.08); margin-bottom: 16px;">
+          <button style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(27,11,148,0.12); background: transparent; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #1B0B94; cursor: pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1B0B94" stroke-width="1.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="#1B0B94"/><circle cx="16" cy="12" r="2" fill="#1B0B94"/><circle cx="10" cy="18" r="2" fill="#1B0B94"/></svg>
+            Filtres
+          </button>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(27,11,148,0.3);">14 modèles</span>
+            <span style="font-size: 9px; color: rgba(27,11,148,0.3);">Nouveautés ▾</span>
+          </div>
+        </div>
+
+        <!-- Full width grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div style="aspect-ratio: 3/4; background: #e8e4dc; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #ddd8ce; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #e2ded6; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #d8d4cc; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #e0dcd4; border-radius: 6px;"></div>
+          <div style="aspect-ratio: 3/4; background: #dad6ce; border-radius: 6px;"></div>
+        </div>
+      </div>
+
+      <!-- Drawer peek -->
+      <div style="position: absolute; top: 0; right: 0; width: 55%; height: 100%; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.08); padding: 24px; opacity: 0.85;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+          <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(27,11,148,0.3);">Filtres</span>
+          <span style="font-size: 14px; color: rgba(27,11,148,0.3); cursor: pointer;">✕</span>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 11px; color: #1B0B94; margin-bottom: 10px;">Tailles</div>
+          <div style="display: flex; gap: 6px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">S</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #1B0B94; color: white; font-size: 10px;">M</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">L</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(27,11,148,0.12); font-size: 10px; color: #1B0B94;">XL</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 11px; color: #1B0B94; margin-bottom: 10px;">Prix</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; border-bottom: 1px solid rgba(27,11,148,0.12); padding-bottom: 4px; font-size: 9px; color: rgba(27,11,148,0.3);">Min</div>
+            <span style="color: rgba(27,11,148,0.15); font-size: 8px;">—</span>
+            <div style="flex: 1; border-bottom: 1px solid rgba(27,11,148,0.12); padding-bottom: 4px; font-size: 9px; color: rgba(27,11,148,0.3);">Max</div>
+          </div>
+        </div>
+        <button style="margin-top: 28px; width: 100%; padding: 12px; background: #1B0B94; color: white; border: none; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;">Appliquer</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Drawer caché</h3>
+      <p>Grille pleine largeur par défaut. Bouton "Filtres" ouvre un panneau latéral. Style Jacquemus.</p>
+    </div>
+  </div>
+</div>

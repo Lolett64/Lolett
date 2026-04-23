@@ -38,6 +38,8 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
     name: initialData?.name ?? '',
     slug: initialData?.slug ?? '',
     description: initialData?.description ?? '',
+    composition: initialData?.composition ?? '',
+    model_info: initialData?.model_info ?? '',
     price: initialData?.price ?? '',
     compare_at_price: initialData?.compare_at_price ?? '',
     gender: initialData?.gender ?? '',
@@ -112,8 +114,10 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
   async function handleImageUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
+    setError('');
     try {
       const uploadedUrls: string[] = [];
+      const errors: string[] = [];
       for (const file of Array.from(files)) {
         const fd = new FormData();
         fd.append('file', file);
@@ -121,9 +125,17 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
         if (res.ok) {
           const data = (await res.json()) as { url: string };
           uploadedUrls.push(data.url);
+        } else {
+          const data = (await res.json().catch(() => ({}))) as { error?: string };
+          errors.push(`${file.name} : ${data.error || `Erreur ${res.status}`}`);
         }
       }
-      setForm((f) => ({ ...f, images: [...f.images, ...uploadedUrls] }));
+      if (uploadedUrls.length > 0) {
+        setForm((f) => ({ ...f, images: [...f.images, ...uploadedUrls] }));
+      }
+      if (errors.length > 0) {
+        setError(`Échec upload : ${errors.join(' | ')}`);
+      }
     } finally {
       setUploading(false);
     }
@@ -141,6 +153,8 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
       name: form.name,
       slug: form.slug,
       description: form.description,
+      composition: form.composition || null,
+      model_info: form.model_info || null,
       price: parseFloat(form.price),
       compare_at_price: form.compare_at_price ? parseFloat(form.compare_at_price) : null,
       gender: form.gender,

@@ -17,7 +17,8 @@ interface ShopContentV4Props {
     gender: 'homme' | 'femme';
     products: Product[];
     categories: Category[];
-    heroImage: string;
+    heroImage?: string;
+    heroColor?: string;
     heroImagePosition?: string;
     heroImageScale?: number;
     heroTitle: string;
@@ -31,12 +32,13 @@ export function ShopContentV4({
     products,
     categories,
     heroImage,
+    heroColor = '#2418a6',
     heroImagePosition = 'center 65%',
     heroImageScale = 1,
     heroTitle,
     heroSubtitle,
     activeCategory,
-    heroHeight = "h-[45vh] min-h-[400px]",
+    heroHeight = "h-[35vh] min-h-[280px]",
 }: ShopContentV4Props) {
     const [sort, setSort] = useState<SortOption>('newest');
     const [filters, setFilters] = useState<FilterState>({ sizes: [] });
@@ -89,21 +91,28 @@ export function ShopContentV4({
         <div className="min-h-screen pb-20" style={{ background: '#FDF5E6' }}>
 
             {/* ═══ HERO ═══ */}
-            <div className={cn("relative overflow-hidden", heroHeight)}>
-                <Image
-                    src={heroImage}
-                    alt={heroTitle}
-                    fill
-                    className="object-cover"
-                    style={{
-                        objectPosition: heroImagePosition,
-                        transform: `scale(${heroImageScale})`
-                    }}
-                    priority
-                />
-                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div
+                className={cn("relative overflow-hidden", heroHeight)}
+                style={{ backgroundColor: heroColor }}
+            >
+                {heroImage && (
+                    <>
+                        <Image
+                            src={heroImage}
+                            alt={heroTitle}
+                            fill
+                            className="object-cover"
+                            style={{
+                                objectPosition: heroImagePosition,
+                                transform: `scale(${heroImageScale})`
+                            }}
+                            priority
+                        />
+                        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    </>
+                )}
 
-                <div className="absolute inset-0 flex flex-col justify-end pb-16 px-6 sm:px-12 lg:px-20 max-w-[1600px] mx-auto">
+                <div className="absolute inset-0 flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-[1px] bg-[#B89547]" />
                         <span className="font-sans text-sm uppercase tracking-[0.4em] text-[#B89547] font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
@@ -111,7 +120,7 @@ export function ShopContentV4({
                         </span>
                     </div>
 
-                    <h1 className="font-[family-name:var(--font-playfair)] text-5xl md:text-7xl text-white mb-4 leading-[0.9] tracking-tight">
+                    <h1 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-5xl md:text-7xl text-white mb-4 leading-[0.9] tracking-tight">
                         {heroTitle.split(' ')[0]} <span className="italic ml-4">{heroTitle.split(' ').slice(1).join(' ')}</span>
                     </h1>
 
@@ -123,8 +132,8 @@ export function ShopContentV4({
 
             {/* ═══ CATEGORIES ═══ */}
             <div className="max-w-[1600px] mx-auto px-6 md:px-20 py-10 flex flex-col items-center">
-                <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-                    <Link href={`/shop/${gender}`} className={cn("relative group font-[family-name:var(--font-newsreader)] text-2xl italic", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}>
+                <div className="flex flex-wrap justify-center gap-x-5 sm:gap-x-8 md:gap-x-12 gap-y-4 sm:gap-y-6">
+                    <Link href={`/shop/${gender}`} className={cn("relative group font-[family-name:var(--font-newsreader)] text-lg sm:text-xl md:text-2xl italic", !activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}>
                         Tout voir
                         <div className={cn("absolute -bottom-2 left-0 h-[1px] bg-[#B89547] transition-all duration-500", !activeCategory ? "w-full" : "w-0 group-hover:w-full")} />
                     </Link>
@@ -132,7 +141,7 @@ export function ShopContentV4({
                         <Link
                             key={cat.id}
                             href={`/shop/${gender}/${cat.slug}`}
-                            className={cn("relative group font-[family-name:var(--font-newsreader)] text-2xl italic", cat.slug === activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}
+                            className={cn("relative group font-[family-name:var(--font-newsreader)] text-lg sm:text-xl md:text-2xl italic", cat.slug === activeCategory ? "text-[#1B0B94]" : "text-[#1B0B94]/40 hover:text-[#1B0B94]")}
                         >
                             {cat.label}
                             <div className={cn("absolute -bottom-2 left-0 h-[1px] bg-[#B89547] transition-all duration-500", cat.slug === activeCategory ? "w-full" : "w-0 group-hover:w-full")} />

@@ -55,13 +55,13 @@ export default function RegisterForm() {
           </div>
           <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
             <div className="mb-4 text-[#1B0B94] text-4xl">&#10003;</div>
-            <h2 className="font-playfair text-2xl text-[#1a1510] mb-4">Inscription reussie</h2>
+            <h2 className="font-playfair text-2xl text-[#1a1510] mb-4">Inscription réussie</h2>
             <p className="text-[#5a4d3e] font-body text-sm mb-6">
-              Un email de confirmation vous a ete envoye. Verifiez votre boite de reception pour activer votre compte.
+              Un email de confirmation vous a été envoyé. Vérifiez votre boîte de réception pour activer votre compte.
             </p>
             <Link
               href="/connexion"
-              className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors"
+              className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors"
             >
               Se connecter
             </Link>
@@ -80,7 +80,7 @@ export default function RegisterForm() {
         </div>
 
         <div className="bg-[#FEFAF3] rounded-2xl p-8 shadow-sm border border-[#c4b49c]/20">
-          <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-8">Creer un compte</h2>
+          <h2 className="font-playfair text-2xl text-[#1a1510] text-center mb-8">Créer un compte</h2>
 
           {error && (
             <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center font-body">
@@ -91,7 +91,7 @@ export default function RegisterForm() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prenom</label>
+                <label htmlFor="firstName" className="block text-sm text-[#5a4d3e] mb-1.5 font-body">Prénom</label>
                 <input
                   id="firstName"
                   type="text"
@@ -139,7 +139,7 @@ export default function RegisterForm() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
-                placeholder="8 caracteres minimum"
+                placeholder="8 caractères minimum"
               />
             </div>
 
@@ -160,20 +160,20 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                   Inscription...
                 </span>
-              ) : 'Creer mon compte'}
+              ) : 'Créer mon compte'}
             </button>
           </form>
 
           <p className="text-center mt-6 text-sm text-[#5a4d3e] font-body">
             Deja un compte ?{' '}
-            <Link href="/connexion" className="text-[#1B0B94] hover:text-[#b3933d] transition-colors font-medium">
+            <Link href="/connexion" className="text-[#1B0B94] hover:text-[#B89547] transition-colors font-medium">
               Se connecter
             </Link>
           </p>

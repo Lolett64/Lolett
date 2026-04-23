@@ -155,6 +155,8 @@ export function ContactV2({ content, visibleSections }: ContactV2Props) {
   const show = (key: string) => !visibleSections?.length || visibleSections.includes(key);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', subject: '', message: '', honeypot: '' });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const contactEmail = content?.email || 'hello@lolett.com';
   const contactAddress = content?.address || 'Sud de la France';
@@ -162,15 +164,39 @@ export function ContactV2({ content, visibleSections }: ContactV2Props) {
   const faqItems = [
     { q: content?.faq1_q || 'Quels sont les délais de livraison ?', a: content?.faq1_a || 'Compte 3 à 5 jours ouvrés pour la France métropolitaine. La livraison est offerte dès 100€ d\u2019achat.' },
     { q: content?.faq2_q || 'Comment faire un retour ?', a: content?.faq2_a || 'Tu as 14 jours après réception pour me retourner tes articles dans leur état d\u2019origine. Envoie-moi un email et je t\u2019envoie une étiquette retour.' },
-    { q: content?.faq3_q || 'Comment choisir ma taille ?', a: content?.faq3_a || 'Un guide des tailles détaillé est dispo sur chaque fiche produit. En cas de doute, écris-moi !' },
     { q: content?.faq4_q || 'Où sont fabriquées les pièces ?', a: content?.faq4_a || 'Je travaille avec des ateliers familiaux au Portugal et en Italie, sélectionnés pour leur savoir-faire.' },
   ];
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.honeypot) return;
-    setSent(true);
-  }, [form.honeypot]);
+    setSending(true);
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+          website: form.honeypot,
+        }),
+      });
+      if (res.ok) {
+        setSent(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Une erreur est survenue. Réessayez.');
+      }
+    } catch {
+      setError('Erreur réseau — vérifiez votre connexion.');
+    } finally {
+      setSending(false);
+    }
+  }, [form]);
 
   const updateField = (field: string) => (val: string) => setForm(prev => ({ ...prev, [field]: val }));
 
@@ -309,22 +335,29 @@ export function ContactV2({ content, visibleSections }: ContactV2Props) {
                   </Reveal>
 
                   <Reveal delay={0.4}>
+                    {error && (
+                      <p style={{ fontFamily: sans, fontSize: '13px', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 16px', margin: 0 }}>
+                        {error}
+                      </p>
+                    )}
                     <button
                       type="submit"
+                      disabled={sending}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                         width: '100%', padding: '16px 32px',
                         background: GOLD, color: '#fff',
                         fontFamily: sans, fontSize: '12px', fontWeight: 500,
                         letterSpacing: '2px', textTransform: 'uppercase',
-                        border: 'none', cursor: 'pointer',
+                        border: 'none', cursor: sending ? 'not-allowed' : 'pointer',
                         transition: 'opacity 0.2s ease', marginTop: '8px',
+                        opacity: sending ? 0.6 : 1,
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                      onMouseEnter={(e) => { if (!sending) e.currentTarget.style.opacity = '0.85'; }}
+                      onMouseLeave={(e) => { if (!sending) e.currentTarget.style.opacity = '1'; }}
                     >
-                      Envoyer
-                      <Send size={16} />
+                      {sending ? 'Envoi en cours...' : 'Envoyer'}
+                      {!sending && <Send size={16} />}
                     </button>
                   </Reveal>
                 </form>

@@ -17,6 +17,7 @@ import { useCategoryForm } from '@/components/admin/categories/useCategoryForm';
 export default function AdminCategoriesPage() {
   const {
     categories,
+    productCounts,
     loading,
     showForm,
     editingId,
@@ -163,6 +164,7 @@ export default function AdminCategoriesPage() {
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-[#1a1510] text-sm">{cat.label}</span>
+                        <span className="text-xs text-[#1a1510]/40">({productCounts[cat.slug] ?? 0} produits)</span>
                         <Badge variant="outline" className="text-xs font-mono text-[#1a1510]/50 border-gray-200">{cat.slug}</Badge>
                       </div>
                       {cat.seo_title && (

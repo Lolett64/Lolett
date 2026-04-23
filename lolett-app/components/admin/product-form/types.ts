@@ -1,4 +1,9 @@
-export const AVAILABLE_SIZES = ['TU', 'XS', 'S', 'M', 'L', 'XL'] as const;
+export const AVAILABLE_SIZES = [
+  'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL',
+  '29', '30', '31', '32', '33', '34', '35', '36', '37', '38',
+  '39', '40', '41', '42', '43', '44',
+  'S/M', 'M/L',
+] as const;
 
 export interface ProductColor {
   name: string;
@@ -16,6 +21,8 @@ export interface ProductFormData {
   name: string;
   slug: string;
   description: string;
+  composition: string;
+  model_info: string;
   price: string;
   compare_at_price: string;
   gender: string;
@@ -49,6 +56,11 @@ export const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string 
     { slug: 'bijoux', label: 'Bijoux' },
     { slug: 'chaussures', label: 'Chaussures' },
     { slug: 'sacs', label: 'Sacs' },
+  ],
+  both: [
+    { slug: 'hauts', label: 'Hauts' },
+    { slug: 'bas', label: 'Bas' },
+    { slug: 'accessoires', label: 'Accessoires' },
   ],
 };
 

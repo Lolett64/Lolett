@@ -1,15 +1,15 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderFilters } from '@/components/admin/OrderFilters';
-import { formatPrice, formatDate } from '@/lib/admin/utils';
-import { ChevronRight } from 'lucide-react';
+import { OrdersTable } from '@/components/admin/OrdersTable';
+import { OrdersPagination } from '@/components/admin/OrdersPagination';
 
 interface SearchParams {
   status?: string;
   sort?: string;
   order?: string;
+  page?: string;
+  limit?: string;
 }
 
 interface OrderRow {
@@ -23,91 +23,70 @@ interface OrderRow {
   created_at: string;
 }
 
-async function getOrders(params: SearchParams): Promise<OrderRow[]> {
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+
+async function getOrders(params: SearchParams): Promise<{ orders: OrderRow[]; total: number; page: number; limit: number; totalPages: number }> {
   const supabase = createAdminClient();
+
+  const pageRaw = Number(params.page ?? '1');
+  const limitRaw = Number(params.limit ?? String(DEFAULT_LIMIT));
+  const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
+  const limit = Number.isFinite(limitRaw) && limitRaw > 0
+    ? Math.min(Math.floor(limitRaw), MAX_LIMIT)
+    : DEFAULT_LIMIT;
+
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   let query = supabase
     .from('orders')
-    .select('id, order_number, customer, total, shipping, status, payment_provider, created_at');
+    .select(
+      'id, order_number, customer, total, shipping, status, payment_provider, created_at',
+      { count: 'exact' },
+    );
 
   if (params.status) query = query.eq('status', params.status);
 
   const validSortFields = ['created_at', 'total', 'status'];
   const sortField = validSortFields.includes(params.sort ?? '') ? params.sort! : 'created_at';
-  query = query.order(sortField, { ascending: params.order === 'asc' });
+  query = query
+    .order(sortField, { ascending: params.order === 'asc' })
+    .range(from, to);
 
-  const { data } = await query;
-  return (data ?? []) as OrderRow[];
+  const { data, count } = await query;
+  const total = count ?? 0;
+  const totalPages = total > 0 ? Math.ceil(total / limit) : 1;
+
+  return {
+    orders: (data ?? []) as OrderRow[],
+    total,
+    page,
+    limit,
+    totalPages,
+  };
 }
 
 async function OrdersContent({ searchParams }: { searchParams: SearchParams }) {
-  const orders = await getOrders(searchParams);
+  const { orders, total, page, limit, totalPages } = await getOrders(searchParams);
+  const showingFrom = total === 0 ? 0 : (page - 1) * limit + 1;
+  const showingTo = Math.min(page * limit, total);
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h2 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510]">Commandes</h2>
-        <p className="text-sm text-[#B89547]/70 mt-1">{orders.length} commande(s)</p>
+        <p className="text-sm text-[#B89547]/70 mt-1">
+          {total === 0 ? 'Aucune commande' : `${showingFrom}–${showingTo} sur ${total} commande${total > 1 ? 's' : ''}`}
+        </p>
       </div>
 
       <OrderFilters />
 
-      {orders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#B89547]/30 p-12 text-center">
-          <p className="text-[#B89547]/60">Aucune commande trouvée</p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-gray-200/50 bg-white overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-gray-200/50 bg-[#FDF5E6]">
-                <tr>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Commande</th>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden md:table-cell">Client</th>
-                  <th className="text-left px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden lg:table-cell">Date</th>
-                  <th className="text-center px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Statut</th>
-                  <th className="text-right px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50 hidden sm:table-cell">Paiement</th>
-                  <th className="text-right px-4 py-3 font-[family-name:var(--font-montserrat)] text-[10px] font-semibold uppercase tracking-wider text-[#1a1510]/50">Total</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100/50">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#FDF5E6] transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-[family-name:var(--font-montserrat)] font-medium text-[#1a1510]">{order.order_number}</div>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <div className="text-[#1a1510]/70">
-                        {order.customer?.firstName} {order.customer?.lastName}
-                      </div>
-                      <div className="text-xs text-[#1a1510]/40">{order.customer?.email}</div>
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell text-[#1a1510]/50 text-xs">
-                      {formatDate(order.created_at)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-4 py-3 text-right hidden sm:table-cell text-[#1a1510]/50 capitalize text-xs">
-                      {order.payment_provider ?? '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium text-[#1a1510]">
-                      {formatPrice(order.total)}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="inline-flex items-center text-[#1a1510]/30 hover:text-[#B89547] transition-colors"
-                      >
-                        <ChevronRight className="size-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <OrdersTable orders={orders} />
+
+      {totalPages > 1 && (
+        <OrdersPagination page={page} totalPages={totalPages} />
       )}
     </div>
   );

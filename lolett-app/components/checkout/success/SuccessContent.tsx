@@ -130,9 +130,9 @@ export function SuccessContent() {
           <div className="ckv-reveal" style={{ animationDelay: '400ms' }}>
             <p style={{ fontSize: 13, color: '#9B8E82', margin: '24px 0', fontFamily: "'DM Sans', sans-serif" }}>
               {order ? (
-                <>Un email de confirmation vous a ete envoye a <span style={{ fontWeight: 500, color: '#2C2420' }}>{order.customer.email}</span>.</>
+                <>Un email de confirmation vous a été envoyé à <span style={{ fontWeight: 500, color: '#2C2420' }}>{order.customer.email}</span>.</>
               ) : (
-                'Un email de confirmation vous a ete envoye.'
+                'Un email de confirmation vous a été envoyé.'
               )}
             </p>
           </div>

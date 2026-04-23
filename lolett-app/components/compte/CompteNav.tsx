@@ -11,7 +11,7 @@ const links = [
   { href: '/compte/commandes', label: 'Mes commandes', icon: Package },
   { href: '/compte/adresses', label: 'Mes adresses', icon: MapPin },
   { href: '/compte/favoris', label: 'Mes favoris', icon: Heart },
-  { href: '/compte/fidelite', label: 'Programme fidelite', icon: Award },
+  { href: '/compte/fidelite', label: 'Programme fidélité', icon: Award },
   { href: '/compte/avis', label: 'Mes avis', icon: Star },
 ];
 
@@ -57,7 +57,7 @@ export function CompteNav() {
           className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-[#5a4d3e] hover:bg-[#f3efe8] transition-colors font-body"
         >
           <LogOut className="h-4 w-4" />
-          Deconnexion
+          Déconnexion
         </button>
       </div>
     </nav>

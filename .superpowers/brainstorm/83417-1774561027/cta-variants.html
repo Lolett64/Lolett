@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOLETT — CTA Section — 3 Variantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #1a1510; color: #FDF5E6; }
+  .header { text-align: center; padding: 48px 24px 24px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 8px; }
+  .header p { font-size: 13px; opacity: 0.4; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .variants { display: flex; flex-direction: column; gap: 32px; padding: 24px 32px 64px; max-width: 1100px; margin: 0 auto; }
+
+  .variant {
+    border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+    position: relative; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .variant:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
+  .variant.selected { outline: 3px solid #B89547; outline-offset: 4px; }
+  .variant.selected::after {
+    content: '✓'; position: absolute; top: 12px; right: 12px; background: #B89547; color: white;
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; z-index: 10;
+  }
+  .vlabel { padding: 14px 20px; background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+  .vlabel h3 { font-family: 'Playfair Display', serif; font-size: 15px; color: #B89547; }
+  .vlabel p { font-size: 11px; opacity: 0.35; max-width: 400px; text-align: right; }
+
+  /* ═══ A — Split Image + CTA ═══ */
+  .cta-a {
+    display: flex; height: 340px; background: #FDF5E6;
+  }
+  .cta-a-img {
+    width: 50%; background: linear-gradient(135deg, #e8e4dc, #d8d4cc);
+    position: relative; overflow: hidden;
+  }
+  .cta-a-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to right, transparent 60%, #FDF5E6);
+  }
+  .cta-a-img .placeholder {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(27,11,148,0.15);
+  }
+  .cta-a-content {
+    width: 50%; display: flex; flex-direction: column; justify-content: center; padding: 48px 56px;
+  }
+  .cta-a-content .overtitle {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: #B89547; margin-bottom: 16px;
+  }
+  .cta-a-content h2 {
+    font-family: 'Playfair Display', serif; font-size: 36px; color: #1B0B94; line-height: 1.15; margin-bottom: 16px;
+  }
+  .cta-a-content h2 em { font-style: italic; font-weight: 400; }
+  .cta-a-content p { font-size: 13px; color: #5a4d3e; line-height: 1.7; margin-bottom: 32px; max-width: 360px; }
+  .cta-a-content .btns { display: flex; gap: 12px; }
+  .cta-a-content .btn {
+    padding: 14px 28px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.3s;
+  }
+  .cta-a-content .btn-primary { background: #1B0B94; color: white; }
+  .cta-a-content .btn-outline { background: transparent; border: 1px solid rgba(27,11,148,0.15); color: #1B0B94; }
+
+  /* ═══ B — Full-width Dark Band ═══ */
+  .cta-b {
+    height: 280px; background: #0C0A1E; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 40px; position: relative; overflow: hidden;
+  }
+  .cta-b::before {
+    content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+    width: 120%; height: 100%;
+    background: radial-gradient(ellipse at center, rgba(184,149,71,0.08) 0%, transparent 60%);
+  }
+  .cta-b .overtitle {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,149,71,0.5);
+    margin-bottom: 16px; position: relative; z-index: 1;
+  }
+  .cta-b h2 {
+    font-family: 'Playfair Display', serif; font-size: 34px; color: white; margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .cta-b h2 em { font-style: italic; font-weight: 400; color: #B89547; }
+  .cta-b p {
+    font-size: 12px; color: rgba(255,255,255,0.3); margin-bottom: 28px; max-width: 420px;
+    position: relative; z-index: 1;
+  }
+  .cta-b .btns { display: flex; gap: 12px; position: relative; z-index: 1; }
+  .cta-b .btn {
+    padding: 14px 32px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.3s;
+  }
+  .cta-b .btn-gold { background: linear-gradient(135deg, #B89547, #D4AF37); color: #0C0A1E; }
+  .cta-b .btn-ghost { background: transparent; border: 1px solid rgba(184,149,71,0.2); color: rgba(255,255,255,0.6); }
+
+  /* ═══ C — Centré Minimal Crème ═══ */
+  .cta-c {
+    height: 320px; background: #FDF5E6; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 40px; position: relative;
+  }
+  .cta-c::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03; pointer-events: none;
+  }
+  .cta-c .sep { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; position: relative; z-index: 1; }
+  .cta-c .sep::before, .cta-c .sep::after { content: ''; width: 40px; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,149,71,0.3), transparent); }
+  .cta-c .sep .dia { width: 5px; height: 5px; background: rgba(184,149,71,0.4); transform: rotate(45deg); }
+
+  .cta-c h2 {
+    font-family: 'Playfair Display', serif; font-size: 38px; font-style: italic; color: #1B0B94;
+    margin-bottom: 12px; position: relative; z-index: 1;
+  }
+  .cta-c p {
+    font-size: 13px; color: #5a4d3e; margin-bottom: 32px; max-width: 440px; line-height: 1.7;
+    position: relative; z-index: 1;
+  }
+  .cta-c .btns { display: flex; gap: 14px; position: relative; z-index: 1; }
+  .cta-c .btn {
+    padding: 14px 32px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 500;
+    border: none; cursor: pointer; border-radius: 6px; transition: all 0.3s;
+  }
+  .cta-c .btn-primary { background: #1B0B94; color: white; }
+  .cta-c .btn-outline { background: transparent; border: 1px solid rgba(27,11,148,0.12); color: #1B0B94; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Section CTA — 3 variantes</h1>
+  <p>Dernière section avant le footer · Clique sur ta préférée</p>
+</div>
+
+<div class="variants">
+
+  <!-- A — Split Image + CTA -->
+  <div class="variant" data-choice="a" onclick="sel(this)">
+    <div class="cta-a">
+      <div class="cta-a-img"><div class="placeholder">Photo lookbook</div></div>
+      <div class="cta-a-content">
+        <div class="overtitle">Collection Été 2026</div>
+        <h2>Trouve <em>ton style</em></h2>
+        <p>Des looks complets pensés au Sud. Pour lui, pour elle. Livraison offerte dès 100 €.</p>
+        <div class="btns">
+          <button class="btn btn-primary">Femme</button>
+          <button class="btn btn-outline">Homme</button>
+        </div>
+      </div>
+    </div>
+    <div class="vlabel">
+      <h3>A — Split Image + CTA</h3>
+      <p>Photo lookbook à gauche, texte + boutons à droite. Éditorial, immersif.</p>
+    </div>
+  </div>
+
+  <!-- B — Full-width Dark Band -->
+  <div class="variant" data-choice="b" onclick="sel(this)">
+    <div class="cta-b">
+      <div class="overtitle">Prêt à changer de style ?</div>
+      <h2>Découvre <em>la collection</em></h2>
+      <p>Pièces uniques, matières nobles, looks complets. Livraison offerte dès 100 €.</p>
+      <div class="btns">
+        <button class="btn btn-gold">Voir la boutique</button>
+        <button class="btn btn-ghost">Notre histoire</button>
+      </div>
+    </div>
+    <div class="vlabel">
+      <h3>B — Bandeau Dark Luxe</h3>
+      <p>Bande sombre pleine largeur, glow doré, bouton gradient or. Rupture visuelle forte.</p>
+    </div>
+  </div>
+
+  <!-- C — Centré Minimal Crème -->
+  <div class="variant" data-choice="c" onclick="sel(this)">
+    <div class="cta-c">
+      <div class="sep"><div class="dia"></div></div>
+      <h2>Prêt à sortir ?</h2>
+      <p>Des looks complets pensés au Sud-Ouest. Pour lui, pour elle. Livraison offerte dès 100 € d'achat.</p>
+      <div class="btns">
+        <button class="btn btn-primary">Vestiaire Femme</button>
+        <button class="btn btn-outline">Vestiaire Homme</button>
+      </div>
+    </div>
+    <div class="vlabel">
+      <h3>C — Centré Minimal Crème</h3>
+      <p>Même fond crème, séparateur doré, titre italique. Cohérent avec le login redesigné.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function sel(el) {
+  document.querySelectorAll('.variant').forEach(v => { if (v !== el) v.classList.remove('selected'); });
+  el.classList.toggle('selected');
+}
+</script>
+</body>
+</html>

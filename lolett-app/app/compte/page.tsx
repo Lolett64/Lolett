@@ -10,9 +10,9 @@ import type { UserProfile } from '@/types';
 const quickLinks = [
   { href: '/compte/profil', label: 'Mon profil', icon: User, desc: 'Modifier mes informations' },
   { href: '/compte/commandes', label: 'Mes commandes', icon: Package, desc: 'Suivre mes achats' },
-  { href: '/compte/adresses', label: 'Mes adresses', icon: MapPin, desc: 'Gerer mes adresses' },
-  { href: '/compte/favoris', label: 'Mes favoris', icon: Heart, desc: 'Mes articles sauvegardes' },
-  { href: '/compte/fidelite', label: 'Fidelite', icon: Award, desc: 'Points et recompenses' },
+  { href: '/compte/adresses', label: 'Mes adresses', icon: MapPin, desc: 'Gérer mes adresses' },
+  { href: '/compte/favoris', label: 'Mes favoris', icon: Heart, desc: 'Mes articles sauvegardés' },
+  { href: '/compte/fidelite', label: 'Fidélité', icon: Award, desc: 'Points et récompenses' },
 ];
 
 export default function CompteDashboard() {
@@ -37,7 +37,7 @@ export default function CompteDashboard() {
           {firstName ? `Bienvenue, ${firstName}` : 'Bienvenue'}
         </h1>
         <p className="text-[#5a4d3e] font-body text-sm mt-1">
-          Gerez votre compte et suivez vos commandes.
+          Gérez votre compte et suivez vos commandes.
         </p>
       </div>
 
@@ -45,7 +45,7 @@ export default function CompteDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 text-center">
           <p className="font-playfair text-2xl text-[#1B0B94]">{profile?.loyaltyPoints ?? 0}</p>
-          <p className="text-xs text-[#8a7d6b] font-body mt-1">Points fidelite</p>
+          <p className="text-xs text-[#8a7d6b] font-body mt-1">Points fidélité</p>
         </div>
         <div className="bg-white rounded-xl border border-[#c4b49c]/15 shadow-sm p-5 text-center">
           <p className="font-playfair text-2xl text-[#1B0B94]">{orderCount ?? 0}</p>

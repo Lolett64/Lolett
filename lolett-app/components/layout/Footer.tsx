@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { TikTokIcon, InstagramIcon, FacebookIcon } from '@/components/icons';
+import { CookieSettingsButton } from './CookieSettingsButton';
 
 const footerLinks = {
   shop: [
@@ -9,10 +10,9 @@ const footerLinks = {
     { name: 'Femme', href: '/shop/femme' },
     { name: 'Nouveautés', href: '/nouveautes' },
   ],
-  help: [
+  brand: [
+    { name: 'Notre histoire', href: '/notre-histoire' },
     { name: 'Contact', href: '/contact' },
-    { name: 'Livraison', href: '/contact' },
-    { name: 'Retours', href: '/contact' },
   ],
   legal: [
     { name: 'CGV', href: '/cgv' },
@@ -97,13 +97,13 @@ export function Footer({ content }: FooterProps) {
             </ul>
           </div>
 
-          {/* Aide */}
+          {/* La marque */}
           <div>
             <h4 className="font-display mb-4 text-sm font-semibold tracking-wider uppercase">
-              Aide
+              La marque
             </h4>
             <ul className="space-y-3">
-              {footerLinks.help.map((link) => (
+              {footerLinks.brand.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -132,6 +132,9 @@ export function Footer({ content }: FooterProps) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <CookieSettingsButton />
+              </li>
             </ul>
           </div>
         </div>

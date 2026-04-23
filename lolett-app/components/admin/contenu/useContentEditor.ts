@@ -15,6 +15,7 @@ export interface ContentItem {
 // Ordre = parcours du site (landing -> pages -> global)
 const SECTION_ORDER = [
   'hero',
+  'shop',
   'collections',
   'brand_story',
   'looks',
@@ -28,6 +29,7 @@ const SECTION_ORDER = [
 
 export const SECTION_LABELS: Record<string, string> = {
   hero: 'Hero / Accueil',
+  shop: 'Page Boutique',
   collections: 'Collections',
   brand_story: 'Histoire de marque',
   looks: 'Looks du moment',

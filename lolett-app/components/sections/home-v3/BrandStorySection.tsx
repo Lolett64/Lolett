@@ -20,7 +20,7 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
           <ScrollReveal className="relative">
             <div className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-[0_20px_80px_rgba(27,11,148,0.10)]">
               <Image
-                src="/images/fondatrice.jpg"
+                src={content?.founder_image || '/images/fondatrice.jpg'}
                 alt="Lola, fondatrice de LOLETT"
                 fill
                 className="object-cover object-top"
@@ -29,8 +29,12 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
             </div>
             {/* Label flottant */}
             <div className="absolute -bottom-5 -right-4 md:-right-8 bg-[#1B0B94] text-white px-6 py-4">
-              <p className="text-[9px] uppercase tracking-[0.35em] font-semibold text-[#B89547] mb-1">Fondatrice</p>
-              <p className="font-[family-name:var(--font-newsreader)] text-xl italic">Lolett</p>
+              <p className="text-[9px] uppercase tracking-[0.35em] font-semibold text-[#B89547] mb-1">
+                {content?.founder_label || 'Fondatrice'}
+              </p>
+              <p className="font-[family-name:var(--font-newsreader)] text-xl italic">
+                {content?.founder_caption || 'Lolett'}
+              </p>
             </div>
           </ScrollReveal>
 
@@ -39,23 +43,25 @@ export function BrandStorySection({ content, hexColor = '#FFFFFF' }: BrandStoryS
             <ScrollReveal>
               <div className="flex items-center gap-4 mb-8">
                 <span className="w-8 h-px bg-[#B89547]/60" />
-                <span className="text-[#B89547] text-[9px] uppercase tracking-[0.5em] font-semibold">Mon histoire</span>
+                <span className="text-[#B89547] text-[9px] uppercase tracking-[0.5em] font-semibold">
+                  {content?.eyebrow || 'Mon histoire'}
+                </span>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
               <h2 className="font-[family-name:var(--font-newsreader)] text-4xl md:text-5xl lg:text-[3.2rem] text-[#1B0B94] leading-[1.1] tracking-tight mb-8">
-                "Je sélectionne chaque pièce comme si c'était pour moi"
+                &ldquo;{content?.quote || "Je sélectionne chaque pièce comme si c'était pour moi"}&rdquo;
               </h2>
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
               <div className="w-8 h-px bg-[#B89547]/50 mb-8" />
               <p className="text-sm md:text-base leading-[1.9] text-[#1B0B94]/65 mb-4 font-[family-name:var(--font-montserrat)]">
-                LOLETT est née d'une envie simple : proposer des pièces que j'aurais moi-même envie de porter. Des matières que l'on sent, des coupes qui restent — sans jamais sacrifier le confort au style.
+                {content?.body_text || "LOLETT est née d'une envie simple : proposer des pièces que j'aurais moi-même envie de porter. Des matières que l'on sent, des coupes qui restent — sans jamais sacrifier le confort au style."}
               </p>
               <p className="text-sm md:text-base leading-[1.9] text-[#1B0B94]/65 font-[family-name:var(--font-montserrat)]">
-                Chaque sélection est pensée depuis le Sud-Ouest, avec cette idée que s'habiller, c'est s'exprimer — pas impressionner.
+                {content?.body_text_2 || "Chaque sélection est pensée depuis le Sud-Ouest, avec cette idée que s'habiller, c'est s'exprimer — pas impressionner."}
               </p>
             </ScrollReveal>
 

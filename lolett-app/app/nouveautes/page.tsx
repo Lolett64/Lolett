@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { NouveautesContentV2 } from '@/components/product/NouveautesContentV2';
 import { productRepository, lookRepository } from '@/lib/adapters';
+import { getSiteContent } from '@/lib/cms/content';
 
 export const revalidate = 60;
 
@@ -20,8 +21,11 @@ export const metadata: Metadata = {
 };
 
 export default async function NouveautesPage() {
-  const newProducts = await productRepository.findMany({ isNew: true });
-  const looks = await lookRepository.findMany();
+  const [newProducts, looks, cms] = await Promise.all([
+    productRepository.findMany({ isNew: true }),
+    lookRepository.findMany(),
+    getSiteContent('nouveautes'),
+  ]);
 
   const lookProductsEntries = await Promise.all(
     looks.map(async (look: { id: string; productIds: string[] }) => {
@@ -37,6 +41,9 @@ export default async function NouveautesPage() {
         products={newProducts}
         looks={looks}
         lookProducts={lookProducts}
+        heroBadge={cms.badge}
+        heroTitle={cms.hero_title}
+        heroSubtitle={cms.hero_subtitle}
       />
     </div>
   );

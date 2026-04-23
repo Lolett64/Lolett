@@ -81,8 +81,45 @@ export default async function ProductPage({ params }: PageProps) {
   const allGenderProducts = await productRepository.findMany({ gender: product.gender });
   const relatedProducts = allGenderProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Shop', item: `${BASE_URL}/shop` },
+      { '@type': 'ListItem', position: 2, name: genderLabel, item: `${BASE_URL}/shop/${product.gender}` },
+      ...(category ? [{ '@type': 'ListItem', position: 3, name: category.label, item: `${BASE_URL}/shop/${product.gender}/${category.slug}` }] : []),
+      { '@type': 'ListItem', position: category ? 4 : 3, name: product.name },
+    ],
+  };
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.images,
+    brand: { '@type': 'Brand', name: 'LOLETT' },
+    url: `${BASE_URL}/produit/${product.slug}`,
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      url: `${BASE_URL}/produit/${product.slug}`,
+      seller: { '@type': 'Organization', name: 'LOLETT' },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: product.price >= 100 ? '0' : '5.90', currency: 'EUR' },
+        deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' } },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+      },
+    },
+  };
+
   return (
     <div className="pt-20 pb-16 sm:pt-24 sm:pb-20 min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="container">
         <Breadcrumbs
           items={[

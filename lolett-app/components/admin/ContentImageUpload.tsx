@@ -12,18 +12,25 @@ interface ContentImageUploadProps {
 export function ContentImageUpload({ value, onChange, label }: ContentImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = useCallback(async (file: File) => {
     setUploading(true);
+    setError(null);
     try {
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || `Erreur upload (${res.status})`);
+        return;
+      }
       if (data.url) onChange(data.url);
+      else setError('Réponse invalide du serveur');
     } catch {
-      // silent
+      setError('Erreur réseau — vérifiez votre connexion');
     } finally {
       setUploading(false);
     }
@@ -80,6 +87,10 @@ export function ContentImageUpload({ value, onChange, label }: ContentImageUploa
           </>
         )}
       </div>
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
+      )}
 
       <input
         ref={inputRef}

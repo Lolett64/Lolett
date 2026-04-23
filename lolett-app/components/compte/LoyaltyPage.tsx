@@ -39,7 +39,7 @@ export function LoyaltyPage() {
 
   return (
     <div>
-      <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Programme fidelite</h1>
+      <h1 className="font-playfair text-xl text-[#1a1510] mb-6">Programme fidélité</h1>
 
       {/* Points card */}
       <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8 mb-6">
@@ -50,8 +50,8 @@ export function LoyaltyPage() {
         <p className="font-playfair text-5xl text-[#1B0B94] mb-2">{points}</p>
         <p className="text-sm text-[#8a7d6b] font-body">
           {nextReward
-            ? `Plus que ${nextReward.pointsCost - points} points pour debloquer "${nextReward.name}"`
-            : 'Toutes les recompenses sont debloquees !'
+            ? `Plus que ${nextReward.pointsCost - points} points pour débloquer "${nextReward.name}"`
+            : 'Toutes les récompenses sont débloquées !'
           }
         </p>
 
@@ -73,11 +73,11 @@ export function LoyaltyPage() {
 
       {/* Rewards */}
       <div className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm p-6 sm:p-8">
-        <h2 className="font-playfair text-lg text-[#1a1510] mb-4">Recompenses disponibles</h2>
+        <h2 className="font-playfair text-lg text-[#1a1510] mb-4">Récompenses disponibles</h2>
         {rewards.length === 0 ? (
           <div className="text-center py-8">
             <Gift className="h-10 w-10 text-[#c4b49c]/40 mx-auto mb-3" />
-            <p className="text-sm text-[#8a7d6b] font-body">Aucune recompense disponible pour le moment.</p>
+            <p className="text-sm text-[#8a7d6b] font-body">Aucune récompense disponible pour le moment.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -92,9 +92,9 @@ export function LoyaltyPage() {
                   </div>
                   <button
                     disabled={!canRedeem}
-                    className="px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white text-xs font-semibold font-body transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white text-xs font-semibold font-body transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    Echanger
+                    Échanger
                   </button>
                 </div>
               );

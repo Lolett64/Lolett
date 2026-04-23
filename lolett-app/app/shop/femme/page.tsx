@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
+import { getSiteContent } from '@/lib/cms/content';
 
 export const revalidate = 60;
 
@@ -20,8 +21,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopFemmePage() {
-  const products = await productRepository.findMany({ gender: 'femme' });
-  const categories = await categoryRepository.findByGender('femme');
+  const [products, categories, cms] = await Promise.all([
+    productRepository.findMany({ gender: 'femme', limit: 24 }),
+    categoryRepository.findByGender('femme'),
+    getSiteContent('shop_femme'),
+  ]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FDF5E6' }}>
@@ -29,11 +33,10 @@ export default async function ShopFemmePage() {
         gender="femme"
         products={products}
         categories={categories}
-        heroImage="https://plus.unsplash.com/premium_photo-1683141076955-bddd5efbb03c?w=1600&q=80"
-        heroImagePosition="50% 50%"
-        heroHeight="h-[35vh] min-h-[300px]"
-        heroTitle="Collection Femme"
-        heroSubtitle="Robes fluides, tops en lin. L'art de vivre à la mode du Sud-Ouest."
+        heroColor="#2418a6"
+        heroHeight="h-[25vh] min-h-[190px]"
+        heroTitle={cms.hero_title || 'Collection Femme'}
+        heroSubtitle={cms.hero_subtitle || "Robes fluides, tops en lin. L'art de vivre à la mode du Sud-Ouest."}
       />
     </div>
   );

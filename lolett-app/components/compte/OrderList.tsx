@@ -57,7 +57,7 @@ export function OrderList() {
           <p className="text-sm text-[#8a7d6b] font-body mb-6">Vous n&apos;avez pas encore passe de commande.</p>
           <Link
             href="/shop/femme"
-            className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#b3933d] text-white font-semibold font-body text-sm transition-colors"
+            className="inline-block px-6 py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm transition-colors"
           >
             Decouvrir la boutique
           </Link>

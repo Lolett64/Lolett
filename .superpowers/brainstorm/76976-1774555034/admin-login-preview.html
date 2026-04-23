@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOLETT — Admin Login Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0C0A1E;
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Subtle radial glow */
+  body::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 80%;
+    background: radial-gradient(ellipse at center, rgba(27,11,148,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, rgba(184,149,71,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ═══ LEFT — Brand Panel ═══ */
+  .left {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 40px;
+    position: relative;
+    border-right: 1px solid rgba(184,149,71,0.06);
+  }
+
+  .corner { position: absolute; width: 40px; height: 40px; pointer-events: none; }
+  .corner.tl { top: 28px; left: 28px; border-top: 1px solid rgba(184,149,71,0.12); border-left: 1px solid rgba(184,149,71,0.12); }
+  .corner.br { bottom: 28px; right: 28px; border-bottom: 1px solid rgba(184,149,71,0.12); border-right: 1px solid rgba(184,149,71,0.12); }
+
+  .brand-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    letter-spacing: 0.3em;
+    color: #B89547;
+    font-weight: 400;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-sub {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(184,149,71,0.3);
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184,149,71,0.3), transparent);
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border: 1px solid rgba(184,149,71,0.12);
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .brand-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #B89547;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .brand-badge span {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(184,149,71,0.5);
+    font-weight: 500;
+  }
+
+  .left-footer {
+    position: absolute;
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+  .left-footer span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.08);
+    letter-spacing: 0.05em;
+  }
+
+  /* ═══ RIGHT — Form Panel ═══ */
+  .right {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: rgba(255,255,255,0.88);
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .form-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 36px;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(184,149,71,0.45);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .field input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid rgba(184,149,71,0.1);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    padding: 0 16px;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .field input:focus {
+    border-color: rgba(184,149,71,0.3);
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 0 0 3px rgba(184,149,71,0.06);
+  }
+  .field input::placeholder {
+    color: rgba(255,255,255,0.12);
+    font-weight: 300;
+  }
+
+  .btn-primary {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #B89547 0%, #D4AF37 100%);
+    color: #0C0A1E;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 20px rgba(184,149,71,0.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .error-msg {
+    margin-top: 16px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.15);
+    font-size: 12px;
+    color: #f87171;
+    text-align: center;
+  }
+
+  /* Security badge */
+  .security {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 28px;
+  }
+  .security svg { width: 12px; height: 12px; color: rgba(184,149,71,0.25); }
+  .security span {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.12);
+  }
+</style>
+</head>
+<body>
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="corner tl"></div>
+    <div class="corner br"></div>
+
+    <div class="brand-logo">LOLETT</div>
+    <div class="brand-sub">Mode du Sud-Ouest</div>
+    <div class="brand-divider"></div>
+    <div class="brand-badge">
+      <div class="dot"></div>
+      <span>Espace Administration</span>
+    </div>
+
+    <div class="left-footer">
+      <span>v2.0 — Panel Admin</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="form-container">
+      <h1 class="form-title">Administration</h1>
+      <p class="form-subtitle">Accédez au tableau de bord LOLETT</p>
+
+      <form onsubmit="return false">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" placeholder="admin@lolett.fr" />
+        </div>
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+        <button type="button" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Se connecter
+        </button>
+      </form>
+
+      <div class="security">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <span>Connexion sécurisée SSL</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

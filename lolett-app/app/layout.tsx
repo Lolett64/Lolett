@@ -5,6 +5,8 @@ import { SiteChrome } from '@/components/layout/SiteChrome';
 import { AuthProvider } from '@/lib/auth/context';
 import { CartSync } from '@/features/cart/CartSync';
 import { getSiteContent } from '@/lib/cms/content';
+import { CookieConsent } from '@/components/cookies/CookieConsent';
+import { GoogleTagManager } from '@/components/cookies/GoogleTagManager';
 
 export const revalidate = 60;
 
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
   keywords: ['mode', 'vêtements', 'sud-ouest', 'sud', 'été', 'français'],
   authors: [{ name: 'LOLETT' }],
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
@@ -64,10 +66,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable} ${montserrat.variable} ${newsreader.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://qczdwrudgmozyxkdidmr.supabase.co" />
+      </head>
       <body className="font-body antialiased">
+        <GoogleTagManager />
         <AuthProvider>
           <CartSync />
           <SiteChrome footerContent={footerContent}>{children}</SiteChrome>
+          <CookieConsent />
         </AuthProvider>
       </body>
     </html>

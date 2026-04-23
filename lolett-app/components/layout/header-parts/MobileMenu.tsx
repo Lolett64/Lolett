@@ -105,7 +105,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
                   className="flex items-center gap-2 py-2 text-base text-[#5a4d3e] hover:text-[#1B0B94] transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
-                  Deconnexion
+                  Déconnexion
                 </button>
               </div>
             ) : (

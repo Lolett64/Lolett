@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import React from 'react';
-import { sendEmail } from '@/lib/email';
-import { ContactNotification } from '@/lib/email-templates/contact-notification';
-import { ContactAcknowledgment } from '@/lib/email-templates/contact-acknowledgment';
+import { sendHtmlEmail } from '@/lib/email-provider';
+import { renderContactNotification } from '@/lib/email-templates/contact-notification';
+import { renderContactAcknowledgment } from '@/lib/email-templates/contact-acknowledgment';
 
 // Rate limiting: max 3 messages per IP per hour (in-memory, MVP-level)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -126,10 +125,10 @@ export async function POST(request: NextRequest) {
   });
 
   // Envoi de la notification admin (best-effort)
-  const notificationResult = await sendEmail({
+  const notificationResult = await sendHtmlEmail({
     to: adminEmail,
     subject: `[LOLETT Contact] ${trimmedSubject}`,
-    react: React.createElement(ContactNotification, {
+    html: renderContactNotification({
       name: trimmedName,
       email: trimmedEmail,
       subject: trimmedSubject,
@@ -143,10 +142,10 @@ export async function POST(request: NextRequest) {
   }
 
   // Envoi de l'accusé de réception au visiteur (best-effort)
-  const ackResult = await sendEmail({
+  const ackResult = await sendHtmlEmail({
     to: trimmedEmail,
-    subject: 'On a bien recu ton message — LOLETT',
-    react: React.createElement(ContactAcknowledgment, {
+    subject: 'On a bien reçu ton message — LOLETT',
+    html: renderContactAcknowledgment({
       name: trimmedName,
     }),
   });

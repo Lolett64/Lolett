@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
+  const admin = createAdminClient();
   const { data, error } = await admin
     .from('promo_codes')
     .select('*')
@@ -19,6 +14,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
+  const admin = createAdminClient();
 
   const { data, error } = await admin
     .from('promo_codes')
@@ -43,6 +39,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   const body = await req.json();
   const { id, ...updates } = body;
+  const admin = createAdminClient();
 
   if (updates.code) updates.code = updates.code.toUpperCase().trim();
 
@@ -62,6 +59,7 @@ export async function DELETE(req: Request) {
   const id = url.searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
+  const admin = createAdminClient();
   const { error } = await admin.from('promo_codes').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });

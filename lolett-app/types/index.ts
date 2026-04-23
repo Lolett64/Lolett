@@ -1,6 +1,10 @@
-export type Gender = 'homme' | 'femme';
+export type Gender = 'homme' | 'femme' | 'both';
 
-export type Size = 'TU' | 'XS' | 'S' | 'M' | 'L' | 'XL';
+export type Size =
+  | 'TU' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'
+  | '29' | '30' | '31' | '32' | '33' | '34' | '35' | '36' | '37' | '38'
+  | '39' | '40' | '41' | '42' | '43' | '44'
+  | 'S/M' | 'M/L';
 
 export interface Product {
   id: string;
@@ -16,6 +20,8 @@ export interface Product {
   colors: ProductColor[];
   stock: number; // Stock total (somme des variantes) - conservé pour rétrocompatibilité
   variants?: ProductVariant[]; // Stock détaillé par variante (couleur + taille)
+  composition?: string;
+  modelInfo?: string;
   isNew: boolean;
   tags: string[];
   createdAt?: string;
@@ -85,6 +91,15 @@ export interface Order {
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;
   userId?: string;
+  trackingNumber?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
+  refundedAt?: string;
+  adminNotes?: string;
+  refundAmount?: number;
+  refundReason?: string;
+  cancelReason?: string;
   createdAt: string;
   updatedAt?: string;
 }

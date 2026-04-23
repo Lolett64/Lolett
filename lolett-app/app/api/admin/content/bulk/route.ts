@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { saveHistory } from '@/lib/cms/history';
+import { revalidateSectionPaths } from '@/lib/cms/revalidate';
 
 export async function PUT(request: Request) {
   if (!(await isAdminAuthenticated())) {
@@ -17,6 +18,7 @@ export async function PUT(request: Request) {
 
     const supabase = createAdminClient();
     const now = new Date().toISOString();
+    const sectionsEdited = new Set<string>();
 
     for (const item of items) {
       const { id, value } = item;
@@ -30,6 +32,7 @@ export async function PUT(request: Request) {
         .single();
 
       if (current) {
+        sectionsEdited.add((current as { section: string }).section);
         await saveHistory('site_content', id, current as Record<string, unknown>);
         await supabase
           .from('site_content')
@@ -38,7 +41,13 @@ export async function PUT(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, updated: items.length });
+    const revalidated = revalidateSectionPaths(sectionsEdited);
+
+    return NextResponse.json({
+      success: true,
+      updated: items.length,
+      revalidated,
+    });
   } catch {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }

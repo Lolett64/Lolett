@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { LookRepository } from './types';
 import type { Look } from '@/types';
 import type { DbLook } from './supabase-types';
@@ -6,7 +6,7 @@ import { mapLook } from './supabase-mappers';
 
 export class SupabaseLookRepository implements LookRepository {
   async findMany(options?: { gender?: string; limit?: number }): Promise<Look[]> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase.from('looks').select('*, look_products(product_id)');
 
     if (options?.gender) {
@@ -25,7 +25,7 @@ export class SupabaseLookRepository implements LookRepository {
   }
 
   async findById(id: string): Promise<Look | null> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from('looks')
       .select('*, look_products(product_id)')
@@ -43,7 +43,7 @@ export class SupabaseLookRepository implements LookRepository {
   }
 
   async findLooksForProduct(productId: string): Promise<Look[]> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data: junctionRows, error: junctionError } = await supabase
       .from('look_products')
       .select('look_id')

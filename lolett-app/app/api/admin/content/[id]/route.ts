@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { saveHistory } from '@/lib/cms/history';
+import { revalidateSectionPaths } from '@/lib/cms/revalidate';
 
 export async function PUT(
   request: Request,
@@ -46,6 +47,8 @@ export async function PUT(
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
+
+    revalidateSectionPaths([(current as { section: string }).section]);
 
     return NextResponse.json(updated);
   } catch {

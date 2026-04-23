@@ -209,12 +209,12 @@ export function CheckoutForm({
         {/* Contact info */}
         <p className="ckv-section-label">Informations de contact</p>
         <div className="ckv-grid-2">
-          <FloatingInput id="firstName" name="firstName" label="Prenom" value={formData.firstName} onChange={handleChange} required />
+          <FloatingInput id="firstName" name="firstName" label="Prénom" value={formData.firstName} onChange={handleChange} required />
           <FloatingInput id="lastName" name="lastName" label="Nom" value={formData.lastName} onChange={handleChange} required />
         </div>
         <div className="ckv-grid-2">
           <FloatingInput id="email" name="email" label="Email" type="email" value={formData.email} onChange={handleChange} required />
-          <FloatingInput id="phone" name="phone" label="Telephone" type="tel" value={formData.phone} onChange={handleChange} />
+          <FloatingInput id="phone" name="phone" label="Téléphone" type="tel" value={formData.phone} onChange={handleChange} />
         </div>
 
         <div className="ckv-flourish">&#10022;</div>

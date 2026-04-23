@@ -29,6 +29,8 @@ export function mapProduct(row: DbProduct, variants?: ProductVariant[]): Product
     colors: row.colors ?? [],
     stock: row.stock, // Conservé pour rétrocompatibilité
     variants: variants, // Stock détaillé par variante
+    composition: row.composition ?? undefined,
+    modelInfo: row.model_info ?? undefined,
     isNew: row.is_new,
     tags: row.tags ?? [],
     createdAt: row.created_at,

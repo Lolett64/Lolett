@@ -9,6 +9,7 @@ export class SupabaseOrderRepository implements OrderRepository {
     items: {
       productId: string;
       size: Size;
+      color?: string;
       quantity: number;
       price: number;
       productName: string;
@@ -47,6 +48,7 @@ export class SupabaseOrderRepository implements OrderRepository {
       product_id: item.productId,
       product_name: item.productName,
       size: item.size,
+      color: item.color ?? null,
       quantity: item.quantity,
       price: item.price,
     }));

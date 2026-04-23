@@ -13,7 +13,22 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ categories: data });
+  // Count products per category_slug
+  const { data: products } = await supabase
+    .from('products')
+    .select('category_slug');
+
+  const productCounts: Record<string, number> = {};
+  if (products) {
+    for (const p of products) {
+      const slug = p.category_slug;
+      if (slug) {
+        productCounts[slug] = (productCounts[slug] || 0) + 1;
+      }
+    }
+  }
+
+  return NextResponse.json({ categories: data, productCounts });
 }
 
 export async function POST(request: Request) {

@@ -1,177 +1,127 @@
-import {
-  Body,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Text,
-} from '@react-email/components';
-import React from 'react';
+/**
+ * CONTACT ACKNOWLEDGMENT — "Luxe Whisper"
+ * Matches the order email style: golden accents, Cormorant Garamond, generous whitespace
+ */
 
 export interface ContactAcknowledgmentProps {
   name: string;
 }
 
-export function ContactAcknowledgment({ name }: ContactAcknowledgmentProps) {
-  return (
-    <Html lang="fr">
-      <Head />
-      <Preview>On a bien recu ton message — LOLETT</Preview>
-      <Body style={bodyStyle}>
-        <Container style={containerStyle}>
-          {/* Header */}
-          <Section style={headerStyle}>
-            <Text style={logoStyle}>LOLETT</Text>
-            <Text style={taglineStyle}>Mode Homme &amp; Femme</Text>
-          </Section>
+export function renderContactAcknowledgment({ name }: ContactAcknowledgmentProps): string {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Message bien reçu — LOLETT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body style="margin: 0; padding: 0; background-color: #FAF7F2; font-family: 'DM Sans', Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF7F2;">
+    <tr>
+      <td align="center" style="padding: 60px 20px;">
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width: 520px; width: 100%;">
 
-          <Hr style={hrStyle} />
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom: 48px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-right: 14px;"><div style="width: 28px; height: 1px; background: #D4CBC0; margin-top: 10px;"></div></td>
+                  <td><p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 500; letter-spacing: 0.15em; color: #2C2420;">LOLETT</p></td>
+                  <td style="padding-left: 14px;"><div style="width: 28px; height: 1px; background: #D4CBC0; margin-top: 10px;"></div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-          {/* Corps */}
-          <Section style={sectionStyle}>
-            <Text style={h1Style}>On a bien recu ton message !</Text>
-            <Text style={bodyTextStyle}>
-              Bonjour {name},
-            </Text>
-            <Text style={bodyTextStyle}>
-              L&apos;equipe LOLETT te repondra dans les plus brefs delais. On prend le temps de lire chaque message.
-            </Text>
-            <Text style={microcopyStyle}>
-              En attendant, n&apos;hesite pas a faire un tour dans la boutique.
-            </Text>
-          </Section>
+          <!-- Badge -->
+          <tr>
+            <td align="center" style="padding-bottom: 12px;">
+              <p style="margin: 0; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.25em; color: #C4956A;">Message reçu</p>
+            </td>
+          </tr>
 
-          <Hr style={hrStyle} />
+          <!-- Title -->
+          <tr>
+            <td align="center" style="padding-bottom: 8px;">
+              <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: 34px; color: #2C2420; line-height: 1.15;">
+                On a bien reçu ton message&nbsp;!
+              </h1>
+            </td>
+          </tr>
 
-          {/* CTA */}
-          <Section style={ctaSection}>
-            <Link href="https://lolett.fr" style={linkStyle}>
-              Visiter la boutique
-            </Link>
-          </Section>
+          <!-- Body text -->
+          <tr>
+            <td align="center" style="padding: 16px 20px 0;">
+              <p style="margin: 0; font-size: 14px; color: #7A6E62; line-height: 1.7;">
+                Bonjour ${name},
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 12px 20px 0;">
+              <p style="margin: 0; font-size: 14px; color: #7A6E62; line-height: 1.7;">
+                C'est Lola. Je te réponds personnellement sous 24-48h.<br/>
+                En attendant, je te laisse flâner dans la boutique&nbsp;✨
+              </p>
+            </td>
+          </tr>
 
-          <Hr style={hrStyle} />
+          <!-- Golden line -->
+          <tr>
+            <td align="center" style="padding: 40px 0;">
+              <div style="width: 60px; height: 1px; background: #C4956A;"></div>
+            </td>
+          </tr>
 
-          {/* Footer */}
-          <Section style={footerStyle}>
-            <Text style={footerTextStyle}>LOLETT — Mode Homme &amp; Femme</Text>
-            <Link href="https://lolett.fr" style={footerLinkStyle}>
-              lolett.fr
-            </Link>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  );
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding-bottom: 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="border: 1px solid #C4956A; border-radius: 50px; padding: 13px 44px;">
+                    <a href="https://lolett.fr/shop" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
+                      Découvrir la boutique
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Sign-off -->
+          <tr>
+            <td align="center" style="padding-bottom: 40px;">
+              <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 16px; color: #C4956A;">
+                À très vite, Lola &hearts;
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center">
+              <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
+              <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
+                LOLETT — Mode du Sud-Ouest
+              </p>
+              <p style="margin: 4px 0 0; font-size: 11px;">
+                <a href="https://lolett.fr" style="color: #B5A99A; text-decoration: none;">lolett.fr</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
+// Keep backward-compatible named export
+export function ContactAcknowledgment({ name }: ContactAcknowledgmentProps) {
+  return null; // Deprecated React component — use renderContactAcknowledgment instead
+}
 export default ContactAcknowledgment;
-
-/* ---- Styles ---- */
-
-const bodyStyle: React.CSSProperties = {
-  backgroundColor: '#f9f9f7',
-  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  margin: 0,
-  padding: 0,
-};
-
-const containerStyle: React.CSSProperties = {
-  backgroundColor: '#ffffff',
-  margin: '40px auto',
-  maxWidth: '560px',
-  padding: '0 24px 32px',
-  borderRadius: '4px',
-};
-
-const headerStyle: React.CSSProperties = {
-  textAlign: 'center',
-  paddingTop: '32px',
-  paddingBottom: '8px',
-};
-
-const logoStyle: React.CSSProperties = {
-  fontSize: '28px',
-  fontWeight: '700',
-  letterSpacing: '6px',
-  color: '#111111',
-  margin: '0',
-  textTransform: 'uppercase',
-};
-
-const taglineStyle: React.CSSProperties = {
-  fontSize: '11px',
-  color: '#888888',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  margin: '4px 0 0',
-};
-
-const hrStyle: React.CSSProperties = {
-  borderColor: '#eeeeee',
-  borderTopWidth: '1px',
-  margin: '24px 0',
-};
-
-const sectionStyle: React.CSSProperties = {
-  padding: '0',
-};
-
-const h1Style: React.CSSProperties = {
-  fontSize: '22px',
-  fontWeight: '700',
-  color: '#111111',
-  margin: '0 0 20px',
-};
-
-const bodyTextStyle: React.CSSProperties = {
-  fontSize: '14px',
-  color: '#333333',
-  lineHeight: '1.6',
-  margin: '0 0 12px',
-};
-
-const microcopyStyle: React.CSSProperties = {
-  fontSize: '14px',
-  color: '#555555',
-  fontStyle: 'italic',
-  margin: '8px 0 0',
-};
-
-const ctaSection: React.CSSProperties = {
-  textAlign: 'center',
-};
-
-const linkStyle: React.CSSProperties = {
-  backgroundColor: '#111111',
-  color: '#ffffff',
-  fontSize: '13px',
-  fontWeight: '600',
-  letterSpacing: '1px',
-  textTransform: 'uppercase',
-  textDecoration: 'none',
-  padding: '12px 28px',
-  borderRadius: '2px',
-  display: 'inline-block',
-};
-
-const footerStyle: React.CSSProperties = {
-  textAlign: 'center',
-  paddingTop: '8px',
-};
-
-const footerTextStyle: React.CSSProperties = {
-  fontSize: '12px',
-  color: '#888888',
-  margin: '0 0 4px',
-  letterSpacing: '1px',
-};
-
-const footerLinkStyle: React.CSSProperties = {
-  fontSize: '12px',
-  color: '#111111',
-  textDecoration: 'none',
-};

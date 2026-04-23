@@ -10,9 +10,10 @@ interface OrigineSectionProps {
   text1: string;
   quote: string;
   text2: string;
+  founderImage?: string;
 }
 
-export function OrigineSection({ quote }: OrigineSectionProps) {
+export function OrigineSection({ quote, founderImage }: OrigineSectionProps) {
   return (
     <section style={{ padding: 'clamp(40px, 6vw, 80px) 24px', maxWidth: 1100, margin: '0 auto' }}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
@@ -24,7 +25,7 @@ export function OrigineSection({ quote }: OrigineSectionProps) {
               <span style={{ fontFamily: 'var(--font-newsreader), serif', fontSize: '10rem', color: 'rgba(26,21,16,0.04)', userSelect: 'none' }}>L</span>
             </div>
             <Image
-              src="/images/fondatrice-placeholder.jpg"
+              src={founderImage || '/images/fondatrice.jpg'}
               alt="Fondatrice de LOLETT"
               fill
               className="object-cover"

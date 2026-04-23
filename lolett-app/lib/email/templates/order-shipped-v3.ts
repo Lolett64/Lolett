@@ -173,20 +173,24 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
             </td>
           </tr>
 
-          <!-- Tracking (only if provided) -->
-          ${data.trackingNumber ? `<tr>
+          <!-- Tracking (only if provided) - Mondial Relay -->
+          ${data.trackingNumber ? (() => {
+            const trackingUrl = `https://www.mondialrelay.fr/suivi-de-colis?NumeroExpedition=${encodeURIComponent(data.trackingNumber!)}&CodePostal=${encodeURIComponent(data.address.postalCode)}`;
+            return `<tr>
             <td style="padding: 0 8px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="width: 3px; background: #C4956A; border-radius: 2px;"></td>
                   <td style="padding-left: 18px;">
-                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Suivi</p>
-                    <p style="margin: 0; font-size: 13px; color: #2C2420;">N° de suivi : ${data.trackingNumber}</p>
+                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Suivi Mondial Relay</p>
+                    <p style="margin: 0 0 8px; font-size: 13px; color: #2C2420;">N° de suivi : ${data.trackingNumber}</p>
+                    <a href="${trackingUrl}" style="display: inline-block; font-size: 12px; color: #C4956A; text-decoration: underline; letter-spacing: 0.04em;">Suivre mon colis &rarr;</a>
                   </td>
                 </tr>
               </table>
             </td>
-          </tr>` : ''}
+          </tr>`;
+          })() : ''}
 
           <!-- CTA -->
           <tr>

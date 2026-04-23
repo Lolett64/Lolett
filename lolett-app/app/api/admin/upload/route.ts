@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -77,20 +78,37 @@ export async function POST(request: Request) {
     const sanitizedOriginalName = sanitizeFilename(
       file.name.replace(/\.[^.]*$/, '') // Remove existing extension
     );
-    const ext = getFileExtension(file.type);
-    const fileName = `${timestamp}-${sanitizedOriginalName}.${ext}`;
-    const filePath = `media/${fileName}`;
 
-    // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    // Convert images (except GIF to preserve animation) to optimized WebP
+    const shouldConvert =
+      ALLOWED_IMAGE_TYPES.includes(file.type) && file.type !== 'image/gif';
+
+    let finalBuffer: Buffer | Uint8Array;
+    let finalMimeType = file.type;
+    let finalExt = getFileExtension(file.type);
+
+    if (shouldConvert) {
+      const input = Buffer.from(await file.arrayBuffer());
+      finalBuffer = await sharp(input)
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toBuffer();
+      finalMimeType = 'image/webp';
+      finalExt = 'webp';
+    } else {
+      finalBuffer = new Uint8Array(await file.arrayBuffer());
+    }
+
+    const fileName = `${timestamp}-${sanitizedOriginalName}.${finalExt}`;
+    const filePath = `media/${fileName}`;
 
     // Upload to Supabase Storage
     const supabase = createAdminClient();
     const { error: uploadError } = await supabase.storage
       .from('media')
-      .upload(filePath, buffer, {
-        contentType: file.type,
+      .upload(filePath, finalBuffer, {
+        contentType: finalMimeType,
         upsert: false,
       });
 
@@ -100,7 +118,7 @@ export async function POST(request: Request) {
 
     // Construct public URL
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/media/${fileName}`;
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/media/${filePath}`;
 
     return NextResponse.json(
       {
@@ -109,8 +127,8 @@ export async function POST(request: Request) {
         filePath: `media/${fileName}`,
         url: publicUrl,
         type: ALLOWED_IMAGE_TYPES.includes(file.type) ? 'image' : 'video',
-        mimeType: file.type,
-        size: file.size,
+        mimeType: finalMimeType,
+        size: finalBuffer.byteLength,
       },
       { status: 200 }
     );

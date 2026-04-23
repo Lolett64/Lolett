@@ -24,18 +24,23 @@ const EMPTY_FORM = { gender: '', slug: '', label: '', seo_title: '', seo_descrip
 
 export function useCategoryForm() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [productCounts, setProductCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [slugManual, setSlugManual] = useState(false);
 
   async function fetchCategories() {
     const res = await fetch('/api/admin/categories');
     if (res.ok) {
       const data = await res.json();
       setCategories(data.categories ?? []);
+      if (data.productCounts) {
+        setProductCounts(data.productCounts);
+      }
     }
     setLoading(false);
   }
@@ -48,6 +53,7 @@ export function useCategoryForm() {
     setForm(EMPTY_FORM);
     setShowForm(false);
     setEditingId(null);
+    setSlugManual(false);
   }
 
   function startEdit(cat: Category) {
@@ -59,6 +65,7 @@ export function useCategoryForm() {
       seo_description: cat.seo_description ?? '',
     });
     setEditingId(cat.id);
+    setSlugManual(true);
     setShowForm(true);
   }
 
@@ -71,11 +78,14 @@ export function useCategoryForm() {
     setForm((f) => ({
       ...f,
       label,
-      slug: editingId ? f.slug : slugify(label),
+      slug: slugManual ? f.slug : slugify(label),
     }));
   }
 
   function setFormField(field: string, value: string) {
+    if (field === 'slug') {
+      setSlugManual(value !== '');
+    }
     setForm((f) => ({ ...f, [field]: value }));
   }
 
@@ -121,6 +131,7 @@ export function useCategoryForm() {
 
   return {
     categories,
+    productCounts,
     loading,
     showForm,
     editingId,

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { CategoryRepository } from './types';
 import type { Category } from '@/types';
 import type { DbCategory } from './supabase-types';
@@ -6,7 +6,7 @@ import { mapCategory } from './supabase-mappers';
 
 export class SupabaseCategoryRepository implements CategoryRepository {
   async findMany(options?: { gender?: string }): Promise<Category[]> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase.from('categories').select('*');
 
     if (options?.gender) {
@@ -22,7 +22,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   }
 
   async findBySlug(gender: string, slug: string): Promise<Category | null> {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from('categories')
       .select('*')
