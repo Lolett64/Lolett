@@ -91,6 +91,15 @@ export interface Order {
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;
   userId?: string;
+  trackingNumber?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
+  refundedAt?: string;
+  adminNotes?: string;
+  refundAmount?: number;
+  refundReason?: string;
+  cancelReason?: string;
   createdAt: string;
   updatedAt?: string;
 }

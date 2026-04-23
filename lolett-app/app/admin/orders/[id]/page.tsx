@@ -7,12 +7,14 @@ import { Separator } from '@/components/ui/separator';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderStatusUpdate } from '@/components/admin/OrderStatusUpdate';
 import { formatPrice, formatDate } from '@/lib/admin/utils';
+import { computeVAT, VAT } from '@/lib/constants';
 
 interface OrderItem {
   id: string;
   product_id: string;
   product_name: string;
   size: string;
+  color: string | null;
   quantity: number;
   price: number;
 }
@@ -35,6 +37,15 @@ interface OrderDetail {
   status: string;
   payment_provider: string;
   payment_id: string;
+  tracking_number: string | null;
+  admin_notes: string | null;
+  refund_amount: number | null;
+  refund_reason: string | null;
+  cancel_reason: string | null;
+  shipped_at: string | null;
+  delivered_at: string | null;
+  cancelled_at: string | null;
+  refunded_at: string | null;
   created_at: string;
   updated_at: string;
   items: OrderItem[];
@@ -61,6 +72,8 @@ export default async function OrderDetailPage({
   if (!order) notFound();
 
   const subtotal = order.total - order.shipping;
+  const { vat: vatAmount } = computeVAT(order.total);
+  const vatPercent = Math.round(VAT.RATE * 100);
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl">
@@ -85,6 +98,55 @@ export default async function OrderDetailPage({
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
+
+      {/* Lifecycle history (shipped / delivered / cancelled / refunded) */}
+      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at) && (
+        <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
+          <CardHeader>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Historique</CardTitle>
+          </CardHeader>
+          <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-2 text-sm">
+            {order.shipped_at && (
+              <p className="text-[#1a1510]/70">
+                <span className="font-medium text-[#1a1510]">Expédiée</span> — {formatDate(order.shipped_at)}
+                {order.tracking_number && <span className="text-[#1a1510]/50"> · N° {order.tracking_number}</span>}
+              </p>
+            )}
+            {order.delivered_at && (
+              <p className="text-[#1a1510]/70">
+                <span className="font-medium text-[#1a1510]">Livrée</span> — {formatDate(order.delivered_at)}
+              </p>
+            )}
+            {order.cancelled_at && (
+              <div className="flex flex-col gap-1">
+                <p className="text-[#1a1510]/70">
+                  <span className="font-medium text-[#1a1510]">Annulée</span> — {formatDate(order.cancelled_at)}
+                </p>
+                {order.cancel_reason && (
+                  <p className="pl-3 text-xs text-[#1a1510]/50 border-l-2 border-[#e8e0d6]">
+                    Raison : {order.cancel_reason}
+                  </p>
+                )}
+              </div>
+            )}
+            {order.refunded_at && (
+              <div className="flex flex-col gap-1">
+                <p className="text-[#1a1510]/70">
+                  <span className="font-medium text-[#1a1510]">Remboursée</span> — {formatDate(order.refunded_at)}
+                  {order.refund_amount != null && (
+                    <span className="text-[#B89547] font-medium"> · {formatPrice(order.refund_amount)}</span>
+                  )}
+                </p>
+                {order.refund_reason && (
+                  <p className="pl-3 text-xs text-[#1a1510]/50 border-l-2 border-[#e8e0d6]">
+                    Raison : {order.refund_reason}
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Customer info */}
@@ -131,7 +193,9 @@ export default async function OrderDetailPage({
                 <div>
                   <p className="font-medium text-[#1a1510]">{item.product_name}</p>
                   <p className="text-xs text-[#1a1510]/40">
-                    Taille : {item.size} · Quantité : {item.quantity}
+                    Taille : {item.size}
+                    {item.color && <> · Couleur : {item.color}</>}
+                    {' '}· Quantité : {item.quantity}
                   </p>
                 </div>
                 <div className="text-sm font-medium">
@@ -152,8 +216,12 @@ export default async function OrderDetailPage({
               <span>{order.shipping === 0 ? 'Gratuite' : formatPrice(order.shipping)}</span>
             </div>
             <div className="flex justify-between font-semibold text-[#1a1510] mt-1">
-              <span>Total</span>
+              <span>Total TTC</span>
               <span>{formatPrice(order.total)}</span>
+            </div>
+            <div className="flex justify-between text-xs text-[#1a1510]/50">
+              <span>Dont TVA {vatPercent}%</span>
+              <span>{formatPrice(vatAmount)}</span>
             </div>
           </div>
         </CardContent>
@@ -178,8 +246,29 @@ export default async function OrderDetailPage({
         </CardContent>
       </Card>
 
+      {/* Admin notes display (read-only summary, edition via OrderStatusUpdate) */}
+      {order.admin_notes && (
+        <Card className="bg-[#FEF9EF] border border-[#F1E6D0] shadow-none rounded-xl">
+          <CardHeader>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#B89547]">Notes internes</CardTitle>
+          </CardHeader>
+          <CardContent className="font-[family-name:var(--font-montserrat)] text-sm text-[#1a1510] whitespace-pre-wrap">
+            {order.admin_notes}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Status update */}
-      <OrderStatusUpdate orderId={order.id} currentStatus={order.status} />
+      <OrderStatusUpdate
+        orderId={order.id}
+        currentStatus={order.status}
+        currentTrackingNumber={order.tracking_number}
+        currentAdminNotes={order.admin_notes}
+        currentRefundAmount={order.refund_amount}
+        currentRefundReason={order.refund_reason}
+        currentCancelReason={order.cancel_reason}
+        orderTotal={order.total}
+      />
     </div>
   );
 }
