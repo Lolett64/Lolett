@@ -29,47 +29,30 @@ interface ProductRow {
 }
 
 async function getProduct(id: string): Promise<ProductRow | null> {
-  // Utiliser l'API pour charger le produit avec ses variantes
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-  try {
-    const response = await fetch(`${baseUrl}/api/admin/products/${id}`, {
-      cache: 'no-store',
-      headers: {
-        'Cookie': `admin-auth=${process.env.ADMIN_AUTH_COOKIE || ''}`,
-      },
-    });
-    
-    if (!response.ok) return null;
-    
-    const { product } = await response.json();
-    return product as ProductRow;
-  } catch {
-    // Fallback: charger depuis Supabase directement
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (!data) return null;
-    
-    // Charger les variantes
-    const { data: variants } = await supabase
-      .from('product_variants')
-      .select('*')
-      .eq('product_id', id);
-    
-    return {
-      ...data,
-      variants: variants?.map((v) => ({
-        colorName: v.color_name,
-        colorHex: v.color_hex,
-        size: v.size,
-        stock: v.stock,
-      })) ?? [],
-    } as ProductRow;
-  }
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+
+  const { data: variants } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', id);
+
+  return {
+    ...data,
+    variants: variants?.map((v) => ({
+      colorName: v.color_name,
+      colorHex: v.color_hex,
+      size: v.size,
+      stock: v.stock,
+    })) ?? [],
+  } as ProductRow;
 }
 
 export default async function EditProductPage({
