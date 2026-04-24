@@ -35,6 +35,7 @@ export function useCheckout() {
   const { user } = useAuth();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const giftCard = useCartStore((state) => state.giftCard);
   const { cartProducts, shipping, total } = useCartCalculation(items);
 
   const [step, setStep] = useState(1);
@@ -138,6 +139,7 @@ export function useCheckout() {
         total,
         shipping,
         userId: user?.id,
+        ...(giftCard?.code ? { giftCardCode: giftCard.code } : {}),
       };
 
       // Stripe: redirect to Stripe Checkout hosted page
