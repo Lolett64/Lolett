@@ -12,6 +12,7 @@ const footerLinks = {
   ],
   brand: [
     { name: 'Notre histoire', href: '/notre-histoire' },
+    { name: 'Cartes cadeaux', href: '/cartes-cadeaux' },
     { name: 'Contact', href: '/contact' },
   ],
   legal: [
