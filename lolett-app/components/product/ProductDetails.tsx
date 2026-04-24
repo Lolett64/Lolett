@@ -46,6 +46,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     ? getVariantStock(selectedColor.name, selectedSize)
     : 0;
 
+  // Stock total du produit (toutes variantes confondues)
+  const totalStock = product.variants && product.variants.length > 0
+    ? product.variants.reduce((sum, v) => sum + v.stock, 0)
+    : product.stock;
+
   // Vérifier si une taille est disponible pour la couleur sélectionnée
   const isSizeAvailable = (size: Size): boolean => {
     if (!product.variants || product.variants.length === 0) {
@@ -65,7 +70,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   };
 
   const isLowStock = currentVariantStock > 0 && currentVariantStock <= STOCK.LOW_THRESHOLD;
-  const isOutOfStock = currentVariantStock === 0;
+  // Tant qu'aucune taille n'est sélectionnée, on se base sur le stock total du produit
+  // Dès qu'une taille est sélectionnée, on vérifie la variante exacte
+  const isOutOfStock = selectedSize
+    ? currentVariantStock === 0
+    : totalStock === 0;
 
   const [notifyEmail, setNotifyEmail] = useState('');
   const [notifySubmitted, setNotifySubmitted] = useState(false);
