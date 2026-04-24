@@ -9,7 +9,10 @@ vi.mock('@vercel/blob', () => ({
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
     from: (table: string) => ({
-      select: () => Promise.resolve({ data: [{ table, id: '1' }], error: null }),
+      select: () => ({
+        range: () =>
+          Promise.resolve({ data: [{ table, id: '1' }], error: null }),
+      }),
     }),
   }),
 }));

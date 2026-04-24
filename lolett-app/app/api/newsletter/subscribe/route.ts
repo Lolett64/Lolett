@@ -12,9 +12,39 @@ const schema = z.object({
     .enum(['home', 'editorial', 'contact', 'footer'])
     .optional()
     .default('home'),
+  // Honeypot : champ caché vide. Si rempli → bot.
+  website: z.string().max(0).optional(),
 });
 
+// Rate-limit en mémoire (suffit tant qu'on est sur 1 instance Fluid Compute).
+// Pour scale horizontal : remplacer par Upstash Redis ou Vercel KV.
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 3;
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(req: NextRequest | Request): string {
+  const fwd = req.headers.get('x-forwarded-for');
+  if (fwd) return fwd.split(',')[0]!.trim();
+  return req.headers.get('x-real-ip') || 'unknown';
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipHits.get(ip);
+  if (!entry || entry.resetAt < now) {
+    ipHits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT_MAX;
+}
+
 export async function POST(req: NextRequest | Request) {
+  const ip = getClientIp(req);
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -25,6 +55,11 @@ export async function POST(req: NextRequest | Request) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
+  }
+
+  // Honeypot rempli → silently OK (le bot croit avoir réussi)
+  if (parsed.data.website && parsed.data.website.length > 0) {
+    return NextResponse.json({ ok: true });
   }
 
   const { email, source } = parsed.data;

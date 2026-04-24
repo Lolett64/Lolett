@@ -6,7 +6,9 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
   integrations: [
-    Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
+    // RGPD : masque tous les textes saisis (emails, adresses, noms) dans les replays.
+    // Les images/médias sont bloqués (peuvent contenir des infos persos).
+    Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
   ],
   enabled: process.env.NODE_ENV === 'production',
 });
