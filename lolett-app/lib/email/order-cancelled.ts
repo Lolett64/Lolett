@@ -10,6 +10,12 @@ interface CancelledEmailData {
   wasPaid?: boolean;
 }
 
+function interpolate(template: string, vars: Record<string, string>): string {
+  return template
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? `{{${k}}}`)
+    .replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+}
+
 export async function sendOrderCancelled(data: CancelledEmailData) {
   try {
     let settings: Awaited<ReturnType<typeof getEmailSettings>> = null;
@@ -19,9 +25,15 @@ export async function sendOrderCancelled(data: CancelledEmailData) {
       // DB unavailable — use hardcoded defaults
     }
 
+    const vars = {
+      firstName: data.firstName,
+      orderNumber: data.orderNumber,
+      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr',
+    };
+
     const overrides = settings ? {
-      greeting: settings.greeting,
-      body_text: settings.body_text,
+      greeting: interpolate(settings.greeting, vars),
+      body_text: interpolate(settings.body_text, vars),
       signoff: settings.signoff,
     } : undefined;
 
@@ -34,8 +46,9 @@ export async function sendOrderCancelled(data: CancelledEmailData) {
 
     const fromName = settings?.from_name || 'LOLETT';
     const fromEmail = settings?.from_email || 'onboarding@resend.dev';
-    const subject = settings?.subject_template?.replace('{orderNumber}', data.orderNumber)
-      || `Votre commande ${data.orderNumber} a été annulée`;
+    const subject = settings?.subject_template
+      ? interpolate(settings.subject_template, vars)
+      : `Votre commande ${data.orderNumber} a été annulée`;
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
@@ -49,7 +62,10 @@ export async function sendOrderCancelled(data: CancelledEmailData) {
     } else {
       console.error(`[Email] Failed to send cancelled email: ${result.error}`);
     }
+
+    return result;
   } catch (error) {
     console.error('[Email] Failed to send cancelled email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

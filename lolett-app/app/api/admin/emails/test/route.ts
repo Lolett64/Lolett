@@ -4,6 +4,8 @@ import { getEmailSettings } from '@/lib/cms/emails';
 import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmation-v3';
 import { renderOrderShippedV3 } from '@/lib/email/templates/order-shipped-v3';
 import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3';
+import { renderOrderCancelledV3 } from '@/lib/email/templates/order-cancelled-v3';
+import { renderOrderRefundedV3 } from '@/lib/email/templates/order-refunded-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
 import { sendHtmlEmail } from '@/lib/email-provider';
 
@@ -69,6 +71,28 @@ export async function POST(request: Request) {
       });
       subject = settings?.subject_template?.replace('{orderNumber}', 'LOL-20260220-TEST')
         || 'Votre commande est arrivée — LOLETT';
+    } else if (template_key === 'order_cancelled') {
+      html = renderOrderCancelledV3({
+        firstName: 'Marie',
+        orderNumber: 'LOL-20260220-TEST',
+        reason: 'Produit en rupture de stock',
+        wasPaid: true,
+      });
+      subject = settings?.subject_template
+        ?.replace('{{orderNumber}}', 'LOL-20260220-TEST')
+        .replace('{orderNumber}', 'LOL-20260220-TEST')
+        || 'Votre commande LOL-20260220-TEST a été annulée';
+    } else if (template_key === 'order_refunded') {
+      html = renderOrderRefundedV3({
+        firstName: 'Marie',
+        orderNumber: 'LOL-20260220-TEST',
+        amount: 238.00,
+        reason: 'Retour accepté',
+      });
+      subject = settings?.subject_template
+        ?.replace('{{orderNumber}}', 'LOL-20260220-TEST')
+        .replace('{orderNumber}', 'LOL-20260220-TEST')
+        || 'Remboursement confirmé pour votre commande LOL-20260220-TEST';
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
       subject = settings?.subject_template || 'Bienvenue chez LOLETT';

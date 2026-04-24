@@ -10,6 +10,12 @@ interface RefundedEmailData {
   reason?: string;
 }
 
+function interpolate(template: string, vars: Record<string, string>): string {
+  return template
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? `{{${k}}}`)
+    .replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+}
+
 export async function sendOrderRefunded(data: RefundedEmailData) {
   try {
     let settings: Awaited<ReturnType<typeof getEmailSettings>> = null;
@@ -19,9 +25,19 @@ export async function sendOrderRefunded(data: RefundedEmailData) {
       // DB unavailable — use hardcoded defaults
     }
 
+    const amountStr = data.amount.toFixed(2).replace('.', ',');
+
+    const vars = {
+      firstName: data.firstName,
+      orderNumber: data.orderNumber,
+      amount: amountStr,
+      refund_amount: amountStr,
+      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr',
+    };
+
     const overrides = settings ? {
-      greeting: settings.greeting,
-      body_text: settings.body_text,
+      greeting: interpolate(settings.greeting, vars),
+      body_text: interpolate(settings.body_text, vars),
       signoff: settings.signoff,
     } : undefined;
 
@@ -34,8 +50,9 @@ export async function sendOrderRefunded(data: RefundedEmailData) {
 
     const fromName = settings?.from_name || 'LOLETT';
     const fromEmail = settings?.from_email || 'onboarding@resend.dev';
-    const subject = settings?.subject_template?.replace('{orderNumber}', data.orderNumber)
-      || `Remboursement effectué — commande ${data.orderNumber}`;
+    const subject = settings?.subject_template
+      ? interpolate(settings.subject_template, vars)
+      : `Remboursement effectué — commande ${data.orderNumber}`;
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
@@ -49,7 +66,10 @@ export async function sendOrderRefunded(data: RefundedEmailData) {
     } else {
       console.error(`[Email] Failed to send refunded email: ${result.error}`);
     }
+
+    return result;
   } catch (error) {
     console.error('[Email] Failed to send refunded email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

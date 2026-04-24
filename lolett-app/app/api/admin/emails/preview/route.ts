@@ -4,6 +4,8 @@ import { getEmailSettings, type EmailSettings } from '@/lib/cms/emails';
 import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmation-v3';
 import { renderOrderShippedV3 } from '@/lib/email/templates/order-shipped-v3';
 import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3';
+import { renderOrderCancelledV3 } from '@/lib/email/templates/order-cancelled-v3';
+import { renderOrderRefundedV3 } from '@/lib/email/templates/order-refunded-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
 
 const MOCK_ORDER_DATA = {
@@ -45,6 +47,20 @@ const MOCK_SHIPPED_DATA = {
 const MOCK_DELIVERED_DATA = {
   firstName: 'Marie',
   orderNumber: 'LOL-20260220-DEMO',
+};
+
+const MOCK_CANCELLED_DATA = {
+  firstName: 'Marie',
+  orderNumber: 'LOL-20260220-DEMO',
+  reason: 'Produit en rupture de stock',
+  wasPaid: true,
+};
+
+const MOCK_REFUNDED_DATA = {
+  firstName: 'Marie',
+  orderNumber: 'LOL-20260220-DEMO',
+  amount: 238.00,
+  reason: 'Retour accepté',
 };
 
 function applyOverrides(html: string, settings: Partial<EmailSettings>): string {
@@ -102,6 +118,10 @@ export async function POST(request: Request) {
       html = renderOrderShippedV3(MOCK_SHIPPED_DATA);
     } else if (template_key === 'order_delivered') {
       html = renderOrderDeliveredV3(MOCK_DELIVERED_DATA);
+    } else if (template_key === 'order_cancelled') {
+      html = renderOrderCancelledV3(MOCK_CANCELLED_DATA);
+    } else if (template_key === 'order_refunded') {
+      html = renderOrderRefundedV3(MOCK_REFUNDED_DATA);
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
     } else {
