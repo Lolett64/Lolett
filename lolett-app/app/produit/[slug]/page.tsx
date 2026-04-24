@@ -5,6 +5,7 @@ import { ProductDetails } from '@/components/product/ProductDetails';
 import { ProductLooks } from '@/components/product/ProductLooks';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { productRepository, lookRepository, categoryRepository } from '@/lib/adapters';
+import { buildProductJsonLd } from '@/lib/seo/product-jsonld';
 
 export const revalidate = 60;
 
@@ -92,26 +93,45 @@ export default async function ProductPage({ params }: PageProps) {
     ],
   };
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+  const baseJsonLd = buildProductJsonLd({
     name: product.name,
+    slug: product.slug,
     description: product.description,
-    image: product.images,
-    brand: { '@type': 'Brand', name: 'LOLETT' },
+    images: product.images,
+    price: product.price,
+    currency: 'EUR',
+    stock: product.stock,
+    sku: product.id,
+    baseUrl: BASE_URL,
+  });
+
+  // Enrich with seller + shipping details (valid Google merchant signals)
+  const jsonLd = {
+    ...baseJsonLd,
     url: `${BASE_URL}/produit/${product.slug}`,
     offers: {
-      '@type': 'Offer',
-      price: product.price,
-      priceCurrency: 'EUR',
-      availability: 'https://schema.org/InStock',
-      url: `${BASE_URL}/produit/${product.slug}`,
+      ...baseJsonLd.offers,
       seller: { '@type': 'Organization', name: 'LOLETT' },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: product.price >= 100 ? '0' : '5.90', currency: 'EUR' },
-        deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' } },
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: product.price >= 100 ? '0' : '5.90',
+          currency: 'EUR',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'FR',
+        },
       },
     },
   };
