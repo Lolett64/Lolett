@@ -18,6 +18,10 @@ export type FormData = Omit<EmailSettings, 'id' | 'template_key' | 'label' | 'up
 
 export const VARIABLES_BY_TEMPLATE: Record<string, string[]> = {
   order_confirmation: ['{firstName}', '{orderNumber}', '{total}'],
+  order_shipped: ['{firstName}', '{orderNumber}'],
+  order_delivered: ['{firstName}', '{orderNumber}'],
+  order_cancelled: ['{firstName}', '{orderNumber}'],
+  order_refunded: ['{firstName}', '{orderNumber}', '{amount}'],
   welcome_newsletter: ['{firstName}', '{promoCode}'],
 };
 
