@@ -93,7 +93,7 @@ export function DashboardCharts({ ordersByDay, ordersByStatus }: Props) {
                   fontSize: 12,
                   fontFamily: 'var(--font-montserrat)',
                 }}
-                formatter={(value: number | undefined) => [formatPrice(value ?? 0), 'Revenu']}
+                formatter={(value) => [formatPrice(typeof value === 'number' ? value : 0), 'Revenu']}
                 labelFormatter={(label: unknown) => formatDay(String(label))}
               />
               <Area
@@ -148,7 +148,7 @@ export function DashboardCharts({ ordersByDay, ordersByStatus }: Props) {
                     fontSize: 12,
                     fontFamily: 'var(--font-montserrat)',
                   }}
-                  formatter={(value: number | undefined) => [value ?? 0, 'Commandes']}
+                  formatter={(value) => [typeof value === 'number' ? value : 0, 'Commandes']}
                 />
                 <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20}>
                   {statusData.map((entry, i) => (

@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const sendHtmlEmailMock = vi.fn().mockResolvedValue({ success: true });
+const { sendHtmlEmailMock, getEmailSettingsMock } = vi.hoisted(() => ({
+  sendHtmlEmailMock: vi.fn().mockResolvedValue({ success: true }),
+  getEmailSettingsMock: vi.fn(),
+}));
+
 vi.mock('@/lib/email-provider', () => ({
   sendHtmlEmail: sendHtmlEmailMock,
 }));
 
-const getEmailSettingsMock = vi.fn();
 vi.mock('@/lib/cms/emails', () => ({
   getEmailSettings: getEmailSettingsMock,
 }));
