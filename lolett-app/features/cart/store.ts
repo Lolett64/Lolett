@@ -4,20 +4,29 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartItem, Size } from '@/types';
 
+export interface AppliedGiftCard {
+  code: string;
+  balance: number;
+}
+
 interface CartState {
   items: CartItem[];
+  giftCard: AppliedGiftCard | null;
   addItem: (productId: string, size: Size, quantity?: number, color?: string) => void;
   removeItem: (productId: string, size: Size, color?: string) => void;
   updateQuantity: (productId: string, size: Size, quantity: number, color?: string) => void;
   clearCart: () => void;
   getItemCount: () => number;
   getTotal: (getProductPrice: (id: string) => number) => number;
+  setGiftCard: (giftCard: AppliedGiftCard | null) => void;
+  clearGiftCard: () => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      giftCard: null,
 
       addItem: (productId: string, size: Size, quantity = 1, color?: string) => {
         set((state) => {
@@ -78,7 +87,10 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], giftCard: null }),
+
+      setGiftCard: (giftCard: AppliedGiftCard | null) => set({ giftCard }),
+      clearGiftCard: () => set({ giftCard: null }),
 
       getItemCount: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
