@@ -7,6 +7,10 @@ import { formatPrice } from '@/lib/admin/utils';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { getDashboardStats } from '@/components/admin/dashboard/getDashboardStats';
 import { DashboardCharts } from '@/components/admin/dashboard/DashboardCharts';
+import {
+  LowStockWidget,
+  LowStockWidgetSkeleton,
+} from '@/components/admin/dashboard/LowStockWidget';
 
 async function DashboardContent() {
   const stats = await getDashboardStats();
@@ -133,7 +137,12 @@ async function DashboardContent() {
           </CardContent>
         </Card>
 
-        {/* Low stock products */}
+        {/* Low stock variants (RSC widget dédié) */}
+        <Suspense fallback={<LowStockWidgetSkeleton />}>
+          <LowStockWidget />
+        </Suspense>
+
+        {/* Low stock products (agrégés au niveau produit) */}
         <Card className="bg-white border border-gray-200/50 shadow-none">
           <CardHeader>
             <div className="flex items-center justify-between">
