@@ -5,5 +5,13 @@
       "path": "/api/cron/backup",
       "schedule": "0 3 * * *"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.lolettshop.com" }],
+      "destination": "https://lolettshop.com/:path*",
+      "permanent": true
+    }
   ]
 }
