@@ -9,9 +9,18 @@ export interface AppliedGiftCard {
   balance: number;
 }
 
+export interface AppliedPromo {
+  code: string;
+  discount: number;
+  type: 'percentage' | 'fixed';
+  value: number;
+  description?: string;
+}
+
 interface CartState {
   items: CartItem[];
   giftCard: AppliedGiftCard | null;
+  promo: AppliedPromo | null;
   addItem: (productId: string, size: Size, quantity?: number, color?: string) => void;
   removeItem: (productId: string, size: Size, color?: string) => void;
   updateQuantity: (productId: string, size: Size, quantity: number, color?: string) => void;
@@ -20,6 +29,8 @@ interface CartState {
   getTotal: (getProductPrice: (id: string) => number) => number;
   setGiftCard: (giftCard: AppliedGiftCard | null) => void;
   clearGiftCard: () => void;
+  setPromo: (promo: AppliedPromo | null) => void;
+  clearPromo: () => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -27,6 +38,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       giftCard: null,
+      promo: null,
 
       addItem: (productId: string, size: Size, quantity = 1, color?: string) => {
         set((state) => {
@@ -87,10 +99,13 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [], giftCard: null }),
+      clearCart: () => set({ items: [], giftCard: null, promo: null }),
 
       setGiftCard: (giftCard: AppliedGiftCard | null) => set({ giftCard }),
       clearGiftCard: () => set({ giftCard: null }),
+
+      setPromo: (promo: AppliedPromo | null) => set({ promo }),
+      clearPromo: () => set({ promo: null }),
 
       getItemCount: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);

@@ -17,6 +17,10 @@ export class SupabaseOrderRepository implements OrderRepository {
     customer: CustomerInfo;
     total: number;
     shipping: number;
+    promoCode?: string;
+    promoDiscount?: number;
+    giftCardCode?: string;
+    giftCardAmount?: number;
     userId?: string;
     paymentProvider?: 'stripe' | 'paypal' | 'demo';
   }): Promise<Order> {
@@ -30,6 +34,10 @@ export class SupabaseOrderRepository implements OrderRepository {
         customer: orderData.customer,
         total: orderData.total,
         shipping: orderData.shipping,
+        promo_code: orderData.promoCode ?? null,
+        promo_discount: orderData.promoDiscount ?? 0,
+        gift_card_code: orderData.giftCardCode ?? null,
+        gift_card_amount: orderData.giftCardAmount ?? 0,
         status: 'pending',
         user_id: orderData.userId || null,
         payment_provider: orderData.paymentProvider || 'demo',
@@ -74,6 +82,10 @@ export class SupabaseOrderRepository implements OrderRepository {
       customer: orderData.customer,
       total: orderData.total,
       shipping: orderData.shipping,
+      promoCode: orderData.promoCode,
+      promoDiscount: orderData.promoDiscount,
+      giftCardCode: orderData.giftCardCode,
+      giftCardAmount: orderData.giftCardAmount,
       status: 'pending',
       createdAt: orderRow.created_at as string,
       updatedAt: orderRow.updated_at as string,

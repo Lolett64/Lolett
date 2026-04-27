@@ -60,7 +60,7 @@ export function renderOrderCancelledV3(data: CancelledEmailData, overrides?: Ema
           <tr>
             <td align="center" style="padding-bottom: 8px;">
               <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: 38px; color: #2C2420; line-height: 1.15;">
-                ${overrides?.greeting?.replace('{firstName}', data.firstName) || `${data.firstName}, on a annulé ta commande`}
+                ${overrides?.greeting?.replace(/\{\{?\s*firstName\s*\}?\}/g, data.firstName) || `${data.firstName}, on a annulé ta commande`}
               </h1>
             </td>
           </tr>

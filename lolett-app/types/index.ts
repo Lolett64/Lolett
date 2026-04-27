@@ -87,6 +87,10 @@ export interface Order {
   customer: CustomerInfo;
   total: number;
   shipping: number;
+  promoCode?: string;
+  promoDiscount?: number;
+  giftCardCode?: string;
+  giftCardAmount?: number;
   status: 'pending' | 'confirmed' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'expired';
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;

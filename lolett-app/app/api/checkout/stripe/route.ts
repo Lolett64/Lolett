@@ -5,6 +5,7 @@ import { SHIPPING } from '@/lib/constants';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import type { Size } from '@/types';
 
 function getStripe() {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { items, customer, userId, giftCardCode } = body as {
+    const { items, customer, userId, giftCardCode, promoCode } = body as {
       items: Array<{ productId: string; productName: string; size: string; quantity: number }>;
       customer: {
         firstName: string;
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
       };
       userId?: string;
       giftCardCode?: string;
+      promoCode?: string;
     };
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -66,6 +68,55 @@ export async function POST(req: NextRequest) {
     const subtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const shipping = subtotal >= SHIPPING.FREE_THRESHOLD ? 0 : SHIPPING.COST;
     const total = subtotal + shipping;
+
+    // --- Promo code re-validation (server-side) ---
+    let promoDiscount = 0;
+    let promoId: string | null = null;
+    let promoValidatedCode: string | null = null;
+    let promoUsedCount = 0;
+
+    if (promoCode && typeof promoCode === 'string') {
+      const code = promoCode.trim().toUpperCase();
+      if (code.length === 0 || code.length > 64) {
+        return NextResponse.json({ error: 'Code promo invalide' }, { status: 400 });
+      }
+
+      const { data: promo, error: promoErr } = await admin
+        .from('promo_codes')
+        .select('id, code, type, value, min_order, usage_limit, used_count, active, starts_at, expires_at')
+        .eq('code', code)
+        .eq('active', true)
+        .maybeSingle();
+
+      if (promoErr) {
+        console.error('[POST /api/checkout/stripe] promo lookup error:', promoErr);
+        return NextResponse.json({ error: 'Code promo invalide' }, { status: 400 });
+      }
+
+      const now = new Date();
+      const expiresAt = promo?.expires_at ? new Date(promo.expires_at) : null;
+      const startsAt = promo?.starts_at ? new Date(promo.starts_at) : null;
+      const minOrder = Number(promo?.min_order ?? 0);
+
+      const usable =
+        promo &&
+        (!expiresAt || expiresAt > now) &&
+        (!startsAt || startsAt <= now) &&
+        (!promo.usage_limit || Number(promo.used_count) < Number(promo.usage_limit)) &&
+        (minOrder <= 0 || subtotal >= minOrder);
+
+      if (!usable || !promo) {
+        return NextResponse.json({ error: 'Code promo invalide ou expiré' }, { status: 400 });
+      }
+
+      promoDiscount = computePromoDiscount(promo.type as PromoType, Number(promo.value), subtotal);
+      promoId = promo.id;
+      promoValidatedCode = promo.code;
+      promoUsedCount = Number(promo.used_count ?? 0);
+    }
+
+    const discountedSubtotal = +(subtotal - promoDiscount).toFixed(2);
+    const totalAfterPromo = +(discountedSubtotal + shipping).toFixed(2);
 
     // --- Gift card redemption ---
     let giftCardRedeemAmount = 0;
@@ -105,15 +156,16 @@ export async function POST(req: NextRequest) {
 
       giftCardId = card.id;
       giftCardValidatedCode = card.code;
-      giftCardRedeemAmount = Math.min(Number(card.balance), total);
+      giftCardRedeemAmount = Math.min(Number(card.balance), totalAfterPromo);
     }
 
-    const stripeAmount = +(total - giftCardRedeemAmount).toFixed(2);
+    const stripeAmount = +(totalAfterPromo - giftCardRedeemAmount).toFixed(2);
     const siteUrl = process.env.CHECKOUT_REDIRECT_URL || 'http://localhost:3000';
 
-    // --- Case 1: gift card fully covers the order (stripeAmount <= 0) ---
-    if (giftCardRedeemAmount > 0 && stripeAmount <= 0.0001) {
+    // --- Case 1: discounts (promo + gift card) fully cover the order (stripeAmount <= 0) ---
+    if ((giftCardRedeemAmount > 0 || promoDiscount > 0) && stripeAmount <= 0.0001) {
       // Create order directly, mark paid, decrement balance, insert redemption.
+      const finalTotal = Math.max(0, +(total - promoDiscount - giftCardRedeemAmount).toFixed(2));
       const orderRepo = new SupabaseOrderRepository();
       const order = await orderRepo.create({
         items: verifiedItems.map((i) => ({
@@ -124,13 +176,19 @@ export async function POST(req: NextRequest) {
           price: i.price,
         })),
         customer,
-        total,
+        total: finalTotal,
         shipping,
+        promoCode: promoValidatedCode ?? undefined,
+        promoDiscount,
+        giftCardCode: giftCardValidatedCode ?? undefined,
+        giftCardAmount: giftCardRedeemAmount,
         userId: userId || undefined,
         paymentProvider: 'stripe',
       });
 
-      const paymentPseudoId = `giftcard_${order.id}`;
+      const paymentPseudoId = giftCardId
+        ? `giftcard_${order.id}`
+        : `promo_${order.id}`;
 
       await admin
         .from('orders')
@@ -170,9 +228,20 @@ export async function POST(req: NextRequest) {
           .eq('id', giftCardId);
       }
 
-      // Loyalty points (same rule as webhook)
+      // Increment promo used_count if applicable
+      if (promoId) {
+        await admin
+          .from('promo_codes')
+          .update({
+            used_count: promoUsedCount + 1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', promoId);
+      }
+
+      // Loyalty points (based on amount actually paid)
       if (userId) {
-        const points = Math.floor(total);
+        const points = Math.floor(finalTotal);
         if (points > 0) {
           await admin.rpc('increment_loyalty_points', {
             p_user_id: userId,
@@ -195,7 +264,11 @@ export async function POST(req: NextRequest) {
           customer,
           subtotal,
           shipping,
-          total,
+          total: finalTotal,
+          promoCode: promoValidatedCode ?? undefined,
+          promoDiscount,
+          giftCardCode: giftCardValidatedCode ?? undefined,
+          giftCardAmount: giftCardRedeemAmount,
         });
       } catch (emailErr) {
         console.error('[POST /api/checkout/stripe] email error:', emailErr);
@@ -206,12 +279,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // --- Case 2: gift card present but leftover below Stripe minimum ---
-    if (giftCardRedeemAmount > 0 && stripeAmount > 0 && stripeAmount < STRIPE_MIN_AMOUNT_EUR) {
+    // --- Case 2: discount present but leftover below Stripe minimum ---
+    if ((giftCardRedeemAmount > 0 || promoDiscount > 0) && stripeAmount > 0 && stripeAmount < STRIPE_MIN_AMOUNT_EUR) {
       return NextResponse.json(
         {
           error:
-            'Le montant restant est trop faible pour un paiement par carte. Retirez la carte cadeau ou ajoutez un article au panier.',
+            'Le montant restant est trop faible pour un paiement par carte. Retirez un avantage ou ajoutez un article au panier.',
         },
         { status: 400 }
       );
@@ -267,20 +340,41 @@ export async function POST(req: NextRequest) {
       cancel_url: `${siteUrl}/checkout`,
     };
 
-    if (giftCardRedeemAmount > 0 && giftCardValidatedCode) {
-      // Create a one-off Stripe coupon for the redemption amount
+    const totalAmountOff = +(promoDiscount + giftCardRedeemAmount).toFixed(2);
+
+    if (totalAmountOff > 0) {
+      // Combine promo + gift card into a single Stripe coupon (Stripe Checkout
+      // only allows one coupon per session — see plan).
+      const couponName = [
+        promoValidatedCode ? `Promo ${promoValidatedCode}` : null,
+        giftCardValidatedCode ? `Carte cadeau ${giftCardValidatedCode}` : null,
+      ]
+        .filter(Boolean)
+        .join(' + ');
+
       const coupon = await getStripe().coupons.create({
-        amount_off: Math.round(giftCardRedeemAmount * 100),
+        amount_off: Math.round(totalAmountOff * 100),
         currency: 'eur',
         duration: 'once',
-        name: `Carte cadeau ${giftCardValidatedCode}`,
+        name: couponName || 'Réduction',
       });
       sessionParams.discounts = [{ coupon: coupon.id }];
+
+      const extraMeta: Record<string, string> = {};
+      if (giftCardValidatedCode) {
+        extraMeta.giftCardCode = giftCardValidatedCode;
+        extraMeta.giftCardRedeemAmount = String(giftCardRedeemAmount);
+      }
+      if (promoValidatedCode && promoId) {
+        extraMeta.promoCode = promoValidatedCode;
+        extraMeta.promoId = promoId;
+        extraMeta.promoDiscount = String(promoDiscount);
+      }
+      extraMeta.couponId = coupon.id;
+
       sessionParams.metadata = {
         ...(sessionParams.metadata || {}),
-        giftCardCode: giftCardValidatedCode,
-        giftCardRedeemAmount: String(giftCardRedeemAmount),
-        giftCardCouponId: coupon.id,
+        ...extraMeta,
       };
       // NOTE: allow_promotion_codes cannot be combined with discounts.
     } else {

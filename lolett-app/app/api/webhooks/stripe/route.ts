@@ -172,9 +172,16 @@ export async function POST(req: NextRequest) {
     try {
       const items = WebhookItemSchema.parse(JSON.parse(metadata.items));
       const customer = WebhookCustomerSchema.parse(JSON.parse(metadata.customer));
-      const total = parseFloat(metadata.total || '0');
+      const grossTotal = parseFloat(metadata.total || '0');
       const shipping = parseFloat(metadata.shipping || '0');
       const userId = metadata.userId || undefined;
+
+      const promoCode = metadata.promoCode || undefined;
+      const promoDiscount = parseFloat(metadata.promoDiscount || '0') || 0;
+      const giftCardCode = metadata.giftCardCode || undefined;
+      const giftCardAmount = parseFloat(metadata.giftCardRedeemAmount || '0') || 0;
+
+      const finalTotal = Math.max(0, +(grossTotal - promoDiscount - giftCardAmount).toFixed(2));
 
       const admin = createAdminClient();
 
@@ -195,8 +202,12 @@ export async function POST(req: NextRequest) {
       const order = await orderRepo.create({
         items,
         customer,
-        total,
+        total: finalTotal,
         shipping,
+        promoCode,
+        promoDiscount,
+        giftCardCode,
+        giftCardAmount,
         userId,
         paymentProvider: 'stripe',
       });
@@ -219,9 +230,9 @@ export async function POST(req: NextRequest) {
         await admin.from('cart_items').delete().eq('user_id', userId);
       }
 
-      // 4. Loyalty points
+      // 4. Loyalty points (based on amount actually paid)
       if (userId) {
-        const points = Math.floor(total);
+        const points = Math.floor(finalTotal);
         if (points > 0) {
           await admin.rpc('increment_loyalty_points', {
             p_user_id: userId,
@@ -241,9 +252,13 @@ export async function POST(req: NextRequest) {
           price: i.price,
         })),
         customer,
-        subtotal: total - shipping,
+        subtotal: grossTotal - shipping,
         shipping,
-        total,
+        total: finalTotal,
+        promoCode,
+        promoDiscount,
+        giftCardCode,
+        giftCardAmount,
       });
 
       // 6. Apply gift card redemption if present
@@ -304,6 +319,34 @@ export async function POST(req: NextRequest) {
       } catch (giftErr) {
         // Never fail the webhook because of a gift-card redemption issue.
         console.error('[Stripe webhook] gift card redemption error:', giftErr);
+      }
+
+      // 7. Increment promo_codes.used_count if a promo was applied
+      try {
+        if (metadata.promoId) {
+          const promoId = String(metadata.promoId);
+          const { data: promo, error: promoErr } = await admin
+            .from('promo_codes')
+            .select('id, used_count')
+            .eq('id', promoId)
+            .maybeSingle();
+
+          if (promoErr) {
+            console.error('[Stripe webhook] promo lookup error:', promoErr);
+          } else if (promo) {
+            const { error: updErr } = await admin
+              .from('promo_codes')
+              .update({
+                used_count: Number(promo.used_count ?? 0) + 1,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', promo.id);
+            if (updErr) console.error('[Stripe webhook] promo used_count update error:', updErr);
+          }
+        }
+      } catch (promoErr) {
+        // Never fail the webhook because of a promo increment issue.
+        console.error('[Stripe webhook] promo increment error:', promoErr);
       }
 
       console.log(`[Stripe webhook] Order ${order.orderNumber} created successfully`);

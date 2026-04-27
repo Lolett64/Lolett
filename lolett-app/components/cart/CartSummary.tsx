@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Truck, ShieldCheck, RotateCcw, Gift } from 'lucide-react';
+import { Truck, ShieldCheck, RotateCcw, Gift, Tag } from 'lucide-react';
 import { SHIPPING, VAT, computeVAT } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/features/cart';
@@ -27,13 +27,22 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   const giftCard = useCartStore((s) => s.giftCard);
   const setGiftCard = useCartStore((s) => s.setGiftCard);
   const clearGiftCard = useCartStore((s) => s.clearGiftCard);
+  const promo = useCartStore((s) => s.promo);
+  const setPromo = useCartStore((s) => s.setPromo);
+  const clearPromo = useCartStore((s) => s.clearPromo);
 
   const [codeInput, setCodeInput] = useState('');
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redeemAmount = giftCard ? Math.min(giftCard.balance, total) : 0;
-  const payableTotal = Math.max(0, +(total - redeemAmount).toFixed(2));
+  const [promoInput, setPromoInput] = useState('');
+  const [applyingPromo, setApplyingPromo] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const promoAmount = promo ? Math.min(promo.discount, subtotal) : 0;
+  const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
+  const redeemAmount = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
+  const payableTotal = Math.max(0, +(totalAfterPromo - redeemAmount).toFixed(2));
   const { vat: vatAmount } = computeVAT(payableTotal);
   const vatPercent = Math.round(VAT.RATE * 100);
 
@@ -65,6 +74,42 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   function removeGiftCard() {
     clearGiftCard();
     setError(null);
+  }
+
+  async function applyPromo(e: React.FormEvent) {
+    e.preventDefault();
+    if (!promoInput.trim() || applyingPromo) return;
+    setApplyingPromo(true);
+    setPromoError(null);
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoInput.trim(), subtotal }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.valid) {
+        setPromo({
+          code: data.code,
+          discount: Number(data.discount),
+          type: data.type,
+          value: Number(data.value),
+          description: data.description,
+        });
+        setPromoInput('');
+      } else {
+        setPromoError(data?.error ?? 'Code promo invalide');
+      }
+    } catch {
+      setPromoError('Impossible de vérifier le code pour le moment');
+    } finally {
+      setApplyingPromo(false);
+    }
+  }
+
+  function removePromo() {
+    clearPromo();
+    setPromoError(null);
   }
 
   return (
@@ -99,6 +144,17 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
           {shipping === 0 ? 'Offerte' : formatPrice(shipping)}
         </span>
       </div>
+
+      {promo && promoAmount > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+          <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e' }}>
+            Code promo ({promo.code})
+          </span>
+          <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#B89547' }}>
+            -{formatPrice(promoAmount)}
+          </span>
+        </div>
+      )}
 
       {giftCard && redeemAmount > 0 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -180,6 +236,75 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
             {error && (
               <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#c44545', margin: 0 }}>
                 {error}
+              </p>
+            )}
+          </form>
+        )}
+      </div>
+
+      {/* Promo code section */}
+      <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(184,149,71,0.2)' }}>
+        {promo ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Tag size={14} color="#B89547" />
+              <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 12, color: '#1a1510', fontWeight: 600 }}>
+                {promo.code}
+              </span>
+            </div>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#5a4d3e', margin: 0 }}>
+              {promo.type === 'percentage' ? `${promo.value}% de réduction` : `${formatPrice(promo.value)} de réduction`}
+              {' · '}
+              Économie : {formatPrice(promoAmount)}
+            </p>
+            <button
+              type="button"
+              onClick={removePromo}
+              style={{
+                marginTop: 4, alignSelf: 'flex-start', background: 'transparent',
+                border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11,
+                color: '#9B8E82', textDecoration: 'underline', padding: 0,
+              }}
+            >
+              Retirer
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={applyPromo} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <label style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#5a4d3e', letterSpacing: 0.5 }}>
+              Code promo
+            </label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                placeholder="CODE10"
+                style={{
+                  flex: 1, padding: '8px 10px', borderRadius: 6,
+                  border: '1px solid rgba(184,149,71,0.3)', background: 'white',
+                  fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 12,
+                  color: '#1a1510', letterSpacing: 0.5, outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={applyingPromo || !promoInput.trim()}
+                style={{
+                  padding: '8px 12px', background: '#1a1510', color: '#FDF5E6',
+                  border: 'none', borderRadius: 6, cursor: applyingPromo ? 'wait' : 'pointer',
+                  fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11,
+                  fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase',
+                  opacity: applyingPromo || !promoInput.trim() ? 0.6 : 1,
+                }}
+              >
+                {applyingPromo ? '...' : 'Appliquer'}
+              </button>
+            </div>
+            {promoError && (
+              <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#c44545', margin: 0 }}>
+                {promoError}
               </p>
             )}
           </form>

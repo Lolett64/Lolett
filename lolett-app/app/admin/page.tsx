@@ -65,7 +65,7 @@ async function DashboardContent() {
         {statCards.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="bg-white border border-gray-200/50 shadow-none hover:shadow-md hover:border-[#B89547]/30 transition-all duration-300 cursor-pointer">
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 min-h-[140px]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center justify-center size-9 rounded-full bg-[#B89547]/10">
                     <stat.icon className="size-4 text-[#B89547]" />

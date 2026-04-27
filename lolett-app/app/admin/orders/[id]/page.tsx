@@ -34,6 +34,10 @@ interface OrderDetail {
   };
   total: number;
   shipping: number;
+  promo_code: string | null;
+  promo_discount: number | null;
+  gift_card_code: string | null;
+  gift_card_amount: number | null;
   status: string;
   payment_provider: string;
   payment_id: string;
@@ -71,7 +75,9 @@ export default async function OrderDetailPage({
 
   if (!order) notFound();
 
-  const subtotal = order.total - order.shipping;
+  const promoDiscount = Number(order.promo_discount ?? 0);
+  const giftCardAmount = Number(order.gift_card_amount ?? 0);
+  const subtotal = +(order.total + promoDiscount + giftCardAmount - order.shipping).toFixed(2);
   const { vat: vatAmount } = computeVAT(order.total);
   const vatPercent = Math.round(VAT.RATE * 100);
 
@@ -215,6 +221,18 @@ export default async function OrderDetailPage({
               <span>Livraison</span>
               <span>{order.shipping === 0 ? 'Gratuite' : formatPrice(order.shipping)}</span>
             </div>
+            {order.promo_code && promoDiscount > 0 && (
+              <div className="flex justify-between text-sm text-[#1a1510]/60">
+                <span>Code promo ({order.promo_code})</span>
+                <span className="text-[#B89547]">-{formatPrice(promoDiscount)}</span>
+              </div>
+            )}
+            {order.gift_card_code && giftCardAmount > 0 && (
+              <div className="flex justify-between text-sm text-[#1a1510]/60">
+                <span>Carte cadeau ({order.gift_card_code})</span>
+                <span className="text-[#B89547]">-{formatPrice(giftCardAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-semibold text-[#1a1510] mt-1">
               <span>Total TTC</span>
               <span>{formatPrice(order.total)}</span>

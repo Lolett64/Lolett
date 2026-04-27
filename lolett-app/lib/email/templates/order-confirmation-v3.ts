@@ -17,6 +17,10 @@ interface OrderEmailData {
   subtotal: number;
   shipping: number;
   total: number;
+  promoCode?: string;
+  promoDiscount?: number;
+  giftCardCode?: string;
+  giftCardAmount?: number;
   address: {
     firstName: string;
     lastName: string;
@@ -92,7 +96,7 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
           <tr>
             <td align="center" style="padding-bottom: 8px;">
               <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: 38px; color: #2C2420; line-height: 1.15;">
-                ${overrides?.greeting?.replace('{firstName}', data.firstName) || `Merci, ${data.firstName}.`}
+                ${overrides?.greeting?.replace(/\{\{?\s*firstName\s*\}?\}/g, data.firstName) || `Merci, ${data.firstName}.`}
               </h1>
             </td>
           </tr>
@@ -139,6 +143,16 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
                         <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; letter-spacing: 0.03em;">Livraison</td>
                         <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; text-align: right;">${data.shipping === 0 ? 'Offerte' : `${data.shipping.toFixed(2)}&nbsp;&euro;`}</td>
                       </tr>
+                      ${data.promoCode && data.promoDiscount && data.promoDiscount > 0 ? `
+                      <tr>
+                        <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; letter-spacing: 0.03em;">Code promo (${data.promoCode})</td>
+                        <td style="padding: 6px 0; font-size: 12px; color: #C4956A; text-align: right;">-${data.promoDiscount.toFixed(2)}&nbsp;&euro;</td>
+                      </tr>` : ''}
+                      ${data.giftCardCode && data.giftCardAmount && data.giftCardAmount > 0 ? `
+                      <tr>
+                        <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; letter-spacing: 0.03em;">Carte cadeau (${data.giftCardCode})</td>
+                        <td style="padding: 6px 0; font-size: 12px; color: #C4956A; text-align: right;">-${data.giftCardAmount.toFixed(2)}&nbsp;&euro;</td>
+                      </tr>` : ''}
                       <tr>
                         <td colspan="2" style="padding: 14px 0 0;"><div style="height: 1px; background: #F0EBE4;"></div></td>
                       </tr>

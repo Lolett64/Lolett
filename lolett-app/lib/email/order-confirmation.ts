@@ -10,6 +10,10 @@ interface OrderEmailData {
   subtotal: number;
   shipping: number;
   total: number;
+  promoCode?: string;
+  promoDiscount?: number;
+  giftCardCode?: string;
+  giftCardAmount?: number;
 }
 
 export async function sendOrderConfirmation(data: OrderEmailData) {
@@ -35,6 +39,10 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
       subtotal: data.subtotal,
       shipping: data.shipping,
       total: data.total,
+      promoCode: data.promoCode,
+      promoDiscount: data.promoDiscount,
+      giftCardCode: data.giftCardCode,
+      giftCardAmount: data.giftCardAmount,
       address: {
         firstName: data.customer.firstName,
         lastName: data.customer.lastName,
