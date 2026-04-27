@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SAND, GOLD, BROWN } from '@/components/sections/notre-histoire/constants';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Merci — Carte cadeau LOLETT',

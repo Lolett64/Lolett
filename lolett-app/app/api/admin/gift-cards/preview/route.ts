@@ -11,7 +11,7 @@ const MOCK_DELIVERY_DATA = {
   message:
     "Pour ton anniversaire, offre-toi une pièce qui te rendra rayonnante. Joyeux anniversaire ma belle ! ✨",
   expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-  shopUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr',
+  shopUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com',
 };
 
 const MOCK_PURCHASE_DATA = {

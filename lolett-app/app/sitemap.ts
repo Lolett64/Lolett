@@ -4,7 +4,7 @@ import { productRepository, categoryRepository, lookRepository } from '@/lib/ada
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
   const [products, categories, looks] = await Promise.all([
     productRepository.findMany(),

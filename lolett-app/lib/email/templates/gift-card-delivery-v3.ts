@@ -169,7 +169,7 @@ export function renderGiftCardDeliveryV3(data: GiftCardDeliveryData): string {
           </tr>
           <tr>
             <td align="center" style="padding-bottom: 40px;">
-              <p style="margin: 0; font-size: 11px; color: #B5A99A;">À utiliser au checkout sur lolett.fr</p>
+              <p style="margin: 0; font-size: 11px; color: #B5A99A;">À utiliser au checkout sur lolettshop.com</p>
             </td>
           </tr>
 
@@ -202,7 +202,7 @@ export function renderGiftCardDeliveryV3(data: GiftCardDeliveryData): string {
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="${shopUrl}" style="color: #B5A99A; text-decoration: none;">lolett.fr</a>
+                <a href="${shopUrl}" style="color: #B5A99A; text-decoration: none;">lolettshop.com</a>
               </p>
             </td>
           </tr>

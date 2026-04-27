@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { GiftCardForm } from './Form';
 import { SAND, GOLD, BROWN } from '@/components/sections/notre-histoire/constants';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 const VALID_AMOUNTS = [25, 50, 100, 150] as const;
 type ValidAmount = (typeof VALID_AMOUNTS)[number];

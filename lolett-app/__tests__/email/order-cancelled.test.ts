@@ -21,12 +21,12 @@ const MOCK_SETTINGS = {
   template_key: 'order_cancelled',
   label: 'Commande annulée',
   from_name: 'LOLETT',
-  from_email: 'contact@lolett.fr',
+  from_email: 'contact.lolett@gmail.com',
   subject_template: 'Votre commande {{orderNumber}} a été annulée',
   greeting: '{{firstName}}, on a annulé ta commande',
   body_text: 'Désolé·e {{firstName}} pour la commande {{orderNumber}}.',
   cta_text: 'Voir mes commandes',
-  cta_url: 'https://lolett.fr/compte/commandes',
+  cta_url: 'https://lolettshop.com/compte/commandes',
   signoff: 'À bientôt, LOLETT ♥',
   extra_params: {},
 };
@@ -53,7 +53,7 @@ describe('sendOrderCancelled', () => {
     expect(call.to).toBe('camille@example.fr');
     expect(call.subject).toContain('LOL-123');
     expect(call.subject).not.toContain('{{orderNumber}}');
-    expect(call.from).toContain('contact@lolett.fr');
+    expect(call.from).toContain('contact.lolett@gmail.com');
     expect(call.html).toContain('Camille');
     expect(result).toEqual({ success: true });
   });

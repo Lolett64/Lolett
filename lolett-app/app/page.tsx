@@ -11,7 +11,7 @@ import { productRepository, lookRepository } from '@/lib/adapters';
 import { getSiteContent } from '@/lib/cms/content';
 import { getPageSections } from '@/lib/cms/sections';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'LOLETT — Mode Homme & Femme | Looks complets prêt à sortir',
@@ -66,7 +66,7 @@ const organizationJsonLd = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    email: 'hello@lolett.com',
+    email: 'contact.lolett@gmail.com',
     contactType: 'customer service',
     availableLanguage: 'French',
   },

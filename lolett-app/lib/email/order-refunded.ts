@@ -32,7 +32,7 @@ export async function sendOrderRefunded(data: RefundedEmailData) {
       orderNumber: data.orderNumber,
       amount: amountStr,
       refund_amount: amountStr,
-      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr',
+      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com',
     };
 
     const overrides = settings ? {

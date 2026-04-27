@@ -151,7 +151,7 @@ export function renderGiftCardPurchaseConfirmationV3(
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                LOLETT &middot; lolett.fr
+                LOLETT &middot; lolettshop.com
               </p>
             </td>
           </tr>

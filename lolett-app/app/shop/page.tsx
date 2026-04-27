@@ -8,7 +8,7 @@ import { ShopFeaturedLooks } from '@/components/shop/ShopFeaturedLooks';
 import { ShopTrustBar } from '@/components/shop/ShopTrustBar';
 
 export const revalidate = 60;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'La Boutique — LOLETT',

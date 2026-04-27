@@ -9,7 +9,7 @@ import { buildProductJsonLd } from '@/lib/seo/product-jsonld';
 
 export const revalidate = 60;
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 interface PageProps {
   params: Promise<{

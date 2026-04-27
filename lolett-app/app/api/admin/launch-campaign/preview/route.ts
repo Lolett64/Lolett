@@ -6,7 +6,7 @@ export async function GET(req: Request) {
   const firstName = url.searchParams.get('firstName') || 'Marie';
   const promoCode = url.searchParams.get('promoCode') || 'BIENVENUE-MARIE-A8F2';
   const discount = url.searchParams.get('discount') || '15';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
   const html = renderLaunchInvitationV3({
     firstName,

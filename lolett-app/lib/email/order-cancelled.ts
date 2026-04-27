@@ -28,7 +28,7 @@ export async function sendOrderCancelled(data: CancelledEmailData) {
     const vars = {
       firstName: data.firstName,
       orderNumber: data.orderNumber,
-      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr',
+      base_url: process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com',
     };
 
     const overrides = settings ? {

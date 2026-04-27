@@ -10,7 +10,7 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;

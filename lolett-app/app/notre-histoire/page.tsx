@@ -5,7 +5,7 @@ import { getVisibleSectionKeys } from '@/lib/cms/sections';
 
 export const revalidate = 60;
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Mon Histoire',

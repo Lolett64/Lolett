@@ -12,13 +12,13 @@ describe('buildProductJsonLd', () => {
       currency: 'EUR',
       stock: 15,
       sku: 'ISA-MARRON',
-      baseUrl: 'https://lolett.fr',
+      baseUrl: 'https://lolettshop.com',
     });
     expect(jsonld['@type']).toBe('Product');
     expect(jsonld.offers['@type']).toBe('Offer');
     expect(jsonld.offers.price).toBe(39);
     expect(jsonld.offers.availability).toBe('https://schema.org/InStock');
-    expect(jsonld.offers.url).toBe('https://lolett.fr/produit/isa-marron');
+    expect(jsonld.offers.url).toBe('https://lolettshop.com/produit/isa-marron');
     expect(jsonld.image).toEqual(['https://cdn/p1.jpg']);
     expect(jsonld.brand.name).toBe('LOLETT');
   });
@@ -33,7 +33,7 @@ describe('buildProductJsonLd', () => {
       currency: 'EUR',
       stock: 0,
       sku: 'X',
-      baseUrl: 'https://lolett.fr',
+      baseUrl: 'https://lolettshop.com',
     });
     expect(jsonld.offers.availability).toBe('https://schema.org/OutOfStock');
     expect(jsonld.image).toBeUndefined();

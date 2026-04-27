@@ -397,7 +397,7 @@ export function GiftCardForm({ amount }: GiftCardFormProps) {
                 lineHeight: 1.6,
               }}
             >
-              Valable 1 an à compter de l’achat, sur toute la boutique lolett.fr.
+              Valable 1 an à compter de l’achat, sur toute la boutique lolettshop.com.
             </p>
           </div>
         </aside>

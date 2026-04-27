@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Conditions Générales de Vente — LOLETT',
@@ -22,7 +22,7 @@ export default function CGVPage() {
             <h2 className="text-lg font-bold mb-3">1. Objet</h2>
             <p>
               Les présentes Conditions Générales de Vente (CGV) régissent l'ensemble des ventes réalisées sur le site
-              <strong> lolett.fr</strong>, édité par <strong>LOLETT</strong>,
+              <strong> lolettshop.com</strong>, édité par <strong>LOLETT</strong>,
               dont le siège social est situé au 30 avenue Honoré Baradat, 64000 Pau, France.
               SIRET : 999 609 332 00013 — RCS Pau.
               Toute commande implique l'acceptation sans réserve des présentes CGV.

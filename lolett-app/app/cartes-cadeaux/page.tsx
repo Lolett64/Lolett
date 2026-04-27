@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Reveal } from '@/components/sections/notre-histoire/Reveal';
 import { SAND, GOLD, BROWN, WARM_CREAM } from '@/components/sections/notre-histoire/constants';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Cartes cadeaux LOLETT — Offrez le style',
@@ -42,7 +42,7 @@ const STEPS = [
   {
     n: '03',
     title: 'Il reçoit son code par email',
-    text: 'À utiliser directement sur lolett.fr, au moment qu’il aura choisi.',
+    text: 'À utiliser directement sur lolettshop.com, au moment qu’il aura choisi.',
   },
 ];
 
@@ -280,7 +280,7 @@ export default function CartesCadeauxPage() {
               color: 'rgba(26,21,16,0.6)',
             }}
           >
-            Valable 1 an à compter de la date d’achat, sur toute la boutique lolett.fr.
+            Valable 1 an à compter de la date d’achat, sur toute la boutique lolettshop.com.
           </p>
         </Reveal>
       </section>

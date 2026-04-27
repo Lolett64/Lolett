@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ received: true });
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
         // Email destinataire
         try {

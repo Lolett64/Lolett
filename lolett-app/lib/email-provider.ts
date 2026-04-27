@@ -19,7 +19,7 @@ function getResendClient() {
 
 const DEFAULT_FROM =
   process.env.NODE_ENV === 'production'
-    ? 'LOLETT <contact@lolett.fr>'
+    ? 'LOLETT <contact.lolett@gmail.com>'
     : 'LOLETT <onboarding@resend.dev>';
 
 interface SendOptions {

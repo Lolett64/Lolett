@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   }
 
   const admin = createAdminClient();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
   const subject = body.subject?.trim() || 'Lola — l\'ouverture de LOLETT, rien que pour toi';
   const shopUrl = `${baseUrl}${SHOP_PATH}`;
 
