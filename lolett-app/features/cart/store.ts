@@ -11,10 +11,6 @@ export interface AppliedGiftCard {
 
 export interface AppliedPromo {
   code: string;
-  discount: number;
-  type: 'percentage' | 'fixed';
-  value: number;
-  description?: string;
 }
 
 interface CartState {
@@ -138,6 +134,14 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'lolett-cart',
+      version: 2,
+      migrate: (persisted: unknown, version: number) => {
+        const state = (persisted ?? {}) as Partial<CartState> & { promo?: { code?: string } | null };
+        if (version < 2 && state.promo) {
+          state.promo = state.promo.code ? { code: state.promo.code } : null;
+        }
+        return state as CartState;
+      },
     }
   )
 );

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Truck, ShieldCheck, RotateCcw, Gift, Tag } from 'lucide-react';
 import { SHIPPING, VAT, computeVAT } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
-import { useCartStore } from '@/features/cart';
-import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
+import { useCartStore, useValidatedPromo } from '@/features/cart';
 
 interface CartSummaryProps {
   subtotal: number;
@@ -28,9 +27,11 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   const giftCard = useCartStore((s) => s.giftCard);
   const setGiftCard = useCartStore((s) => s.setGiftCard);
   const clearGiftCard = useCartStore((s) => s.clearGiftCard);
-  const promo = useCartStore((s) => s.promo);
+  const promoCode = useCartStore((s) => s.promo?.code ?? null);
   const setPromo = useCartStore((s) => s.setPromo);
   const clearPromo = useCartStore((s) => s.clearPromo);
+
+  const { promo: validatedPromo, promoAmount, validating: promoValidating } = useValidatedPromo(subtotal);
 
   const [codeInput, setCodeInput] = useState('');
   const [applying, setApplying] = useState(false);
@@ -40,10 +41,6 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   const [applyingPromo, setApplyingPromo] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
 
-  const promoAmount = useMemo(
-    () => (promo ? computePromoDiscount(promo.type as PromoType, promo.value, subtotal) : 0),
-    [promo, subtotal],
-  );
   const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
   const redeemAmount = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
   const payableTotal = Math.max(0, +(totalAfterPromo - redeemAmount).toFixed(2));
@@ -93,13 +90,7 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
       });
       const data = await res.json();
       if (res.ok && data?.valid) {
-        setPromo({
-          code: data.code,
-          discount: Number(data.discount),
-          type: data.type,
-          value: Number(data.value),
-          description: data.description,
-        });
+        setPromo({ code: data.code });
         setPromoInput('');
       } else {
         setPromoError(data?.error ?? 'Code promo invalide');
@@ -149,10 +140,10 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
         </span>
       </div>
 
-      {promo && promoAmount > 0 && (
+      {validatedPromo && promoAmount > 0 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
           <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#5a4d3e' }}>
-            Code promo ({promo.code})
+            Code promo ({validatedPromo.code})
           </span>
           <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13, color: '#B89547' }}>
             -{formatPrice(promoAmount)}
@@ -248,18 +239,24 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
 
       {/* Promo code section */}
       <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(184,149,71,0.2)' }}>
-        {promo ? (
+        {promoCode ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Tag size={14} color="#B89547" />
               <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 12, color: '#1a1510', fontWeight: 600 }}>
-                {promo.code}
+                {validatedPromo?.code ?? promoCode}
               </span>
             </div>
             <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#5a4d3e', margin: 0 }}>
-              {promo.type === 'percentage' ? `${promo.value}% de réduction` : `${formatPrice(promo.value)} de réduction`}
-              {' · '}
-              Économie : {formatPrice(promoAmount)}
+              {validatedPromo
+                ? <>
+                    {validatedPromo.type === 'percentage' ? `${validatedPromo.value}% de réduction` : `${formatPrice(validatedPromo.value)} de réduction`}
+                    {' · '}
+                    Économie : {formatPrice(promoAmount)}
+                  </>
+                : promoValidating
+                  ? 'Validation…'
+                  : 'Code en attente de validation'}
             </p>
             <button
               type="button"
