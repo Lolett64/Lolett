@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import Script from 'next/script';
+import { useEffect, useRef, useState } from 'react';
 import { MapPin, Check } from 'lucide-react';
 import { useCartStore } from '@/features/cart';
 import type { PickupPoint, ShippingCountryCode } from '@/types';
 
-// Mondial Relay diffuse un widget jQuery officiel. On l'instancie côté client
-// après chargement de jQuery + plugin. Le widget rend une carte Leaflet et
-// notifie via un callback quand l'utilisateur sélectionne un point.
+// Mondial Relay diffuse un widget jQuery officiel. On charge jQuery puis
+// le plugin séquentiellement (sinon le plugin tente de s'initialiser avant
+// que jQuery ne soit prêt et ne fait rien). Une fois prêt, on l'instancie
+// sur notre conteneur, et il rend une carte Leaflet + liste de points.
 //
 // Doc: https://widget.mondialrelay.com/
-//
-// Brand "BDTEST13" est la valeur de test publique fournie par MR pour les
-// environnements de dev. À remplacer par l'Enseigne réelle en prod via
-// NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID.
 
 declare global {
   interface JQueryWidget {
@@ -46,72 +42,114 @@ interface MondialRelayWidgetProps {
 }
 
 const BRAND_ID = process.env.NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID || 'BDTEST13';
+const JQUERY_SRC = 'https://code.jquery.com/jquery-3.6.0.min.js';
+const PLUGIN_SRC = 'https://widget.mondialrelay.com/parcelshop-picker/v4_0/js/jquery.plugin.mondialrelay.parcelshoppicker.min.js';
+const PLUGIN_CSS = 'https://widget.mondialrelay.com/parcelshop-picker/v4_0/css/parcelshoppicker.min.css';
+
+// Charge un script <script> séquentiellement et résout quand l'événement
+// onload est tiré. Idempotent : si un script avec la même src existe déjà,
+// on attend juste qu'il soit prêt (pas de double chargement).
+function loadScript(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      if (existing.getAttribute('data-loaded') === 'true') {
+        resolve();
+        return;
+      }
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)));
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = false;
+    s.onload = () => {
+      s.setAttribute('data-loaded', 'true');
+      resolve();
+    };
+    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+function loadStylesheet(href: string) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
 
 export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const initializedRef = useRef(false);
   const setPickupPoint = useCartStore((s) => s.setPickupPoint);
   const pickupPoint = useCartStore((s) => s.pickupPoint);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
+  // Réinitialise le point relais sélectionné si pays/CP change.
   useEffect(() => {
-    // Réinitialise si pays/CP change pour forcer un nouveau choix.
-    initializedRef.current = false;
     setPickupPoint(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [country]);
 
-  const tryInit = () => {
-    if (initializedRef.current) return;
-    if (typeof window === 'undefined') return;
-    const $ = window.jQuery;
-    if (!$ || !$.fn?.MR_ParcelShopPicker || !containerRef.current) return;
+  useEffect(() => {
+    let cancelled = false;
 
-    initializedRef.current = true;
-    $(`#${containerRef.current.id}`).MR_ParcelShopPicker({
-      Target: '#mr-pickup-id',
-      TargetDisplay: '#mr-pickup-display',
-      TargetDisplayInfoPR: '#mr-pickup-info',
-      Brand: BRAND_ID,
-      Country: country,
-      PostCode: postalCode || '',
-      Weight: '1000',
-      MaxResults: '7',
-      DeliveryMode: '24R',
-      Responsive: true,
-      ShowResultsOnMap: true,
-      OnParcelShopSelected: (data: MondialRelayPoint) => {
-        const point: PickupPoint = {
-          id: data.ID,
-          name: data.Nom,
-          address: [data.Adresse1, data.Adresse2].filter(Boolean).join(' '),
-          postalCode: data.CP,
-          city: data.Ville,
-          country: data.Pays,
-          lat: parseFloat(data.Latitude),
-          lng: parseFloat(data.Longitude),
-        };
-        setPickupPoint(point);
-      },
-    });
-  };
+    async function init() {
+      try {
+        loadStylesheet(PLUGIN_CSS);
+        await loadScript(JQUERY_SRC);
+        await loadScript(PLUGIN_SRC);
+
+        if (cancelled) return;
+        const $ = window.jQuery;
+        if (!$ || !$.fn?.MR_ParcelShopPicker || !containerRef.current) {
+          throw new Error('jQuery ou plugin MR introuvable après chargement');
+        }
+
+        $(`#${containerRef.current.id}`).MR_ParcelShopPicker({
+          Target: '#mr-pickup-id',
+          Brand: BRAND_ID,
+          Country: country,
+          PostCode: postalCode || '',
+          Weight: '1000',
+          MaxResults: '7',
+          DeliveryMode: '24R',
+          Responsive: true,
+          ShowResultsOnMap: true,
+          OnParcelShopSelected: (data: MondialRelayPoint) => {
+            const point: PickupPoint = {
+              id: data.ID,
+              name: data.Nom,
+              address: [data.Adresse1, data.Adresse2].filter(Boolean).join(' '),
+              postalCode: data.CP,
+              city: data.Ville,
+              country: data.Pays,
+              lat: parseFloat(data.Latitude),
+              lng: parseFloat(data.Longitude),
+            };
+            setPickupPoint(point);
+          },
+        });
+
+        setStatus('ready');
+      } catch (err) {
+        console.error('[MondialRelayWidget] init failed:', err);
+        if (!cancelled) setStatus('error');
+      }
+    }
+
+    init();
+    return () => {
+      cancelled = true;
+    };
+    // Re-init si pays change pour rebrancher le widget sur le bon pays.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [country]);
 
   return (
     <div style={{ marginTop: 16 }}>
-      <Script
-        src="https://code.jquery.com/jquery-3.6.0.min.js"
-        strategy="afterInteractive"
-        onLoad={tryInit}
-      />
-      <Script
-        src="https://widget.mondialrelay.com/parcelshop-picker/v4_0/js/jquery.plugin.mondialrelay.parcelshoppicker.min.js"
-        strategy="afterInteractive"
-        onLoad={tryInit}
-      />
-      <link
-        rel="stylesheet"
-        href="https://widget.mondialrelay.com/parcelshop-picker/v4_0/css/parcelshoppicker.min.css"
-      />
-
       <div
         id="mr-widget-container"
         ref={containerRef}
@@ -121,11 +159,23 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
           borderRadius: 8,
           padding: 8,
           background: '#FFFBF7',
+          display: 'flex',
+          alignItems: status === 'ready' ? 'stretch' : 'center',
+          justifyContent: status === 'ready' ? 'stretch' : 'center',
         }}
-      />
+      >
+        {status === 'loading' && (
+          <p style={{ fontSize: 13, color: '#9B8E82', fontFamily: "'DM Sans', sans-serif" }}>
+            Chargement de la carte des points relais…
+          </p>
+        )}
+        {status === 'error' && (
+          <p style={{ fontSize: 13, color: '#B85555', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: 16 }}>
+            Impossible de charger le widget Mondial Relay. Merci de réessayer ou de choisir la livraison à domicile.
+          </p>
+        )}
+      </div>
       <input id="mr-pickup-id" type="hidden" />
-      <div id="mr-pickup-display" style={{ display: 'none' }} />
-      <div id="mr-pickup-info" style={{ display: 'none' }} />
 
       {pickupPoint && (
         <div

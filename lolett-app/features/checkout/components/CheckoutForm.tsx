@@ -29,12 +29,12 @@ interface CheckoutFormProps {
 
 function FloatingInput({
   id, name, label, value, onChange, type = 'text', required = false, disabled = false,
-  placeholder, error,
+  error,
 }: {
   id: string; name: string; label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string; required?: boolean; disabled?: boolean;
-  placeholder?: string; error?: string;
+  error?: string;
 }) {
   const filled = value && value.length > 0;
   return (
@@ -42,7 +42,7 @@ function FloatingInput({
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
         required={required} disabled={disabled}
-        className="ckv-float-input" placeholder={placeholder ?? ' '}
+        className="ckv-float-input" placeholder=" "
         aria-invalid={!!error}
       />
       <label htmlFor={id} className={`ckv-float-label ${filled ? 'ckv-float-label--filled' : ''}`}>
@@ -214,9 +214,6 @@ export function CheckoutForm({
   loadingAddresses, handleChange, setAddressFields, goToPayment, selectAddress,
   subtotal,
 }: CheckoutFormProps) {
-  const countryInfo = getShippingCountry(formData.country);
-  const phonePlaceholder = countryInfo ? `${countryInfo.phonePrefix} XXXXXXXXX` : '';
-  const postalPlaceholder = countryInfo?.postalCodeExample ?? '';
   const isFrance = formData.country === 'FR';
   const shippingMethod = useCartStore((s) => s.shippingMethod);
 
@@ -267,7 +264,7 @@ export function CheckoutForm({
           <FloatingInput
             id="phone" name="phone" label="Téléphone" type="tel"
             value={formData.phone} onChange={handleChange} required
-            placeholder={phonePlaceholder} error={formErrors.phone}
+            error={formErrors.phone}
           />
         </div>
 
@@ -292,7 +289,7 @@ export function CheckoutForm({
           <FloatingInput
             id="postalCode" name="postalCode" label="Code postal"
             value={formData.postalCode} onChange={handleChange} required
-            placeholder={postalPlaceholder} error={formErrors.postalCode}
+            error={formErrors.postalCode}
           />
           <FloatingInput id="city" name="city" label="Ville" value={formData.city} onChange={handleChange} required />
         </div>
