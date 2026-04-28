@@ -10,6 +10,8 @@ interface OrderItem {
   price: number;
 }
 
+import type { ShippingMethod, PickupPoint } from '@/types';
+
 interface OrderEmailData {
   firstName: string;
   orderNumber: string;
@@ -21,6 +23,9 @@ interface OrderEmailData {
   promoDiscount?: number;
   giftCardCode?: string;
   giftCardAmount?: number;
+  shippingMethod?: ShippingMethod;
+  pickupPoint?: PickupPoint | null;
+  phone?: string;
   address: {
     firstName: string;
     lastName: string;
@@ -36,6 +41,14 @@ export interface EmailOverrides {
   body_text?: string;
   cta_text?: string;
   signoff?: string;
+}
+
+function buildMapsUrl(p: PickupPoint): string {
+  if (typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)) {
+    return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  }
+  const q = encodeURIComponent(`${p.name}, ${p.address}, ${p.postalCode} ${p.city}, ${p.country}`);
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
 }
 
 export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: EmailOverrides): string {
@@ -174,17 +187,29 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
             </td>
           </tr>
 
-          <!-- Address -->
+          <!-- Adresse de livraison ou Point Relais -->
           <tr>
             <td style="padding: 32px 8px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="width: 3px; background: #C4956A; border-radius: 2px;"></td>
                   <td style="padding-left: 18px;">
-                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Livraison</p>
+                    ${data.shippingMethod === 'mondial_relay' && data.pickupPoint ? `
+                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Point Relais Mondial Relay</p>
+                    <p style="margin: 0; font-size: 13px; font-weight: 500; color: #2C2420;">${data.pickupPoint.name}</p>
+                    <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.pickupPoint.address}</p>
+                    <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.pickupPoint.postalCode} ${data.pickupPoint.city} &middot; ${data.pickupPoint.country}</p>
+                    <p style="margin: 10px 0 0;">
+                      <a href="${buildMapsUrl(data.pickupPoint)}" style="font-size: 12px; color: #C4956A; text-decoration: none; border-bottom: 1px solid #E8D9C4; padding-bottom: 1px;">Voir sur Google Maps &rarr;</a>
+                    </p>
+                    ${data.phone ? `<p style="margin: 12px 0 0; font-size: 11px; color: #B5A99A; line-height: 1.5;">Vous serez notifi&eacute; par SMS au ${data.phone} d&egrave;s que votre colis sera disponible au retrait.</p>` : ''}
+                    ` : `
+                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Livraison &agrave; domicile</p>
                     <p style="margin: 0; font-size: 13px; color: #2C2420;">${data.address.firstName} ${data.address.lastName}</p>
                     <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.address.address}</p>
                     <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.address.postalCode} ${data.address.city}</p>
+                    ${data.address.country && data.address.country !== 'France' ? `<p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.address.country}</p>` : ''}
+                    `}
                   </td>
                 </tr>
               </table>

@@ -60,6 +60,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                 <CheckoutForm
                   formData={checkout.formData}
                   isFormValid={checkout.isFormValid}
+                  formErrors={checkout.formErrors}
                   savedAddresses={checkout.savedAddresses}
                   selectedAddressId={checkout.selectedAddressId}
                   loadingAddresses={checkout.loadingAddresses}
@@ -67,6 +68,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                   setAddressFields={checkout.setAddressFields}
                   goToPayment={checkout.goToPayment}
                   selectAddress={checkout.selectAddress}
+                  subtotal={subtotal}
                 />
               )}
               {checkout.step === 2 && (

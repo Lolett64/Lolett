@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartItem, Size } from '@/types';
+import type { CartItem, Size, ShippingCountryCode, ShippingMethod, PickupPoint } from '@/types';
 
 export interface AppliedGiftCard {
   code: string;
@@ -21,6 +21,9 @@ interface CartState {
   items: CartItem[];
   giftCard: AppliedGiftCard | null;
   promo: AppliedPromo | null;
+  shippingCountry: ShippingCountryCode;
+  shippingMethod: ShippingMethod;
+  pickupPoint: PickupPoint | null;
   addItem: (productId: string, size: Size, quantity?: number, color?: string) => void;
   removeItem: (productId: string, size: Size, color?: string) => void;
   updateQuantity: (productId: string, size: Size, quantity: number, color?: string) => void;
@@ -31,6 +34,9 @@ interface CartState {
   clearGiftCard: () => void;
   setPromo: (promo: AppliedPromo | null) => void;
   clearPromo: () => void;
+  setShippingCountry: (country: ShippingCountryCode) => void;
+  setShippingMethod: (method: ShippingMethod) => void;
+  setPickupPoint: (point: PickupPoint | null) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -39,6 +45,9 @@ export const useCartStore = create<CartState>()(
       items: [],
       giftCard: null,
       promo: null,
+      shippingCountry: 'FR',
+      shippingMethod: 'home',
+      pickupPoint: null,
 
       addItem: (productId: string, size: Size, quantity = 1, color?: string) => {
         set((state) => {
@@ -99,13 +108,22 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [], giftCard: null, promo: null }),
+      clearCart: () => set({ items: [], giftCard: null, promo: null, pickupPoint: null }),
 
       setGiftCard: (giftCard: AppliedGiftCard | null) => set({ giftCard }),
       clearGiftCard: () => set({ giftCard: null }),
 
       setPromo: (promo: AppliedPromo | null) => set({ promo }),
       clearPromo: () => set({ promo: null }),
+
+      // Réinitialise le mode + point relais quand le pays change pour éviter
+      // un état incohérent (ex: point relais FR conservé après bascule ES).
+      setShippingCountry: (country) => set({ shippingCountry: country, shippingMethod: 'home', pickupPoint: null }),
+      setShippingMethod: (method) => set((state) => ({
+        shippingMethod: method,
+        pickupPoint: method === 'home' ? null : state.pickupPoint,
+      })),
+      setPickupPoint: (point) => set({ pickupPoint: point }),
 
       getItemCount: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);

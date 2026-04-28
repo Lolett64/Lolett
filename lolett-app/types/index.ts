@@ -80,6 +80,21 @@ export interface FavoriteItem {
   addedAt: string;
 }
 
+export type ShippingMethod = 'home' | 'mondial_relay';
+export type ShippingCarrier = 'colissimo' | 'mondial_relay';
+export type ShippingCountryCode = 'FR' | 'BE' | 'LU' | 'NL' | 'ES' | 'PT';
+
+export interface PickupPoint {
+  id: string;
+  name: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  lat?: number;
+  lng?: number;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -91,6 +106,12 @@ export interface Order {
   promoDiscount?: number;
   giftCardCode?: string;
   giftCardAmount?: number;
+  shippingMethod?: ShippingMethod;
+  shippingCarrier?: ShippingCarrier;
+  shippingCountry?: ShippingCountryCode;
+  pickupPoint?: PickupPoint | null;
+  invoiceNumber?: string;
+  invoicePdfUrl?: string;
   status: 'pending' | 'confirmed' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'expired';
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;

@@ -25,6 +25,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-email/components": "^1.0.7",
+    "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "^10.24.0",
     "@stripe/stripe-js": "^8.7.0",
     "@supabase/ssr": "^0.8.0",

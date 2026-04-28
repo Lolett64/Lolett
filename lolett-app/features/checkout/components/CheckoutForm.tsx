@@ -4,12 +4,17 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import type { useCheckout } from '../hooks/useCheckout';
 import type { UserAddress } from '@/types';
+import { SHIPPING_COUNTRIES, getShippingCountry } from '@/lib/constants';
+import { ShippingMethodSelect } from './ShippingMethodSelect';
+import { MondialRelayWidget } from './MondialRelayWidget';
+import { useCartStore } from '@/features/cart';
 
 type CheckoutHook = ReturnType<typeof useCheckout>;
 
 interface CheckoutFormProps {
   formData: CheckoutHook['formData'];
   isFormValid: CheckoutHook['isFormValid'];
+  formErrors: CheckoutHook['formErrors'];
   savedAddresses: CheckoutHook['savedAddresses'];
   selectedAddressId: CheckoutHook['selectedAddressId'];
   loadingAddresses: CheckoutHook['loadingAddresses'];
@@ -17,16 +22,19 @@ interface CheckoutFormProps {
   setAddressFields: CheckoutHook['setAddressFields'];
   goToPayment: CheckoutHook['goToPayment'];
   selectAddress: CheckoutHook['selectAddress'];
+  subtotal: number;
 }
 
 /* ─── FloatingInput ─────────────────────────────────────────────────── */
 
 function FloatingInput({
   id, name, label, value, onChange, type = 'text', required = false, disabled = false,
+  placeholder, error,
 }: {
   id: string; name: string; label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string; required?: boolean; disabled?: boolean;
+  placeholder?: string; error?: string;
 }) {
   const filled = value && value.length > 0;
   return (
@@ -34,10 +42,45 @@ function FloatingInput({
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
         required={required} disabled={disabled}
-        className="ckv-float-input" placeholder=" "
+        className="ckv-float-input" placeholder={placeholder ?? ' '}
+        aria-invalid={!!error}
       />
       <label htmlFor={id} className={`ckv-float-label ${filled ? 'ckv-float-label--filled' : ''}`}>
         {label}
+      </label>
+      {error && filled && (
+        <p style={{ fontSize: 11, color: '#B85555', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function CountrySelect({
+  value, onChange,
+}: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+}) {
+  return (
+    <div className="ckv-float-group">
+      <select
+        id="country"
+        name="country"
+        value={value}
+        onChange={onChange}
+        className="ckv-float-input"
+        style={{ appearance: 'auto' }}
+      >
+        {SHIPPING_COUNTRIES.map((c) => (
+          <option key={c.code} value={c.code}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <label htmlFor="country" className="ckv-float-label ckv-float-label--filled">
+        Pays
       </label>
     </div>
   );
@@ -167,9 +210,16 @@ function AddressAutocomplete({
 /* ─── CheckoutForm ──────────────────────────────────────────────────── */
 
 export function CheckoutForm({
-  formData, isFormValid, savedAddresses, selectedAddressId,
+  formData, isFormValid, formErrors, savedAddresses, selectedAddressId,
   loadingAddresses, handleChange, setAddressFields, goToPayment, selectAddress,
+  subtotal,
 }: CheckoutFormProps) {
+  const countryInfo = getShippingCountry(formData.country);
+  const phonePlaceholder = countryInfo ? `${countryInfo.phonePrefix} XXXXXXXXX` : '';
+  const postalPlaceholder = countryInfo?.postalCodeExample ?? '';
+  const isFrance = formData.country === 'FR';
+  const shippingMethod = useCartStore((s) => s.shippingMethod);
+
   return (
     <div>
       <h2 className="ckv-heading-italic" style={{ marginBottom: 32 }}>
@@ -214,23 +264,57 @@ export function CheckoutForm({
         </div>
         <div className="ckv-grid-2">
           <FloatingInput id="email" name="email" label="Email" type="email" value={formData.email} onChange={handleChange} required />
-          <FloatingInput id="phone" name="phone" label="Téléphone" type="tel" value={formData.phone} onChange={handleChange} />
+          <FloatingInput
+            id="phone" name="phone" label="Téléphone" type="tel"
+            value={formData.phone} onChange={handleChange} required
+            placeholder={phonePlaceholder} error={formErrors.phone}
+          />
         </div>
 
         <div className="ckv-flourish">&#10022;</div>
 
+        {/* Country first — détermine modes de livraison + format CP/tél */}
+        <p className="ckv-section-label">Pays de livraison</p>
+        <CountrySelect value={formData.country} onChange={handleChange} />
+
         {/* Address */}
-        <p className="ckv-section-label">Adresse de livraison</p>
-        <AddressAutocomplete
-          value={formData.address}
-          onChange={handleChange}
-          onSelect={setAddressFields}
-        />
+        <p className="ckv-section-label" style={{ marginTop: 24 }}>Adresse de livraison</p>
+        {isFrance ? (
+          <AddressAutocomplete
+            value={formData.address}
+            onChange={handleChange}
+            onSelect={setAddressFields}
+          />
+        ) : (
+          <FloatingInput id="address" name="address" label="Adresse" value={formData.address} onChange={handleChange} required />
+        )}
         <div className="ckv-grid-2">
-          <FloatingInput id="postalCode" name="postalCode" label="Code postal" value={formData.postalCode} onChange={handleChange} required />
+          <FloatingInput
+            id="postalCode" name="postalCode" label="Code postal"
+            value={formData.postalCode} onChange={handleChange} required
+            placeholder={postalPlaceholder} error={formErrors.postalCode}
+          />
           <FloatingInput id="city" name="city" label="Ville" value={formData.city} onChange={handleChange} required />
         </div>
-        <FloatingInput id="country" name="country" label="Pays" value={formData.country} onChange={handleChange} />
+
+        <div className="ckv-flourish">&#10022;</div>
+
+        {/* Mode de livraison */}
+        <p className="ckv-section-label">Mode de livraison</p>
+        <ShippingMethodSelect subtotal={subtotal} />
+
+        {shippingMethod === 'mondial_relay' && (
+          <MondialRelayWidget
+            postalCode={formData.postalCode}
+            country={formData.country}
+          />
+        )}
+
+        {formErrors.pickupPoint && (
+          <p style={{ marginTop: 12, fontSize: 12, color: '#B85555', fontFamily: "'DM Sans', sans-serif" }}>
+            {formErrors.pickupPoint}
+          </p>
+        )}
 
         <div style={{ paddingTop: 24 }}>
           <button type="submit" disabled={!isFormValid} className="ckv-btn-primary">

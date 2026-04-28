@@ -157,6 +157,9 @@ export async function PATCH(
         shipping: Number(updated.shipping),
         total: Number(updated.total),
         trackingNumber: body.trackingNumber || (updated.tracking_number as string | undefined),
+        shippingMethod: (updated.shipping_method as 'home' | 'mondial_relay' | null) ?? undefined,
+        shippingCarrier: (updated.shipping_carrier as 'colissimo' | 'mondial_relay' | null) ?? undefined,
+        pickupPoint: (updated.pickup_point as import('@/types').PickupPoint | null) ?? null,
       }).catch((err: unknown) => console.error('[Admin orders PATCH] Shipped email error:', err));
     }
 

@@ -4,10 +4,16 @@ import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendHtmlEmail } from '@/lib/email-provider';
 import { renderGiftCardDeliveryV3 } from '@/lib/email/templates/gift-card-delivery-v3';
 import { renderGiftCardPurchaseConfirmationV3 } from '@/lib/email/templates/gift-card-purchase-confirmation-v3';
+import { SHIPPING_COUNTRIES } from '@/lib/constants';
+import type { ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
+
+const VALID_COUNTRY_CODES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
+const VALID_SHIPPING_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
 
 const VALID_SIZES = [
   'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL',
@@ -181,6 +187,21 @@ export async function POST(req: NextRequest) {
       const giftCardCode = metadata.giftCardCode || undefined;
       const giftCardAmount = parseFloat(metadata.giftCardRedeemAmount || '0') || 0;
 
+      // Livraison — récupérée depuis la metadata stockée à la création de session.
+      const rawMethod = metadata.shippingMethod as ShippingMethod | undefined;
+      const rawCountry = metadata.shippingCountry as ShippingCountryCode | undefined;
+      const shippingMethod: ShippingMethod = rawMethod && VALID_SHIPPING_METHODS.includes(rawMethod) ? rawMethod : 'home';
+      const shippingCountry: ShippingCountryCode = rawCountry && VALID_COUNTRY_CODES.includes(rawCountry) ? rawCountry : 'FR';
+      const shippingCarrier = shippingMethod === 'mondial_relay' ? 'mondial_relay' : 'colissimo';
+      let pickupPoint: PickupPoint | null = null;
+      if (metadata.pickupPoint) {
+        try {
+          pickupPoint = JSON.parse(metadata.pickupPoint) as PickupPoint;
+        } catch {
+          pickupPoint = null;
+        }
+      }
+
       const finalTotal = Math.max(0, +(grossTotal - promoDiscount - giftCardAmount).toFixed(2));
 
       const admin = createAdminClient();
@@ -208,6 +229,10 @@ export async function POST(req: NextRequest) {
         promoDiscount,
         giftCardCode,
         giftCardAmount,
+        shippingMethod,
+        shippingCarrier,
+        shippingCountry,
+        pickupPoint,
         userId,
         paymentProvider: 'stripe',
       });
@@ -241,6 +266,22 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // 4.5 Génération facture PDF (fire-and-forget — n'invalide pas la commande
+      // si la facture échoue, mais log pour intervention manuelle ultérieure).
+      generateInvoicePdf({
+        ...order,
+        shippingMethod,
+        shippingCarrier,
+        shippingCountry,
+        pickupPoint,
+        promoCode,
+        promoDiscount,
+        giftCardCode,
+        giftCardAmount,
+      }).catch((err) => {
+        console.error('[Stripe webhook] Invoice generation failed:', err);
+      });
+
       // 5. Confirmation email
       await sendOrderConfirmation({
         to: customer.email,
@@ -259,6 +300,8 @@ export async function POST(req: NextRequest) {
         promoDiscount,
         giftCardCode,
         giftCardAmount,
+        shippingMethod,
+        pickupPoint,
       });
 
       // 6. Apply gift card redemption if present

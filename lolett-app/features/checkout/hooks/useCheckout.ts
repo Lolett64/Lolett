@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore, useCartCalculation } from '@/features/cart';
 import { useAuth } from '@/lib/auth/context';
 import { getProfile } from '@/lib/adapters/supabase-user';
 import { getAddresses } from '@/lib/adapters/supabase-user';
-import type { UserAddress } from '@/types';
+import { SHIPPING_COUNTRIES, getShippingCarrier, getShippingCountry } from '@/lib/constants';
+import type { UserAddress, ShippingCountryCode } from '@/types';
 
 export interface CheckoutFormData {
   firstName: string;
@@ -16,7 +17,7 @@ export interface CheckoutFormData {
   address: string;
   city: string;
   postalCode: string;
-  country: string;
+  country: ShippingCountryCode;
 }
 
 const initialFormData: CheckoutFormData = {
@@ -27,8 +28,20 @@ const initialFormData: CheckoutFormData = {
   address: '',
   city: '',
   postalCode: '',
-  country: 'France',
+  country: 'FR',
 };
+
+// Normalise un nom de pays libre (ex: "France", "Espagne", "es", "ES") vers un
+// code ISO supporté. Renvoie 'FR' par défaut si la valeur est inconnue.
+function normalizeCountry(input: string | undefined | null): ShippingCountryCode {
+  if (!input) return 'FR';
+  const upper = input.trim().toUpperCase();
+  const byCode = SHIPPING_COUNTRIES.find((c) => c.code === upper);
+  if (byCode) return byCode.code;
+  const byName = SHIPPING_COUNTRIES.find((c) => c.name.toUpperCase() === upper);
+  if (byName) return byName.code;
+  return 'FR';
+}
 
 export function useCheckout() {
   const router = useRouter();
@@ -37,6 +50,10 @@ export function useCheckout() {
   const clearCart = useCartStore((state) => state.clearCart);
   const giftCard = useCartStore((state) => state.giftCard);
   const promo = useCartStore((state) => state.promo);
+  const shippingCountry = useCartStore((state) => state.shippingCountry);
+  const shippingMethod = useCartStore((state) => state.shippingMethod);
+  const pickupPoint = useCartStore((state) => state.pickupPoint);
+  const setShippingCountry = useCartStore((state) => state.setShippingCountry);
   const { cartProducts, shipping, total } = useCartCalculation(items);
 
   const [step, setStep] = useState(1);
@@ -87,6 +104,7 @@ export function useCheckout() {
 
   const selectAddress = useCallback((addr: UserAddress) => {
     setSelectedAddressId(addr.id);
+    const code = normalizeCountry(addr.country);
     setFormData((prev) => ({
       ...prev,
       firstName: addr.firstName || prev.firstName,
@@ -94,16 +112,21 @@ export function useCheckout() {
       address: addr.address,
       city: addr.city,
       postalCode: addr.postalCode,
-      country: addr.country,
+      country: code,
     }));
-  }, []);
+    setShippingCountry(code);
+  }, [setShippingCountry]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    if (['address', 'city', 'postalCode'].includes(e.target.name)) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'country') {
+      const code = normalizeCountry(value);
+      setFormData((prev) => ({ ...prev, country: code }));
+      setShippingCountry(code);
+      return;
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (['address', 'city', 'postalCode'].includes(name)) {
       setSelectedAddressId(null);
     }
   };
@@ -134,12 +157,19 @@ export function useCheckout() {
         price: cp.product.price,
       }));
 
+      // Le payload `customer.country` reste le nom complet pour rétrocompat
+      // avec les emails et l'admin existants. Le code ISO est transmis à part.
+      const countryName = getShippingCountry(formData.country)?.name ?? 'France';
       const payload = {
         items: orderItems,
-        customer: formData,
+        customer: { ...formData, country: countryName },
         total,
         shipping,
         userId: user?.id,
+        shippingMethod,
+        shippingCarrier: getShippingCarrier(shippingMethod),
+        shippingCountry: formData.country,
+        pickupPoint: shippingMethod === 'mondial_relay' ? pickupPoint : null,
         ...(giftCard?.code ? { giftCardCode: giftCard.code } : {}),
         ...(promo?.code ? { promoCode: promo.code } : {}),
       };
@@ -181,25 +211,52 @@ export function useCheckout() {
     }
   };
 
-  const isFormValid = !!(
-    formData.firstName &&
-    formData.lastName &&
-    formData.email &&
-    formData.address &&
-    formData.city &&
-    formData.postalCode
-  );
+  const validation = useMemo(() => {
+    const country = getShippingCountry(formData.country);
+    const errors: Partial<Record<keyof CheckoutFormData | 'pickupPoint', string>> = {};
+
+    if (!formData.firstName) errors.firstName = 'Prénom requis';
+    if (!formData.lastName) errors.lastName = 'Nom requis';
+    if (!formData.email) errors.email = 'Email requis';
+    if (!formData.address) errors.address = 'Adresse requise';
+    if (!formData.city) errors.city = 'Ville requise';
+
+    if (!formData.phone) {
+      errors.phone = 'Téléphone requis';
+    } else if (country && !country.phoneRegex.test(formData.phone.replace(/\s+/g, ''))) {
+      errors.phone = `Format invalide (ex: ${country.phonePrefix} XXXXXXXXX)`;
+    }
+
+    if (!formData.postalCode) {
+      errors.postalCode = 'Code postal requis';
+    } else if (country && !country.postalCodeRegex.test(formData.postalCode.trim())) {
+      errors.postalCode = `Format invalide (ex: ${country.postalCodeExample})`;
+    }
+
+    if (shippingMethod === 'mondial_relay' && !pickupPoint) {
+      errors.pickupPoint = 'Merci de sélectionner un point relais';
+    }
+
+    return { errors, isValid: Object.keys(errors).length === 0 };
+  }, [formData, shippingMethod, pickupPoint]);
+
+  const isFormValid = validation.isValid;
+  const formErrors = validation.errors;
 
   return {
     step,
     formData,
     isSubmitting,
     isFormValid,
+    formErrors,
     savedAddresses,
     selectedAddressId,
     loadingAddresses,
     total,
     shipping,
+    shippingCountry,
+    shippingMethod,
+    pickupPoint,
     paymentMethod,
     setPaymentMethod,
     handleChange,

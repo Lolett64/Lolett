@@ -7,7 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderStatusUpdate } from '@/components/admin/OrderStatusUpdate';
 import { formatPrice, formatDate } from '@/lib/admin/utils';
-import { computeVAT, VAT } from '@/lib/constants';
+import { computeVAT, VAT, SHIPPING_METHODS, SHIPPING_COUNTRIES } from '@/lib/constants';
+import type { PickupPoint, ShippingMethod, ShippingCarrier, ShippingCountryCode } from '@/types';
 
 interface OrderItem {
   id: string;
@@ -38,6 +39,12 @@ interface OrderDetail {
   promo_discount: number | null;
   gift_card_code: string | null;
   gift_card_amount: number | null;
+  shipping_method: ShippingMethod | null;
+  shipping_carrier: ShippingCarrier | null;
+  shipping_country: ShippingCountryCode | null;
+  pickup_point: PickupPoint | null;
+  invoice_number: string | null;
+  invoice_pdf_url: string | null;
   status: string;
   payment_provider: string;
   payment_id: string;
@@ -186,6 +193,68 @@ export default async function OrderDetailPage({
         </Card>
       </div>
 
+      {/* Mode de livraison + point relais (V1 Mondial Relay) */}
+      <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
+        <CardHeader>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Livraison</CardTitle>
+        </CardHeader>
+        <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-3 text-sm">
+          <div className="grid grid-cols-2 gap-2 text-[#1a1510]/60">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Mode</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.shipping_method ? SHIPPING_METHODS[order.shipping_method].label : 'Domicile (legacy)'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Transporteur</p>
+              <p className="text-[#1a1510] font-medium capitalize">
+                {(order.shipping_carrier ?? 'colissimo').replace('_', ' ')}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Pays</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.shipping_country
+                  ? SHIPPING_COUNTRIES.find((c) => c.code === order.shipping_country)?.name ?? order.shipping_country
+                  : order.customer.country}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">T&eacute;l&eacute;phone</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.customer.phone ? (
+                  <a href={`tel:${order.customer.phone}`} className="hover:underline">{order.customer.phone}</a>
+                ) : '—'}
+              </p>
+            </div>
+          </div>
+
+          {order.pickup_point && (
+            <div className="rounded-lg border border-[#E8D9C4] bg-[#FFFBF7] p-4">
+              <p className="text-xs uppercase tracking-wider text-[#B89547] font-medium mb-2">
+                Point Relais à recopier dans le dashboard MR Pro
+              </p>
+              <p className="font-medium text-[#1a1510]">{order.pickup_point.name}</p>
+              <p className="text-[#1a1510]/70 mt-1">{order.pickup_point.address}</p>
+              <p className="text-[#1a1510]/70">
+                {order.pickup_point.postalCode} {order.pickup_point.city} · {order.pickup_point.country}
+              </p>
+              <p className="mt-2 font-mono text-xs text-[#1a1510]/60">
+                ID: <span className="text-[#1a1510]">{order.pickup_point.id}</span>
+              </p>
+            </div>
+          )}
+
+          {order.tracking_number && (
+            <div className="border-t border-[#F0EBE4] pt-3">
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40 mb-1">N° de suivi</p>
+              <p className="font-mono text-[#1a1510]">{order.tracking_number}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Order items */}
       <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
         <CardHeader>
@@ -244,6 +313,31 @@ export default async function OrderDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      {/* Facture PDF */}
+      {(order.invoice_number || order.invoice_pdf_url) && (
+        <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
+          <CardHeader>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Facture</CardTitle>
+          </CardHeader>
+          <CardContent className="font-[family-name:var(--font-montserrat)] flex items-center justify-between text-sm">
+            <div>
+              <p className="text-[#1a1510]/40 text-xs uppercase tracking-wider">Numéro</p>
+              <p className="font-mono text-[#1a1510]">{order.invoice_number ?? '—'}</p>
+            </div>
+            {order.invoice_pdf_url && (
+              <a
+                href={order.invoice_pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#B89547]/30 text-[#B89547] hover:bg-[#FEF9EF] transition-colors text-sm font-medium"
+              >
+                Télécharger le PDF
+              </a>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Payment info */}
       <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">

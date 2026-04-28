@@ -1,6 +1,12 @@
 import { useMemo, useEffect, useState } from 'react';
-import type { CartItem, Product } from '@/types';
-import { SHIPPING } from '@/lib/constants';
+import type { CartItem, Product, ShippingCountryCode, ShippingMethod } from '@/types';
+import {
+  computeShippingCost,
+  getShippingZone,
+  SHIPPING_FREE_THRESHOLD,
+  SHIPPING_RATES,
+} from '@/lib/constants';
+import { useCartStore } from './store';
 
 export interface CartProductItem extends CartItem {
   product: Product;
@@ -17,9 +23,13 @@ export interface CartCalculation {
   shippingCost: number;
   amountUntilFreeShipping: number;
   loading: boolean;
+  shippingCountry: ShippingCountryCode;
+  shippingMethod: ShippingMethod;
 }
 
 export function useCartCalculation(items: CartItem[]): CartCalculation {
+  const shippingCountry = useCartStore((s) => s.shippingCountry);
+  const shippingMethod = useCartStore((s) => s.shippingMethod);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -68,11 +78,16 @@ export function useCartCalculation(items: CartItem[]): CartCalculation {
       0
     );
 
-    const isFreeShipping = subtotal >= SHIPPING.FREE_THRESHOLD;
-    const shipping = isFreeShipping ? 0 : SHIPPING.COST;
+    const zone = getShippingZone(shippingCountry);
+    const freeThreshold = (zone && SHIPPING_FREE_THRESHOLD[zone]) ?? Number.POSITIVE_INFINITY;
+    const baseRate = (zone && SHIPPING_RATES[zone][shippingMethod]) ?? 0;
+    const shipping = computeShippingCost(subtotal, shippingCountry, shippingMethod);
+    const isFreeShipping = shipping === 0 && subtotal > 0 && Number.isFinite(freeThreshold);
     const total = subtotal + shipping;
     const itemCount = cartProducts.reduce((sum, item) => sum + item.quantity, 0);
-    const amountUntilFreeShipping = Math.max(0, SHIPPING.FREE_THRESHOLD - subtotal);
+    const amountUntilFreeShipping = Number.isFinite(freeThreshold)
+      ? Math.max(0, freeThreshold - subtotal)
+      : 0;
 
     return {
       cartProducts,
@@ -81,10 +96,12 @@ export function useCartCalculation(items: CartItem[]): CartCalculation {
       total,
       isFreeShipping,
       itemCount,
-      freeThreshold: SHIPPING.FREE_THRESHOLD,
-      shippingCost: SHIPPING.COST,
+      freeThreshold: Number.isFinite(freeThreshold) ? freeThreshold : 0,
+      shippingCost: baseRate,
       amountUntilFreeShipping,
       loading,
+      shippingCountry,
+      shippingMethod,
     };
-  }, [items, products, loading]);
+  }, [items, products, loading, shippingCountry, shippingMethod]);
 }

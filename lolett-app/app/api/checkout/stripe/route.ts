@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { SHIPPING } from '@/lib/constants';
+import {
+  computeShippingCost,
+  getShippingCarrier,
+  SHIPPING_COUNTRIES,
+} from '@/lib/constants';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
-import type { Size } from '@/types';
+import type { Size, ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
+
+const VALID_COUNTRIES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
+const VALID_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -24,7 +32,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { items, customer, userId, giftCardCode, promoCode } = body as {
+    const {
+      items,
+      customer,
+      userId,
+      giftCardCode,
+      promoCode,
+      shippingMethod: rawMethod,
+      shippingCountry: rawCountry,
+      pickupPoint: rawPickup,
+    } = body as {
       items: Array<{ productId: string; productName: string; size: string; quantity: number }>;
       customer: {
         firstName: string;
@@ -39,11 +56,27 @@ export async function POST(req: NextRequest) {
       userId?: string;
       giftCardCode?: string;
       promoCode?: string;
+      shippingMethod?: ShippingMethod;
+      shippingCountry?: ShippingCountryCode;
+      pickupPoint?: PickupPoint | null;
     };
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Items requis' }, { status: 400 });
     }
+
+    // Validation pays + mode (sécurité serveur — ne jamais faire confiance au client).
+    const shippingCountry: ShippingCountryCode = (rawCountry && VALID_COUNTRIES.includes(rawCountry)) ? rawCountry : 'FR';
+    const shippingMethod: ShippingMethod = (rawMethod && VALID_METHODS.includes(rawMethod)) ? rawMethod : 'home';
+    const shippingCarrier = getShippingCarrier(shippingMethod);
+
+    if (shippingMethod === 'mondial_relay' && (!rawPickup || !rawPickup.id)) {
+      return NextResponse.json(
+        { error: 'Point relais Mondial Relay manquant' },
+        { status: 400 }
+      );
+    }
+    const pickupPoint: PickupPoint | null = shippingMethod === 'mondial_relay' ? (rawPickup ?? null) : null;
 
     // Server-side price verification
     const admin = createAdminClient();
@@ -66,7 +99,8 @@ export async function POST(req: NextRequest) {
     });
 
     const subtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const shipping = subtotal >= SHIPPING.FREE_THRESHOLD ? 0 : SHIPPING.COST;
+    // Recalcul SERVEUR des frais de port — source de vérité.
+    const shipping = computeShippingCost(subtotal, shippingCountry, shippingMethod);
     const total = subtotal + shipping;
 
     // --- Promo code re-validation (server-side) ---
@@ -182,6 +216,10 @@ export async function POST(req: NextRequest) {
         promoDiscount,
         giftCardCode: giftCardValidatedCode ?? undefined,
         giftCardAmount: giftCardRedeemAmount,
+        shippingMethod,
+        shippingCarrier,
+        shippingCountry,
+        pickupPoint,
         userId: userId || undefined,
         paymentProvider: 'stripe',
       });
@@ -250,6 +288,17 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Génération facture PDF (fire-and-forget)
+      generateInvoicePdf({
+        ...order,
+        shippingMethod,
+        shippingCarrier,
+        shippingCountry,
+        pickupPoint,
+      }).catch((err) => {
+        console.error('[POST /api/checkout/stripe] Invoice generation failed:', err);
+      });
+
       // Confirmation email
       try {
         await sendOrderConfirmation({
@@ -269,6 +318,8 @@ export async function POST(req: NextRequest) {
           promoDiscount,
           giftCardCode: giftCardValidatedCode ?? undefined,
           giftCardAmount: giftCardRedeemAmount,
+          shippingMethod,
+          pickupPoint,
         });
       } catch (emailErr) {
         console.error('[POST /api/checkout/stripe] email error:', emailErr);
@@ -321,6 +372,9 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       line_items: lineItems,
       customer_email: customer.email,
+      shipping_address_collection: {
+        allowed_countries: VALID_COUNTRIES as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
+      },
       metadata: {
         customer: JSON.stringify(customer),
         items: JSON.stringify(
@@ -334,6 +388,10 @@ export async function POST(req: NextRequest) {
         ),
         total: String(total),
         shipping: String(shipping),
+        shippingMethod,
+        shippingCarrier,
+        shippingCountry,
+        pickupPoint: pickupPoint ? JSON.stringify(pickupPoint) : '',
         userId: userId || '',
       },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

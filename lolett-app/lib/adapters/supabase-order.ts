@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { OrderRepository } from './types';
-import type { Order, CustomerInfo, Size } from '@/types';
+import type { Order, CustomerInfo, Size, ShippingMethod, ShippingCarrier, ShippingCountryCode, PickupPoint } from '@/types';
 import type { DbOrder } from './supabase-types';
 import { mapOrder, generateOrderNumber } from './supabase-mappers';
 
@@ -21,6 +21,10 @@ export class SupabaseOrderRepository implements OrderRepository {
     promoDiscount?: number;
     giftCardCode?: string;
     giftCardAmount?: number;
+    shippingMethod?: ShippingMethod;
+    shippingCarrier?: ShippingCarrier;
+    shippingCountry?: ShippingCountryCode;
+    pickupPoint?: PickupPoint | null;
     userId?: string;
     paymentProvider?: 'stripe' | 'paypal' | 'demo';
   }): Promise<Order> {
@@ -38,6 +42,10 @@ export class SupabaseOrderRepository implements OrderRepository {
         promo_discount: orderData.promoDiscount ?? 0,
         gift_card_code: orderData.giftCardCode ?? null,
         gift_card_amount: orderData.giftCardAmount ?? 0,
+        shipping_method: orderData.shippingMethod ?? null,
+        shipping_carrier: orderData.shippingCarrier ?? null,
+        shipping_country: orderData.shippingCountry ?? null,
+        pickup_point: orderData.pickupPoint ?? null,
         status: 'pending',
         user_id: orderData.userId || null,
         payment_provider: orderData.paymentProvider || 'demo',
@@ -86,6 +94,10 @@ export class SupabaseOrderRepository implements OrderRepository {
       promoDiscount: orderData.promoDiscount,
       giftCardCode: orderData.giftCardCode,
       giftCardAmount: orderData.giftCardAmount,
+      shippingMethod: orderData.shippingMethod,
+      shippingCarrier: orderData.shippingCarrier,
+      shippingCountry: orderData.shippingCountry,
+      pickupPoint: orderData.pickupPoint ?? null,
       status: 'pending',
       createdAt: orderRow.created_at as string,
       updatedAt: orderRow.updated_at as string,
