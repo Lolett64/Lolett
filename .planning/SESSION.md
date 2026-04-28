@@ -1,58 +1,74 @@
-# Session State — 2026-04-28 00:05
+# Session State — 2026-04-28 16:30
 
 ## Branch
-preview (HEAD à pusher avec ce commit)
+preview (commit `6df2fd8` pushé)
 
 ## Completed This Session
-- **Diagnostic webhook Stripe Test 400** : cause vraie identifiée — l'URL configurée dans Stripe (`lolett-lolett64-lolett64s-projects.vercel.app`) est un alias auto-Vercel pointant depuis 5j sur le deploy **Production** (`78sqk8n1g`). Le code y lit `STRIPE_WEBHOOK_SECRET` Production (= `whsec_live_...`) au lieu de Preview (`whsec_test_...`). Confirmé via `vercel alias ls`. Body réponse 400 = `{"error":"Invalid signature"}`.
-- **Faux pistes écartées** : signature secret manquant (vars présentes), code v4 (non committé donc pas en preview), middleware (n'intercepte pas `/api/webhooks/stripe`), redirect www→apex (URL différente).
-- **Code v4 committé** : ce commit ajoute les fixes des 5 bugs (total payé, colonnes promo/gift_card sur orders, regex accolades dans 6 templates email, hauteur cartes dashboard, lib/promo/discount.ts) + migration `20260427000001_orders_discount_columns.sql`.
+- **Mondial Relay + livraison Europe (6 pays UE)** : intégration complète checkout/Stripe/webhook/emails/admin
+- **Page /livraison** + mise à jour CGV (multi-pays, retours UE, RGPD transporteur) + lien footer
+- **Facture PDF auto** via `@react-pdf/renderer` avec numérotation séquentielle LOL-YYYY-NNNNN, mention art. 293 B CGI, upload Supabase Storage
+- **Validations** tél/CP par pays, autocomplete data.gouv.fr conditionnel FR-only
+- **Recalcul serveur** des frais de port (sécurité — jamais confiance au client)
+- Build Next.js OK, type-check propre, push effectué
 
-## Next Task — Reprendre les tests Stripe
+## Next Task — 3 actions manuelles AVANT tout test en preview
 
-⚠️ **L'URL du webhook Stripe Test est cassée** — Lyes doit la corriger AVANT tout test paiement.
-
-### Step 1 — Lyes change l'URL du webhook Stripe Test
-Stripe Dashboard (test mode) → endpoint `Lolett preview - test mode` → **Modifier la destination** → coller :
-```
-https://lolett-5ila2kmrh-lolett64s-projects.vercel.app/api/webhooks/stripe?x-vercel-protection-bypass=FoUmv4vrLTXVrBY1bAVQAR9jRXW3fgkU
-```
-(Le secret `whsec_test_` reste inchangé côté Stripe et est déjà en Vercel Preview.)
-Test : sur n'importe quel event 400 → bouton "Renvoyer" → doit passer 200 OK.
-
-### Step 2 — Appliquer la migration v4 dans Supabase (CRITIQUE avant tout test)
-Via Supabase MCP ou SQL Editor (cf. `lolett-app/supabase/migrations/20260427000001_orders_discount_columns.sql`) :
+### 1. Appliquer la migration Supabase (CRITIQUE — sinon INSERT plante en 500)
+SQL Editor Supabase → coller le contenu de `lolett-app/supabase/migrations/20260428000001_orders_shipping_method.sql` :
 ```sql
 ALTER TABLE orders
-  ADD COLUMN IF NOT EXISTS promo_code TEXT,
-  ADD COLUMN IF NOT EXISTS promo_discount NUMERIC(10,2) DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS gift_card_code TEXT,
-  ADD COLUMN IF NOT EXISTS gift_card_amount NUMERIC(10,2) DEFAULT 0;
+  ADD COLUMN IF NOT EXISTS shipping_method TEXT,
+  ADD COLUMN IF NOT EXISTS shipping_carrier TEXT,
+  ADD COLUMN IF NOT EXISTS shipping_country TEXT,
+  ADD COLUMN IF NOT EXISTS pickup_point JSONB,
+  ADD COLUMN IF NOT EXISTS invoice_pdf_url TEXT,
+  ADD COLUMN IF NOT EXISTS invoice_number TEXT;
+
+CREATE TABLE IF NOT EXISTS invoice_counter (
+  year INT PRIMARY KEY, last_number INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION next_invoice_number(p_year INT) RETURNS INT
+LANGUAGE plpgsql AS $$
+DECLARE v_next INT;
+BEGIN
+  INSERT INTO invoice_counter (year, last_number) VALUES (p_year, 1)
+    ON CONFLICT (year) DO UPDATE
+      SET last_number = invoice_counter.last_number + 1, updated_at = NOW()
+    RETURNING last_number INTO v_next;
+  RETURN v_next;
+END;
+$$;
 ```
-Sans cette migration, le code v4 plantera en 500 sur l'INSERT côté webhook.
 
-### Step 3 — Insérer le code promo BIENVENUE10
-```sql
-INSERT INTO promo_codes (code, description, type, value, min_order, usage_limit, used_count, active)
-VALUES ('BIENVENUE10', 'Code de bienvenue newsletter -10%', 'percentage', 10, 0, NULL, 0, TRUE);
-```
+### 2. Créer bucket Supabase Storage `invoices` (privé)
+Dashboard Supabase → Storage → New bucket → nom `invoices` → Private → Save.
 
-### Step 4 — Vérifier greeting admin
-`/admin/emails` → "Confirmation de commande" → champ "Salutation" → doit contenir `Merci, {firstName}.` ou `Merci, {{firstName}}.` (regex tolère les deux).
+### 3. Ajouter variable Vercel Preview
+Vercel → Settings → Environment Variables → Preview :
+- `NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID` = `BDTEST13` (test) — à remplacer par l'Enseigne réelle de la cliente avant prod
 
-### Step 5 — Test end-to-end
-Sur preview avec carte `4242 4242 4242 4242` + code `BIENVENUE10` ou `8NB0OQHO`. Vérifier :
-- Email reçu : "Merci, Lyes." (sans accolades) + ligne "Code promo (CODE) -X €" + total réduit
-- `/admin/orders/[id]` : sous-total + livraison + code promo + total payé cohérents
-- `/admin` dashboard : 5 cartes même hauteur
-- Webhook Stripe : 200 OK
+## Test plan preview (après 1+2+3)
+1. Déclencher un nouveau deploy preview (ou attendre auto-rebuild GitHub)
+2. Tester scénarios :
+   - **FR Domicile** : panier 60€ → port 5,90€ → email confirmation + facture PDF
+   - **FR Mondial Relay** : panier 50€ → widget MR → choisir point Paris → port 4,90€ → email avec point relais + lien Maps
+   - **ES Domicile** : pays ES → port 9,90€ → autocomplete FR désactivé → CP 28013 validé
+   - **BE Mondial Relay** : pays BE + MR → widget liste points Bruxelles → port 6,90€
+   - **Validation bloquante** : MR sans pickup → bouton désactivé ; tél vide → erreur ; CP `123` en FR → erreur
+   - **Régression** : code promo `BIENVENUE10` toujours fonctionnel
 
 ## Blockers
-- URL webhook Stripe Test pointe sur prod alias (Lyes doit changer dans Stripe UI)
-- Migration v4 à appliquer avant tout test (sinon 500 sur INSERT)
+- Migration BDD non appliquée (MCP Supabase en read-only — manuel)
+- Bucket invoices non créé (manuel)
+- `NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID` non set en Vercel
+- Tarifs MR à valider avec la cliente (ceux du code sont des estimations publiques, pas son contrat)
 
 ## Key Context
-- **Pourquoi l'alias preview est figé sur un deploy 6j** : derniers preview deploys ont été créés via `vercel deploy --yes` (CLI manuel), qui ne rafraîchit PAS l'alias `lolett-git-preview-...`. Pour rafraîchir cet alias, il faudrait `git push origin preview` qui trigger un build automatique Vercel (suppose GitHub webhook actif).
-- **Alias auto Vercel prod** : `lolett.vercel.app`, `lolett-lolett64s-projects.vercel.app`, `lolett-lolett64-lolett64s-projects.vercel.app` pointent tous sur le dernier deploy production. NE PAS les utiliser pour Preview.
-- **Vars Sensitive non pullables** : `vercel env pull` retourne `""` pour Sensitive vars. Vérifier valeurs uniquement via Vercel UI.
-- **Réponse webhook** : 400 `{"error":"Webhook not configured"}` = secret absent ; 400 `{"error":"Invalid signature"}` = secret présent mais ne matche pas.
+- **Compte MR Pro de la cliente** : déjà actif (Enseigne + clé privée à fournir pour valeur prod)
+- **SIRET trouvé dans les CGV** : `99960933200013` (utilisé dans `lib/legal.ts`)
+- **TVA** : franchise base art. 293 B CGI (mention sur facture)
+- **Étiquettes d'expédition** : V1 = manuel via dashboard MR Pro (la cliente recopie depuis l'admin), V2 envisagée via API SOAP
+- **Le widget MR utilise jQuery 3.6** (chargé par `<Script>` Next.js) + plugin officiel + CSS officiel
+- **Tarifs proposés** : FR 4,90/5,90 — BENELUX 6,90/7,90 — IBERIA 7,90/9,90 (gratuit FR≥100€, BENELUX≥150€, IBERIA jamais)
