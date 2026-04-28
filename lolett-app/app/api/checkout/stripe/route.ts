@@ -239,31 +239,24 @@ export async function POST(req: NextRequest) {
 
       await decrementStockForOrder(order.id);
 
-      // Insert redemption + decrement gift-card balance
+      // Atomic redemption (lock + check + insert + update en 1 transaction).
+      // Empêche le double-débit si 2 requêtes parallèles arrivent avec la
+      // même carte (clic double, retry webhook).
       if (giftCardId) {
-        await admin.from('gift_card_redemptions').insert({
-          gift_card_id: giftCardId,
-          order_id: order.id,
-          amount: giftCardRedeemAmount,
-          stripe_payment_intent: paymentPseudoId,
-        });
-
-        const { data: cardAfter } = await admin
-          .from('gift_cards')
-          .select('balance')
-          .eq('id', giftCardId)
-          .maybeSingle();
-
-        const currentBalance = Number(cardAfter?.balance ?? 0);
-        const newBalance = Math.max(0, +(currentBalance - giftCardRedeemAmount).toFixed(2));
-        await admin
-          .from('gift_cards')
-          .update({
-            balance: newBalance,
-            status: newBalance <= 0 ? 'fully_redeemed' : 'active',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', giftCardId);
+        const { data: redeemResult, error: redeemError } = await admin.rpc(
+          'redeem_gift_card_atomic',
+          {
+            p_card_id: giftCardId,
+            p_order_id: order.id,
+            p_amount: giftCardRedeemAmount,
+            p_stripe_payment_intent: paymentPseudoId,
+          },
+        );
+        if (redeemError) {
+          console.error('[POST /api/checkout/stripe] redeem_gift_card_atomic failed:', redeemError);
+        } else if (redeemResult && (redeemResult as { success?: boolean }).success === false) {
+          console.error('[POST /api/checkout/stripe] redeem_gift_card_atomic rejected:', redeemResult);
+        }
       }
 
       // Increment promo used_count if applicable

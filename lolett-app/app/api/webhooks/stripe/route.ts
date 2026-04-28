@@ -312,7 +312,8 @@ export async function POST(req: NextRequest) {
         invoicePdf,
       });
 
-      // 6. Apply gift card redemption if present
+      // 6. Apply gift card redemption if present (atomic via RPC).
+      // Lock + idempotency check + decrement + insert dans 1 transaction.
       try {
         if (metadata.giftCardCode && metadata.giftCardRedeemAmount) {
           const code = String(metadata.giftCardCode).trim().toUpperCase();
@@ -328,41 +329,20 @@ export async function POST(req: NextRequest) {
             if (cardErr) {
               console.error('[Stripe webhook] gift_card lookup error:', cardErr);
             } else if (card) {
-              // Idempotency: skip if a redemption already exists for this order.
-              const { data: existingRedemption } = await admin
-                .from('gift_card_redemptions')
-                .select('id')
-                .eq('gift_card_id', card.id)
-                .eq('order_id', order.id)
-                .maybeSingle();
-
-              if (!existingRedemption) {
-                const currentBalance = Number(card.balance);
-                const redeemed = Math.min(currentBalance, amount);
-                const newBalance = Math.max(0, +(currentBalance - redeemed).toFixed(2));
-
-                const { error: redErr } = await admin
-                  .from('gift_card_redemptions')
-                  .insert({
-                    gift_card_id: card.id,
-                    order_id: order.id,
-                    amount: redeemed,
-                    stripe_payment_intent: session.payment_intent as string,
-                  });
-
-                if (redErr) {
-                  console.error('[Stripe webhook] gift_card_redemption insert error:', redErr);
-                } else {
-                  const { error: updErr } = await admin
-                    .from('gift_cards')
-                    .update({
-                      balance: newBalance,
-                      status: newBalance <= 0 ? 'fully_redeemed' : 'active',
-                      updated_at: new Date().toISOString(),
-                    })
-                    .eq('id', card.id);
-                  if (updErr) console.error('[Stripe webhook] gift_card update error:', updErr);
-                }
+              const redeemed = Math.min(Number(card.balance), amount);
+              const { data: redeemResult, error: redeemError } = await admin.rpc(
+                'redeem_gift_card_atomic',
+                {
+                  p_card_id: card.id,
+                  p_order_id: order.id,
+                  p_amount: redeemed,
+                  p_stripe_payment_intent: session.payment_intent as string,
+                },
+              );
+              if (redeemError) {
+                console.error('[Stripe webhook] redeem_gift_card_atomic failed:', redeemError);
+              } else if (redeemResult && (redeemResult as { success?: boolean }).success === false) {
+                console.error('[Stripe webhook] redeem_gift_card_atomic rejected:', redeemResult);
               }
             }
           }
