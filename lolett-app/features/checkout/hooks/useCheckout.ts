@@ -223,8 +223,13 @@ export function useCheckout() {
 
     if (!formData.phone) {
       errors.phone = 'Téléphone requis';
-    } else if (country && !country.phoneRegex.test(formData.phone.replace(/\s+/g, ''))) {
-      errors.phone = `Format invalide (ex: ${country.phonePrefix} XXXXXXXXX)`;
+    } else {
+      // Accepte tout numéro international valide (FR, ES, etc.)
+      // car le téléphone du client peut différer du pays de livraison.
+      const digits = formData.phone.replace(/\D/g, '');
+      if (digits.length < 8 || digits.length > 15) {
+        errors.phone = 'Numéro de téléphone invalide';
+      }
     }
 
     if (!formData.postalCode) {

@@ -41,10 +41,13 @@ interface MondialRelayWidgetProps {
   country: ShippingCountryCode;
 }
 
-const BRAND_ID = process.env.NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID || 'BDTEST13';
-const JQUERY_SRC = 'https://code.jquery.com/jquery-3.6.0.min.js';
-const PLUGIN_SRC = 'https://widget.mondialrelay.com/parcelshop-picker/v4_0/js/jquery.plugin.mondialrelay.parcelshoppicker.min.js';
-const PLUGIN_CSS = 'https://widget.mondialrelay.com/parcelshop-picker/v4_0/css/parcelshoppicker.min.css';
+// Mondial Relay impose strictement 8 caractères, padding espaces à droite.
+// On padEnd pour résister aux trim accidentels de l'env var (Vercel/Next).
+const BRAND_ID = (process.env.NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID || 'BDTEST').padEnd(8, ' ');
+const JQUERY_SRC = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js';
+const LEAFLET_JS = 'https://unpkg.com/leaflet/dist/leaflet.js';
+const LEAFLET_CSS = 'https://unpkg.com/leaflet/dist/leaflet.css';
+const PLUGIN_SRC = 'https://widget.mondialrelay.com/parcelshop-picker/jquery.plugin.mondialrelay.parcelshoppicker.min.js';
 
 // Charge un script <script> séquentiellement et résout quand l'événement
 // onload est tiré. Idempotent : si un script avec la même src existe déjà,
@@ -98,8 +101,9 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
 
     async function init() {
       try {
-        loadStylesheet(PLUGIN_CSS);
+        loadStylesheet(LEAFLET_CSS);
         await loadScript(JQUERY_SRC);
+        await loadScript(LEAFLET_JS);
         await loadScript(PLUGIN_SRC);
 
         if (cancelled) return;
@@ -114,8 +118,8 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
           Country: country,
           PostCode: postalCode || '',
           Weight: '1000',
-          MaxResults: '7',
-          DeliveryMode: '24R',
+          NbResults: '7',
+          ColLivMod: '24R',
           Responsive: true,
           ShowResultsOnMap: true,
           OnParcelShopSelected: (data: MondialRelayPoint) => {
