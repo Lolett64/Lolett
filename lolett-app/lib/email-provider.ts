@@ -22,11 +22,17 @@ const DEFAULT_FROM =
     ? 'LOLETT <contact.lolett@gmail.com>'
     : 'LOLETT <onboarding@resend.dev>';
 
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+}
+
 interface SendOptions {
   from?: string;
   to: string;
   subject: string;
   html: string;
+  attachments?: EmailAttachment[];
 }
 
 interface SendReactOptions {
@@ -46,6 +52,7 @@ async function sendViaSmtp(opts: SendOptions): Promise<{ success: boolean; error
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
+      attachments: opts.attachments,
     });
     console.log(`[Email] Sent via SMTP to ${opts.to}`);
     return { success: true };
@@ -63,6 +70,7 @@ async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; err
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
+      attachments: opts.attachments?.map((a) => ({ filename: a.filename, content: a.content })),
     });
     if (error) {
       console.error('[Email] Resend error:', error);

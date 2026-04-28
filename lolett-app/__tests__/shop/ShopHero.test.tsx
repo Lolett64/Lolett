@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ShopHero } from '@/components/shop/ShopHero';
 
 // Mock next/image pour rendre un <img> simple

@@ -1,13 +1,23 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { MapPin } from 'lucide-react';
 import type { useCheckout } from '../hooks/useCheckout';
 import type { UserAddress } from '@/types';
 import { SHIPPING_COUNTRIES, getShippingCountry } from '@/lib/constants';
 import { ShippingMethodSelect } from './ShippingMethodSelect';
-import { MondialRelayWidget } from './MondialRelayWidget';
 import { useCartStore } from '@/features/cart';
+
+const MondialRelayWidget = dynamic(
+  () => import('./MondialRelayWidget').then((m) => ({ default: m.MondialRelayWidget })),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-sm text-stone-500">Chargement du sélecteur de point relais…</p>
+    ),
+  },
+);
 
 type CheckoutHook = ReturnType<typeof useCheckout>;
 

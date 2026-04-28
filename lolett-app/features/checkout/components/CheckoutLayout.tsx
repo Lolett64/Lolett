@@ -1,11 +1,13 @@
 'use client';
 
+import { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { TrustBadges } from '@/components/ui/TrustBadges';
 import { formatPrice } from '@/lib/utils';
 import { VAT, computeVAT } from '@/lib/constants';
 import { useCartStore } from '@/features/cart';
+import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutForm } from './CheckoutForm';
 import { PaymentStep } from './PaymentStep';
@@ -34,7 +36,10 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
   const promo = useCartStore((s) => s.promo);
   const giftCard = useCartStore((s) => s.giftCard);
 
-  const promoAmount = promo ? Math.min(promo.discount, subtotal) : 0;
+  const promoAmount = useMemo(
+    () => (promo ? computePromoDiscount(promo.type as PromoType, promo.value, subtotal) : 0),
+    [promo, subtotal],
+  );
   const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
   const giftCardRedeem = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
   const payableTotal = Math.max(0, +(totalAfterPromo - giftCardRedeem).toFixed(2));

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Truck, ShieldCheck, RotateCcw, Gift, Tag } from 'lucide-react';
 import { SHIPPING, VAT, computeVAT } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/features/cart';
+import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 
 interface CartSummaryProps {
   subtotal: number;
@@ -39,7 +40,10 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   const [applyingPromo, setApplyingPromo] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
 
-  const promoAmount = promo ? Math.min(promo.discount, subtotal) : 0;
+  const promoAmount = useMemo(
+    () => (promo ? computePromoDiscount(promo.type as PromoType, promo.value, subtotal) : 0),
+    [promo, subtotal],
+  );
   const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
   const redeemAmount = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
   const payableTotal = Math.max(0, +(totalAfterPromo - redeemAmount).toFixed(2));

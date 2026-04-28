@@ -288,16 +288,22 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Génération facture PDF (fire-and-forget)
-      generateInvoicePdf({
-        ...order,
-        shippingMethod,
-        shippingCarrier,
-        shippingCountry,
-        pickupPoint,
-      }).catch((err) => {
+      // Génération facture PDF (await — pour joindre le PDF à l'email).
+      let invoicePdf: { buffer: Buffer; filename: string } | undefined;
+      try {
+        const invoice = await generateInvoicePdf({
+          ...order,
+          shippingMethod,
+          shippingCarrier,
+          shippingCountry,
+          pickupPoint,
+        });
+        if (invoice.pdf) {
+          invoicePdf = { buffer: invoice.pdf, filename: `Facture-${invoice.number}.pdf` };
+        }
+      } catch (err) {
         console.error('[POST /api/checkout/stripe] Invoice generation failed:', err);
-      });
+      }
 
       // Confirmation email
       try {
@@ -320,6 +326,7 @@ export async function POST(req: NextRequest) {
           giftCardAmount: giftCardRedeemAmount,
           shippingMethod,
           pickupPoint,
+          invoicePdf,
         });
       } catch (emailErr) {
         console.error('[POST /api/checkout/stripe] email error:', emailErr);
@@ -367,11 +374,43 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // --- Stripe Customer (dédup par email + adresse complète pour pré-remplissage) ---
+    const fullName = `${customer.firstName} ${customer.lastName}`.trim();
+    const stripeAddress: Stripe.AddressParam = {
+      line1: customer.address,
+      city: customer.city,
+      postal_code: customer.postalCode,
+      country: shippingCountry,
+    };
+    const customerData: Stripe.CustomerCreateParams = {
+      email: customer.email,
+      name: fullName,
+      phone: customer.phone,
+      address: stripeAddress,
+      shipping: { name: fullName, phone: customer.phone, address: stripeAddress },
+    };
+
+    let stripeCustomerId: string | null = null;
+    try {
+      const existing = await getStripe().customers.list({ email: customer.email, limit: 1 });
+      if (existing.data.length > 0) {
+        const updated = await getStripe().customers.update(existing.data[0].id, customerData);
+        stripeCustomerId = updated.id;
+      } else {
+        const created = await getStripe().customers.create(customerData);
+        stripeCustomerId = created.id;
+      }
+    } catch (err) {
+      console.error('[Stripe] Customer create/update failed, fallback to customer_email:', err);
+    }
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       mode: 'payment',
       line_items: lineItems,
-      customer_email: customer.email,
+      ...(stripeCustomerId
+        ? { customer: stripeCustomerId, customer_update: { shipping: 'auto', address: 'auto', name: 'auto' } }
+        : { customer_email: customer.email }),
       shipping_address_collection: {
         allowed_countries: VALID_COUNTRIES as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
       },

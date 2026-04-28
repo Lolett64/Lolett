@@ -17,6 +17,7 @@ interface OrderEmailData {
   giftCardAmount?: number;
   shippingMethod?: ShippingMethod;
   pickupPoint?: PickupPoint | null;
+  invoicePdf?: { buffer: Buffer; filename: string };
 }
 
 export async function sendOrderConfirmation(data: OrderEmailData) {
@@ -69,6 +70,9 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
       to: data.to,
       subject,
       html,
+      attachments: data.invoicePdf
+        ? [{ filename: data.invoicePdf.filename, content: data.invoicePdf.buffer }]
+        : undefined,
     });
 
     if (result.success) {

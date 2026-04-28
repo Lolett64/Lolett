@@ -266,21 +266,28 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 4.5 Génération facture PDF (fire-and-forget — n'invalide pas la commande
-      // si la facture échoue, mais log pour intervention manuelle ultérieure).
-      generateInvoicePdf({
-        ...order,
-        shippingMethod,
-        shippingCarrier,
-        shippingCountry,
-        pickupPoint,
-        promoCode,
-        promoDiscount,
-        giftCardCode,
-        giftCardAmount,
-      }).catch((err) => {
+      // 4.5 Génération facture PDF (await — on veut joindre le PDF à l'email).
+      // En cas d'échec, on log et on envoie l'email sans PJ pour ne pas bloquer
+      // la confirmation (le PDF pourra être régénéré manuellement plus tard).
+      let invoicePdf: { buffer: Buffer; filename: string } | undefined;
+      try {
+        const invoice = await generateInvoicePdf({
+          ...order,
+          shippingMethod,
+          shippingCarrier,
+          shippingCountry,
+          pickupPoint,
+          promoCode,
+          promoDiscount,
+          giftCardCode,
+          giftCardAmount,
+        });
+        if (invoice.pdf) {
+          invoicePdf = { buffer: invoice.pdf, filename: `Facture-${invoice.number}.pdf` };
+        }
+      } catch (err) {
         console.error('[Stripe webhook] Invoice generation failed:', err);
-      });
+      }
 
       // 5. Confirmation email
       await sendOrderConfirmation({
@@ -302,6 +309,7 @@ export async function POST(req: NextRequest) {
         giftCardAmount,
         shippingMethod,
         pickupPoint,
+        invoicePdf,
       });
 
       // 6. Apply gift card redemption if present
