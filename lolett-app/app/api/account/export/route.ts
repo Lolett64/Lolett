@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { accountExportLimit, checkLimit } from '@/lib/security/ratelimit';
 
 export const runtime = 'nodejs';
 
@@ -16,7 +17,16 @@ export async function GET() {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
   }
 
+  const limit = await checkLimit(accountExportLimit, `user:${user.id}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: 'Trop de requêtes. Réessayez plus tard.' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
   const email = user.email;
+  const normalizedEmail = email?.trim().toLowerCase() ?? null;
   const admin = createAdminClient();
 
   try {
@@ -30,11 +40,11 @@ export async function GET() {
         .order('created_at', { ascending: false }),
       admin.from('reviews').select('*').eq('user_id', user.id),
       admin.from('favorites').select('*').eq('user_id', user.id),
-      email
+      normalizedEmail
         ? admin
             .from('gift_cards')
             .select('code, initial_amount, balance, recipient_email, recipient_name, message, status, created_at')
-            .ilike('purchaser_email', email)
+            .ilike('purchaser_email', normalizedEmail)
         : Promise.resolve({ data: [], error: null }),
     ]);
 

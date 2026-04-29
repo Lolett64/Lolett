@@ -19,6 +19,8 @@ function makeLimiter(limit: number, window: `${number} ${'s' | 'm' | 'h'}`, pref
 export const promoLimit = makeLimiter(20, '15 m', 'rl:promo');
 export const giftCardLimit = makeLimiter(10, '1 h', 'rl:gift');
 export const adminLoginLimit = makeLimiter(5, '15 m', 'rl:admin');
+export const accountDeleteLimit = makeLimiter(3, '1 h', 'rl:acct-delete');
+export const accountExportLimit = makeLimiter(10, '1 h', 'rl:acct-export');
 
 export function getClientIp(req: Request): string {
   // Vercel populates x-real-ip from the verified source — non-spoofable.

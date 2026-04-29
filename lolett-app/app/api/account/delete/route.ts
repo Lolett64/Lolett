@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { accountDeleteLimit, checkLimit } from '@/lib/security/ratelimit';
 
 export const runtime = 'nodejs';
 
@@ -43,12 +44,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Compte sans email' }, { status: 400 });
   }
 
+  const limit = await checkLimit(accountDeleteLimit, `user:${user.id}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: 'Trop de tentatives. Réessayez plus tard.' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
   const admin = createAdminClient();
-  const emailHash = await sha256Hex(email.toLowerCase().trim());
+  const normalizedEmail = email.trim();
+  const emailHash = await sha256Hex(normalizedEmail.toLowerCase());
 
   const { data: rpcResult, error: rpcError } = await admin.rpc('delete_user_account_atomic', {
     p_user_id: user.id,
-    p_email: email,
+    p_email: normalizedEmail,
     p_email_hash: emailHash,
   });
 
@@ -77,8 +87,8 @@ export async function POST(request: Request) {
 
   if (deleteAuthError) {
     // Cas critique : la cascade DB est faite, mais auth.users n'est pas vidé.
-    // L'utilisateur ne pourra plus se reconnecter (profile supprimé, FK orphelin),
-    // mais on doit alerter pour purge manuelle.
+    // On retourne 500 pour que l'UI affiche une erreur claire (pas de fausse réussite).
+    // L'alerte Sentry fatal déclenche la purge manuelle de auth.users côté Lola.
     Sentry.captureException(deleteAuthError, {
       level: 'fatal',
       tags: { route: 'account/delete', step: 'auth_delete' },
@@ -86,15 +96,16 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(
       {
-        ok: true,
-        warning: 'Compte supprimé partiellement. Contactez le support.',
+        error:
+          'Suppression partielle. Vos données ont été effacées mais votre identifiant subsiste. Contactez le support.',
       },
-      { status: 200 },
+      { status: 500 },
     );
   }
 
-  // Sign out (efface les cookies côté client)
-  await supabase.auth.signOut();
+  // signOut local : efface le cookie côté serveur (la session JWT est déjà invalidée
+  // par admin.deleteUser, mais le cookie peut traîner).
+  await supabase.auth.signOut({ scope: 'local' });
 
   return NextResponse.json({ ok: true });
 }
