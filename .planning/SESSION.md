@@ -1,7 +1,7 @@
-# Session State — 2026-04-29 (Sprint 2 done)
+# Session State — 2026-04-29 (Sprint 2 done + code review S1 fixes)
 
 ## Branch
-preview (Sprint 2 commit en cours)
+preview (commit `01113b1` poussé — code review Sprint 1 résolu)
 
 ## Stratégie validée 2026-04-29
 **Toutes les actions hors session Vercel sont groupées en FIN de cycle**, juste avant prod. Sprints 2/3/4 attaquables d'abord ; Sprint 1 §1.1-1.4 reporté à la session finale.
@@ -9,6 +9,12 @@ preview (Sprint 2 commit en cours)
 ## Completed sessions précédentes
 - Sprint 1 §1.5 (RLS email_settings) + §1.6 (RPC atomic gift card) — commit `1c27c27`
 - Fix hydration #418 + promo dynamique — commits `da323de`, `97d82c6`
+
+## Code review Sprint 1 — fixes appliqués cette session (commit `01113b1`)
+- ✅ **C2 (critique)** : reorder du flow gift card AVANT mark paid + email dans les 2 routes (`/api/checkout/stripe` + `/api/webhooks/stripe`). Si redeem échoue → `status='payment_review'` + `Sentry.captureMessage` + skip email. Webhook return 200 (Stripe ne retente pas, idempotency OK), checkout return 503 au client.
+- ✅ **I1** : `Math.min(card.balance, amount)` viré dans le webhook → on passe `amount` brut au RPC, qui peut maintenant signaler `insufficient` correctement.
+- ✅ **I2** : nouveau type `lib/types/gift-card.ts` (union discriminée `RedeemGiftCardSuccess | RedeemGiftCardFailure`).
+- ✅ Migration `20260429000001_orders_status_payment_review.sql` appliquée via Dashboard SQL editor (étend le CHECK constraint `orders.status` avec `'payment_review'`).
 
 ## Completed CETTE session — Sprint 2
 - ✅ Provisionné Upstash Redis via Vercel Marketplace (resource `lolett-ratelimit`, free tier 500k cmds/mois, région Dublin)
