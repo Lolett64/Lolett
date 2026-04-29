@@ -3,7 +3,7 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ajax.googleapis.com https://unpkg.com https://widget.mondialrelay.com https://www.googletagmanager.com https://js.stripe.com",
+  "script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://unpkg.com https://widget.mondialrelay.com https://www.googletagmanager.com https://js.stripe.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://qczdwrudgmozyxkdidmr.supabase.co https://*.tile.openstreetmap.org https://www.googletagmanager.com",
@@ -15,7 +15,7 @@ const csp = [
 ].join('; ');
 
 const securityHeaders = [
-  { key: 'Content-Security-Policy-Report-Only', value: csp },
+  { key: 'Content-Security-Policy', value: csp },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
