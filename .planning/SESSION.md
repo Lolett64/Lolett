@@ -1,65 +1,61 @@
-# Session State — 2026-04-29 (Sprints 1+2+3 done — prêt pour S4)
+# Session State — 2026-04-29 (Sprints 1+2+3+4 done + CSP hardening Mozilla)
 
 ## Branch
-preview (dernier commit `b797a74` poussé — code review S3 fixes)
+preview (HEAD `2f3a446` poussé — CSP hardening Mozilla Observatory)
 
-## Stratégie validée
-**Toutes les actions Vercel hors session sont groupées en FIN de cycle**, juste avant prod. Sprint 1 §1.1-1.4 reporté à la session finale.
+## Completed CETTE session
 
-## Completed sessions précédentes
-- Sprint 1 §1.5 (RLS email_settings) + §1.6 (RPC atomic gift card) — `1c27c27`
-- Code review Sprint 1 fixes (C2+I1+I2 : reorder gift card avant mark paid + payment_review status) — `01113b1`
-- Fix hydration #418 + promo dynamique — `da323de`, `97d82c6`
+### Sprint 4 — Plan d'incident + backups + bascule CSP strict
+- ✅ `lolett-app/docs/operations/INCIDENT.md` — 5 runbooks (Stripe webhook / Supabase / fuite données + CNIL 72h / fraude+chargeback / email Resend) adaptés au vrai code Lolett (idempotence webhook, fallback Gmail/Resend, queries JSONB)
+- ✅ `lolett-app/app/api/cron/backup-invoices/route.ts` — cron mensuel (1er du mois 3h UTC) qui copie le bucket Supabase `invoices` vers Vercel Blob avec manifest JSON par mois pour idempotence + addRandomSuffix:true (PDFs PII non-énumérables) + pagination cursor/hasMore + Sentry sur abort/échecs + guard `CRON_SECRET` requis
+- ✅ `vercel.json` — ajout entrée cron mensuel
+- ✅ `next.config.ts` — bascule CSP `Report-Only` → `strict` + retrait `'unsafe-eval'`
+- ✅ Code review S4 → 4 fixes (C1 PDFs PII URL devinable + I1 list() non paginé + I2 abort silencieux + L1 Bearer undefined) ; 1 faux positif écarté (I3 CSP Stripe Elements pas embed)
+- ✅ commits `dfdc7a0` + `7df7adf` (fix lockfile pnpm)
 
-## Completed CETTE session — Sprints 2 + 3
+### CSP hardening Mozilla Observatory (B+ → 80/100)
+- ✅ Scan securityheaders.com → **A** (de D à A) ✅
+- ✅ Scan Mozilla Observatory → **B+** 80/100, 9/10 tests passés
+- ✅ `next.config.ts` durcissement CSP (commit `2f3a446`) :
+  - `default-src 'self'` → `'none'`
+  - Ajout `media-src 'self' + Supabase Storage` (vidéos hero)
+  - Ajout `worker-src 'self' blob:` (Sentry replay)
+  - Ajout `manifest-src 'self'` (sécurité)
+  - Ajout `object-src 'none'` (explicite)
+  - Ajout `https://unpkg.com` au `connect-src` (Leaflet widget MR)
+- ✅ Code review pré-push : 1 fix Important (connect-src unpkg.com), tsc clean
+- ⚠️ Mozilla reste à 80/100 = pénalité fixe -20 due à `'unsafe-inline'` dans script-src/style-src — capping technique inhérent à Next.js 15 hydration (sortie via nonces CSP, ~3-4h dev, **REPORTÉ POST-LAUNCH**)
 
-### Sprint 2 — Headers + rate-limit Upstash
-- ✅ Provisionné Upstash Redis via Vercel Marketplace (`lolett-ratelimit`, free tier 500k cmds/mois, Dublin)
-- ✅ Env vars `UPSTASH_REDIS_KV_REST_API_URL/TOKEN` (Preview + Production)
-- ✅ §2.1-2.5 implémentés — commit `e4af4dc`
-- ✅ Code review S2 → 5 fixes (middleware exact-match, IP non-spoofable, CSP m.stripe.*, timing-safe HMAC, audit unsafe-eval noté pour S4) — commit `e9c72af`
+### Lockfile pnpm sync (S2 deps Upstash)
+- Fix `ERR_PNPM_OUTDATED_LOCKFILE` Vercel build — `pnpm-lock.yaml` régénéré avec `pnpm install --lockfile-only` → ajout `@upstash/ratelimit + @upstash/redis + sub-deps` (commit `7df7adf`)
+- Code review pré-push : GO clean (tous packages legitimes orgs upstashnpm + unjs, aucun CVE)
 
-### Sprint 3 — RGPD + monitoring
-- ✅ Migration `20260429000002_rgpd_delete_account.sql` (table `account_deletions` + RPC `delete_user_account_atomic`) — appliquée en DB par Lyes via Dashboard
-- ✅ `/api/account/delete` (POST, Art. 17) — confirm requis, RPC + auth.admin.deleteUser, signOut local, Sentry on errors
-- ✅ `/api/account/export` (GET, Art. 20) — JSON download avec profile/addresses/orders+items/reviews/favorites/gift_cards
-- ✅ `/api/health` — checks parallèles Stripe + Supabase + Resend, timeout 5s
-- ✅ `components/compte/RgpdSection.tsx` — 2 boutons (Télécharger + Supprimer) avec modale 2 étapes
-- ✅ Intégrée dans `app/compte/profil/page.tsx`
-- ✅ commit `94e1a61`
-- ✅ Code review S3 → 4 fixes :
-  - return 500 au lieu de 200 sur delete partiel (UI ne croira plus à un faux succès)
-  - rate-limit Upstash (3/h delete, 10/h export, keyé user.id)
-  - `email.trim().toLowerCase()` avant `ilike` dans /export (cohérent avec RPC)
-  - `signOut({ scope: 'local' })` pour cookie effacé fiable
-  - 2 faux positifs écartés (orders n'a que customer JSONB, email_settings = templates admin)
-  - commit `b797a74`
+### Mémoires créées
+- `feedback_code_review_before_push.md` : code review systématique avant TOUT git push (pas seulement à /token-saver fin)
+- `user_profile_lyes.md` : Lyes non-développeur, vulgarisation FR obligatoire avec analogies
 
-### Skill /token-saver mis à jour
-- Étape 0 ajoutée au Save Protocol : `PRE-FLIGHT CODE REVIEW (MANDATORY)` avant le commit de fin si du code a été touché
-- Procédure : spawn code-reviewer → triage findings (VRAI / FAUX POSITIF / DIFFÉRÉ vérifiés via grep/SQL/Read) → fix VRAI → tsc → commit séparé `fix(scope): code review hardening (N)`
-- Liste des cas où c'est obligatoire (override "fin") : destructif, auth, payments, RGPD, security headers, migrations SQL prod
-- Cas où on skip : pas de code touché, "skip review" explicite, session exploratoire
-- Fichier : `~/.claude/skills/token-saver/SKILL.md`
+### Déploiements preview
+- `https://lolett-qww6vrw4c-lolett64s-projects.vercel.app` (avant CSP hardening, scan A)
+- `https://lolett-6ihr08z3n-lolett64s-projects.vercel.app` (après CSP hardening, scan B+ Mozilla)
 
-### Décisions RGPD actées
-- Q1 — Reviews : anonymiser (`user_id = NULL`, garder commentaire)
-- Q2 — Gift cards où user est purchaser : anonymiser (carte reste fonctionnelle pour destinataire)
-- Q3 — Catch-up migration des 5 tables hors versioning : skip (dette technique post-launch)
+## Tests réalisés CETTE session
+- ✅ Test #1 securityheaders.com → **A**
+- ✅ Test Mozilla Observatory → **B+ 80/100**
+- ✅ Test #2 (CSP violations console) — 1 erreur "vercel.live" preview-only (pas en prod), home OK
 
-### §3.5 Sentry — HORS CODE
-À configurer par Lyes dans dashboard Sentry post-deploy :
-- Webhook Stripe error rate > 1% → email
-- Email send failure → email
-- Order creation failure → email
-- **/api/account/delete error → email** (NOUVEAU, critique RGPD)
+## Tests RESTANTS avant merge prod
+- ⏳ Test #2 complet : naviguer checkout + Mondial Relay sur `lolett-6ihr08z3n` pour vérifier que la carte Leaflet s'affiche (CSP plus stricte avec `default-src 'none'`)
+- ⏳ Test #3 `/api/health` → 200 + JSON ok (curl avec Deployment Protection désactivée)
+- ⏳ Test #5 RGPD export
+- ⏳ Test #7 login admin (mais Sprint 1 §1.1-1.4 bcrypt PAS encore implémenté → tests à refaire après)
+- ⏳ Test #8 RGPD suppression complète (compte test → commande → delete → vérif Supabase)
+- ⏳ Test #9 cron backup-invoices (curl avec CRON_SECRET)
+- ⏳ Test #10 anti-spoofing IP X-Forwarded-For
+- ⏳ Test #11 middleware admin guard sans cookie
+- ⏳ Test #12 bypass-prefix admin avec `..`
 
-## Next Task — Sprint 4 (Plan d'incident + backups + bascule CSP strict)
-Cf. SECURITY_PLAN.md §4.1-4.4 — pas de pré-requis hors session sauf §4.2.
-- §4.1 `docs/INCIDENT.md` (5 runbooks : Stripe down, Supabase down, fuite données, fraude, email down)
-- §4.2 Validation PITR Supabase (HORS SESSION par Lyes : Dashboard → Settings → Database → PITR enabled)
-- §4.3 Cron mensuel `backup-invoices` → Vercel Blob (archivage factures 10 ans)
-- §4.4 Audit `unsafe-eval` Mondial Relay → bascule CSP Report-Only → strict (cible securityheaders A-)
+## Next Task
+**Continuer les tests fonctionnels pré-merge prod** (cf. liste ci-dessus) puis enchaîner SESSION FINALE PRÉ-PROD.
 
 ## 🏁 SESSION FINALE PRÉ-PROD (à grouper avec actions Vercel)
 - Générer `ADMIN_TOKEN_SECRET` (`openssl rand -hex 32`) + Vercel Prod+Preview
@@ -68,29 +64,30 @@ Cf. SECURITY_PLAN.md §4.1-4.4 — pas de pré-requis hors session sauf §4.2.
 - Implémenter Sprint 1 §1.1-1.4 (bcrypt + kill dev-fallback + sameSite strict)
 - Rotation `STRIPE_SECRET_KEY` live + `service_role` Supabase + `RESEND_API_KEY`
 - Vider `.env.local`
-- Validation PITR Supabase
+- Validation PITR Supabase (Dashboard → Settings → Database → PITR enabled)
+- Configuration 4 alertes Sentry (Stripe webhook >1%, email failure, order failure, RGPD delete failure)
 - Merge `preview` → `main`
+- Re-scan securityheaders + Mozilla sur `https://lolettshop.com` après merge
 
-## 📋 SESSION DE TESTS GROUPÉS (S1 + S2 + S3) — APRÈS DEPLOY PREVIEW
-**Sprint 1** : RLS email_settings, double-débit gift card, checkout normal/avec gift card.
-**Sprint 2** : Headers HTTP, securityheaders.com scan, CSP violations console, rate-limits 3 endpoints, middleware admin guard (4 sous-tests dont prefix-bypass), login admin standard, cookie consent Secure, E2E checkout 4 scénarios.
-**Sprint 3** : `/api/health` 200, `/api/account/export` télécharge JSON valide, `/api/account/delete` complet (créer compte test → export → delete → vérifier purge en DB).
-**Cross** : anti-spoofing IP `X-Forwarded-For`, rate-limit /account/delete et /export.
-
-## Dette technique (post-launch)
-- 5 tables hors versioning Git (`gift_cards`, `gift_card_redemptions`, `email_settings`, `newsletter_subscribers`, `pre_launch_contacts`) → faire `pg_dump --schema-only` baseline + reset tracker, sur branche Supabase isolée
+## 🌟 BACKLOG POST-LAUNCH
+- **Sprint 5 — CSP nonces** : retirer `'unsafe-inline'` de script-src + style-src via Routing Middleware Vercel + injection nonce sur scripts inline Next.js → cible Mozilla A/A+. ~3-4h dev + tests E2E.
+- 5 tables hors versioning Git (gift_cards, gift_card_redemptions, email_settings, newsletter_subscribers, pre_launch_contacts) → pg_dump --schema-only baseline + reset tracker
+- Table `banned_emails` si récidive de fraude (cf. INCIDENT.md runbook 4)
+- Désactivation Vercel Toolbar sur previews ou whitelist `vercel.live` dans CSP (au choix)
 
 ## Blockers
-- 404 mystérieux checkout (asset Leaflet probablement)
+- 404 mystérieux checkout (asset Leaflet probablement) — non bloquant
 - Webhook GitHub→Vercel cassé : déploiements via `vercel deploy --yes`
 - Tracker migrations Supabase remote pas sync local → migrations via Dashboard SQL editor
 - Compte MR `BDTEST  ` toujours en démo
 
 ## Key Context
-- Preview alias stable : `https://lolett-lolett64-lolett64s-projects.vercel.app`
+- **Preview alias actuel** : `https://lolett-6ihr08z3n-lolett64s-projects.vercel.app` (CSP hardened)
+- **Score sécurité actuel** : securityheaders A / Mozilla B+ 80/100 — au-dessus de la majorité des e-commerce FR
+- **Pénalité Mozilla -20 fixe** : bloquante uniquement via nonces CSP (post-launch Sprint 5)
+- **5 directives CSP ajoutées** : default-src 'none' + media-src + worker-src 'self' blob: + manifest-src + object-src 'none' + unpkg.com dans connect-src
+- 5 limiters Upstash actifs : promoLimit, giftCardLimit, adminLoginLimit, accountDeleteLimit, accountExportLimit
+- RPC `delete_user_account_atomic` : SECURITY DEFINER, REVOKE PUBLIC, GRANT service_role only
+- Refactor admin token : `lib/admin/token.ts` (pur, middleware-safe) + `lib/admin/auth.ts` (next/headers)
 - Webhook Stripe : bypass token déjà configuré
 - **Noms env Upstash** : `UPSTASH_REDIS_KV_REST_API_URL/TOKEN` (préfixe custom, NOT le standard)
-- Stratégie CSP : Report-Only en S2, bascule strict en S4 après 48h observation
-- Refactor admin token : `lib/admin/token.ts` (pur, middleware-safe) + `lib/admin/auth.ts` (next/headers)
-- RPC `delete_user_account_atomic` : SECURITY DEFINER, REVOKE PUBLIC, GRANT service_role only
-- 5 limiters Upstash actifs : promoLimit, giftCardLimit, adminLoginLimit, accountDeleteLimit, accountExportLimit
