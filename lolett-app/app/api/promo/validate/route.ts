@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
+import { promoLimit, getClientIp, checkLimit } from '@/lib/security/ratelimit';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,6 +10,14 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
+  const limit = await checkLimit(promoLimit, getClientIp(req));
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: 'Trop de tentatives. Réessayez plus tard.' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
   const { code, subtotal } = await req.json();
 
   if (!code) return NextResponse.json({ error: 'Code manquant' }, { status: 400 });

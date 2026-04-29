@@ -24,7 +24,8 @@ function getStoredConsent(): CookiePreferences | null {
 
 function setConsentCookie(prefs: CookiePreferences) {
   const value = encodeURIComponent(JSON.stringify(prefs));
-  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
 }
 
 /** Émet un custom event pour que les scripts tiers réagissent au consentement */

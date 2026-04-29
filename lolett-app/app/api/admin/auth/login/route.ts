@@ -1,28 +1,16 @@
 import { NextResponse } from 'next/server';
+import { adminLoginLimit, getClientIp, checkLimit } from '@/lib/security/ratelimit';
 
 const COOKIE_NAME = 'lolett_admin_token';
 
-// Rate limiting: 5 attempts per 15 minutes per IP
-const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 15 * 60 * 1000;
-const loginAttempts = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const record = loginAttempts.get(ip);
-  if (!record || now > record.resetAt) {
-    loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-  record.count++;
-  return record.count > MAX_ATTEMPTS;
-}
-
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (isRateLimited(ip)) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 });
+    const limit = await checkLimit(adminLoginLimit, getClientIp(request));
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez plus tard.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+      );
     }
 
     const body = (await request.json()) as { email?: string; password?: string };

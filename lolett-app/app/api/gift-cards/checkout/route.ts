@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateUniqueGiftCardCode } from '@/lib/gift-cards/code';
+import { giftCardLimit, getClientIp, checkLimit } from '@/lib/security/ratelimit';
 
 const GiftCardCheckoutSchema = z.object({
   amount: z.union([
@@ -27,6 +28,14 @@ function getBaseUrl(): string {
 }
 
 export async function POST(req: NextRequest) {
+  const limit = await checkLimit(giftCardLimit, getClientIp(req));
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: 'Trop de tentatives. Réessayez plus tard.' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
       { error: 'Stripe non configuré' },
