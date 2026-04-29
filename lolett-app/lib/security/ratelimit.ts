@@ -21,11 +21,17 @@ export const giftCardLimit = makeLimiter(10, '1 h', 'rl:gift');
 export const adminLoginLimit = makeLimiter(5, '15 m', 'rl:admin');
 
 export function getClientIp(req: Request): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  );
+  // Vercel populates x-real-ip from the verified source — non-spoofable.
+  // For x-forwarded-for, take the LAST entry (Vercel appends the real IP)
+  // since the leftmost values are attacker-controlled.
+  const realIp = req.headers.get('x-real-ip')?.trim();
+  if (realIp) return realIp;
+  const xff = req.headers.get('x-forwarded-for');
+  if (xff) {
+    const parts = xff.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  }
+  return 'unknown';
 }
 
 export type RateLimitResult = { ok: true } | { ok: false; retryAfterSeconds: number };

@@ -7,7 +7,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://qczdwrudgmozyxkdidmr.supabase.co https://*.tile.openstreetmap.org https://www.googletagmanager.com",
-  "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://*.ingest.sentry.io https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://api.stripe.com https://www.google-analytics.com",
+  "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://*.ingest.sentry.io https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://api.stripe.com https://m.stripe.com https://m.stripe.network https://www.google-analytics.com",
   "frame-src 'self' https://js.stripe.com https://www.googletagmanager.com https://hooks.stripe.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",

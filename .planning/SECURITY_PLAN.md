@@ -513,6 +513,10 @@ Cron Vercel dans `vercel.json` :
 
 ## §4.4 — Bascule CSP Report-Only → strict
 
+**Pré-requis audit `'unsafe-eval'`** : avant de basculer en strict, vérifier si Mondial Relay widget en a réellement besoin. Si oui → garder. Si non → le retirer du `script-src` (réduit la surface XSS si jamais une faille est exploitée).
+
+Pour tester : retirer temporairement `'unsafe-eval'` en Report-Only, ouvrir le widget MR, vérifier console DevTools.
+
 Après 48h d'observation Sentry/console DevTools sans violation critique :
 
 [next.config.ts](lolett-app/next.config.ts) :

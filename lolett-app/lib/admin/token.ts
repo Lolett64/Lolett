@@ -15,6 +15,15 @@ async function hmacSign(secret: string, data: string): Promise<string> {
     .join('');
 }
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 export async function verifyAdminToken(cookieValue: string): Promise<boolean> {
   const lastDot = cookieValue.lastIndexOf('.');
   if (lastDot === -1) return false;
@@ -22,7 +31,7 @@ export async function verifyAdminToken(cookieValue: string): Promise<boolean> {
   const signature = cookieValue.substring(lastDot + 1);
   const secret = process.env.ADMIN_TOKEN_SECRET || 'dev-fallback';
   const expected = await hmacSign(secret, payload);
-  return signature === expected;
+  return timingSafeEqual(signature, expected);
 }
 
 export function readAdminCookieFromHeader(cookieHeader: string | null): string | null {

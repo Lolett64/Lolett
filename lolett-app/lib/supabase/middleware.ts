@@ -5,11 +5,11 @@ import { readAdminCookieFromHeader, verifyAdminToken } from '@/lib/admin/token';
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (
-    pathname.startsWith('/api/admin') &&
-    !pathname.startsWith('/api/admin/auth/login') &&
-    !pathname.startsWith('/api/admin/auth/logout')
-  ) {
+  const isAdminPublicRoute =
+    pathname === '/api/admin/auth/login' ||
+    pathname === '/api/admin/auth/logout';
+
+  if (pathname.startsWith('/api/admin/') && !isAdminPublicRoute) {
     const cookieValue = readAdminCookieFromHeader(request.headers.get('cookie'));
     const isAuth = cookieValue ? await verifyAdminToken(cookieValue) : false;
     if (!isAuth) {
