@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
@@ -11,6 +12,7 @@ import { renderGiftCardDeliveryV3 } from '@/lib/email/templates/gift-card-delive
 import { renderGiftCardPurchaseConfirmationV3 } from '@/lib/email/templates/gift-card-purchase-confirmation-v3';
 import { SHIPPING_COUNTRIES } from '@/lib/constants';
 import type { ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
+import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
 
 const VALID_COUNTRY_CODES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
 const VALID_SHIPPING_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
@@ -237,6 +239,74 @@ export async function POST(req: NextRequest) {
         paymentProvider: 'stripe',
       });
 
+      // 1.5 Atomic gift card redemption (BEFORE marking paid).
+      // Si le débit échoue, l'order reste en 'pending' puis bascule en
+      // 'payment_review' → Lola traite manuellement (refund Stripe partiel
+      // ou contact client). Évite de marquer 'paid' + envoyer l'email de
+      // confirmation alors que la carte n'a pas été débitée (Lola perdrait
+      // le montant gift card encaissé par Stripe sans contrepartie en DB).
+      if (metadata.giftCardCode && metadata.giftCardRedeemAmount) {
+        const code = String(metadata.giftCardCode).trim().toUpperCase();
+        const amount = parseFloat(String(metadata.giftCardRedeemAmount));
+
+        if (code && Number.isFinite(amount) && amount > 0) {
+          const { data: card, error: cardErr } = await admin
+            .from('gift_cards')
+            .select('id')
+            .eq('code', code)
+            .maybeSingle();
+
+          if (cardErr || !card) {
+            console.error('[Stripe webhook] gift_card lookup error:', cardErr);
+            await admin.from('orders').update({
+              status: 'payment_review',
+              updated_at: new Date().toISOString(),
+            }).eq('id', order.id);
+            Sentry.captureMessage(
+              `Gift card lookup failed for paid order ${order.orderNumber}`,
+              { level: 'error', extra: { orderId: order.id, code, amount, error: cardErr } },
+            );
+            return NextResponse.json({ received: true, warning: 'gift_card_lookup_failed' });
+          }
+
+          const { data: redeemRaw, error: redeemError } = await admin.rpc(
+            'redeem_gift_card_atomic',
+            {
+              p_card_id: card.id,
+              p_order_id: order.id,
+              p_amount: amount,
+              p_stripe_payment_intent: session.payment_intent as string,
+            },
+          );
+          const redeemResult = redeemRaw as RedeemGiftCardResult | null;
+
+          if (redeemError || !redeemResult || redeemResult.success === false) {
+            console.error('[Stripe webhook] redeem_gift_card_atomic failed:', { redeemError, redeemResult });
+            await admin.from('orders').update({
+              status: 'payment_review',
+              updated_at: new Date().toISOString(),
+            }).eq('id', order.id);
+            Sentry.captureMessage(
+              `Gift card redeem failed for paid order ${order.orderNumber}`,
+              {
+                level: 'error',
+                extra: {
+                  orderId: order.id,
+                  code,
+                  amount,
+                  reason: redeemResult?.success === false ? redeemResult.reason : 'rpc_error',
+                  rpcError: redeemError?.message,
+                },
+              },
+            );
+            // Stripe a déjà encaissé. On return 200 pour qu'il ne re-tente pas
+            // (le retry échouerait pareil — l'idempotency check renverrait success).
+            // L'order est en 'payment_review' → traitement humain.
+            return NextResponse.json({ received: true, warning: 'gift_card_redeem_failed' });
+          }
+        }
+      }
+
       // 2. Mark as paid
       await admin
         .from('orders')
@@ -311,46 +381,6 @@ export async function POST(req: NextRequest) {
         pickupPoint,
         invoicePdf,
       });
-
-      // 6. Apply gift card redemption if present (atomic via RPC).
-      // Lock + idempotency check + decrement + insert dans 1 transaction.
-      try {
-        if (metadata.giftCardCode && metadata.giftCardRedeemAmount) {
-          const code = String(metadata.giftCardCode).trim().toUpperCase();
-          const amount = parseFloat(String(metadata.giftCardRedeemAmount));
-
-          if (code && Number.isFinite(amount) && amount > 0) {
-            const { data: card, error: cardErr } = await admin
-              .from('gift_cards')
-              .select('id, balance')
-              .eq('code', code)
-              .maybeSingle();
-
-            if (cardErr) {
-              console.error('[Stripe webhook] gift_card lookup error:', cardErr);
-            } else if (card) {
-              const redeemed = Math.min(Number(card.balance), amount);
-              const { data: redeemResult, error: redeemError } = await admin.rpc(
-                'redeem_gift_card_atomic',
-                {
-                  p_card_id: card.id,
-                  p_order_id: order.id,
-                  p_amount: redeemed,
-                  p_stripe_payment_intent: session.payment_intent as string,
-                },
-              );
-              if (redeemError) {
-                console.error('[Stripe webhook] redeem_gift_card_atomic failed:', redeemError);
-              } else if (redeemResult && (redeemResult as { success?: boolean }).success === false) {
-                console.error('[Stripe webhook] redeem_gift_card_atomic rejected:', redeemResult);
-              }
-            }
-          }
-        }
-      } catch (giftErr) {
-        // Never fail the webhook because of a gift-card redemption issue.
-        console.error('[Stripe webhook] gift card redemption error:', giftErr);
-      }
 
       // 7. Increment promo_codes.used_count if a promo was applied
       try {

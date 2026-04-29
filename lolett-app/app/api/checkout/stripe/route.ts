@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
@@ -12,6 +13,7 @@ import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import type { Size, ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
+import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
 
 const VALID_COUNTRIES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
 const VALID_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
@@ -228,6 +230,48 @@ export async function POST(req: NextRequest) {
         ? `giftcard_${order.id}`
         : `promo_${order.id}`;
 
+      // Atomic gift card redemption AVANT mark paid : si le débit échoue
+      // (race condition résiduelle, carte expirée entre validate et confirm),
+      // l'order reste 'pending' puis bascule 'payment_review' → on évite
+      // d'envoyer une confirmation pour une commande gratuite non débitée.
+      if (giftCardId) {
+        const { data: redeemRaw, error: redeemError } = await admin.rpc(
+          'redeem_gift_card_atomic',
+          {
+            p_card_id: giftCardId,
+            p_order_id: order.id,
+            p_amount: giftCardRedeemAmount,
+            p_stripe_payment_intent: paymentPseudoId,
+          },
+        );
+        const redeemResult = redeemRaw as RedeemGiftCardResult | null;
+
+        if (redeemError || !redeemResult || redeemResult.success === false) {
+          console.error('[POST /api/checkout/stripe] redeem_gift_card_atomic failed:', { redeemError, redeemResult });
+          await admin.from('orders').update({
+            status: 'payment_review',
+            updated_at: new Date().toISOString(),
+          }).eq('id', order.id);
+          Sentry.captureMessage(
+            `Gift card redeem failed for full-discount order ${order.orderNumber}`,
+            {
+              level: 'error',
+              extra: {
+                orderId: order.id,
+                giftCardId,
+                amount: giftCardRedeemAmount,
+                reason: redeemResult?.success === false ? redeemResult.reason : 'rpc_error',
+                rpcError: redeemError?.message,
+              },
+            },
+          );
+          return NextResponse.json(
+            { error: 'Échec du débit de la carte cadeau. Notre équipe a été alertée et reviendra vers vous.' },
+            { status: 503 },
+          );
+        }
+      }
+
       await admin
         .from('orders')
         .update({
@@ -238,26 +282,6 @@ export async function POST(req: NextRequest) {
         .eq('id', order.id);
 
       await decrementStockForOrder(order.id);
-
-      // Atomic redemption (lock + check + insert + update en 1 transaction).
-      // Empêche le double-débit si 2 requêtes parallèles arrivent avec la
-      // même carte (clic double, retry webhook).
-      if (giftCardId) {
-        const { data: redeemResult, error: redeemError } = await admin.rpc(
-          'redeem_gift_card_atomic',
-          {
-            p_card_id: giftCardId,
-            p_order_id: order.id,
-            p_amount: giftCardRedeemAmount,
-            p_stripe_payment_intent: paymentPseudoId,
-          },
-        );
-        if (redeemError) {
-          console.error('[POST /api/checkout/stripe] redeem_gift_card_atomic failed:', redeemError);
-        } else if (redeemResult && (redeemResult as { success?: boolean }).success === false) {
-          console.error('[POST /api/checkout/stripe] redeem_gift_card_atomic rejected:', redeemResult);
-        }
-      }
 
       // Increment promo used_count if applicable
       if (promoId) {
