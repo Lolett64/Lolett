@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderStatusUpdate } from '@/components/admin/OrderStatusUpdate';
+import { RefundDialog } from '@/components/admin/RefundDialog';
 import { formatPrice, formatDate } from '@/lib/admin/utils';
 import { computeVAT, VAT, SHIPPING_METHODS, SHIPPING_COUNTRIES } from '@/lib/constants';
 import type { PickupPoint, ShippingMethod, ShippingCarrier, ShippingCountryCode } from '@/types';
@@ -57,6 +58,11 @@ interface OrderDetail {
   delivered_at: string | null;
   cancelled_at: string | null;
   refunded_at: string | null;
+  disputed_at: string | null;
+  dispute_id: string | null;
+  dispute_status: string | null;
+  dispute_reason: string | null;
+  dispute_amount: number | null;
   created_at: string;
   updated_at: string;
   items: OrderItem[];
@@ -112,8 +118,8 @@ export default async function OrderDetailPage({
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {/* Lifecycle history (shipped / delivered / cancelled / refunded) */}
-      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at) && (
+      {/* Lifecycle history (shipped / delivered / cancelled / refunded / disputed) */}
+      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at || order.disputed_at) && (
         <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
           <CardHeader>
             <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Historique</CardTitle>
@@ -153,6 +159,36 @@ export default async function OrderDetailPage({
                 {order.refund_reason && (
                   <p className="pl-3 text-xs text-[#1a1510]/50 border-l-2 border-[#e8e0d6]">
                     Raison : {order.refund_reason}
+                  </p>
+                )}
+              </div>
+            )}
+            {order.disputed_at && (
+              <div className="flex flex-col gap-1">
+                <p className="text-red-700">
+                  <span className="font-semibold">Litige ouvert</span> — {formatDate(order.disputed_at)}
+                  {order.dispute_amount != null && (
+                    <span className="font-semibold"> · {formatPrice(order.dispute_amount)}</span>
+                  )}
+                </p>
+                {order.dispute_reason && (
+                  <p className="pl-3 text-xs text-red-600/70 border-l-2 border-red-200">
+                    Raison Stripe : {order.dispute_reason}
+                  </p>
+                )}
+                {order.dispute_status && (
+                  <p className="pl-3 text-xs text-red-600/70 border-l-2 border-red-200">
+                    Statut : {order.dispute_status}
+                    {order.dispute_id && (
+                      <a
+                        href={`https://dashboard.stripe.com/disputes/${order.dispute_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 underline hover:text-red-800"
+                      >
+                        Voir sur Stripe →
+                      </a>
+                    )}
                   </p>
                 )}
               </div>
@@ -376,11 +412,18 @@ export default async function OrderDetailPage({
         currentStatus={order.status}
         currentTrackingNumber={order.tracking_number}
         currentAdminNotes={order.admin_notes}
-        currentRefundAmount={order.refund_amount}
-        currentRefundReason={order.refund_reason}
         currentCancelReason={order.cancel_reason}
-        orderTotal={order.total}
       />
+
+      {/* Refund via Stripe (passe par /api/admin/orders/:id/refund) */}
+      {order.payment_provider === 'stripe' && (
+        <RefundDialog
+          orderId={order.id}
+          orderTotal={Number(order.total)}
+          alreadyRefunded={Number(order.refund_amount ?? 0)}
+          status={order.status}
+        />
+      )}
     </div>
   );
 }

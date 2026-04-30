@@ -10,6 +10,8 @@ import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendHtmlEmail } from '@/lib/email-provider';
 import { renderGiftCardDeliveryV3 } from '@/lib/email/templates/gift-card-delivery-v3';
 import { renderGiftCardPurchaseConfirmationV3 } from '@/lib/email/templates/gift-card-purchase-confirmation-v3';
+import { sendOrderRefunded } from '@/lib/email/order-refunded';
+import { sendDisputeAlertToAdmin, sendDisputeClosedToAdmin } from '@/lib/email/dispute-alert';
 import { SHIPPING_COUNTRIES } from '@/lib/constants';
 import type { ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
 import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
@@ -68,6 +70,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
+  // Idempotency globale event-id : Stripe peut renvoyer le même event si on
+  // n'a pas répondu sous 5s ou en cas d'erreur réseau côté Stripe. On utilise
+  // INSERT ON CONFLICT pour avoir une garantie atomique au niveau PostgreSQL —
+  // si 2 invocations webhook arrivent en parallèle (race condition Vercel
+  // serverless), une seule passera, l'autre verra le conflit et skipera.
+  {
+    const adminCheck = createAdminClient();
+    const { error: insertErr } = await adminCheck
+      .from('stripe_webhook_events')
+      .insert({
+        event_id: event.id,
+        event_type: event.type,
+      });
+
+    if (insertErr) {
+      // PostgreSQL error code 23505 = unique_violation (event déjà inséré).
+      // Tout autre erreur = problème DB → on retry via Stripe (return 500).
+      const errCode = (insertErr as { code?: string }).code;
+      if (errCode === '23505') {
+        console.log(`[Stripe webhook] Event ${event.id} (${event.type}) already processed (atomic check), skipping`);
+        return NextResponse.json({ received: true, idempotent: true });
+      }
+      console.error('[Stripe webhook] idempotency insert failed:', insertErr);
+      return NextResponse.json({ error: 'Idempotency check failed' }, { status: 500 });
+    }
+  }
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata;
@@ -86,17 +115,20 @@ export async function POST(req: NextRequest) {
 
         if (fetchErr) {
           console.error('[Stripe webhook] Gift card lookup error:', fetchErr);
+          await markEventProcessed(event);
           return NextResponse.json({ received: true });
         }
 
         if (!existingGc) {
           console.error(`[Stripe webhook] No gift_card row for session ${session.id}`);
+          await markEventProcessed(event);
           return NextResponse.json({ received: true });
         }
 
         // Skip si déjà traité
         if (existingGc.status === 'active' || existingGc.email_sent_at) {
           console.log(`[Stripe webhook] Gift card ${existingGc.code} already active, skipping`);
+          await markEventProcessed(event);
           return NextResponse.json({ received: true });
         }
 
@@ -116,7 +148,9 @@ export async function POST(req: NextRequest) {
 
         if (updateErr) {
           console.error('[Stripe webhook] Gift card update error:', updateErr);
-          return NextResponse.json({ received: true });
+          // NE PAS marker — on veut que Stripe retry pour réessayer l'activation
+          await unmarkEventProcessed(event);
+          return NextResponse.json({ error: 'Gift card update failed' }, { status: 500 });
         }
 
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
@@ -168,12 +202,17 @@ export async function POST(req: NextRequest) {
         console.log(`[Stripe webhook] Gift card ${existingGc.code} activated`);
       } catch (error) {
         console.error('[Stripe webhook] Gift card processing error:', error);
+        // Erreur non gérée : unmark + 500 pour Stripe retry
+        await unmarkEventProcessed(event);
+        return NextResponse.json({ error: 'Gift card processing failed' }, { status: 500 });
       }
+      await markEventProcessed(event);
       return NextResponse.json({ received: true });
     }
 
     if (!metadata?.items || !metadata?.customer) {
       console.error('[Stripe webhook] Missing metadata');
+      await markEventProcessed(event);
       return NextResponse.json({ received: true });
     }
 
@@ -217,8 +256,12 @@ export async function POST(req: NextRequest) {
 
       if (existingOrder) {
         console.log(`[Stripe webhook] Order already exists for payment ${session.payment_intent}, skipping`);
+        await markEventProcessed(event);
         return NextResponse.json({ received: true });
       }
+
+      // Vérifie aussi les autres early returns dans cette branche (lignes ~210, 215)
+      // qui retournent {received:true} sans markEventProcessed
 
       // 1. Create order
       const orderRepo = new SupabaseOrderRepository();
@@ -266,6 +309,7 @@ export async function POST(req: NextRequest) {
               `Gift card lookup failed for paid order ${order.orderNumber}`,
               { level: 'error', extra: { orderId: order.id, code, amount, error: cardErr } },
             );
+            await markEventProcessed(event);
             return NextResponse.json({ received: true, warning: 'gift_card_lookup_failed' });
           }
 
@@ -302,6 +346,7 @@ export async function POST(req: NextRequest) {
             // Stripe a déjà encaissé. On return 200 pour qu'il ne re-tente pas
             // (le retry échouerait pareil — l'idempotency check renverrait success).
             // L'order est en 'payment_review' → traitement humain.
+            await markEventProcessed(event);
             return NextResponse.json({ received: true, warning: 'gift_card_redeem_failed' });
           }
         }
@@ -415,7 +460,360 @@ export async function POST(req: NextRequest) {
       console.error('[Stripe webhook] Error processing order:', error);
       return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
     }
+
+    await markEventProcessed(event);
+    return NextResponse.json({ received: true });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // charge.refunded — synchronise DB après refund (admin OU dashboard Stripe)
+  // ─────────────────────────────────────────────────────────────
+  if (event.type === 'charge.refunded') {
+    const charge = event.data.object as Stripe.Charge;
+    const paymentIntentId = typeof charge.payment_intent === 'string'
+      ? charge.payment_intent
+      : charge.payment_intent?.id;
+
+    if (!paymentIntentId) {
+      console.error('[Stripe webhook] charge.refunded without payment_intent', { chargeId: charge.id });
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    const admin = createAdminClient();
+    const { data: order, error: orderErr } = await admin
+      .from('orders')
+      .select('id, order_number, total, refund_amount, status, customer, user_id')
+      .eq('payment_id', paymentIntentId)
+      .maybeSingle();
+
+    if (orderErr || !order) {
+      console.warn(`[Stripe webhook] No order for refunded payment_intent ${paymentIntentId}`, orderErr);
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    const refundedTotalCents = charge.amount_refunded;
+    const refundedTotalEuros = +(refundedTotalCents / 100).toFixed(2);
+    const orderTotalCents = Math.round(Number(order.total) * 100);
+    const isFullyRefunded = refundedTotalCents >= orderTotalCents;
+    const newStatus = isFullyRefunded ? 'refunded' : 'partially_refunded';
+
+    const previouslyRefundedEuros = Number(order.refund_amount ?? 0);
+    const deltaEuros = +(refundedTotalEuros - previouslyRefundedEuros).toFixed(2);
+
+    // Idempotency niveau état : si déjà au bon montant + statut, skip silencieusement
+    if (
+      order.status === newStatus
+      && Math.abs(previouslyRefundedEuros - refundedTotalEuros) < 0.005
+    ) {
+      console.log(`[Stripe webhook] Order ${order.order_number} refund already in sync (${refundedTotalEuros}€)`);
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    // GUARD CRITICAL : Stripe ne garantit PAS l'ordre des webhooks.
+    // Si on reçoit un event "older" (charge.amount_refunded < ce qu'on a en DB),
+    // on NE doit PAS overwrite le refund_amount avec une valeur stale.
+    // Scenario : 2 refunds 30€ rapides → webhook B (60€) arrive avant webhook A (30€).
+    // Webhook B sync correctement (delta=60). Webhook A arrive ensuite avec amount_refunded=30
+    // (état au moment de SON refund) → deltaEuros négatif → overwrite 60→30 sans guard.
+    if (deltaEuros <= 0) {
+      console.log(`[Stripe webhook] Order ${order.order_number} refund event stale (delta=${deltaEuros}€, already at ${previouslyRefundedEuros}€), skipping`);
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true, stale: true });
+    }
+
+    // Récup la raison depuis la metadata du dernier refund (passée par notre admin endpoint)
+    const lastRefund = charge.refunds?.data?.[0];
+    const refundReason =
+      (lastRefund?.metadata?.admin_reason as string | undefined)
+      || 'Remboursement traité via Stripe';
+
+    // 1. Update order
+    const updatePayload: Record<string, unknown> = {
+      status: newStatus,
+      refund_amount: refundedTotalEuros,
+      refunded_at: new Date().toISOString(),
+      refund_reason: refundReason,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error: updErr } = await admin
+      .from('orders')
+      .update(updatePayload)
+      .eq('id', order.id);
+
+    if (updErr) {
+      console.error('[Stripe webhook] order update on refund failed:', updErr);
+      Sentry.captureException(updErr, {
+        extra: { orderId: order.id, refundedTotalEuros },
+      });
+      // Unmark idempotency pour que Stripe retry — la 1re tentative n'a rien fait.
+      await unmarkEventProcessed(event);
+      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    }
+
+    // 2. Stock — restock prorata du DELTA refund (pas du total déjà refundé)
+    // Évite de re-restock sur un refund partiel suivi d'un autre.
+    const orderTotalEuros = Number(order.total);
+    const deltaRatio = orderTotalEuros > 0 ? deltaEuros / orderTotalEuros : 0;
+
+    if (deltaRatio > 0) {
+      try {
+        await admin.rpc('increment_stock_for_order_partial', {
+          p_order_id: order.id,
+          p_ratio: Math.min(1, deltaRatio),
+        });
+      } catch (e) {
+        console.error('[Stripe webhook] increment_stock_for_order_partial failed:', e);
+        Sentry.captureException(e, { extra: { orderId: order.id, deltaRatio } });
+      }
+    }
+
+    // 3. Loyalty points — retire les points prorata du delta
+    if (order.user_id && deltaRatio > 0) {
+      const pointsToRemove = Math.floor(orderTotalEuros * deltaRatio);
+      if (pointsToRemove > 0) {
+        try {
+          await admin.rpc('decrement_loyalty_points', {
+            p_user_id: order.user_id,
+            p_points: pointsToRemove,
+          });
+        } catch (e) {
+          console.error('[Stripe webhook] decrement_loyalty_points failed:', e);
+          Sentry.captureException(e, { extra: { orderId: order.id, pointsToRemove } });
+        }
+      }
+    }
+
+    // 4. Email confirmation client (best-effort — un échec n'invalide pas le refund)
+    const customer = order.customer as { email?: string; firstName?: string } | null;
+    if (customer?.email) {
+      try {
+        await sendOrderRefunded({
+          to: customer.email,
+          orderNumber: order.order_number,
+          firstName: customer.firstName ?? '',
+          amount: refundedTotalEuros,
+          reason: refundReason,
+        });
+      } catch (e) {
+        console.error('[Stripe webhook] refund email failed:', e);
+        // Sentry pour observabilité — Lola peut renvoyer manuellement depuis admin
+        Sentry.captureException(e, {
+          level: 'warning',
+          extra: {
+            orderId: order.id,
+            orderNumber: order.order_number,
+            kind: 'refund_email_failure',
+          },
+        });
+      }
+    }
+
+    console.log(`[Stripe webhook] Order ${order.order_number} refunded ${refundedTotalEuros}€ (status: ${newStatus})`);
+    await markEventProcessed(event);
+    return NextResponse.json({ received: true });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // charge.dispute.created — alerte URGENT à Lola + marque commande
+  // ─────────────────────────────────────────────────────────────
+  if (event.type === 'charge.dispute.created') {
+    const dispute = event.data.object as Stripe.Dispute;
+    const paymentIntentId = typeof dispute.payment_intent === 'string'
+      ? dispute.payment_intent
+      : dispute.payment_intent?.id;
+
+    if (!paymentIntentId) {
+      console.error('[Stripe webhook] dispute.created without payment_intent', { disputeId: dispute.id });
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    const admin = createAdminClient();
+    const { data: order } = await admin
+      .from('orders')
+      .select('id, order_number, customer, total')
+      .eq('payment_id', paymentIntentId)
+      .maybeSingle();
+
+    if (!order) {
+      console.warn(`[Stripe webhook] No order for disputed payment_intent ${paymentIntentId}`);
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    // 1. Update order — passe en 'disputed', stocke metadata litige.
+    // CRITIQUE : on AWAIT et on check l'erreur. Si l'UPDATE échoue, on unmark
+    // event_id + return 500 → Stripe retry. Évite le scénario "Lola reçoit
+    // l'email URGENT mais voit la commande encore en 'paid' dans l'admin".
+    const { error: disputeUpdErr } = await admin
+      .from('orders')
+      .update({
+        status: 'disputed',
+        disputed_at: new Date().toISOString(),
+        dispute_id: dispute.id,
+        dispute_status: dispute.status,
+        dispute_reason: dispute.reason,
+        dispute_amount: +(dispute.amount / 100).toFixed(2),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', order.id);
+
+    if (disputeUpdErr) {
+      console.error('[Stripe webhook] dispute.created order UPDATE failed:', disputeUpdErr);
+      Sentry.captureException(disputeUpdErr, {
+        level: 'error',
+        extra: { orderId: order.id, disputeId: dispute.id, kind: 'dispute_db_update_failure' },
+      });
+      await unmarkEventProcessed(event);
+      return NextResponse.json({ error: 'Dispute order update failed' }, { status: 500 });
+    }
+
+    // 2. Email URGENT Lola
+    const customer = order.customer as {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+    } | null;
+
+    const customerName = customer
+      ? `${customer.firstName ?? ''} ${customer.lastName ?? ''}`.trim() || 'Client'
+      : 'Client';
+
+    const stripeUrl = `https://dashboard.stripe.com/disputes/${dispute.id}`;
+    const dueBy = dispute.evidence_details?.due_by
+      ? new Date(dispute.evidence_details.due_by * 1000).toLocaleDateString('fr-FR', {
+          day: '2-digit', month: 'long', year: 'numeric',
+        })
+      : 'À vérifier sur Stripe';
+
+    // Sentry trace (avant l'email — garantit que Lola sera alertée même si email fail)
+    Sentry.captureMessage(`Dispute opened on order ${order.order_number}`, {
+      level: 'warning',
+      extra: {
+        orderId: order.id,
+        disputeId: dispute.id,
+        amount: dispute.amount / 100,
+        reason: dispute.reason,
+      },
+    });
+
+    // Email URGENT Lola — si fail, unmark + 500 pour retry Stripe
+    // (l'order est déjà marqué 'disputed' en DB donc l'état est sauf,
+    // mais on veut absolument que Lola soit alertée)
+    try {
+      const emailRes = await sendDisputeAlertToAdmin({
+        orderNumber: order.order_number,
+        customerName,
+        customerEmail: customer?.email ?? 'inconnu',
+        amount: +(dispute.amount / 100).toFixed(2),
+        reason: dispute.reason,
+        stripeUrl,
+        dueBy,
+      });
+      if (!emailRes.success) {
+        throw new Error(emailRes.error ?? 'Email send failed');
+      }
+    } catch (e) {
+      console.error('[Stripe webhook] dispute alert email failed — will retry via Stripe:', e);
+      Sentry.captureException(e, {
+        level: 'error',
+        extra: { orderId: order.id, disputeId: dispute.id, kind: 'dispute_alert_email_failure' },
+      });
+      await unmarkEventProcessed(event);
+      return NextResponse.json({ error: 'Dispute alert email failed' }, { status: 500 });
+    }
+
+    console.log(`[Stripe webhook] Dispute ${dispute.id} opened on order ${order.order_number}`);
+    await markEventProcessed(event);
+    return NextResponse.json({ received: true });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // charge.dispute.closed — résultat litige (won/lost/warning_closed)
+  // ─────────────────────────────────────────────────────────────
+  if (event.type === 'charge.dispute.closed') {
+    const dispute = event.data.object as Stripe.Dispute;
+    const admin = createAdminClient();
+
+    const { data: order } = await admin
+      .from('orders')
+      .select('id, order_number')
+      .eq('dispute_id', dispute.id)
+      .maybeSingle();
+
+    if (!order) {
+      console.warn(`[Stripe webhook] No order for closed dispute ${dispute.id}`);
+      await markEventProcessed(event);
+      return NextResponse.json({ received: true });
+    }
+
+    // Update dispute_status sur la commande
+    const updatePayload: Record<string, unknown> = {
+      dispute_status: dispute.status,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Si gagné, on remet la commande en 'paid' (les fonds sont reversés par Stripe)
+    if (dispute.status === 'won') {
+      updatePayload.status = 'paid';
+    }
+
+    await admin
+      .from('orders')
+      .update(updatePayload)
+      .eq('id', order.id);
+
+    // Email Lola — résultat
+    try {
+      await sendDisputeClosedToAdmin({
+        orderNumber: order.order_number,
+        result: dispute.status,
+        amount: +(dispute.amount / 100).toFixed(2),
+        stripeUrl: `https://dashboard.stripe.com/disputes/${dispute.id}`,
+      });
+    } catch (e) {
+      console.error('[Stripe webhook] dispute closed email failed:', e);
+    }
+
+    console.log(`[Stripe webhook] Dispute ${dispute.id} closed (${dispute.status}) for order ${order.order_number}`);
+    await markEventProcessed(event);
+    return NextResponse.json({ received: true });
   }
 
   return NextResponse.json({ received: true });
+}
+
+// Helper : enrichit l'event marqué (insert s'est fait en début de fonction
+// avec event_id+type seulement) avec le payload pour debug/audit. No-op si
+// l'event a été supprimé entre-temps. Idempotent (UPDATE WHERE).
+async function markEventProcessed(event: Stripe.Event) {
+  try {
+    const admin = createAdminClient();
+    await admin
+      .from('stripe_webhook_events')
+      .update({
+        payload: event.data.object as unknown as Record<string, unknown>,
+      })
+      .eq('event_id', event.id);
+  } catch (e) {
+    console.warn('[Stripe webhook] markEventProcessed update (payload enrich) failed:', e);
+  }
+}
+
+// Helper : supprime le marker idempotency pour permettre à Stripe de retry
+// si le handler a échoué de manière transitoire (DB error, email fail critical).
+async function unmarkEventProcessed(event: Stripe.Event) {
+  try {
+    const admin = createAdminClient();
+    await admin
+      .from('stripe_webhook_events')
+      .delete()
+      .eq('event_id', event.id);
+  } catch (e) {
+    console.warn('[Stripe webhook] unmarkEventProcessed failed:', e);
+  }
 }

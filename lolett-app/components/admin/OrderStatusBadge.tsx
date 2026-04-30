@@ -9,6 +9,9 @@ const STATUS_LABELS: Record<string, string> = {
   delivered: 'Livré',
   cancelled: 'Annulé',
   refunded: 'Remboursé',
+  partially_refunded: 'Remb. partiel',
+  disputed: 'Litige',
+  payment_review: 'Vérif paiement',
   expired: 'Expiré',
 };
 
@@ -20,6 +23,9 @@ const STATUS_CLASSES: Record<string, string> = {
   delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
   cancelled: 'bg-rose-50 text-rose-700 border-rose-200/60',
   refunded: 'bg-orange-50 text-orange-700 border-orange-200/60',
+  partially_refunded: 'bg-orange-50 text-orange-600 border-orange-200/60',
+  disputed: 'bg-red-100 text-red-800 border-red-300 font-semibold',
+  payment_review: 'bg-yellow-50 text-yellow-700 border-yellow-200/60',
   expired: 'bg-stone-50 text-stone-500 border-stone-200/60',
 };
 

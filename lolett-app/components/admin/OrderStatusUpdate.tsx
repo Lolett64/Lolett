@@ -21,8 +21,11 @@ const STATUSES = [
   { value: 'shipped', label: 'Expédié' },
   { value: 'delivered', label: 'Livré' },
   { value: 'cancelled', label: 'Annulé' },
-  { value: 'refunded', label: 'Remboursé' },
+  { value: 'payment_review', label: 'Vérif paiement (gift card)' },
   { value: 'expired', label: 'Expiré' },
+  // 'refunded' / 'partially_refunded' / 'disputed' ne sont PAS éditables manuellement.
+  // - refunded : géré par le bouton "Rembourser via Stripe" (RefundDialog)
+  // - disputed : géré automatiquement par le webhook charge.dispute.created
 ];
 
 interface OrderStatusUpdateProps {
@@ -30,10 +33,7 @@ interface OrderStatusUpdateProps {
   currentStatus: string;
   currentTrackingNumber?: string | null;
   currentAdminNotes?: string | null;
-  currentRefundAmount?: number | null;
-  currentRefundReason?: string | null;
   currentCancelReason?: string | null;
-  orderTotal?: number;
 }
 
 export function OrderStatusUpdate({
@@ -41,23 +41,12 @@ export function OrderStatusUpdate({
   currentStatus,
   currentTrackingNumber,
   currentAdminNotes,
-  currentRefundAmount,
-  currentRefundReason,
   currentCancelReason,
-  orderTotal,
 }: OrderStatusUpdateProps) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);
   const [trackingNumber, setTrackingNumber] = useState(currentTrackingNumber ?? '');
   const [adminNotes, setAdminNotes] = useState(currentAdminNotes ?? '');
-  const [refundAmount, setRefundAmount] = useState(
-    currentRefundAmount != null
-      ? String(currentRefundAmount)
-      : orderTotal != null
-        ? String(orderTotal)
-        : '',
-  );
-  const [refundReason, setRefundReason] = useState(currentRefundReason ?? '');
   const [cancelReason, setCancelReason] = useState(currentCancelReason ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -66,7 +55,6 @@ export function OrderStatusUpdate({
     status !== currentStatus
     || trackingNumber !== (currentTrackingNumber ?? '')
     || adminNotes !== (currentAdminNotes ?? '')
-    || (status === 'refunded' && (refundAmount !== String(currentRefundAmount ?? '') || refundReason !== (currentRefundReason ?? '')))
     || (status === 'cancelled' && cancelReason !== (currentCancelReason ?? ''));
 
   async function handleUpdate() {
@@ -81,11 +69,6 @@ export function OrderStatusUpdate({
     }
     if (adminNotes !== (currentAdminNotes ?? '')) {
       payload.adminNotes = adminNotes || null;
-    }
-    if (status === 'refunded') {
-      const parsed = parseFloat(refundAmount);
-      if (!Number.isNaN(parsed) && parsed > 0) payload.refundAmount = parsed;
-      if (refundReason) payload.refundReason = refundReason;
     }
     if (status === 'cancelled' && cancelReason) {
       payload.cancelReason = cancelReason;
@@ -142,34 +125,6 @@ export function OrderStatusUpdate({
             />
             <p className="text-[11px] text-[#1a1510]/50">Un lien de suivi automatique sera inclus dans l&rsquo;email d&rsquo;expédition.</p>
           </div>
-        )}
-
-        {status === 'refunded' && (
-          <>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="refund-amount" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Montant remboursé (€)</Label>
-              <Input
-                id="refund-amount"
-                type="number"
-                step="0.01"
-                min="0"
-                value={refundAmount}
-                onChange={(e) => setRefundAmount(e.target.value)}
-                placeholder="Ex : 75.00"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="refund-reason" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Raison du remboursement</Label>
-              <textarea
-                id="refund-reason"
-                value={refundReason}
-                onChange={(e) => setRefundReason(e.target.value)}
-                placeholder="Ex : produit défectueux, client insatisfait…"
-                rows={3}
-                className="w-full resize-y rounded-md border border-[#e8e0d6] bg-white px-3 py-2 text-sm text-[#1a1510] placeholder:text-[#1a1510]/30 focus:border-[#1B0B94] focus:outline-none focus:ring-2 focus:ring-[#1B0B94]/20"
-              />
-            </div>
-          </>
         )}
 
         {status === 'cancelled' && (
