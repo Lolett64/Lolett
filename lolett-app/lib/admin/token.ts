@@ -24,14 +24,33 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+function getAdminTokenSecret(): string {
+  const raw = process.env.ADMIN_TOKEN_SECRET;
+  const secret = raw ? raw.replace(/^['"]|['"]$/g, '') : undefined;
+  if (raw && secret !== raw) {
+    console.warn(
+      '[admin/token] ADMIN_TOKEN_SECRET had surrounding quotes — stripped. Remove quotes from your env var.',
+    );
+  }
+  if (!secret || secret.length < 32) {
+    throw new Error(
+      'ADMIN_TOKEN_SECRET is missing or too short (need ≥ 32 chars). Refusing to operate with an insecure default.',
+    );
+  }
+  return secret;
+}
+
 export async function verifyAdminToken(cookieValue: string): Promise<boolean> {
   const lastDot = cookieValue.lastIndexOf('.');
   if (lastDot === -1) return false;
   const payload = cookieValue.substring(0, lastDot);
   const signature = cookieValue.substring(lastDot + 1);
-  const secret = process.env.ADMIN_TOKEN_SECRET || 'dev-fallback';
-  const expected = await hmacSign(secret, payload);
+  const expected = await hmacSign(getAdminTokenSecret(), payload);
   return timingSafeEqual(signature, expected);
+}
+
+export async function signAdminPayload(payload: string): Promise<string> {
+  return hmacSign(getAdminTokenSecret(), payload);
 }
 
 export function readAdminCookieFromHeader(cookieHeader: string | null): string | null {

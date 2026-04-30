@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { adminLoginLimit, getClientIp, checkLimit } from '@/lib/security/ratelimit';
-
-const COOKIE_NAME = 'lolett_admin_token';
+import { ADMIN_COOKIE_NAME, signAdminPayload } from '@/lib/admin/token';
 
 export async function POST(request: Request) {
   try {
@@ -15,42 +15,54 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as { email?: string; password?: string };
     const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const rawHash = process.env.ADMIN_PASSWORD_HASH;
+    const adminPasswordHash = rawHash
+      ? rawHash.replace(/^['"]|['"]$/g, '')
+      : undefined;
+    if (rawHash && rawHash !== adminPasswordHash) {
+      console.warn(
+        '[admin/login] ADMIN_PASSWORD_HASH had surrounding quotes — stripped. Remove quotes from your env var.',
+      );
+    }
 
-    if (!adminEmail || !adminPassword) {
+    if (!adminEmail || !adminPasswordHash) {
+      console.error('[admin/login] ADMIN_EMAIL or ADMIN_PASSWORD_HASH is missing');
       return NextResponse.json({ error: 'Server error' }, { status: 500 });
     }
 
-    if (body.email !== adminEmail || body.password !== adminPassword) {
+    if (!body.email || !body.password) {
       return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
     }
 
-    // Simple signed token using timestamp + secret
-    const secret = process.env.ADMIN_TOKEN_SECRET || 'dev-fallback';
+    const emailMatches = body.email === adminEmail;
+    const passwordMatches = await bcrypt.compare(body.password, adminPasswordHash);
+
+    if (!emailMatches || !passwordMatches) {
+      return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
+    }
+
     const timestamp = Date.now().toString(36);
-    const rand = Math.random().toString(36).substring(2, 15);
+    const randBytes = new Uint8Array(12);
+    crypto.getRandomValues(randBytes);
+    const rand = Array.from(randBytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
     const payload = `${timestamp}.${rand}`;
-
-    // Simple hash without Node crypto (works in Edge)
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(secret);
-    const key = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
-    const signature = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
-
+    const signature = await signAdminPayload(payload);
     const cookieValue = `${payload}.${signature}`;
 
     const response = NextResponse.json({ ok: true });
-    response.cookies.set(COOKIE_NAME, cookieValue, {
+    response.cookies.set(ADMIN_COOKIE_NAME, cookieValue, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 24,
       path: '/',
     });
 
     return response;
-  } catch {
+  } catch (e) {
+    console.error('[admin/login] unexpected error', e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

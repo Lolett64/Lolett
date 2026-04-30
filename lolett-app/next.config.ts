@@ -1,9 +1,22 @@
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 
+const isDev = process.env.NODE_ENV === 'development';
+
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(isDev ? ["'unsafe-eval'"] : []),
+  'https://ajax.googleapis.com',
+  'https://unpkg.com',
+  'https://widget.mondialrelay.com',
+  'https://www.googletagmanager.com',
+  'https://js.stripe.com',
+].join(' ');
+
 const csp = [
   "default-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://unpkg.com https://widget.mondialrelay.com https://www.googletagmanager.com https://js.stripe.com",
+  `script-src ${scriptSrc}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://qczdwrudgmozyxkdidmr.supabase.co https://*.tile.openstreetmap.org https://www.googletagmanager.com",
