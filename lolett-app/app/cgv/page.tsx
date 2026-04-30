@@ -60,8 +60,7 @@ export default function CGVPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">5. Paiement</h2>
             <p>
-              Le paiement s'effectue en ligne par carte bancaire (Visa, Mastercard) via la plateforme sécurisée Stripe,
-              ou par PayPal.
+              Le paiement s'effectue en ligne par carte bancaire (Visa, Mastercard) via la plateforme sécurisée Stripe.
               Le paiement est débité au moment de la confirmation de commande. Les données bancaires ne sont jamais
               stockées sur nos serveurs.
             </p>
