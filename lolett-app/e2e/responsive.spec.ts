@@ -57,7 +57,7 @@ test.describe('Responsive mobile', () => {
       await page.waitForURL('**/produit/**', { timeout: 15_000 });
     }
 
-    await expect(page.getByText('Ajouter au panier')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: 'Ajouter au panier' })).toBeVisible({ timeout: 10_000 });
   });
 
   test('le panier est accessible en mobile', async ({ page }) => {

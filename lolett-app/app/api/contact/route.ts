@@ -70,10 +70,21 @@ export async function POST(request: NextRequest) {
   }
 
   // Validation des champs requis
-  const { name, email, subject, message } = data;
+  // Accepte soit `name` (legacy), soit `firstName`+`lastName` (ContactV2)
+  const { name, firstName, lastName, email, subject, message } = data;
+
+  let resolvedName: string | null = null;
+  if (typeof name === 'string' && name.trim().length > 0) {
+    resolvedName = name.trim();
+  } else if (
+    typeof firstName === 'string' && firstName.trim().length > 0 &&
+    typeof lastName === 'string' && lastName.trim().length > 0
+  ) {
+    resolvedName = `${firstName.trim()} ${lastName.trim()}`;
+  }
 
   if (
-    typeof name !== 'string' || name.trim().length === 0 ||
+    resolvedName === null ||
     typeof email !== 'string' || email.trim().length === 0 ||
     typeof subject !== 'string' || subject.trim().length === 0 ||
     typeof message !== 'string' || message.trim().length === 0
@@ -84,10 +95,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const trimmedName = name.trim();
+  const trimmedName = resolvedName;
   const trimmedEmail = email.trim().toLowerCase();
   const trimmedSubject = subject.trim();
   const trimmedMessage = message.trim();
+
+  // Validation longueur (anti-DoS / abus payload Resend)
+  if (
+    trimmedName.length > 100 ||
+    trimmedEmail.length > 254 ||
+    trimmedSubject.length > 200 ||
+    trimmedMessage.length > 5000
+  ) {
+    return NextResponse.json(
+      { success: false, error: 'Un ou plusieurs champs depassent la longueur maximale autorisee.' },
+      { status: 400 }
+    );
+  }
 
   // Validation format email
   if (!isValidEmail(trimmedEmail)) {

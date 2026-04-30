@@ -10,13 +10,15 @@ async function addFirstProductToCart(page: import('@playwright/test').Page) {
   await firstProduct.click();
   await page.waitForURL('**/produit/**', { timeout: 15_000 });
 
-  // Sélectionner une taille disponible
-  const sizeBtn = page.locator('button[aria-pressed]').filter({ hasNot: page.locator('[disabled]') }).first();
-  if (await sizeBtn.isVisible()) {
-    await sizeBtn.click();
-  }
+  // Sélectionner une taille disponible (aria-label="Taille XX", indispos = "Taille XX (indisponible)")
+  const sizeBtn = page.locator('button[aria-label^="Taille "]:not([aria-label*="indisponible"]):not([disabled])').first();
+  await expect(sizeBtn).toBeVisible({ timeout: 10_000 });
+  await sizeBtn.click();
 
-  await page.getByText('Ajouter au panier').click();
+  // Attendre que le bouton "Ajouter au panier" devienne actif
+  const addBtn = page.getByRole('button', { name: 'Ajouter au panier' });
+  await expect(addBtn).toBeEnabled({ timeout: 5_000 });
+  await addBtn.click();
   // Attendre que le bouton change de texte
   await page.waitForTimeout(2_000);
 }
@@ -47,8 +49,8 @@ test.describe('Produit → Panier', () => {
     await page.goto('/panier');
     await expect(page.getByText('Récapitulatif')).toBeVisible({ timeout: 10_000 });
 
-    // Récupérer le total avant (exact match pour éviter "Sous-total")
-    const totalEl = page.locator('span').filter({ hasText: /^Total$/ }).locator('..').locator('span').last();
+    // Récupérer le total avant (label = "Total TTC", éviter "Sous-total")
+    const totalEl = page.locator('span').filter({ hasText: /^Total TTC$/ }).locator('..').locator('span').last();
     const totalBefore = await totalEl.textContent();
 
     // Cliquer sur +

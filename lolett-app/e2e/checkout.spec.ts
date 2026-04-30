@@ -10,12 +10,13 @@ async function addFirstProductToCart(page: import('@playwright/test').Page) {
   await firstProduct.click();
   await page.waitForURL('**/produit/**', { timeout: 15_000 });
 
-  const sizeBtn = page.locator('button[aria-pressed]').filter({ hasNot: page.locator('[disabled]') }).first();
-  if (await sizeBtn.isVisible()) {
-    await sizeBtn.click();
-  }
+  const sizeBtn = page.locator('button[aria-label^="Taille "]:not([aria-label*="indisponible"]):not([disabled])').first();
+  await expect(sizeBtn).toBeVisible({ timeout: 10_000 });
+  await sizeBtn.click();
 
-  await page.getByText('Ajouter au panier').click();
+  const addBtn = page.getByRole('button', { name: 'Ajouter au panier' });
+  await expect(addBtn).toBeEnabled({ timeout: 5_000 });
+  await addBtn.click();
   await page.waitForTimeout(2_000);
 }
 
