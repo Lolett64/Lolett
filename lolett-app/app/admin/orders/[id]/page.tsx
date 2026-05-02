@@ -13,7 +13,7 @@ import type { PickupPoint, ShippingMethod, ShippingCarrier, ShippingCountryCode 
 
 interface OrderItem {
   id: string;
-  product_id: string;
+  product_id: string | null;
   product_name: string;
   size: string;
   color: string | null;
@@ -422,6 +422,15 @@ export default async function OrderDetailPage({
           orderTotal={Number(order.total)}
           alreadyRefunded={Number(order.refund_amount ?? 0)}
           status={order.status}
+          orderItems={order.items.map(i => ({
+            id: i.id,
+            product_id: i.product_id,
+            product_name: i.product_name,
+            size: i.size,
+            color: i.color,
+            quantity: i.quantity,
+            price: Number(i.price),
+          }))}
         />
       )}
     </div>

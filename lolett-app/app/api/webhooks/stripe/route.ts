@@ -554,12 +554,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Update failed' }, { status: 500 });
     }
 
-    // 2. Stock — restock prorata du DELTA refund (pas du total déjà refundé)
-    // Évite de re-restock sur un refund partiel suivi d'un autre.
+    // 2. Stock — dispatch selon le mode du refund (metadata du dernier refund Stripe).
+    //   - 'items' : restock pile-poil les variants des articles cochés (Scénario B).
+    //   - 'commercial_gesture' : aucun restock (geste commercial sans retour produit).
+    //   - undefined (refund déclenché depuis Stripe Dashboard direct) : fallback prorata
+    //     comme l'ancien comportement, pour rester cohérent avec un canal externe.
     const orderTotalEuros = Number(order.total);
     const deltaRatio = orderTotalEuros > 0 ? deltaEuros / orderTotalEuros : 0;
 
-    if (deltaRatio > 0) {
+    const refundKind = lastRefund?.metadata?.refund_kind as
+      | 'items'
+      | 'commercial_gesture'
+      | undefined;
+    const itemsJson = lastRefund?.metadata?.items_json as string | undefined;
+
+    if (refundKind === 'items') {
+      // Si refund_kind='items' on N'utilise PAS le fallback prorata même si
+      // items_json est absent. Une metadata corrompue/tronquée doit être visible
+      // dans Sentry, pas masquée par un restock prorata involontaire.
+      if (!itemsJson) {
+        console.error(`[Stripe webhook] Order ${order.order_number} refund_kind=items mais items_json absent — restock skippé`);
+        Sentry.captureMessage('items_json manquant pour refund kind=items', {
+          level: 'error',
+          extra: { orderId: order.id, orderNumber: order.order_number },
+        });
+      } else {
+        try {
+          // items_json compressé : [{p,s,c,q}] → expand au format attendu par le RPC.
+          const compact = JSON.parse(itemsJson) as Array<{ p: string; s: string; c: string; q: number }>;
+          const items = compact.map(i => ({
+            product_id: i.p,
+            size: i.s,
+            color: i.c || null,
+            quantity: i.q,
+          }));
+          await admin.rpc('restock_order_items_partial', {
+            p_order_id: order.id,
+            p_items: items,
+          });
+        } catch (e) {
+          console.error('[Stripe webhook] restock_order_items_partial failed:', e);
+          Sentry.captureException(e, { extra: { orderId: order.id, itemsJson } });
+        }
+      }
+    } else if (refundKind === 'commercial_gesture') {
+      console.log(`[Stripe webhook] Order ${order.order_number} commercial gesture refund — no restock`);
+    } else if (deltaRatio > 0) {
+      // Fallback : refund déclenché hors admin (ex Stripe Dashboard). Restock prorata.
       try {
         await admin.rpc('increment_stock_for_order_partial', {
           p_order_id: order.id,

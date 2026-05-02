@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -16,55 +18,127 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+interface OrderItemForRefund {
+  id: string;
+  product_id: string | null;
+  product_name: string;
+  size: string;
+  color: string | null;
+  quantity: number;
+  price: number;
+}
+
 interface RefundDialogProps {
   orderId: string;
   orderTotal: number;
   alreadyRefunded: number;
   status: string;
+  orderItems: OrderItemForRefund[];
 }
 
 const REFUNDABLE_STATUSES = ['paid', 'confirmed', 'shipped', 'delivered', 'partially_refunded'];
 
-export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: RefundDialogProps) {
+type RefundMode = 'items' | 'commercial';
+
+export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, orderItems }: RefundDialogProps) {
   const router = useRouter();
   const remaining = +(orderTotal - alreadyRefunded).toFixed(2);
   const canRefund = REFUNDABLE_STATUSES.includes(status) && remaining > 0;
 
+  // Items refundables = ceux qui ont un product_id (sinon impossible de matcher variant en DB)
+  const refundableItems = useMemo(
+    () => orderItems.filter(i => i.product_id !== null),
+    [orderItems],
+  );
+
   const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState(remaining.toFixed(2));
+  const [mode, setMode] = useState<RefundMode>(refundableItems.length > 0 ? 'items' : 'commercial');
+  const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
+  const [commercialAmount, setCommercialAmount] = useState(remaining.toFixed(2));
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup setTimeout sur unmount pour éviter router.refresh() sur un router stale
   useEffect(() => {
     return () => {
       if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     };
   }, []);
 
-  const parsedAmount = parseFloat(amount.replace(',', '.'));
-  const isAmountValid = !Number.isNaN(parsedAmount) && parsedAmount > 0 && parsedAmount <= remaining;
+  // Total auto-calculé pour le mode "items"
+  const itemsAmount = useMemo(() => {
+    let total = 0;
+    for (const item of refundableItems) {
+      const qty = qtyMap[item.id] ?? 0;
+      if (qty > 0) total += Number(item.price) * qty;
+    }
+    return +total.toFixed(2);
+  }, [qtyMap, refundableItems]);
+
+  const parsedCommercial = parseFloat(commercialAmount.replace(',', '.'));
+  const isCommercialAmountValid =
+    !Number.isNaN(parsedCommercial) && parsedCommercial > 0 && parsedCommercial <= remaining + 0.005;
+  const isItemsAmountValid = itemsAmount > 0 && itemsAmount <= remaining + 0.005;
   const isReasonValid = reason.trim().length >= 3;
-  const canSubmit = isAmountValid && isReasonValid && !submitting;
+
+  const canSubmit =
+    !submitting
+    && isReasonValid
+    && (mode === 'items' ? isItemsAmountValid : isCommercialAmountValid);
+
+  function setItemQty(itemId: string, maxQty: number, raw: string) {
+    const n = parseInt(raw || '0', 10);
+    if (Number.isNaN(n) || n < 0) {
+      setQtyMap(prev => ({ ...prev, [itemId]: 0 }));
+      return;
+    }
+    setQtyMap(prev => ({ ...prev, [itemId]: Math.min(n, maxQty) }));
+  }
+
+  function toggleItem(item: OrderItemForRefund) {
+    setQtyMap(prev => {
+      const current = prev[item.id] ?? 0;
+      return { ...prev, [item.id]: current > 0 ? 0 : item.quantity };
+    });
+  }
 
   async function handleRefund() {
     setSubmitting(true);
     setError('');
 
-    // Nonce unique par submit pour Stripe idempotency-key (évite collision
-    // si Lola lance 2 refunds 30€ avant le sync DB du webhook 1er).
     const nonce =
       typeof crypto !== 'undefined' && 'randomUUID' in crypto
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+    const payload =
+      mode === 'items'
+        ? {
+            kind: 'items' as const,
+            items: refundableItems
+              .filter(i => (qtyMap[i.id] ?? 0) > 0)
+              .map(i => ({
+                productId: i.product_id!,
+                size: i.size,
+                color: i.color,
+                quantity: qtyMap[i.id]!,
+              })),
+            reason: reason.trim(),
+            nonce,
+          }
+        : {
+            kind: 'commercial_gesture' as const,
+            amount: parsedCommercial,
+            reason: reason.trim(),
+            nonce,
+          };
+
     try {
       const res = await fetch(`/api/admin/orders/${orderId}/refund`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: parsedAmount, reason: reason.trim(), nonce }),
+        body: JSON.stringify(payload),
       });
 
       const data = (await res.json()) as { error?: string; message?: string };
@@ -73,8 +147,6 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: R
       }
 
       setOpen(false);
-      // Le webhook sync DB en quelques secondes — refresh après 3s pour voir le statut updated.
-      // Cleanup garanti via useEffect → clearTimeout sur unmount.
       if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
       refreshTimerRef.current = setTimeout(() => router.refresh(), 3000);
     } catch (err) {
@@ -83,6 +155,13 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: R
       setSubmitting(false);
     }
   }
+
+  const submitLabel =
+    mode === 'items'
+      ? `Rembourser ${itemsAmount.toFixed(2)} €`
+      : Number.isNaN(parsedCommercial)
+        ? 'Rembourser'
+        : `Rembourser ${parsedCommercial.toFixed(2)} €`;
 
   return (
     <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
@@ -129,7 +208,7 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: R
               Rembourser via Stripe
             </Button>
           </DialogTrigger>
-          <DialogContent className="font-[family-name:var(--font-montserrat)]">
+          <DialogContent className="font-[family-name:var(--font-montserrat)] sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Confirmer le remboursement</DialogTitle>
               <DialogDescription>
@@ -138,50 +217,130 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: R
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex flex-col gap-4 py-2">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="refund-amount" className="text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">
-                  Montant à rembourser (€) — max {remaining.toFixed(2)} €
-                </Label>
-                <Input
-                  id="refund-amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  max={remaining}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-                {!isAmountValid && amount && (
-                  <p className="text-xs text-red-600">
-                    Montant invalide (doit être entre 0.01 et {remaining.toFixed(2)} €).
+            <Tabs value={mode} onValueChange={(v) => setMode(v as RefundMode)} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="items" disabled={refundableItems.length === 0}>
+                  Retour produits
+                </TabsTrigger>
+                <TabsTrigger value="commercial">Geste commercial</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="items" className="flex flex-col gap-4 pt-3">
+                {refundableItems.length === 0 ? (
+                  <p className="text-sm text-[#1a1510]/60 italic">
+                    Aucun article éligible (produit supprimé ?). Utiliser "Geste commercial".
                   </p>
-                )}
-              </div>
+                ) : (
+                  <>
+                    <p className="text-xs text-[#1a1510]/60">
+                      Coche les articles retournés et ajuste la quantité. Le montant est calculé automatiquement.
+                    </p>
+                    <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto">
+                      {refundableItems.map((item) => {
+                        const qty = qtyMap[item.id] ?? 0;
+                        const checked = qty > 0;
+                        return (
+                          <div
+                            key={item.id}
+                            className="flex items-center gap-3 p-3 rounded-lg border border-[#e8e0d6] bg-white"
+                          >
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={() => toggleItem(item)}
+                              aria-label={`Cocher ${item.product_name}`}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-[#1a1510] truncate">{item.product_name}</p>
+                              <p className="text-xs text-[#1a1510]/50">
+                                Taille : {item.size}
+                                {item.color && <> · {item.color}</>}
+                                {' '}· {Number(item.price).toFixed(2)} €/u · vendu : {item.quantity}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                min={0}
+                                max={item.quantity}
+                                value={qty}
+                                onChange={(e) => setItemQty(item.id, item.quantity, e.target.value)}
+                                disabled={!checked}
+                                className="w-16 text-center"
+                              />
+                              <span className="text-xs text-[#1a1510]/40 whitespace-nowrap">
+                                / {item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="refund-reason" className="text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">
-                  Raison du remboursement (visible par le client)
-                </Label>
-                <textarea
-                  id="refund-reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Ex : produit défectueux, demande client, retour reçu…"
-                  rows={3}
-                  className="w-full resize-y rounded-md border border-[#e8e0d6] bg-white px-3 py-2 text-sm text-[#1a1510] placeholder:text-[#1a1510]/30 focus:border-[#1B0B94] focus:outline-none focus:ring-2 focus:ring-[#1B0B94]/20"
-                />
-                {!isReasonValid && reason && (
-                  <p className="text-xs text-red-600">Au moins 3 caractères requis.</p>
+                    <div className="rounded-lg bg-[#F8F6F2] border border-[#e8e0d6] p-3 flex justify-between items-center">
+                      <span className="text-xs uppercase tracking-[0.12em] text-[#1a1510]/40">Montant</span>
+                      <span className="text-lg font-semibold text-[#1a1510]">{itemsAmount.toFixed(2)} €</span>
+                    </div>
+                    {itemsAmount > remaining + 0.005 && (
+                      <p className="text-xs text-red-600">
+                        Montant ({itemsAmount.toFixed(2)} €) supérieur au reste remboursable ({remaining.toFixed(2)} €).
+                      </p>
+                    )}
+                  </>
                 )}
-              </div>
+              </TabsContent>
 
-              {error && (
-                <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-                  {error}
+              <TabsContent value="commercial" className="flex flex-col gap-4 pt-3">
+                <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
+                  ⚠️ Aucun produit retourné — le stock ne sera pas réincrémenté.
                 </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="commercial-amount" className="text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">
+                    Montant à rembourser (€) — max {remaining.toFixed(2)} €
+                  </Label>
+                  <Input
+                    id="commercial-amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max={remaining}
+                    value={commercialAmount}
+                    onChange={(e) => setCommercialAmount(e.target.value)}
+                  />
+                  {!isCommercialAmountValid && commercialAmount && (
+                    <p className="text-xs text-red-600">
+                      Montant invalide (doit être entre 0.01 et {remaining.toFixed(2)} €).
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex flex-col gap-2 pt-2">
+              <Label htmlFor="refund-reason" className="text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">
+                Raison du remboursement (visible par le client)
+              </Label>
+              <textarea
+                id="refund-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder={
+                  mode === 'items'
+                    ? 'Ex : retour reçu et inspecté'
+                    : 'Ex : geste commercial pour retard de livraison'
+                }
+                rows={2}
+                className="w-full resize-y rounded-md border border-[#e8e0d6] bg-white px-3 py-2 text-sm text-[#1a1510] placeholder:text-[#1a1510]/30 focus:border-[#1B0B94] focus:outline-none focus:ring-2 focus:ring-[#1B0B94]/20"
+              />
+              {!isReasonValid && reason && (
+                <p className="text-xs text-red-600">Au moins 3 caractères requis.</p>
               )}
             </div>
+
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             <DialogFooter className="gap-2">
               <Button
@@ -196,7 +355,7 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status }: R
                 disabled={!canSubmit}
                 className="bg-[#B89547] text-white hover:bg-[#9b7d3c]"
               >
-                {submitting ? 'Remboursement…' : `Rembourser ${parsedAmount.toFixed(2)} €`}
+                {submitting ? 'Remboursement…' : submitLabel}
               </Button>
             </DialogFooter>
           </DialogContent>
