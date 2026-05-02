@@ -13,6 +13,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const STATUSES = [
   { value: 'pending', label: 'En attente' },
@@ -24,9 +32,27 @@ const STATUSES = [
   { value: 'payment_review', label: 'Vérif paiement (gift card)' },
   { value: 'expired', label: 'Expiré' },
   // 'refunded' / 'partially_refunded' / 'disputed' ne sont PAS éditables manuellement.
-  // - refunded : géré par le bouton "Rembourser via Stripe" (RefundDialog)
-  // - disputed : géré automatiquement par le webhook charge.dispute.created
 ];
+
+// Transitions logiques autorisées. Statuts terminaux (refunded/partially_refunded/disputed/expired/cancelled)
+// non éditables ici → ne contiennent rien.
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  pending: ['paid', 'expired', 'cancelled'],
+  paid: ['confirmed', 'cancelled'],
+  confirmed: ['shipped', 'cancelled'],
+  shipped: ['delivered', 'cancelled'],
+  delivered: [],
+  payment_review: ['paid', 'cancelled'],
+  expired: [],
+  cancelled: [],
+  refunded: [],
+  partially_refunded: [],
+  disputed: [],
+};
+
+// Statuts pour lesquels une annulation est sensible (déjà payée/expédiée).
+// Aligné avec VALID_TRANSITIONS : 'delivered' n'a pas de transition possible donc exclu.
+const CANCEL_REQUIRES_CONFIRM = ['paid', 'confirmed', 'shipped'];
 
 interface OrderStatusUpdateProps {
   orderId: string;
@@ -50,14 +76,26 @@ export function OrderStatusUpdate({
   const [cancelReason, setCancelReason] = useState(currentCancelReason ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+
+  const allowedNextStatuses = VALID_TRANSITIONS[currentStatus] ?? [];
+  // Le statut actuel reste affiché (pour permettre d'éditer tracking/notes sans changer de statut).
+  const availableStatuses = STATUSES.filter(
+    (s) => s.value === currentStatus || allowedNextStatuses.includes(s.value),
+  );
+  const isLockedStatus = allowedNextStatuses.length === 0;
+
+  const isStatusChange = status !== currentStatus;
+  const isInvalidTransition = isStatusChange && !allowedNextStatuses.includes(status);
+  const isSensitiveCancel = isStatusChange && status === 'cancelled' && CANCEL_REQUIRES_CONFIRM.includes(currentStatus);
 
   const isDirty =
-    status !== currentStatus
+    isStatusChange
     || trackingNumber !== (currentTrackingNumber ?? '')
     || adminNotes !== (currentAdminNotes ?? '')
     || (status === 'cancelled' && cancelReason !== (currentCancelReason ?? ''));
 
-  async function handleUpdate() {
+  async function performUpdate() {
     setSaving(true);
     setError('');
 
@@ -89,7 +127,20 @@ export function OrderStatusUpdate({
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setSaving(false);
+      setConfirmCancelOpen(false);
     }
+  }
+
+  function handleSubmit() {
+    if (isInvalidTransition) {
+      setError(`Transition non autorisée : "${currentStatus}" → "${status}".`);
+      return;
+    }
+    if (isSensitiveCancel) {
+      setConfirmCancelOpen(true);
+      return;
+    }
+    void performUpdate();
   }
 
   return (
@@ -100,18 +151,36 @@ export function OrderStatusUpdate({
       <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Statut</Label>
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={status} onValueChange={setStatus} disabled={isLockedStatus}>
             <SelectTrigger className="w-full font-[family-name:var(--font-montserrat)] text-sm text-[#1a1510] focus:border-[#1B0B94] focus:ring-2 focus:ring-[#1B0B94]/20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {STATUSES.map((s) => (
+              {availableStatuses.map((s) => (
                 <SelectItem key={s.value} value={s.value}>
                   {s.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {isLockedStatus && (
+            <p className="text-[11px] text-[#1a1510]/50 italic">
+              Statut terminal — non modifiable manuellement.
+            </p>
+          )}
+          {!isLockedStatus && (
+            <p className="text-[11px] text-[#1a1510]/40">
+              Transitions autorisées :{' '}
+              {allowedNextStatuses
+                .map((v) => STATUSES.find((s) => s.value === v)?.label ?? v)
+                .join(' · ')}
+            </p>
+          )}
+          {isInvalidTransition && (
+            <p className="text-xs text-red-600">
+              Transition non autorisée depuis &laquo; {STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus} &raquo;.
+            </p>
+          )}
         </div>
 
         {status === 'shipped' && (
@@ -158,13 +227,43 @@ export function OrderStatusUpdate({
         )}
 
         <Button
-          onClick={handleUpdate}
-          disabled={saving || !isDirty}
+          onClick={handleSubmit}
+          disabled={saving || !isDirty || isInvalidTransition}
           className="w-fit bg-[#1B0B94] text-white hover:bg-[#130970] font-[family-name:var(--font-montserrat)]"
         >
           {saving ? 'Mise à jour...' : 'Enregistrer'}
         </Button>
       </CardContent>
+
+      <Dialog open={confirmCancelOpen} onOpenChange={setConfirmCancelOpen}>
+        <DialogContent className="font-[family-name:var(--font-montserrat)]">
+          <DialogHeader>
+            <DialogTitle>Confirmer l&rsquo;annulation</DialogTitle>
+            <DialogDescription className="text-[#1a1510]/70 leading-relaxed">
+              Cette commande est déjà <span className="font-semibold">{STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus}</span>.
+              L&rsquo;annuler ne déclenche <span className="font-semibold">PAS</span> le remboursement automatique.
+              Tu dois rembourser manuellement via le bouton « Rembourser via Stripe » ci-dessous.
+              Confirmer l&rsquo;annulation ?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmCancelOpen(false)}
+              disabled={saving}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => void performUpdate()}
+              disabled={saving}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {saving ? 'Annulation…' : 'Confirmer l’annulation'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

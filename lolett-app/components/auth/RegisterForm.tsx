@@ -11,6 +11,7 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorKind, setErrorKind] = useState<'generic' | 'duplicate'>('generic');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +20,7 @@ export default function RegisterForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setErrorKind('generic');
 
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
@@ -36,7 +38,22 @@ export default function RegisterForm() {
     });
 
     if (error) {
-      setError(error.message);
+      // Détection robuste d'un email déjà inscrit. Supabase renvoie un code
+      // « user_already_exists » ou un message du type « User already registered ».
+      const code = (error as { code?: string }).code ?? '';
+      const msg = (error.message || '').toLowerCase();
+      const isDuplicate =
+        code === 'user_already_exists' ||
+        msg.includes('already registered') ||
+        msg.includes('already exists') ||
+        msg.includes('already been registered');
+
+      if (isDuplicate) {
+        setErrorKind('duplicate');
+        setError('Cet email est déjà associé à un compte. Connectez-vous ou réinitialisez votre mot de passe.');
+      } else {
+        setError('Une erreur est survenue. Veuillez réessayer.');
+      }
       setLoading(false);
       return;
     }
@@ -84,7 +101,18 @@ export default function RegisterForm() {
 
           {error && (
             <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center font-body">
-              {error}
+              <p>{error}</p>
+              {errorKind === 'duplicate' && (
+                <div className="mt-2 flex items-center justify-center gap-3 text-xs">
+                  <Link href="/connexion" className="underline font-medium hover:text-[#1B0B94]">
+                    Se connecter
+                  </Link>
+                  <span aria-hidden>·</span>
+                  <Link href="/mot-de-passe-oublie" className="underline font-medium hover:text-[#1B0B94]">
+                    Mot de passe oublié
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 

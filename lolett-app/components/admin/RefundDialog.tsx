@@ -41,21 +41,33 @@ interface RefundDialogProps {
   alreadyRefunded: number;
   status: string;
   orderItems: OrderItemForRefund[];
+  /**
+   * { [order_item.id]: qty déjà remboursée }, calculé serveur depuis stripe.refunds.list
+   * (parsing metadata.items_json). Sert à griser les checkboxes des items déjà
+   * intégralement remboursés et à plafonner la qty sélectionnable.
+   */
+  alreadyRefundedQtyMap?: Record<string, number>;
 }
 
 const REFUNDABLE_STATUSES = ['paid', 'confirmed', 'shipped', 'delivered', 'partially_refunded'];
 
 type RefundMode = 'items' | 'commercial';
 
-export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, orderItems }: RefundDialogProps) {
+export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, orderItems, alreadyRefundedQtyMap }: RefundDialogProps) {
   const router = useRouter();
+  const refundedQtyMap = alreadyRefundedQtyMap ?? {};
   const remaining = +(orderTotal - alreadyRefunded).toFixed(2);
   const canRefund = REFUNDABLE_STATUSES.includes(status) && remaining > 0;
 
   // Items refundables = ceux qui ont un product_id (sinon impossible de matcher variant en DB)
+  // ET qui ont encore au moins 1 unité non remboursée.
   const refundableItems = useMemo(
-    () => orderItems.filter(i => i.product_id !== null),
-    [orderItems],
+    () => orderItems.filter(i => {
+      if (i.product_id === null) return false;
+      const refundedQty = refundedQtyMap[i.id] ?? 0;
+      return refundedQty < i.quantity;
+    }),
+    [orderItems, refundedQtyMap],
   );
 
   const [open, setOpen] = useState(false);
@@ -99,9 +111,10 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
   }
 
   function toggleItem(item: OrderItemForRefund) {
+    const remainingQty = item.quantity - (refundedQtyMap[item.id] ?? 0);
     setQtyMap(prev => {
       const current = prev[item.id] ?? 0;
-      return { ...prev, [item.id]: current > 0 ? 0 : item.quantity };
+      return { ...prev, [item.id]: current > 0 ? 0 : remainingQty };
     });
   }
 
@@ -241,6 +254,9 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
                       {refundableItems.map((item) => {
                         const qty = qtyMap[item.id] ?? 0;
                         const checked = qty > 0;
+                        const refundedQty = refundedQtyMap[item.id] ?? 0;
+                        const remainingQty = item.quantity - refundedQty;
+                        const fullyRefunded = remainingQty <= 0;
                         return (
                           <div
                             key={item.id}
@@ -249,6 +265,7 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
                             <Checkbox
                               checked={checked}
                               onCheckedChange={() => toggleItem(item)}
+                              disabled={fullyRefunded}
                               aria-label={`Cocher ${item.product_name}`}
                             />
                             <div className="flex-1 min-w-0">
@@ -258,9 +275,15 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
                                 {item.color && <> · {item.color}</>}
                                 {' '}· {Number(item.price).toFixed(2)} €/u · vendu : {item.quantity}
                               </p>
+                              {refundedQty > 0 && (
+                                <p className="text-[11px] text-orange-600 mt-0.5">
+                                  Déjà remboursé : {refundedQty}/{item.quantity}
+                                  {fullyRefunded && ' — entièrement remboursé'}
+                                </p>
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
-                              {item.quantity > 1 ? (
+                              {remainingQty > 1 ? (
                                 <Select
                                   value={String(qty)}
                                   onValueChange={(v) => setItemQty(item.id, parseInt(v, 10))}
@@ -270,7 +293,7 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {Array.from({ length: item.quantity }, (_, i) => i + 1).map(n => (
+                                    {Array.from({ length: remainingQty }, (_, i) => i + 1).map(n => (
                                       <SelectItem key={n} value={String(n)}>
                                         {n}
                                       </SelectItem>

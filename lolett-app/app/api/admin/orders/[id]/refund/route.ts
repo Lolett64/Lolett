@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getAlreadyRefundedQtyMap, refundItemKey } from '@/lib/orders/refund-tracking';
 
 // Refund par articles (Scénario B) — 2 modes :
 // - 'items' : Lola coche les articles retournés. Montant calculé serveur depuis
@@ -119,6 +120,11 @@ export async function POST(
     let computedAmount = 0;
     const matchedForMetadata: Array<{ p: string; s: string; c: string; q: number }> = [];
 
+    // Defence-in-depth : agrège les qty déjà remboursées via les refunds Stripe précédents
+    // (parsing metadata.items_json). Empêche de re-rembourser un item déjà remboursé même
+    // si le client (UI) envoie une requête falsifiée ou une UI obsolète.
+    const alreadyRefundedQtyMap = await getAlreadyRefundedQtyMap(getStripe(), order.payment_id);
+
     for (const refundItem of data.items) {
       const reqColor = normalizeColor(refundItem.color);
       const match = orderItems.find(oi =>
@@ -134,9 +140,14 @@ export async function POST(
         );
       }
 
-      if (refundItem.quantity > match.quantity) {
+      const alreadyQty = alreadyRefundedQtyMap.get(
+        refundItemKey(refundItem.productId, refundItem.size, refundItem.color ?? null),
+      ) ?? 0;
+      const remainingQty = match.quantity - alreadyQty;
+
+      if (refundItem.quantity > remainingQty) {
         return NextResponse.json(
-          { error: `Quantité demandée (${refundItem.quantity}) supérieure à la quantité vendue (${match.quantity}) pour ${refundItem.size}` },
+          { error: `Quantité demandée (${refundItem.quantity}) supérieure au reste remboursable (${remainingQty}/${match.quantity}, déjà remboursé ${alreadyQty}) pour ${refundItem.size}` },
           { status: 400 },
         );
       }
@@ -190,13 +201,41 @@ export async function POST(
   };
   if (itemsForMetadata) {
     const itemsJson = JSON.stringify(itemsForMetadata);
-    if (itemsJson.length > 490) {
+    if (Buffer.byteLength(itemsJson, 'utf8') > 490) {
       return NextResponse.json(
         { error: 'Trop d\'articles dans le refund (limite Stripe metadata atteinte). Faire en plusieurs refunds.' },
         { status: 400 },
       );
     }
     metadata.items_json = itemsJson;
+  }
+
+  // Verrou applicatif anti-double-refund : UPDATE atomique conditionnel sur
+  // refund_amount = previousRefundAmount. Réservation préemptive avant l'appel
+  // Stripe pour empêcher 2 onglets concurrents de dépasser le total remboursable.
+  // Si une autre requête a déjà modifié refund_amount entre le SELECT et ici,
+  // l'UPDATE ne touchera 0 ligne → on retourne 409.
+  // Note : refund_amount peut être NULL en DB (commandes pré-Niveau 2 sans default 0).
+  // Postgres .eq(col, null) ne match pas (sémantique SQL "= NULL" ≠ "IS NULL"), donc
+  // on bascule sur .is('refund_amount', null) si la valeur précédente est null.
+  const previousRefundAmount = order.refund_amount;
+  const newRefundAmount = +(alreadyRefunded + amount).toFixed(2);
+
+  const reservationQuery = admin
+    .from('orders')
+    .update({ refund_amount: newRefundAmount })
+    .eq('id', orderId);
+  const reservation = await (
+    previousRefundAmount === null || previousRefundAmount === undefined
+      ? reservationQuery.is('refund_amount', null)
+      : reservationQuery.eq('refund_amount', previousRefundAmount as number)
+  ).select('id');
+
+  if (reservation.error || !reservation.data || reservation.data.length === 0) {
+    return NextResponse.json(
+      { error: 'Un remboursement vient d\'être lancé, réessaie dans 3 secondes.' },
+      { status: 409 },
+    );
   }
 
   try {
@@ -210,9 +249,9 @@ export async function POST(
       { idempotencyKey },
     );
 
-    // PAS de mise à jour DB ici — le webhook charge.refunded fait le travail
-    // (idempotent via stripe_webhook_events.event_id). Garantit la cohérence
-    // que Lola passe par l'admin OU par le dashboard Stripe directement.
+    // refund_amount déjà mis à jour côté admin (réservation préemptive). Le webhook
+    // charge.refunded qui sync ensuite verra que refundedTotalEuros matche déjà
+    // refund_amount DB (idempotence via diff < 0.005) et skippera le re-update.
     return NextResponse.json({
       success: true,
       refundId: refund.id,
@@ -221,6 +260,20 @@ export async function POST(
       message: 'Remboursement initié — la commande sera mise à jour dans quelques secondes.',
     });
   } catch (err) {
+    // ROLLBACK de la réservation préemptive : Stripe a échoué donc on rend la
+    // capacité de refund à Lola. Sans ce rollback, refund_amount serait gonflé
+    // alors qu'aucun remboursement réel n'a eu lieu.
+    // Note : restaure la valeur précédente exacte (peut être null pour les commandes
+    // pré-Niveau 2). On utilise .eq('refund_amount', newRefundAmount) car la
+    // réservation a posé une valeur numérique (pas null).
+    const rollback = await admin
+      .from('orders')
+      .update({ refund_amount: previousRefundAmount })
+      .eq('id', orderId)
+      .eq('refund_amount', newRefundAmount);
+    if (rollback.error) {
+      console.error('[admin refund] CRITICAL rollback failed:', rollback.error);
+    }
     const message = err instanceof Error ? err.message : 'Stripe refund failed';
     console.error('[admin refund] Stripe error:', err);
     return NextResponse.json({ error: message }, { status: 500 });

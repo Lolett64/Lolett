@@ -196,6 +196,8 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
         onAddColor={addColor}
         onRemoveColor={removeColor}
         onUpdateVariantStock={updateVariantStock}
+        mode={mode}
+        initialVariants={initialData?.variants}
       />
       <ProductFormImageSection
         images={form.images}

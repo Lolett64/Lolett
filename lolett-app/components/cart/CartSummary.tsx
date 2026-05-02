@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Truck, ShieldCheck, RotateCcw, Gift, Tag } from 'lucide-react';
 import { SHIPPING, VAT, computeVAT } from '@/lib/constants';
@@ -36,10 +36,95 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
   const [codeInput, setCodeInput] = useState('');
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [liveGiftPreview, setLiveGiftPreview] = useState<{ valid: boolean; balance?: number; reason?: string } | null>(null);
+  const [liveGiftChecking, setLiveGiftChecking] = useState(false);
+  const giftAbortRef = useRef<AbortController | null>(null);
 
   const [promoInput, setPromoInput] = useState('');
   const [applyingPromo, setApplyingPromo] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [livePromoPreview, setLivePromoPreview] = useState<{ valid: boolean; type?: string; value?: number; error?: string } | null>(null);
+  const [livePromoChecking, setLivePromoChecking] = useState(false);
+  const promoAbortRef = useRef<AbortController | null>(null);
+
+  // Validation live (debounced 500ms) du code carte cadeau pendant la frappe.
+  // Évite de découvrir au submit qu'un code est expiré/épuisé.
+  useEffect(() => {
+    const code = codeInput.trim();
+    if (!code || code.length < 8 || giftCard) {
+      setLiveGiftPreview(null);
+      setLiveGiftChecking(false);
+      return;
+    }
+    setLiveGiftChecking(true);
+    const ctrl = new AbortController();
+    giftAbortRef.current?.abort();
+    giftAbortRef.current = ctrl;
+    const timer = setTimeout(() => {
+      fetch('/api/gift-cards/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+        signal: ctrl.signal,
+      })
+        .then(async (res) => {
+          const data = await res.json().catch(() => null);
+          if (ctrl.signal.aborted) return;
+          if (data?.valid) {
+            setLiveGiftPreview({ valid: true, balance: Number(data.balance) });
+          } else {
+            setLiveGiftPreview({ valid: false, reason: data?.reason });
+          }
+        })
+        .catch(() => { /* aborted ou network */ })
+        .finally(() => {
+          if (!ctrl.signal.aborted) setLiveGiftChecking(false);
+        });
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, [codeInput, giftCard]);
+
+  // Validation live (debounced 500ms) du code promo pendant la frappe.
+  useEffect(() => {
+    const code = promoInput.trim();
+    if (!code || code.length < 2 || promoCode) {
+      setLivePromoPreview(null);
+      setLivePromoChecking(false);
+      return;
+    }
+    setLivePromoChecking(true);
+    const ctrl = new AbortController();
+    promoAbortRef.current?.abort();
+    promoAbortRef.current = ctrl;
+    const timer = setTimeout(() => {
+      fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal }),
+        signal: ctrl.signal,
+      })
+        .then(async (res) => {
+          const data = await res.json().catch(() => null);
+          if (ctrl.signal.aborted) return;
+          if (res.ok && data?.valid) {
+            setLivePromoPreview({ valid: true, type: data.type, value: Number(data.value) });
+          } else {
+            setLivePromoPreview({ valid: false, error: data?.error ?? 'Code promo invalide' });
+          }
+        })
+        .catch(() => { /* aborted ou network */ })
+        .finally(() => {
+          if (!ctrl.signal.aborted) setLivePromoChecking(false);
+        });
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, [promoInput, subtotal, promoCode]);
 
   const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
   const redeemAmount = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
@@ -233,6 +318,22 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
                 {error}
               </p>
             )}
+            {!error && liveGiftChecking && (
+              <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#9B8E82', margin: 0 }}>
+                Vérification…
+              </p>
+            )}
+            {!error && !liveGiftChecking && liveGiftPreview && (
+              liveGiftPreview.valid ? (
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#4a7a3a', margin: 0 }}>
+                  Code valide — solde {formatPrice(liveGiftPreview.balance ?? 0)}
+                </p>
+              ) : (
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#c44545', margin: 0 }}>
+                  {REDEEM_REASONS[liveGiftPreview.reason ?? ''] ?? 'Code invalide'}
+                </p>
+              )
+            )}
           </form>
         )}
       </div>
@@ -307,6 +408,24 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
               <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#c44545', margin: 0 }}>
                 {promoError}
               </p>
+            )}
+            {!promoError && livePromoChecking && (
+              <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#9B8E82', margin: 0 }}>
+                Vérification…
+              </p>
+            )}
+            {!promoError && !livePromoChecking && livePromoPreview && (
+              livePromoPreview.valid ? (
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#4a7a3a', margin: 0 }}>
+                  Code valide — {livePromoPreview.type === 'percentage'
+                    ? `${livePromoPreview.value}% de réduction`
+                    : `${formatPrice(livePromoPreview.value ?? 0)} de réduction`}
+                </p>
+              ) : (
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 11, color: '#c44545', margin: 0 }}>
+                  {livePromoPreview.error ?? 'Code promo invalide'}
+                </p>
+              )
             )}
           </form>
         )}

@@ -22,6 +22,14 @@ interface PromoFormProps {
   onSubmit: (e: FormEvent) => void;
 }
 
+function todayISO() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function generateCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
@@ -32,6 +40,9 @@ function generateCode() {
 }
 
 export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
+  const today = todayISO();
+  const expiresInPast = !!(form.expires_at && form.expires_at < today);
+  const canSubmit = !expiresInPast;
   return (
     <form onSubmit={onSubmit} className={`${card} mb-6`}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -116,13 +127,21 @@ export function PromoForm({ form, setForm, onSubmit }: PromoFormProps) {
           <label className="block text-[13px] font-medium text-[#1a1510] mb-1">Date d&apos;expiration</label>
           <input
             type="date"
+            min={today}
             value={form.expires_at}
             onChange={(e) => setForm(f => ({ ...f, expires_at: e.target.value }))}
             className={inputBase}
           />
+          {expiresInPast && (
+            <p className="text-xs text-red-600 mt-1">Date d&apos;expiration doit etre future</p>
+          )}
         </div>
         <div className="flex items-end">
-          <button type="submit" className={`${btnPrimary} w-full`}>
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            className={`${btnPrimary} w-full`}
+          >
             Creer le code promo
           </button>
         </div>

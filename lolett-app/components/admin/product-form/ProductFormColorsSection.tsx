@@ -3,6 +3,7 @@ import { Plus, X } from 'lucide-react';
 import {
   ProductFormData,
   ProductColor,
+  ProductVariantStock,
   AVAILABLE_SIZES,
   card,
   fieldLabel,
@@ -20,6 +21,8 @@ interface ProductFormColorsSectionProps {
   onAddColor: () => void;
   onRemoveColor: (idx: number) => void;
   onUpdateVariantStock: (colorName: string, size: string, stock: number) => void;
+  mode?: 'create' | 'edit';
+  initialVariants?: ProductVariantStock[];
 }
 
 export function ProductFormColorsSection({
@@ -31,7 +34,15 @@ export function ProductFormColorsSection({
   onAddColor,
   onRemoveColor,
   onUpdateVariantStock,
+  mode = 'create',
+  initialVariants,
 }: ProductFormColorsSectionProps) {
+  function getInitialStock(colorName: string, size: string): number | null {
+    if (mode !== 'edit' || !initialVariants) return null;
+    const v = initialVariants.find((iv) => iv.colorName === colorName && iv.size === size);
+    return v ? v.stock : null;
+  }
+
   return (
     <div className={card}>
       <h3 className={sectionTitle}>Tailles et couleurs</h3>
@@ -128,36 +139,45 @@ export function ProductFormColorsSection({
               borderRadius: '0.5rem',
               border: '1px solid #e8e8ef',
             }}>
-              {form.variants.map((variant, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <span style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      background: variant.colorHex,
-                      border: '1px solid #d1d1dc',
-                      display: 'inline-block',
-                      flexShrink: 0,
-                    }} />
-                    <span style={{ fontSize: '0.75rem', color: '#4a4a56', fontWeight: 500 }}>
-                      {variant.colorName} - {variant.size}
-                    </span>
-                  </div>
-                  <input
-                    type="number"
-                    min="0"
-                    value={variant.stock}
-                    onChange={(e) => onUpdateVariantStock(
-                      variant.colorName,
-                      variant.size,
-                      parseInt(e.target.value, 10) || 0
+              {form.variants.map((variant, idx) => {
+                const initial = getInitialStock(variant.colorName, variant.size);
+                const showInitial = initial !== null && initial !== variant.stock;
+                return (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                      <span style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        background: variant.colorHex,
+                        border: '1px solid #d1d1dc',
+                        display: 'inline-block',
+                        flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: '0.75rem', color: '#4a4a56', fontWeight: 500 }}>
+                        {variant.colorName} - {variant.size}
+                      </span>
+                    </div>
+                    <input
+                      type="number"
+                      min={0}
+                      value={variant.stock}
+                      onChange={(e) => {
+                        const parsed = parseInt(e.target.value, 10);
+                        const safe = Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
+                        onUpdateVariantStock(variant.colorName, variant.size, safe);
+                      }}
+                      className={inputBase}
+                      style={{ fontSize: '0.875rem', padding: '0.375rem 0.5rem' }}
+                    />
+                    {initial !== null && (
+                      <span style={{ fontSize: '0.7rem', color: showInitial ? '#1B0B94' : '#9999a8' }}>
+                        Stock actuel : {initial}
+                      </span>
                     )}
-                    className={inputBase}
-                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.5rem' }}
-                  />
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
             <p style={{ fontSize: '0.75rem', color: '#6b6b7a', marginTop: '0.5rem' }}>
               Stock total: <strong>{form.stock}</strong> unités

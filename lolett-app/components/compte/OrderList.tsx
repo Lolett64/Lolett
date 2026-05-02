@@ -10,13 +10,16 @@ import { cn, formatPrice } from '@/lib/utils';
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
-  confirmed: { label: 'Confirmee', color: 'bg-blue-100 text-blue-700' },
-  paid: { label: 'Payee', color: 'bg-blue-100 text-blue-700' },
-  shipped: { label: 'Expediee', color: 'bg-indigo-100 text-indigo-700' },
-  delivered: { label: 'Livree', color: 'bg-green-100 text-green-700' },
-  cancelled: { label: 'Annulee', color: 'bg-red-100 text-red-700' },
-  refunded: { label: 'Remboursee', color: 'bg-gray-100 text-gray-700' },
-  expired: { label: 'Expiree', color: 'bg-gray-100 text-gray-500' },
+  confirmed: { label: 'Confirmée', color: 'bg-blue-100 text-blue-700' },
+  paid: { label: 'Payée', color: 'bg-blue-100 text-blue-700' },
+  shipped: { label: 'Expédiée', color: 'bg-indigo-100 text-indigo-700' },
+  delivered: { label: 'Livrée', color: 'bg-green-100 text-green-700' },
+  cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-700' },
+  refunded: { label: 'Remboursée', color: 'bg-orange-100 text-orange-700' },
+  partially_refunded: { label: 'Partiellement remboursée', color: 'bg-orange-50 text-orange-600' },
+  disputed: { label: 'Litige en cours', color: 'bg-red-100 text-red-800' },
+  payment_review: { label: 'Vérification paiement', color: 'bg-yellow-50 text-yellow-700' },
+  expired: { label: 'Expirée', color: 'bg-gray-100 text-gray-500' },
 };
 
 export function OrderList() {

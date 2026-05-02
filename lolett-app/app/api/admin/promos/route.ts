@@ -16,6 +16,18 @@ export async function POST(req: Request) {
   const body = await req.json();
   const admin = createAdminClient();
 
+  if (body.expires_at) {
+    const exp = new Date(body.expires_at);
+    if (Number.isNaN(exp.getTime())) {
+      return NextResponse.json({ error: 'Date d\'expiration invalide' }, { status: 400 });
+    }
+    const expStr = String(body.expires_at).slice(0, 10);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (expStr < todayStr) {
+      return NextResponse.json({ error: 'Date d\'expiration doit être future' }, { status: 400 });
+    }
+  }
+
   const { data, error } = await admin
     .from('promo_codes')
     .insert({

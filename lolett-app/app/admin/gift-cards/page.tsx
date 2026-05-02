@@ -1,6 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type GiftCardStatus =
   | 'pending'
@@ -70,6 +78,9 @@ export default function AdminGiftCardsPage() {
   const [cards, setCards] = useState<GiftCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<StatusFilter>('all');
+  const [confirmTarget, setConfirmTarget] = useState<GiftCard | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const fetchCards = useCallback(async () => {
     setLoading(true);
@@ -90,14 +101,36 @@ export default function AdminGiftCardsPage() {
     fetchCards();
   }, [fetchCards]);
 
-  async function cancel(id: string) {
-    if (!confirm('Annuler cette carte cadeau ? Le solde sera remis a 0.')) return;
-    const res = await fetch('/api/admin/gift-cards', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, action: 'cancel' }),
-    });
-    if (res.ok) fetchCards();
+  function requestCancel(c: GiftCard) {
+    setCancelError(null);
+    setConfirmTarget(c);
+  }
+
+  async function confirmCancel() {
+    if (!confirmTarget) return;
+    setCancelling(true);
+    setCancelError(null);
+    try {
+      const res = await fetch('/api/admin/gift-cards', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: confirmTarget.id, action: 'cancel' }),
+      });
+      if (res.ok) {
+        setConfirmTarget(null);
+        fetchCards();
+        return;
+      }
+      if (res.status === 409) {
+        setCancelError('Cette carte est deja annulee.');
+        fetchCards();
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      setCancelError(data?.error || 'Erreur lors de l\'annulation.');
+    } finally {
+      setCancelling(false);
+    }
   }
 
   const filtered = useMemo(() => {
@@ -210,16 +243,24 @@ export default function AdminGiftCardsPage() {
                     <td className="px-3 py-2.5 text-xs">{formatDate(c.created_at)}</td>
                     <td className="px-3 py-2.5 text-xs">{formatDate(c.expires_at)}</td>
                     <td className="px-3 py-2.5">
-                      {c.status !== 'cancelled' && c.status !== 'fully_redeemed' ? (
-                        <button
-                          onClick={() => cancel(c.id)}
-                          className="text-xs text-red-500 underline bg-transparent border-none cursor-pointer hover:text-red-700 transition-colors"
-                        >
-                          Annuler
-                        </button>
-                      ) : (
-                        <span className="text-xs text-[#1a1510]/30">—</span>
-                      )}
+                      {(() => {
+                        const cancellable =
+                          c.status !== 'cancelled' &&
+                          c.status !== 'fully_redeemed' &&
+                          c.status !== 'expired' &&
+                          Number(c.balance) > 0;
+                        if (!cancellable) {
+                          return <span className="text-xs text-[#1a1510]/30">—</span>;
+                        }
+                        return (
+                          <button
+                            onClick={() => requestCancel(c)}
+                            className="text-xs text-red-500 underline bg-transparent border-none cursor-pointer hover:text-red-700 transition-colors"
+                          >
+                            Annuler
+                          </button>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))}
@@ -228,6 +269,60 @@ export default function AdminGiftCardsPage() {
           </div>
         )}
       </div>
+
+      <Dialog
+        open={!!confirmTarget}
+        onOpenChange={(open) => {
+          if (!open && !cancelling) {
+            setConfirmTarget(null);
+            setCancelError(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Annuler la carte cadeau ?</DialogTitle>
+            <DialogDescription>
+              {confirmTarget ? (
+                <>
+                  Cette carte cadeau{' '}
+                  <span className="font-mono font-semibold">{confirmTarget.code}</span>{' '}
+                  a un solde restant de{' '}
+                  <span className="font-semibold">{formatEuros(confirmTarget.balance)}</span>.
+                  L&apos;annuler la rendra inutilisable meme si le client tente de la rentrer
+                  en checkout. Cette action est irreversible.
+                </>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+          {cancelError && (
+            <p className="text-sm text-red-600">{cancelError}</p>
+          )}
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => {
+                if (!cancelling) {
+                  setConfirmTarget(null);
+                  setCancelError(null);
+                }
+              }}
+              disabled={cancelling}
+              className="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-[#1a1510] hover:bg-gray-50 disabled:opacity-50"
+            >
+              Conserver
+            </button>
+            <button
+              type="button"
+              onClick={confirmCancel}
+              disabled={cancelling}
+              className="px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              {cancelling ? 'Annulation...' : 'Confirmer l\'annulation'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

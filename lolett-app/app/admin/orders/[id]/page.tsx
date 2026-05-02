@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -9,6 +10,7 @@ import { OrderStatusUpdate } from '@/components/admin/OrderStatusUpdate';
 import { RefundDialog } from '@/components/admin/RefundDialog';
 import { formatPrice, formatDate } from '@/lib/admin/utils';
 import { computeVAT, VAT, SHIPPING_METHODS, SHIPPING_COUNTRIES } from '@/lib/constants';
+import { getAlreadyRefundedQtyMap, refundItemKey } from '@/lib/orders/refund-tracking';
 import type { PickupPoint, ShippingMethod, ShippingCarrier, ShippingCountryCode } from '@/types';
 
 interface OrderItem {
@@ -93,6 +95,12 @@ export default async function OrderDetailPage({
   const subtotal = +(order.total + promoDiscount + giftCardAmount - order.shipping).toFixed(2);
   const { vat: vatAmount } = computeVAT(order.total);
   const vatPercent = Math.round(VAT.RATE * 100);
+
+  // Parsing des refunds Stripe pour griser les items déjà remboursés dans le dialog.
+  const alreadyRefundedQtyByItemId =
+    order.payment_provider === 'stripe'
+      ? await buildAlreadyRefundedQtyByItemId(order)
+      : {};
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl">
@@ -431,8 +439,34 @@ export default async function OrderDetailPage({
             quantity: i.quantity,
             price: Number(i.price),
           }))}
+          alreadyRefundedQtyMap={alreadyRefundedQtyByItemId}
         />
       )}
     </div>
   );
+}
+
+// Construit { [order_item.id]: qtyDejaRembourse } à partir des refunds Stripe parsés.
+async function buildAlreadyRefundedQtyByItemId(order: OrderDetail): Promise<Record<string, number>> {
+  if (!order.payment_id || !process.env.STRIPE_SECRET_KEY) return {};
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const refundedMap = await getAlreadyRefundedQtyMap(stripe, order.payment_id);
+    const result: Record<string, number> = {};
+    for (const item of order.items) {
+      // Items legacy avec product_id supprimé : on les marque comme totalement
+      // déjà remboursés pour éviter d'afficher "0 déjà remboursé" qui tromperait
+      // l'admin. Le RefundDialog les filtre ensuite via i.product_id === null.
+      if (!item.product_id) {
+        result[item.id] = item.quantity;
+        continue;
+      }
+      const key = refundItemKey(item.product_id, item.size, item.color);
+      const qty = refundedMap.get(key) ?? 0;
+      if (qty > 0) result[item.id] = qty;
+    }
+    return result;
+  } catch {
+    return {};
+  }
 }

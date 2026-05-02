@@ -55,10 +55,18 @@ export async function PATCH(req: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
+      .neq('status', 'cancelled')
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: 'Carte déjà annulée' }, { status: 409 });
+    }
+
     return NextResponse.json(data);
   }
 

@@ -143,7 +143,35 @@ export async function DELETE(
   }
 
   const { id } = await params;
+  const url = new URL(request.url);
+  const force = url.searchParams.get('force') === 'true';
   const supabase = createAdminClient();
+
+  // Check références avant delete (defence-in-depth)
+  const [orderItemsRes, lookProductsRes, cartItemsRes, favoritesRes] = await Promise.all([
+    supabase.from('order_items').select('id', { count: 'exact', head: true }).eq('product_id', id),
+    supabase.from('look_products').select('id', { count: 'exact', head: true }).eq('product_id', id),
+    supabase.from('cart_items').select('id', { count: 'exact', head: true }).eq('product_id', id),
+    supabase.from('favorites').select('user_id', { count: 'exact', head: true }).eq('product_id', id),
+  ]);
+
+  const refs = {
+    orders: orderItemsRes.count ?? 0,
+    looks: lookProductsRes.count ?? 0,
+    carts: cartItemsRes.count ?? 0,
+    favorites: favoritesRes.count ?? 0,
+  };
+
+  // Si présent dans des commandes ou paniers actifs et pas force=true, bloquer
+  if ((refs.orders > 0 || refs.carts > 0) && !force) {
+    return NextResponse.json(
+      {
+        error: 'Produit référencé dans des commandes ou paniers actifs',
+        references: refs,
+      },
+      { status: 409 },
+    );
+  }
 
   const { error } = await supabase.from('products').delete().eq('id', id);
 
@@ -151,5 +179,5 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, references: refs });
 }

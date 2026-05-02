@@ -47,8 +47,10 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [touched, setTouched] = useState(false);
 
   function toggleProduct(productId: string) {
+    setTouched(true);
     setForm((f) => ({
       ...f,
       productIds: f.productIds.includes(productId)
@@ -57,9 +59,17 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
     }));
   }
 
+  const noProducts = form.productIds.length === 0;
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError('');
+
+    if (noProducts) {
+      setError('Sélectionne au moins 1 produit pour créer un look.');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -157,6 +167,12 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
         gender={form.gender}
       />
 
+      {noProducts && touched && (
+        <div style={{ fontSize: '0.8125rem', color: '#b45309' }}>
+          Sélectionne au moins 1 produit pour pouvoir sauvegarder le look.
+        </div>
+      )}
+
       {/* ── Erreur ───────────────────────────────────── */}
       {error && (
         <div style={{ borderRadius: '0.5rem', background: '#fef2f2', border: '1px solid #fecaca', padding: '1rem', fontSize: '0.875rem', color: '#b91c1c' }}>
@@ -166,7 +182,7 @@ export function LookForm({ initialData, lookId, mode }: LookFormProps) {
 
       {/* ── Actions ──────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <button type="submit" disabled={saving} className={btnPrimary}>
+        <button type="submit" disabled={saving || noProducts} className={btnPrimary}>
           {saving ? 'Enregistrement...' : mode === 'create' ? 'Créer le look' : 'Mettre à jour'}
         </button>
         <button type="button" onClick={() => router.push('/admin/looks')} disabled={saving} className={btnOutline}>
