@@ -9,6 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -87,13 +94,8 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
     && isReasonValid
     && (mode === 'items' ? isItemsAmountValid : isCommercialAmountValid);
 
-  function setItemQty(itemId: string, maxQty: number, raw: string) {
-    const n = parseInt(raw || '0', 10);
-    if (Number.isNaN(n) || n < 0) {
-      setQtyMap(prev => ({ ...prev, [itemId]: 0 }));
-      return;
-    }
-    setQtyMap(prev => ({ ...prev, [itemId]: Math.min(n, maxQty) }));
+  function setItemQty(itemId: string, qty: number) {
+    setQtyMap(prev => ({ ...prev, [itemId]: qty }));
   }
 
   function toggleItem(item: OrderItemForRefund) {
@@ -258,15 +260,28 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Input
-                                type="number"
-                                min={0}
-                                max={item.quantity}
-                                value={qty}
-                                onChange={(e) => setItemQty(item.id, item.quantity, e.target.value)}
-                                disabled={!checked}
-                                className="w-16 text-center"
-                              />
+                              {item.quantity > 1 ? (
+                                <Select
+                                  value={String(qty)}
+                                  onValueChange={(v) => setItemQty(item.id, parseInt(v, 10))}
+                                  disabled={!checked}
+                                >
+                                  <SelectTrigger className="w-20 h-9">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({ length: item.quantity }, (_, i) => i + 1).map(n => (
+                                      <SelectItem key={n} value={String(n)}>
+                                        {n}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <span className="text-sm text-[#1a1510]/60 w-20 text-center">
+                                  {checked ? '1' : '—'}
+                                </span>
+                              )}
                               <span className="text-xs text-[#1a1510]/40 whitespace-nowrap">
                                 / {item.quantity}
                               </span>
