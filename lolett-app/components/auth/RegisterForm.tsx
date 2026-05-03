@@ -17,10 +17,24 @@ export default function RegisterForm() {
 
   const supabase = createClient();
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    digit: /\d/.test(password),
+  };
+  const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.digit;
+  const passwordsMatch = password.length > 0 && password === confirmPassword;
+  const canSubmit = passwordValid && passwordsMatch && !loading;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setErrorKind('generic');
+
+    if (!passwordValid) {
+      setError('Le mot de passe ne respecte pas les règles requises.');
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
@@ -74,7 +88,7 @@ export default function RegisterForm() {
             <div className="mb-4 text-[#1B0B94] text-4xl">&#10003;</div>
             <h2 className="font-playfair text-2xl text-[#1a1510] mb-4">Inscription réussie</h2>
             <p className="text-[#5a4d3e] font-body text-sm mb-6">
-              Un email de confirmation vous a été envoyé. Vérifiez votre boîte de réception pour activer votre compte.
+              Votre compte a été créé. Vous pouvez dès à présent vous connecter.
             </p>
             <Link
               href="/connexion"
@@ -167,8 +181,15 @@ export default function RegisterForm() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg bg-white border border-[#c4b49c]/30 text-[#1a1510] placeholder-[#8a7d6b] font-body text-sm focus:outline-none focus:border-[#1B0B94] focus:ring-1 focus:ring-[#1B0B94] transition-colors"
-                placeholder="8 caractères minimum"
+                placeholder="Au moins 8 caractères"
               />
+              {password.length > 0 && (
+                <ul className="mt-2 space-y-1 text-xs font-body" aria-live="polite">
+                  <PasswordRule ok={passwordChecks.length} label="Au moins 8 caractères" />
+                  <PasswordRule ok={passwordChecks.uppercase} label="Au moins 1 majuscule" />
+                  <PasswordRule ok={passwordChecks.digit} label="Au moins 1 chiffre" />
+                </ul>
+              )}
             </div>
 
             <div>
@@ -187,7 +208,7 @@ export default function RegisterForm() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={!canSubmit}
               className="w-full py-3 rounded-lg bg-[#1B0B94] hover:bg-[#B89547] text-white font-semibold font-body text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
@@ -208,5 +229,16 @@ export default function RegisterForm() {
         </div>
       </div>
     </div>
+  );
+}
+
+function PasswordRule({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <li className={`flex items-center gap-2 ${ok ? 'text-green-700' : 'text-[#8a7d6b]'}`}>
+      <span aria-hidden className="inline-flex items-center justify-center w-4 h-4">
+        {ok ? '✓' : '○'}
+      </span>
+      <span>{label}</span>
+    </li>
   );
 }
