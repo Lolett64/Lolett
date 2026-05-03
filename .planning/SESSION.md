@@ -1,109 +1,99 @@
-# Session State — 2026-04-30 (Niveau 2 refund + disputes validé en preview)
+# Session State — 2026-05-03 (Refund par articles + audit UX P0/P1 livré)
 
 ## Branch
-preview — HEAD `5931f91` poussé + déployé Vercel preview validé
+preview — HEAD `64a2e41` poussé + déployé Vercel preview validé
 
 ## Completed CETTE session
 
-### Niveau 2 — Refund admin + Webhooks chargeback (commit 5931f91, ~5h)
+### Phase 1 — Refund par articles (Scénario B) — commits 15071d6 + 5cc79f7
+- Migration SQL `restock_order_items_partial` appliquée prod Supabase ✅
+- Endpoint POST refund avec Zod discriminatedUnion (`items` | `commercial_gesture`)
+- Recalcul montant côté serveur depuis order_items (sécurité)
+- Webhook `charge.refunded` dispatch sur metadata.refund_kind
+- UI Tabs items/commercial avec dropdown qty (Select shadcn) — items qty>1 = dropdown, qty=1 = checkbox seule
+- Smoke test refund TOTAL + PARTIEL VALIDÉ ✅ (LOL-MOJ4GAZC-D6VX 234€/49€ restant après 185€ remboursés)
 
-**Architecture** : Lola gère 100% des remboursements depuis admin Lolett (jamais Stripe Dashboard). Webhooks Stripe sync DB automatiquement. Site autonome 1 an+.
+### Phase 2 — Audit UX complet P0+P1 — commit 64a2e41 (1401 insertions / 171 deletions / 26 fichiers)
+- **4 agents en parallèle** ont fixé 18 edge cases (Refund, Catalog, Promos, Cart)
+- **4 code reviews en parallèle** → 17 findings (1 faux positif identifié)
+- **4 fix-it agents en parallèle** ont corrigé les 16 findings VRAI
+- Fix manuel additionnel : `refund_amount` NULL en DB (utilisation `.is()` au lieu `.eq()`)
+- 10 cas P2 sauvegardés dans `memory/project_ux_audit_p2_followup.md` pour follow-up post-launch
 
-**Fichiers livrés** :
-- ✅ Migration SQL `20260430120000_refunds_disputes_support.sql` — enum status étendu (partially_refunded + disputed), 5 colonnes dispute, table `stripe_webhook_events` (idempotency atomique), RPC `increment_stock_for_order_partial`, RPC `decrement_loyalty_points`
-- ✅ Endpoint `POST /api/admin/orders/[id]/refund` — Stripe API + nonce idempotency-key + auth admin Zod
-- ✅ Webhook handlers : `charge.refunded` (delta restock prorata + loyalty + email), `charge.dispute.created` (URGENT email Lola + mapping FR 14 raisons), `charge.dispute.closed` (email résultat + status revert si won)
-- ✅ Idempotency globale event-id : INSERT ON CONFLICT atomique en début de webhook + unmark sur erreur transitoire pour permettre Stripe retry
-- ✅ UI `RefundDialog.tsx` : Card + Dialog + nonce crypto.randomUUID + useEffect cleanup setTimeout + désactivation statuts non-refundables
-- ✅ PATCH admin durci : Zod retire 'refunded'/'partially_refunded'/'disputed' (force passage par bouton)
-- ✅ Template `dispute-alert.ts` : email URGENT Lola + email closed + mapping FR 14 raisons Stripe
-- ✅ OrderStatusBadge : labels FR pour partially_refunded, disputed, payment_review
+### Détails fixes Phase 2 livrés
+- **Refund/Orders** : tracking par-item via stripe.refunds.list, verrou applicatif anti-double-refund (UPDATE atomique conditionnel + rollback), items_json byteLength UTF-8, accents labels client (Confirmée/Payée/Expédiée…)
+- **Catalog/Delete** : endpoints /references, DELETE produit bloque sur orders+carts avec `?force=true`, errors Supabase propagées 500, LookForm warning touched, PUT look check delete
+- **Promos/Gift Cards** : badges Expiré/Épuisé, validation expires_at via strings ISO TZ-safe, cancel gift card UPDATE atomique idempotent, accents (Réduction/Désactiver)
+- **Cart/Checkout** : stock par variant, auto-clamp banner rouge si stock changé, getVariantStock retourne null pour variant inconnu, validation live promo/gift-card debouncée 500ms+AbortController, erreur Supabase générique inscription
 
-**Fixes appliqués** (2 reviews code-reviewer agent) :
-1. CRITICAL : guard deltaEuros<=0 (race events Stripe out-of-order)
-2. HIGH : await + check error sur dispute.created UPDATE
-3. HIGH : markEventProcessed dans gift-card early returns (audit gap)
-4. HIGH : Zod retire 'refunded' (defence-in-depth)
-5. HIGH : email dispute fail = unmark + 500 (pour Stripe retry)
-6. MEDIUM : mapping FR 14 dispute reasons
-7. MEDIUM : Sentry sur refund email fail
-8. BONUS : payment_review dans dropdown
-9. BONUS : disputed_at dans lifecycle history
-10. Race condition INSERT+SELECT → INSERT ON CONFLICT atomique
-11. Nonce client UUID pour Stripe idempotency-key (évite collision multi-refund 30€)
+### Smoke test sur preview Vercel — confirmation utilisateur
+- ✅ Refund partiel : items déjà remboursés filtrés du dialog (LOL-MOJ4GAZC-D6VX → seul Emoticoeurs Noir XL refundable)
+- ✅ Bouton "+" panier : se grise au max stock + warning "Plus que 2 en stock"
+- ✅ Statuts commande accentués côté client
+- ❌ Pas testé : promo expiré (pas de données), suppression produit dépendances
 
-### Migration appliquée en prod Supabase ✅
-- Vérifié : 5 colonnes dispute + table stripe_webhook_events + 2 RPCs présents
-- Aucun row dirty (vérif preflight `SELECT DISTINCT status FROM orders` → que 'paid' x7)
-- 0 downtime, 100% additive
+## Next Task (PROCHAINE SESSION) — Auth fixes + finitions
 
-### Smoke test refund TOTAL validé ✅
-- URL preview : `https://lolett-lolett64-lolett64s-projects.vercel.app`
-- Webhook Stripe TEST configuré (4 events) → preview Vercel
-- Commande test `LOL-MOLZ6PQ9-VNZ9` 73,40€ créée par Lyes
-- Bouton "Rembourser via Stripe" cliqué → status passé à `refunded` ✅
-- Vérifs Supabase : `orders.refund_amount=73.4`, `refunded_at` populé, 2 events dans `stripe_webhook_events` (`checkout.session.completed` + `charge.refunded`)
-- Idempotency atomique fonctionne, sync DB en <3s après clic
+**3 vrais bugs identifiés au smoke test** :
+1. **Confirmation email Supabase obligatoire** bloque les nouveaux comptes ; `lyestriki@yahoo.fr` créé sans pouvoir se connecter
+2. **Inscription accepte n'importe quel mdp** (pas de validation client/serveur)
+3. **Compte yahoo cassé** (mdp perdu côté Lyes) — décision : on le garde, on ne le supprime pas
 
-## Next Task (PROCHAINE SESSION) — Refund par articles (Scénario B)
+**Décisions actées** :
+- Désactiver la confirmation email côté Supabase (config dashboard, NON-faisable via MCP, à faire par Lyes manuellement)
+- Validation mot de passe règles classiques : 8 chars min + 1 majuscule + 1 chiffre, feedback temps réel avec coches vertes
+- Statuts commande : on GARDE la matrice stricte (pas de retours arrière)
 
-**Plan complet** : `/Users/trikilyes/.claude/plans/refund-par-articles-scenario-b.md`
+**Plan implémentation prochaine session** (~30 min) :
+- Étape 1 — Lyes désactive confirmation email dans Supabase Dashboard → Auth → Providers → Email → "Confirm email" off
+- Étape 2 — Modifier `components/auth/RegisterForm.tsx` : ajouter `<PasswordRules />` qui affiche en temps réel les 3 règles (≥8 chars, 1 maj, 1 chiffre) avec coches vertes Tailwind. Bouton submit disabled tant que les 3 règles pas satisfaites
+- Étape 3 — Validation serveur defence-in-depth : où ? Soit dans `RegisterForm.tsx` avant `supabase.auth.signUp()` (mais c'est client), soit créer `/api/auth/signup` qui fait le check serveur avant relayer à Supabase. **À voir** selon l'archi actuelle de `RegisterForm.tsx`
+- Étape 4 — Tester l'inscription complète : nouveau compte avec mdp faible doit être rejeté, mdp fort doit pouvoir se connecter immédiatement
+- Étape 5 — Optionnel : créer un promo expiré en DB pour tester le badge "Expiré" visuellement
+- Étape 6 — TSC + commit + push + redeploy + smoke test final
 
-**Pourquoi** : le refund actuel restock proportionnellement au montant (faux dans 100% des cas multi-articles). Lyes veut pouvoir cocher LES articles retournés (ex commande 3 articles, retourne juste le pantalon → restock pile +1 sur Pantalon-M).
+## Blockers
 
-**Décision actée** : Scénario B = 2 modes au choix dans dialog
-- Mode "Retour produits" : checkbox + qty par item, montant auto, restock précis
-- Mode "Geste commercial" : montant libre, raison, PAS de restock
-
-**Effort estimé** : ~3-4h
-- Migration RPC `restock_order_items_partial(order_id, items JSONB)` : 30 min
-- Endpoint route.ts : Zod discriminatedUnion + recalcul amount serveur (sécurité) : 30 min
-- Webhook handler : lecture metadata refund_kind + dispatch RPC : 30 min
-- RefundDialog refacto Tabs items/commercial (peut nécessiter shadcn add tabs) : 1h-1h30
-- Tests 7 scénarios + code review + fixes : 1h
-
-**Pour reprendre** : Dis "on attaque le refund par articles, plan dans `~/.claude/plans/refund-par-articles-scenario-b.md`"
-
-## Phases restantes plan launch (pour mémoire)
-
-- ✅ P1 (auth admin bcrypt) commit b5f8d13 + ed0d5ca
-- ✅ P2 (E2E tests 32) commit 11f2c73
-- ✅ P3 (légal CGV/RGPD) commit b4e1a7c
-- ✅ **Niveau 2 BONUS** (refund admin + disputes) commit 5931f91 ← CETTE SESSION
-- ⏳ P4 (rotation clés Stripe live + Resend live + Supabase PITR) — interrompu pour Niveau 2
-- ⏳ P4.5 (refund par articles Scénario B) — PROCHAINE SESSION
-- ⏳ P5 (Mondial Relay credentials pro)
-- ⏳ P6 (merge preview → main)
-- ⏳ P7 (validation post-merge prod)
-- ⏳ P8 (backlog post-launch)
-
-## Blockers connus
-
-- Webhook GitHub→Vercel cassé : déploiement via `vercel deploy --yes` **depuis racine `/Lorett`** (path `lolett-app` doublé sinon depuis le sous-dossier)
-- Webhook Stripe LIVE ne contient encore qu'1 event (`checkout.session.completed`) → à étendre aux 4 events AVANT merge preview→main
-- 234€ commande test (autre que la 73,40€ remboursée) PAS remboursée — état OK mais à nettoyer après si besoin
-- Tracker migrations Supabase remote pas sync local
-- 404 mystérieux Leaflet checkout : post-launch
+- **Webhook GitHub→Vercel cassé** : déploiement via `vercel deploy --yes` **depuis racine `/Lorett`** (path `lolett-app` doublé sinon depuis le sous-dossier)
+- **Webhook Stripe TEST pointe sur l'ancienne URL preview** : à mettre à jour sur la nouvelle URL avant chaque smoke test refund réel. Ou créer alias stable Vercel.
+- **Webhook Stripe LIVE incomplet** (1 event seulement, à étendre aux 4 avant merge prod)
+- Risque #A1 différé post-launch : double-refund même item possible théoriquement (borné par `amount > remaining`, demande colonne DB `quantity_refunded` ou parsing refunds Stripe historiques)
 
 ## Key Context
 
-- **URL preview Vercel courante** : `https://lolett-lolett64-lolett64s-projects.vercel.app`
-- **Webhook Stripe TEST** : `https://dashboard.stripe.com/test/webhooks` → "Lolett preview - test mode" → 4 events configurés
-- **Webhook Stripe LIVE** : `https://dashboard.stripe.com/webhooks` → "Lolettshop" → 1 event seulement (à étendre)
-- **Migration applied prod Supabase** : `20260430120000_refunds_disputes_support.sql` ✅ vérifiée
-- **Score sécurité** : securityheaders A / Mozilla B+ 80/100
+- **URL preview Vercel courante** : `https://lolett-drhmhv3et-lolett64s-projects.vercel.app`
+- **Webhook Stripe TEST** : `https://dashboard.stripe.com/test/webhooks` → "Lolett preview - test mode" → 4 events (à pointer sur nouvelle URL avant test refund)
+- **Migrations Supabase appliquées prod** : `restock_order_items_partial` (2026-05-02) ✅
 - **TSC** : EXIT=0 ✅
 - **Carte test Stripe** : `4242 4242 4242 4242`, exp `12/30`, CVC `123`
+- **MCP Supabase** : `mcp__supabase-lola__execute_sql` (read-only). Apply migration → SQL Editor manuel via dashboard
+- **Compte test fonctionnel** : `lyestriki@gmail.com` (créé 2026-04-22, confirmed). Compte yahoo créé 2026-05-02 confirmé manuellement mais mdp perdu.
+
+## Phases restantes plan launch
+
+- ✅ P1 (auth admin bcrypt) commit b5f8d13
+- ✅ P2 (E2E tests 32) commit 11f2c73
+- ✅ P3 (légal CGV/RGPD) commit b4e1a7c
+- ✅ Niveau 2 BONUS (refund admin + disputes) commit 5931f91
+- ✅ **Niveau 2.5** (refund par articles Scénario B) commits 15071d6 + 5cc79f7
+- ✅ **Audit UX P0+P1** commit 64a2e41 ← CETTE SESSION
+- ⏳ **Auth fixes + validation mdp** — PROCHAINE SESSION (~30 min)
+- ⏳ P4 (rotation clés Stripe live + Resend live + Supabase PITR)
+- ⏳ P5 (Mondial Relay credentials pro)
+- ⏳ P6 (merge preview → main)
+- ⏳ P7 (validation post-merge prod)
+- ⏳ P8 (backlog post-launch incluant les 10 P2 du UX audit)
 
 ## Pour reprendre PROCHAINE session
 
-Dis : **"on attaque le refund par articles (Scénario B), plan dans ~/.claude/plans/refund-par-articles-scenario-b.md"**
+Dis : **"on attaque les fixes auth (désactiver confirmation email + validation mdp client/serveur), plan dans SESSION.md"**
 
-→ Je relis le plan, lis les 4 fichiers à modifier, et on enchaîne migration SQL → endpoint → webhook → UI → tests.
+→ Je relis SESSION.md, je guide Lyes pour désactiver confirmation email Supabase, puis je modifie RegisterForm.tsx + endpoint signup, on teste l'inscription bout en bout.
 
 ## Notes session
 
-- 2 reviews code-reviewer agent successifs ont été précieuses (12 issues détectées au total, 11 fixes appliqués, 1 faux positif loyalty correctement identifié)
-- Le pattern "endpoint admin = trigger Stripe + ne touche pas DB / webhook = single source of truth" est très robuste — même si Lola passe par dashboard Stripe directement la DB sync auto
-- L'idempotency event-id atomique INSERT ON CONFLICT a évité un bug critical race condition (review #1 catché)
-- Le mapping FR des dispute reasons rendra l'UX Lola beaucoup plus claire qu'avec les enum Stripe en anglais
+- **Pattern 4 agents en parallèle validé** : très efficace. 18 fixes en ~5 min wallclock + 16 fixes review en ~2 min. À reproduire pour les phases suivantes.
+- **Code reviews systématiques** ont attrapé 1 faux positif (auth admin "manquante" alors qu'elle est dans middleware.ts) + 1 risque réel (refund_amount NULL pour les commandes pré-Niveau 2). Toujours vérifier les findings agent contre la DB réelle.
+- **Décision sécu inscription** : pas de check live email (account enumeration) — message clair au submit + CTAs. Validée Lyes.
+- **Stripe metadata** : limite 500 BYTES UTF-8 par value (pas chars). admin_reason et items_json tous deux protégés par Buffer.byteLength.
+- **Verrou applicatif refund** : UPDATE atomique avec `.eq()` ou `.is()` selon que la valeur précédente est null ou pas. Évite migration SQL FOR UPDATE.
