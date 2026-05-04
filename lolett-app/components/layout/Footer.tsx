@@ -41,7 +41,7 @@ export function Footer({ content }: FooterProps) {
             <div className="mt-6 flex gap-3">
               {/* Instagram - gradient rose/violet/orange */}
               <a
-                href={content?.instagram_url || "https://instagram.com/lolett"}
+                href={content?.instagram_url || "https://www.instagram.com/lolett.eshop"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-gradient-to-br hover:from-[#833AB4] hover:via-[#E1306C] hover:to-[#F77737]"
@@ -51,7 +51,7 @@ export function Footer({ content }: FooterProps) {
               </a>
               {/* TikTok - noir/blanc */}
               <a
-                href={content?.tiktok_url || "https://tiktok.com/@lolett"}
+                href={content?.tiktok_url || "https://www.tiktok.com/@lolett.eshop"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-black"
@@ -61,7 +61,7 @@ export function Footer({ content }: FooterProps) {
               </a>
               {/* Facebook - bleu officiel */}
               <a
-                href={content?.facebook_url || "https://facebook.com/lolett"}
+                href={content?.facebook_url || "https://www.facebook.com/share/1Lgs5JMnHZ/?mibextid=wwXIfr"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300 hover:bg-[#1877F2]"

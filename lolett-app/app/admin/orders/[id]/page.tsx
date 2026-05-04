@@ -103,7 +103,7 @@ export default async function OrderDetailPage({
       : {};
 
   return (
-    <div className="flex flex-col gap-6 max-w-4xl">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
         <Link
           href="/admin/orders"

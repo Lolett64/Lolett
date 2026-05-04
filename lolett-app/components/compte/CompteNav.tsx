@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, Package, MapPin, Heart, Star, Award, LogOut } from 'lucide-react';
+import { User, Package, MapPin, Star, Award, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 
@@ -10,7 +10,6 @@ const links = [
   { href: '/compte/profil', label: 'Mon profil', icon: User },
   { href: '/compte/commandes', label: 'Mes commandes', icon: Package },
   { href: '/compte/adresses', label: 'Mes adresses', icon: MapPin },
-  { href: '/compte/favoris', label: 'Mes favoris', icon: Heart },
   { href: '/compte/fidelite', label: 'Programme fidélité', icon: Award },
   { href: '/compte/avis', label: 'Mes avis', icon: Star },
 ];

@@ -117,10 +117,31 @@ export function renderLaunchInvitationV3(data: LaunchInvitationData): string {
           </tr>
 
           <tr>
-            <td align="center" style="padding-bottom: 40px;">
+            <td align="center" style="padding-bottom: 32px;">
               <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 16px; color: #C4956A;">
                 Avec tout mon cœur,<br />Lola &hearts;
               </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding-bottom: 32px;">
+              <p style="margin: 0 0 14px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: #9B8E82;">Suis l'aventure</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td style="padding: 0 8px;">
+                    <a href="https://www.instagram.com/lolett.eshop" style="text-decoration: none; color: #C4956A; font-size: 13px; font-weight: 500;">Instagram</a>
+                  </td>
+                  <td style="color: #D4CBC0; font-size: 13px;">·</td>
+                  <td style="padding: 0 8px;">
+                    <a href="https://www.tiktok.com/@lolett.eshop" style="text-decoration: none; color: #C4956A; font-size: 13px; font-weight: 500;">TikTok</a>
+                  </td>
+                  <td style="color: #D4CBC0; font-size: 13px;">·</td>
+                  <td style="padding: 0 8px;">
+                    <a href="https://www.facebook.com/share/1Lgs5JMnHZ/?mibextid=wwXIfr" style="text-decoration: none; color: #C4956A; font-size: 13px; font-weight: 500;">Facebook</a>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 

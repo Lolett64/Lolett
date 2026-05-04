@@ -31,7 +31,7 @@ export function SocialDropdown({ isOpen, onOpen, onClose }: SocialDropdownProps)
       >
         <div className="border-lolett-gray-200 flex min-w-[140px] flex-col gap-2 rounded-xl border bg-white p-3 shadow-lg">
           <a
-            href="https://instagram.com/lolett"
+            href="https://www.instagram.com/lolett.eshop"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all hover:bg-gradient-to-r hover:from-[#833AB4]/10 hover:via-[#E1306C]/10 hover:to-[#F77737]/10"
@@ -44,7 +44,7 @@ export function SocialDropdown({ isOpen, onOpen, onClose }: SocialDropdownProps)
             </span>
           </a>
           <a
-            href="https://tiktok.com/@lolett"
+            href="https://www.tiktok.com/@lolett.eshop"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all hover:bg-black/5"

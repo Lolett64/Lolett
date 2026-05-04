@@ -139,7 +139,7 @@ export function AdminSidebar({ pendingOrders = 0 }: { pendingOrders?: number }) 
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-gradient-to-b from-[#1B0B94] to-[#130866] shadow-sm transition-transform duration-200 lg:static lg:translate-x-0 lg:shadow-none',
+          'fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-gradient-to-b from-[#1B0B94] to-[#130866] shadow-sm transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-none',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -161,7 +161,7 @@ export function AdminSidebar({ pendingOrders = 0 }: { pendingOrders?: number }) 
         </div>
 
         {/* Nav */}
-        <nav className="flex flex-1 flex-col gap-0.5 px-2 pt-2">
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pt-2">
           {navGroups.map((group) => (
             <div key={group.label || 'top'}>
               {group.label && (

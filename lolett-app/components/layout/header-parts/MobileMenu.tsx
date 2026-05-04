@@ -124,7 +124,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
             {/* Social links mobile */}
             <div className="mb-4 flex justify-center gap-3">
               <a
-                href="https://instagram.com/lolett"
+                href="https://www.instagram.com/lolett.eshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737]"
@@ -133,7 +133,7 @@ export function MobileMenu({ pathname, isOpen, onOpenChange }: MobileMenuProps) 
                 <InstagramIcon className="h-5 w-5 text-white" />
               </a>
               <a
-                href="https://tiktok.com/@lolett"
+                href="https://www.tiktok.com/@lolett.eshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-black"

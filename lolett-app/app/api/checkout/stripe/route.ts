@@ -10,6 +10,7 @@ import {
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { sendNewOrderAlertToAdmin } from '@/lib/email/order-new-admin';
 import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import type { Size, ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
@@ -348,6 +349,26 @@ export async function POST(req: NextRequest) {
       } catch (emailErr) {
         console.error('[POST /api/checkout/stripe] email error:', emailErr);
       }
+
+      // Admin notification — non-blocking
+      sendNewOrderAlertToAdmin({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        customer,
+        items: verifiedItems.map((i) => ({
+          productName: i.productName,
+          size: i.size,
+          quantity: i.quantity,
+          price: i.price,
+        })),
+        subtotal,
+        shipping,
+        total: finalTotal,
+        shippingMethod,
+        pickupPoint,
+        promoCode: promoValidatedCode ?? undefined,
+        giftCardCode: giftCardValidatedCode ?? undefined,
+      }).catch((err: unknown) => console.error('[POST /api/checkout/stripe] admin alert failed:', err));
 
       return NextResponse.json({
         url: `${siteUrl}/checkout/success?gift_card=1&order_id=${order.id}`,

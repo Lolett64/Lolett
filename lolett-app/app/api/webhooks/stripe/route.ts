@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
+import { sendNewOrderAlertToAdmin } from '@/lib/email/order-new-admin';
 import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendHtmlEmail } from '@/lib/email-provider';
@@ -426,6 +427,21 @@ export async function POST(req: NextRequest) {
         pickupPoint,
         invoicePdf,
       });
+
+      // 5b. Admin notification (non-blocking — must never fail the webhook)
+      sendNewOrderAlertToAdmin({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        customer,
+        items,
+        subtotal: grossTotal - shipping,
+        shipping,
+        total: finalTotal,
+        shippingMethod,
+        pickupPoint,
+        promoCode,
+        giftCardCode,
+      }).catch((err: unknown) => console.error('[Stripe webhook] Admin alert email failed:', err));
 
       // 7. Increment promo_codes.used_count if a promo was applied
       try {
