@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Truck } from 'lucide-react';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,7 +114,7 @@ export default async function OrderDetailPage({
         </Link>
       </div>
 
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="font-[family-name:var(--font-newsreader)] text-3xl font-light text-[#1a1510] tracking-tight">{order.order_number}</h2>
           <p className="font-[family-name:var(--font-montserrat)] text-sm text-[#B89547]/70 mt-1.5 tracking-wide">
@@ -123,7 +123,18 @@ export default async function OrderDetailPage({
               ` · Mise à jour le ${formatDate(order.updated_at)}`}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} />
+        <div className="flex items-center gap-3 flex-wrap">
+          {(order.status === 'paid' || order.status === 'confirmed') && (
+            <Link
+              href={`/admin/orders/${order.id}/expedition`}
+              className="font-[family-name:var(--font-montserrat)] inline-flex items-center gap-2 rounded-lg border border-[#1B0B94] bg-white px-4 py-2 text-sm font-medium text-[#1B0B94] hover:bg-[#FDF5E6] transition-colors"
+            >
+              <Truck className="size-4" />
+              Fiche d&rsquo;expédition
+            </Link>
+          )}
+          <OrderStatusBadge status={order.status} />
+        </div>
       </div>
 
       {/* Lifecycle history (shipped / delivered / cancelled / refunded / disputed) */}
