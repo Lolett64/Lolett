@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCartStore, useCartCalculation } from '@/features/cart';
 import { CartItem } from '@/components/cart/CartItem';
 import { CartSummary } from '@/components/cart/CartSummary';
+import { CartSuggestions } from '@/components/cart/CartSuggestions';
 
 export default function PanierPage() {
   const items = useCartStore((state) => state.items);
@@ -62,6 +63,7 @@ export default function PanierPage() {
                 amountUntilFreeShipping={amountUntilFreeShipping}
               />
             </div>
+            <CartSuggestions />
           </>
         )}
       </div>
