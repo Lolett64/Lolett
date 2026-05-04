@@ -2,7 +2,10 @@ import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import React from 'react';
 
-// --- SMTP (primary) — Gmail SMTP par défaut, configurable via SMTP_HOST/PORT/USER/PASSWORD ---
+// Ordre des providers : Brevo (HTTP API, fiable serverless) → SMTP Gmail
+// (fallback, ~70% en serverless) → Resend (fallback final, mode test).
+// On teste chaque provider dans l'ordre, on s'arrête au premier qui réussit.
+
 const smtpTransport = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT) || 587,
@@ -12,7 +15,6 @@ const smtpTransport = nodemailer.createTransport({
   },
 });
 
-// --- Resend (fallback) — instancié lazily pour éviter l'erreur au build ---
 function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
@@ -42,7 +44,71 @@ interface SendReactOptions {
   react: React.ReactElement;
 }
 
-async function sendViaSmtp(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
+interface SendResult {
+  success: boolean;
+  error?: string;
+}
+
+// Parse "LOLETT <contact.lolett@gmail.com>" → { name: 'LOLETT', email: 'contact.lolett@gmail.com' }
+// Brevo exige un objet { email, name? } et non une chaîne formatée.
+function parseFromAddress(from: string): { email: string; name?: string } {
+  const match = from.match(/^(.+?)\s*<(.+)>$/);
+  if (match) {
+    return { name: match[1].trim(), email: match[2].trim() };
+  }
+  return { email: from.trim() };
+}
+
+async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    return { success: false, error: 'BREVO_API_KEY not configured' };
+  }
+
+  const sender = parseFromAddress(opts.from || DEFAULT_FROM);
+
+  const body: Record<string, unknown> = {
+    sender,
+    to: [{ email: opts.to }],
+    subject: opts.subject,
+    htmlContent: opts.html,
+  };
+
+  if (opts.attachments?.length) {
+    body.attachment = opts.attachments.map((a) => ({
+      name: a.filename,
+      content: a.content.toString('base64'),
+    }));
+  }
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      const message = `Brevo HTTP ${res.status}: ${text.slice(0, 200)}`;
+      console.error('[Email] Brevo error:', message);
+      return { success: false, error: message };
+    }
+
+    console.log(`[Email] Sent via Brevo to ${opts.to}`);
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Brevo error';
+    console.error('[Email] Brevo failed:', message);
+    return { success: false, error: message };
+  }
+}
+
+async function sendViaSmtp(opts: SendOptions): Promise<SendResult> {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
     return { success: false, error: 'SMTP not configured' };
   }
@@ -63,7 +129,7 @@ async function sendViaSmtp(opts: SendOptions): Promise<{ success: boolean; error
   }
 }
 
-async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
+async function sendViaResend(opts: SendOptions): Promise<SendResult> {
   try {
     const { error } = await getResendClient().emails.send({
       from: opts.from || DEFAULT_FROM,
@@ -86,9 +152,13 @@ async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; err
 }
 
 /**
- * Send HTML email — SMTP (Gmail) first, Resend fallback
+ * Send HTML email — Brevo (primary) → SMTP Gmail → Resend
  */
-export async function sendHtmlEmail(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendHtmlEmail(opts: SendOptions): Promise<SendResult> {
+  const brevoResult = await sendViaBrevo(opts);
+  if (brevoResult.success) return brevoResult;
+
+  console.warn('[Email] Brevo failed, falling back to SMTP...');
   const smtpResult = await sendViaSmtp(opts);
   if (smtpResult.success) return smtpResult;
 
@@ -99,8 +169,7 @@ export async function sendHtmlEmail(opts: SendOptions): Promise<{ success: boole
 /**
  * Send React email — renders to HTML then sends via dual provider
  */
-export async function sendReactEmail(opts: SendReactOptions): Promise<{ success: boolean; error?: string }> {
-  // Dynamic import to avoid bundling issues
+export async function sendReactEmail(opts: SendReactOptions): Promise<SendResult> {
   const { render } = await import('@react-email/components');
   const html = await render(opts.react);
 
