@@ -12,6 +12,8 @@ const footerLinks = {
   ],
   brand: [
     { name: 'Notre histoire', href: '/notre-histoire' },
+    { name: 'Cartes cadeaux', href: '/cartes-cadeaux' },
+    { name: 'Livraison & Retours', href: '/livraison' },
     { name: 'Contact', href: '/contact' },
   ],
   legal: [
@@ -69,7 +71,7 @@ export function Footer({ content }: FooterProps) {
               </a>
               {/* Email - bleu LOLETT */}
               <a
-                href={`mailto:${content?.email || 'hello@lolett.com'}`}
+                href={`mailto:${content?.email || 'contact.lolett@gmail.com'}`}
                 className="hover:bg-lolett-gold touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300"
                 aria-label="Email"
               >

@@ -50,6 +50,13 @@ export async function PUT(
 
   const { productIds, ...lookData } = body;
 
+  if (productIds !== undefined && (!Array.isArray(productIds) || productIds.length === 0)) {
+    return NextResponse.json(
+      { error: 'Un look doit contenir au moins 1 produit.' },
+      { status: 400 },
+    );
+  }
+
   const { data: look, error: lookError } = await supabase
     .from('looks')
     .update({ ...lookData, updated_at: new Date().toISOString() })
@@ -63,7 +70,14 @@ export async function PUT(
 
   // Update look_products if provided
   if (productIds !== undefined) {
-    await supabase.from('look_products').delete().eq('look_id', id);
+    const { error: delLpError } = await supabase.from('look_products').delete().eq('look_id', id);
+    if (delLpError) {
+      console.error('[admin looks PUT] delete look_products failed:', delLpError);
+      return NextResponse.json(
+        { error: 'Impossible de mettre à jour les produits du look.' },
+        { status: 500 },
+      );
+    }
     if (productIds.length > 0) {
       const lookProducts = productIds.map((pid, idx) => ({
         look_id: id,

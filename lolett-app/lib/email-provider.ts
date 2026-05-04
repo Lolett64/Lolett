@@ -2,13 +2,13 @@ import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import React from 'react';
 
-// --- Brevo SMTP (primary) ---
-const brevoTransport = nodemailer.createTransport({
-  host: process.env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com',
-  port: Number(process.env.BREVO_SMTP_PORT) || 587,
+// --- SMTP (primary) — Gmail SMTP par défaut, configurable via SMTP_HOST/PORT/USER/PASSWORD ---
+const smtpTransport = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT) || 587,
   auth: {
-    user: process.env.BREVO_SMTP_USER,
-    pass: process.env.BREVO_SMTP_PASSWORD,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
@@ -19,14 +19,20 @@ function getResendClient() {
 
 const DEFAULT_FROM =
   process.env.NODE_ENV === 'production'
-    ? 'LOLETT <contact@lolett.fr>'
+    ? 'LOLETT <contact.lolett@gmail.com>'
     : 'LOLETT <onboarding@resend.dev>';
+
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+}
 
 interface SendOptions {
   from?: string;
   to: string;
   subject: string;
   html: string;
+  attachments?: EmailAttachment[];
 }
 
 interface SendReactOptions {
@@ -36,22 +42,23 @@ interface SendReactOptions {
   react: React.ReactElement;
 }
 
-async function sendViaBrevo(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
-  if (!process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASSWORD) {
-    return { success: false, error: 'Brevo SMTP not configured' };
+async function sendViaSmtp(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+    return { success: false, error: 'SMTP not configured' };
   }
   try {
-    await brevoTransport.sendMail({
+    await smtpTransport.sendMail({
       from: opts.from || DEFAULT_FROM,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
+      attachments: opts.attachments,
     });
-    console.log(`[Email] Sent via Brevo to ${opts.to}`);
+    console.log(`[Email] Sent via SMTP to ${opts.to}`);
     return { success: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Brevo error';
-    console.error('[Email] Brevo failed:', message);
+    const message = err instanceof Error ? err.message : 'SMTP error';
+    console.error('[Email] SMTP failed:', message);
     return { success: false, error: message };
   }
 }
@@ -63,6 +70,7 @@ async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; err
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
+      attachments: opts.attachments?.map((a) => ({ filename: a.filename, content: a.content })),
     });
     if (error) {
       console.error('[Email] Resend error:', error);
@@ -78,13 +86,13 @@ async function sendViaResend(opts: SendOptions): Promise<{ success: boolean; err
 }
 
 /**
- * Send HTML email — Brevo first, Resend fallback
+ * Send HTML email — SMTP (Gmail) first, Resend fallback
  */
 export async function sendHtmlEmail(opts: SendOptions): Promise<{ success: boolean; error?: string }> {
-  const brevoResult = await sendViaBrevo(opts);
-  if (brevoResult.success) return brevoResult;
+  const smtpResult = await sendViaSmtp(opts);
+  if (smtpResult.success) return smtpResult;
 
-  console.warn('[Email] Brevo failed, falling back to Resend...');
+  console.warn('[Email] SMTP failed, falling back to Resend...');
   return sendViaResend(opts);
 }
 

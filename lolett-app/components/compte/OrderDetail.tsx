@@ -11,13 +11,16 @@ import { cn, formatPrice } from '@/lib/utils';
 const statusSteps = ['pending', 'confirmed', 'paid', 'shipped', 'delivered'];
 const statusLabels: Record<string, string> = {
   pending: 'En attente',
-  confirmed: 'Confirmee',
-  paid: 'Payee',
-  shipped: 'Expediee',
-  delivered: 'Livree',
-  cancelled: 'Annulee',
-  refunded: 'Remboursee',
-  expired: 'Expiree',
+  confirmed: 'Confirmée',
+  paid: 'Payée',
+  shipped: 'Expédiée',
+  delivered: 'Livrée',
+  cancelled: 'Annulée',
+  refunded: 'Remboursée',
+  partially_refunded: 'Partiellement remboursée',
+  disputed: 'Litige en cours',
+  payment_review: 'Vérification paiement',
+  expired: 'Expirée',
 };
 
 export function OrderDetail({ orderId }: { orderId: string }) {
@@ -72,7 +75,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         </div>
 
         {/* Status timeline */}
-        {!['cancelled', 'refunded', 'expired'].includes(order.status) && (
+        {!['cancelled', 'refunded', 'partially_refunded', 'disputed', 'expired'].includes(order.status) && (
           <div className="mb-8">
             <div className="flex items-center justify-between">
               {statusSteps.map((step, i) => (

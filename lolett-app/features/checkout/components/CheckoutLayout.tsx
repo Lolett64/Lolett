@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { TrustBadges } from '@/components/ui/TrustBadges';
 import { formatPrice } from '@/lib/utils';
 import { VAT, computeVAT } from '@/lib/constants';
+import { useCartStore, useValidatedPromo } from '@/features/cart';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutForm } from './CheckoutForm';
 import { PaymentStep } from './PaymentStep';
@@ -30,6 +31,13 @@ interface CheckoutLayoutProps {
 }
 
 export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, total }: CheckoutLayoutProps) {
+  const giftCard = useCartStore((s) => s.giftCard);
+  const { promo, promoAmount } = useValidatedPromo(subtotal);
+
+  const totalAfterPromo = Math.max(0, +(total - promoAmount).toFixed(2));
+  const giftCardRedeem = giftCard ? Math.min(giftCard.balance, totalAfterPromo) : 0;
+  const payableTotal = Math.max(0, +(totalAfterPromo - giftCardRedeem).toFixed(2));
+
   return (
     <div className="ckv-page">
       <div className="container">
@@ -51,6 +59,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                 <CheckoutForm
                   formData={checkout.formData}
                   isFormValid={checkout.isFormValid}
+                  formErrors={checkout.formErrors}
                   savedAddresses={checkout.savedAddresses}
                   selectedAddressId={checkout.selectedAddressId}
                   loadingAddresses={checkout.loadingAddresses}
@@ -58,6 +67,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                   setAddressFields={checkout.setAddressFields}
                   goToPayment={checkout.goToPayment}
                   selectAddress={checkout.selectAddress}
+                  subtotal={subtotal}
                 />
               )}
               {checkout.step === 2 && (
@@ -65,7 +75,7 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                   onBack={checkout.goBackToShipping}
                   onConfirm={() => checkout.handleSubmit()}
                   isSubmitting={checkout.isSubmitting}
-                  total={total}
+                  total={payableTotal}
                   paymentMethod={checkout.paymentMethod}
                   onMethodChange={checkout.setPaymentMethod}
                 />
@@ -123,16 +133,28 @@ export function CheckoutLayout({ checkout, cartProducts, subtotal, shipping, tot
                     )}
                   </span>
                 </div>
+                {promo && promoAmount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62' }}>
+                    <span>Code promo ({promo.code})</span>
+                    <span style={{ color: '#B89547' }}>-{formatPrice(promoAmount)}</span>
+                  </div>
+                )}
+                {giftCard && giftCardRedeem > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#7A6E62' }}>
+                    <span>Carte cadeau ({giftCard.code})</span>
+                    <span style={{ color: '#B89547' }}>-{formatPrice(giftCardRedeem)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="ckv-divider" />
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#2C2420' }}>Total TTC</span>
-                <span style={{ fontSize: 18, fontWeight: 600, color: '#2C2420', fontFamily: "'Cormorant Garamond', serif" }}>{formatPrice(total)}</span>
+                <span style={{ fontSize: 18, fontWeight: 600, color: '#2C2420', fontFamily: "'Cormorant Garamond', serif" }}>{formatPrice(payableTotal)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: 11, color: '#9B8E82', marginTop: 4 }}>
-                <span>Dont TVA {Math.round(VAT.RATE * 100)}% : {formatPrice(computeVAT(total).vat)}</span>
+                <span>Dont TVA {Math.round(VAT.RATE * 100)}% : {formatPrice(computeVAT(payableTotal).vat)}</span>
               </div>
 
               <div style={{ marginTop: 20 }}>

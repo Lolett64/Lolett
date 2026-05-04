@@ -36,7 +36,7 @@ test.describe('Parcours boutique', () => {
 
     await page.waitForURL('**/produit/**');
     await expect(page).toHaveURL(/\/produit\//);
-    await expect(page.getByText('Ajouter au panier')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: 'Ajouter au panier' })).toBeVisible({ timeout: 10_000 });
   });
 
   test('la trust bar est visible sur /shop', async ({ page }) => {

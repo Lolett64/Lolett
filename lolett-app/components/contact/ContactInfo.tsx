@@ -16,10 +16,10 @@ export function ContactInfo() {
             <div>
               <p className="text-lolett-gray-900 font-medium">Email</p>
               <a
-                href="mailto:hello@lolett.com"
+                href="mailto:contact.lolett@gmail.com"
                 className="text-lolett-gray-600 hover:text-lolett-gold transition-colors"
               >
-                hello@lolett.com
+                contact.lolett@gmail.com
               </a>
             </div>
           </div>

@@ -5,20 +5,26 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderShipped } from '@/lib/email/order-shipped';
 import { sendOrderDelivered } from '@/lib/email/order-delivered';
 import { sendOrderCancelled } from '@/lib/email/order-cancelled';
-import { sendOrderRefunded } from '@/lib/email/order-refunded';
 
+// Note : 'refunded', 'partially_refunded' et 'disputed' sont VOLONTAIREMENT
+// absents — ces statuts sont gérés par les webhooks Stripe (charge.refunded,
+// charge.dispute.created) et l'endpoint POST /api/admin/orders/:id/refund.
+// Permettre une transition manuelle créerait un état "refunded en DB sans
+// remboursement Stripe" = perte d'argent.
+// 'payment_review' est inclus pour que Lola puisse SORTIR de cet état
+// (vers 'paid' ou 'cancelled') une fois le cas gift card résolu.
 const ORDER_STATUSES = [
   'pending', 'paid', 'confirmed', 'shipped', 'delivered',
-  'cancelled', 'refunded', 'expired',
+  'cancelled', 'payment_review', 'expired',
 ] as const;
 
 const PatchSchema = z.object({
   status: z.enum(ORDER_STATUSES).optional(),
   trackingNumber: z.string().max(50).optional(),
   adminNotes: z.string().max(2000).nullable().optional(),
-  refundAmount: z.number().positive().optional(),
-  refundReason: z.string().max(500).optional(),
   cancelReason: z.string().max(500).optional(),
+  // Pas de refundAmount/refundReason ici — le refund passe par
+  // POST /api/admin/orders/:id/refund qui appelle Stripe.
 });
 
 type OrderCustomer = {
@@ -93,17 +99,30 @@ export async function PATCH(
     return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
   }
 
+  // Defence-in-depth : Zod a déjà retiré 'refunded'/'partially_refunded'/'disputed'
+  // de la liste autorisée, mais on ajoute un guard runtime au cas où la liste
+  // évoluerait par mégarde — empêche absolument toute transition manuelle
+  // vers ces statuts gérés par Stripe.
+  const STRIPE_MANAGED_STATUSES = new Set(['refunded', 'partially_refunded', 'disputed']);
+  if (body.status && STRIPE_MANAGED_STATUSES.has(body.status)) {
+    return NextResponse.json(
+      {
+        error: 'Statut géré automatiquement par Stripe. Pour rembourser, utilisez "Rembourser via Stripe". Pour les litiges, ils sont créés automatiquement par Stripe.',
+      },
+      { status: 400 },
+    );
+  }
+
   const now = new Date().toISOString();
   const updatePayload: Record<string, unknown> = { updated_at: now };
 
   if (body.status) updatePayload.status = body.status;
   if (body.trackingNumber !== undefined) updatePayload.tracking_number = body.trackingNumber;
   if (body.adminNotes !== undefined) updatePayload.admin_notes = body.adminNotes;
-  if (body.refundAmount !== undefined) updatePayload.refund_amount = body.refundAmount;
-  if (body.refundReason !== undefined) updatePayload.refund_reason = body.refundReason;
   if (body.cancelReason !== undefined) updatePayload.cancel_reason = body.cancelReason;
 
   // Auto-set lifecycle timestamps on status transitions
+  // Note : refunded_at est set par le webhook charge.refunded, pas ici.
   if (body.status && body.status !== currentOrder.status) {
     if (body.status === 'shipped' && !currentOrder.shipped_at) {
       updatePayload.shipped_at = now;
@@ -113,9 +132,6 @@ export async function PATCH(
     }
     if (body.status === 'cancelled' && !currentOrder.cancelled_at) {
       updatePayload.cancelled_at = now;
-    }
-    if (body.status === 'refunded' && !currentOrder.refunded_at) {
-      updatePayload.refunded_at = now;
     }
   }
 
@@ -157,6 +173,9 @@ export async function PATCH(
         shipping: Number(updated.shipping),
         total: Number(updated.total),
         trackingNumber: body.trackingNumber || (updated.tracking_number as string | undefined),
+        shippingMethod: (updated.shipping_method as 'home' | 'mondial_relay' | null) ?? undefined,
+        shippingCarrier: (updated.shipping_carrier as 'colissimo' | 'mondial_relay' | null) ?? undefined,
+        pickupPoint: (updated.pickup_point as import('@/types').PickupPoint | null) ?? null,
       }).catch((err: unknown) => console.error('[Admin orders PATCH] Shipped email error:', err));
     }
 
@@ -179,16 +198,8 @@ export async function PATCH(
       }).catch((err: unknown) => console.error('[Admin orders PATCH] Cancelled email error:', err));
     }
 
-    if (body.status === 'refunded') {
-      const amount = body.refundAmount ?? Number(updated.refund_amount) ?? Number(updated.total);
-      sendOrderRefunded({
-        to: customer.email,
-        orderNumber,
-        firstName: customer.firstName,
-        amount,
-        reason: body.refundReason,
-      }).catch((err: unknown) => console.error('[Admin orders PATCH] Refunded email error:', err));
-    }
+    // Note : pas de branche 'refunded' ici — l'email de remboursement est
+    // envoyé par le webhook charge.refunded (cf. app/api/webhooks/stripe/route.ts).
   }
 
   return NextResponse.json({ order: updated });

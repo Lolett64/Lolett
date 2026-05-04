@@ -55,7 +55,7 @@ export function renderWelcomeNewsletterV3(data: WelcomeEmailData, overrides?: Em
           <tr>
             <td align="center" style="padding-bottom: 20px;">
               <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: 36px; color: #2C2420; line-height: 1.2;">
-                ${overrides?.greeting ? overrides.greeting.replace('{firstName}', name) : (name ? `${name}, vous êtes<br />des nôtres.` : `Vous êtes<br />des nôtres.`)}
+                ${overrides?.greeting ? overrides.greeting.replace(/\{\{?\s*firstName\s*\}?\}/g, name) : (name ? `${name}, vous êtes<br />des nôtres.` : `Vous êtes<br />des nôtres.`)}
               </h1>
             </td>
           </tr>

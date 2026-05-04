@@ -1,4 +1,4 @@
-import type { CustomerInfo, Order } from '@/types';
+import type { CustomerInfo, Order, PickupPoint } from '@/types';
 
 export type DbProduct = {
   id: string;
@@ -61,6 +61,16 @@ export type DbOrder = {
   customer: CustomerInfo;
   total: number;
   shipping: number;
+  promo_code: string | null;
+  promo_discount: number | null;
+  gift_card_code: string | null;
+  gift_card_amount: number | null;
+  shipping_method: Order['shippingMethod'] | null;
+  shipping_carrier: Order['shippingCarrier'] | null;
+  shipping_country: string | null;
+  pickup_point: PickupPoint | null;
+  invoice_pdf_url: string | null;
+  invoice_number: string | null;
   status: Order['status'];
   payment_provider: Order['paymentProvider'] | null;
   payment_id: string | null;

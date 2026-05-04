@@ -81,7 +81,7 @@ export function renderContactAcknowledgment({ name }: ContactAcknowledgmentProps
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="border: 1px solid #C4956A; border-radius: 50px; padding: 13px 44px;">
-                    <a href="https://lolett.fr/shop" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
+                    <a href="https://lolettshop.com/shop" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
                       Découvrir la boutique
                     </a>
                   </td>
@@ -107,7 +107,7 @@ export function renderContactAcknowledgment({ name }: ContactAcknowledgmentProps
                 LOLETT — Mode du Sud-Ouest
               </p>
               <p style="margin: 4px 0 0; font-size: 11px;">
-                <a href="https://lolett.fr" style="color: #B5A99A; text-decoration: none;">lolett.fr</a>
+                <a href="https://lolettshop.com" style="color: #B5A99A; text-decoration: none;">lolettshop.com</a>
               </p>
             </td>
           </tr>

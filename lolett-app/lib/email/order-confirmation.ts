@@ -1,15 +1,23 @@
 import { sendHtmlEmail } from '@/lib/email-provider';
 import { renderOrderConfirmationV3 } from './templates/order-confirmation-v3';
 import { getEmailSettings } from '@/lib/cms/emails';
+import type { ShippingMethod, PickupPoint } from '@/types';
 
 interface OrderEmailData {
   to: string;
   orderNumber: string;
   items: { productName: string; size: string; quantity: number; price: number }[];
-  customer: { firstName: string; lastName: string; address: string; city: string; postalCode: string; country?: string };
+  customer: { firstName: string; lastName: string; address: string; city: string; postalCode: string; country?: string; phone?: string };
   subtotal: number;
   shipping: number;
   total: number;
+  promoCode?: string;
+  promoDiscount?: number;
+  giftCardCode?: string;
+  giftCardAmount?: number;
+  shippingMethod?: ShippingMethod;
+  pickupPoint?: PickupPoint | null;
+  invoicePdf?: { buffer: Buffer; filename: string };
 }
 
 export async function sendOrderConfirmation(data: OrderEmailData) {
@@ -35,6 +43,13 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
       subtotal: data.subtotal,
       shipping: data.shipping,
       total: data.total,
+      promoCode: data.promoCode,
+      promoDiscount: data.promoDiscount,
+      giftCardCode: data.giftCardCode,
+      giftCardAmount: data.giftCardAmount,
+      shippingMethod: data.shippingMethod,
+      pickupPoint: data.pickupPoint ?? null,
+      phone: data.customer.phone,
       address: {
         firstName: data.customer.firstName,
         lastName: data.customer.lastName,
@@ -55,6 +70,9 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
       to: data.to,
       subject,
       html,
+      attachments: data.invoicePdf
+        ? [{ filename: data.invoicePdf.filename, content: data.invoicePdf.buffer }]
+        : undefined,
     });
 
     if (result.success) {

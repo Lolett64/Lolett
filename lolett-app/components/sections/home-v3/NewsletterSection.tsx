@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, type FormEvent } from 'react';
 import { AtSign } from 'lucide-react';
 import { ScrollReveal } from '@/components/editorial/ScrollReveal';
 
@@ -7,6 +10,30 @@ interface NewsletterSectionProps {
 }
 
 export function NewsletterSection({ content, hexColor = '#FFFFFF' }: NewsletterSectionProps) {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setStatus('loading');
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'home' }),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setEmail('');
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
+  }
+
   return (
     <section
       className="text-[#1B0B94] py-16 px-6 lg:px-12 text-center overflow-hidden border-t border-[#1B0B94]/5"
@@ -29,26 +56,43 @@ export function NewsletterSection({ content, hexColor = '#FFFFFF' }: NewsletterS
             {content?.description || "Inscrivez-vous pour recevoir nos nouvelles créations et exclusivités."}
           </p>
 
-          <form className="w-full max-w-lg mx-auto group">
-            <div className="flex flex-col sm:flex-row items-center gap-4 border-b border-[#1B0B94]/20 pb-2 transition-all focus-within:border-[#1B0B94]">
-              <input
-                type="email"
-                placeholder={content?.placeholder_text || "VOTRE ADRESSE ÉLECTRONIQUE"}
-                className="flex-1 bg-transparent py-4 text-[#1B0B94] text-[10px] tracking-[0.2em] placeholder:text-[#1B0B94]/30 focus:outline-none min-w-0 uppercase w-full sm:w-auto text-center"
-                aria-label="Adresse email"
-              />
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-8 py-4 bg-[#1B0B94] text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#B89547] transition-all duration-500 shadow-sm"
-              >
-                {content?.button_text || "Rejoindre"}
-              </button>
-            </div>
-
-            <p className="text-[8px] uppercase tracking-[0.2em] text-[#1B0B94]/40 mt-6 text-center w-full">
-              {content?.disclaimer || 'Pas de spam, promis. Désinscription en un clic.'}
+          {status === 'success' ? (
+            <p className="text-sm font-[family-name:var(--font-montserrat)] text-[#B89547] tracking-widest uppercase py-6">
+              Merci, bienvenue dans le cercle LOLETT.
             </p>
-          </form>
+          ) : (
+            <form onSubmit={onSubmit} className="w-full max-w-lg mx-auto group">
+              <div className="flex flex-col sm:flex-row items-center gap-4 border-b border-[#1B0B94]/20 pb-2 transition-all focus-within:border-[#1B0B94]">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={content?.placeholder_text || "VOTRE ADRESSE ÉLECTRONIQUE"}
+                  className="flex-1 bg-transparent py-4 text-[#1B0B94] text-[10px] tracking-[0.2em] placeholder:text-[#1B0B94]/30 focus:outline-none min-w-0 uppercase w-full sm:w-auto text-center"
+                  aria-label="Adresse email"
+                  disabled={status === 'loading'}
+                />
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="w-full sm:w-auto px-8 py-4 bg-[#1B0B94] text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#B89547] transition-all duration-500 shadow-sm disabled:opacity-60"
+                >
+                  {status === 'loading' ? '…' : content?.button_text || 'Rejoindre'}
+                </button>
+              </div>
+
+              {status === 'error' ? (
+                <p className="text-[8px] uppercase tracking-[0.2em] text-red-600 mt-6 text-center w-full">
+                  Une erreur est survenue, merci de réessayer.
+                </p>
+              ) : (
+                <p className="text-[8px] uppercase tracking-[0.2em] text-[#1B0B94]/40 mt-6 text-center w-full">
+                  {content?.disclaimer || 'Pas de spam, promis. Désinscription en un clic.'}
+                </p>
+              )}
+            </form>
+          )}
         </ScrollReveal>
 
       </div>

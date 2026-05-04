@@ -50,6 +50,13 @@ export async function POST(request: Request) {
 
   const { productIds, ...lookData } = body;
 
+  if (!Array.isArray(productIds) || productIds.length === 0) {
+    return NextResponse.json(
+      { error: 'Un look doit contenir au moins 1 produit.' },
+      { status: 400 },
+    );
+  }
+
   const { data: look, error: lookError } = await supabase
     .from('looks')
     .insert([lookData])

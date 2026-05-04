@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Mentions Légales — LOLETT',
@@ -20,7 +20,7 @@ export default function MentionsLegalesPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">1. Éditeur du site</h2>
             <p>
-              Le site <strong>lolett.fr</strong> est édité par :<br />
+              Le site <strong>lolettshop.com</strong> est édité par :<br />
               <strong>LOLETT</strong><br />
               Forme juridique : Micro-entreprise — Entrepreneur individuel<br />
               Siège social : 30 avenue Honoré Baradat, 64000 Pau, France<br />

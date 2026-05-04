@@ -1,6 +1,7 @@
 import { sendHtmlEmail } from '@/lib/email-provider';
 import { renderOrderShippedV3 } from './templates/order-shipped-v3';
 import { getEmailSettings } from '@/lib/cms/emails';
+import type { ShippingCarrier, ShippingMethod, PickupPoint } from '@/types';
 
 interface OrderShippedData {
   to: string;
@@ -11,6 +12,9 @@ interface OrderShippedData {
   shipping: number;
   total: number;
   trackingNumber?: string;
+  shippingMethod?: ShippingMethod;
+  shippingCarrier?: ShippingCarrier;
+  pickupPoint?: PickupPoint | null;
 }
 
 export async function sendOrderShipped(data: OrderShippedData) {
@@ -45,6 +49,9 @@ export async function sendOrderShipped(data: OrderShippedData) {
         country: data.customer.country || 'France',
       },
       trackingNumber: data.trackingNumber,
+      shippingMethod: data.shippingMethod,
+      shippingCarrier: data.shippingCarrier,
+      pickupPoint: data.pickupPoint ?? null,
     }, overrides);
 
     const fromName = settings?.from_name || 'LOLETT';

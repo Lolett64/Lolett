@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolett.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 
 export const metadata: Metadata = {
   title: 'Politique de Confidentialité — LOLETT',
@@ -78,8 +78,8 @@ export default function ConfidentialitePage() {
               <li><strong>Stripe</strong> — traitement des paiements</li>
               <li><strong>Vercel</strong> — hébergement du site</li>
               <li><strong>Supabase</strong> — base de données et authentification</li>
-              <li><strong>Brevo</strong> — envoi d'emails transactionnels et marketing</li>
-              <li><strong>Transporteurs</strong> — livraison des commandes</li>
+              <li><strong>Google (Gmail SMTP) et Resend</strong> — envoi d'emails transactionnels et marketing</li>
+              <li><strong>Transporteurs</strong> (La Poste / Colissimo, Mondial Relay) — livraison des commandes</li>
             </ul>
             <p className="mt-2">
               Aucune donnée n'est vendue à des tiers. Les sous-traitants sont soumis à des obligations de confidentialité conformes au RGPD.

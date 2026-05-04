@@ -1,7 +1,22 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { readAdminCookieFromHeader, verifyAdminToken } from '@/lib/admin/token';
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  const isAdminPublicRoute =
+    pathname === '/api/admin/auth/login' ||
+    pathname === '/api/admin/auth/logout';
+
+  if (pathname.startsWith('/api/admin/') && !isAdminPublicRoute) {
+    const cookieValue = readAdminCookieFromHeader(request.headers.get('cookie'));
+    const isAuth = cookieValue ? await verifyAdminToken(cookieValue) : false;
+    if (!isAuth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

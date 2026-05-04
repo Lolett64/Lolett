@@ -4,6 +4,20 @@ import type { Product, ProductVariant } from '@/types';
 import type { DbProduct, DbProductVariant } from './supabase-types';
 import { mapProduct, mapVariant } from './supabase-mappers';
 
+/**
+ * Trie en place un tableau de produits en plaçant les produits épuisés
+ * (stock = 0) en dernier tout en préservant l'ordre relatif initial.
+ * Utilisé côté shop pour éviter de mettre en avant des produits
+ * indisponibles à l'achat.
+ */
+function sortSoldOutLast<T extends { stock: number }>(products: T[]): T[] {
+  return [...products].sort((a, b) => {
+    const aOut = (a.stock ?? 0) <= 0 ? 1 : 0;
+    const bOut = (b.stock ?? 0) <= 0 ? 1 : 0;
+    return aOut - bOut;
+  });
+}
+
 async function loadProductVariants(supabase: ReturnType<typeof createPublicClient>, productId: string): Promise<ProductVariant[]> {
   const { data, error } = await supabase
     .from('product_variants')
@@ -56,7 +70,7 @@ export class SupabaseProductRepository implements ProductRepository {
       })
     );
 
-    return products;
+    return sortSoldOutLast(products);
   }
 
   async findById(id: string): Promise<Product | null> {
@@ -106,7 +120,7 @@ export class SupabaseProductRepository implements ProductRepository {
       })
     );
 
-    return products;
+    return sortSoldOutLast(products);
   }
 
   async findByIds(ids: string[]): Promise<Product[]> {

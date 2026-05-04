@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { CartSummary } from '@/components/cart/CartSummary';
 
 // Mock next/link
@@ -21,7 +21,7 @@ describe('CartSummary', () => {
     const livraisonRow = screen.getByText('Livraison').closest('div')!;
     expect(livraisonRow.textContent).toContain('5,90');
     // Total
-    const totalRow = screen.getByText('Total').closest('div')!;
+    const totalRow = screen.getByText('Total TTC').closest('div')!;
     expect(totalRow.textContent).toContain('85,90');
   });
 

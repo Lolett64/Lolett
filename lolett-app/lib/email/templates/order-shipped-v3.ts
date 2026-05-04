@@ -3,6 +3,9 @@
  * Ultra-refined, generous whitespace, thin lines, soft golden touches
  */
 
+import { getTrackingUrl } from '@/lib/constants';
+import type { ShippingCarrier, ShippingMethod, PickupPoint } from '@/types';
+
 interface ShippedItem {
   productName: string;
   size: string;
@@ -26,6 +29,9 @@ interface ShippedEmailData {
     country: string;
   };
   trackingNumber?: string;
+  shippingMethod?: ShippingMethod;
+  shippingCarrier?: ShippingCarrier;
+  pickupPoint?: PickupPoint | null;
 }
 
 export interface EmailOverrides {
@@ -93,7 +99,7 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
           <tr>
             <td align="center" style="padding-bottom: 8px;">
               <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: 38px; color: #2C2420; line-height: 1.15;">
-                ${overrides?.greeting?.replace('{firstName}', data.firstName) || `Bonne nouvelle, ${data.firstName} !`}
+                ${overrides?.greeting?.replace(/\{\{?\s*firstName\s*\}?\}/g, data.firstName) || `Bonne nouvelle, ${data.firstName} !`}
               </h1>
             </td>
           </tr>
@@ -173,18 +179,27 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
             </td>
           </tr>
 
-          <!-- Tracking (only if provided) - Mondial Relay -->
+          <!-- Tracking (only if provided) — adapté au transporteur -->
           ${data.trackingNumber ? (() => {
-            const trackingUrl = `https://www.mondialrelay.fr/suivi-de-colis?NumeroExpedition=${encodeURIComponent(data.trackingNumber!)}&CodePostal=${encodeURIComponent(data.address.postalCode)}`;
+            const carrier: ShippingCarrier = data.shippingCarrier ?? (data.shippingMethod === 'mondial_relay' ? 'mondial_relay' : 'colissimo');
+            const carrierLabel = carrier === 'mondial_relay' ? 'Mondial Relay' : 'Colissimo';
+            const trackingUrl = getTrackingUrl(carrier, data.trackingNumber!);
+            const pickupBlock = (carrier === 'mondial_relay' && data.pickupPoint) ? `
+                    <p style="margin: 8px 0 0; font-size: 12px; color: #7A6E62; line-height: 1.5;">
+                      Retrait au point relais&nbsp;:
+                      <strong style="color: #2C2420;">${data.pickupPoint.name}</strong>,
+                      ${data.pickupPoint.address}, ${data.pickupPoint.postalCode} ${data.pickupPoint.city}
+                    </p>` : '';
             return `<tr>
             <td style="padding: 0 8px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="width: 3px; background: #C4956A; border-radius: 2px;"></td>
                   <td style="padding-left: 18px;">
-                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Suivi Mondial Relay</p>
-                    <p style="margin: 0 0 8px; font-size: 13px; color: #2C2420;">N° de suivi : ${data.trackingNumber}</p>
+                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Suivi ${carrierLabel}</p>
+                    <p style="margin: 0 0 8px; font-size: 13px; color: #2C2420;">N&deg; de suivi&nbsp;: ${data.trackingNumber}</p>
                     <a href="${trackingUrl}" style="display: inline-block; font-size: 12px; color: #C4956A; text-decoration: underline; letter-spacing: 0.04em;">Suivre mon colis &rarr;</a>
+                    ${pickupBlock}
                   </td>
                 </tr>
               </table>

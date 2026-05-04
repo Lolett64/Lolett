@@ -1,3 +1,21 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/backup",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/backup-invoices",
+      "schedule": "0 3 1 * *"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.lolettshop.com" }],
+      "destination": "https://lolettshop.com/:path*",
+      "permanent": true
+    }
+  ]
 }

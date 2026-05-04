@@ -1,17 +1,21 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
 import { OrderStatusUpdate } from '@/components/admin/OrderStatusUpdate';
+import { RefundDialog } from '@/components/admin/RefundDialog';
 import { formatPrice, formatDate } from '@/lib/admin/utils';
-import { computeVAT, VAT } from '@/lib/constants';
+import { computeVAT, VAT, SHIPPING_METHODS, SHIPPING_COUNTRIES } from '@/lib/constants';
+import { getAlreadyRefundedQtyMap, refundItemKey } from '@/lib/orders/refund-tracking';
+import type { PickupPoint, ShippingMethod, ShippingCarrier, ShippingCountryCode } from '@/types';
 
 interface OrderItem {
   id: string;
-  product_id: string;
+  product_id: string | null;
   product_name: string;
   size: string;
   color: string | null;
@@ -34,6 +38,16 @@ interface OrderDetail {
   };
   total: number;
   shipping: number;
+  promo_code: string | null;
+  promo_discount: number | null;
+  gift_card_code: string | null;
+  gift_card_amount: number | null;
+  shipping_method: ShippingMethod | null;
+  shipping_carrier: ShippingCarrier | null;
+  shipping_country: ShippingCountryCode | null;
+  pickup_point: PickupPoint | null;
+  invoice_number: string | null;
+  invoice_pdf_url: string | null;
   status: string;
   payment_provider: string;
   payment_id: string;
@@ -46,6 +60,11 @@ interface OrderDetail {
   delivered_at: string | null;
   cancelled_at: string | null;
   refunded_at: string | null;
+  disputed_at: string | null;
+  dispute_id: string | null;
+  dispute_status: string | null;
+  dispute_reason: string | null;
+  dispute_amount: number | null;
   created_at: string;
   updated_at: string;
   items: OrderItem[];
@@ -71,9 +90,17 @@ export default async function OrderDetailPage({
 
   if (!order) notFound();
 
-  const subtotal = order.total - order.shipping;
+  const promoDiscount = Number(order.promo_discount ?? 0);
+  const giftCardAmount = Number(order.gift_card_amount ?? 0);
+  const subtotal = +(order.total + promoDiscount + giftCardAmount - order.shipping).toFixed(2);
   const { vat: vatAmount } = computeVAT(order.total);
   const vatPercent = Math.round(VAT.RATE * 100);
+
+  // Parsing des refunds Stripe pour griser les items déjà remboursés dans le dialog.
+  const alreadyRefundedQtyByItemId =
+    order.payment_provider === 'stripe'
+      ? await buildAlreadyRefundedQtyByItemId(order)
+      : {};
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl">
@@ -99,8 +126,8 @@ export default async function OrderDetailPage({
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {/* Lifecycle history (shipped / delivered / cancelled / refunded) */}
-      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at) && (
+      {/* Lifecycle history (shipped / delivered / cancelled / refunded / disputed) */}
+      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at || order.disputed_at) && (
         <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
           <CardHeader>
             <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Historique</CardTitle>
@@ -144,6 +171,36 @@ export default async function OrderDetailPage({
                 )}
               </div>
             )}
+            {order.disputed_at && (
+              <div className="flex flex-col gap-1">
+                <p className="text-red-700">
+                  <span className="font-semibold">Litige ouvert</span> — {formatDate(order.disputed_at)}
+                  {order.dispute_amount != null && (
+                    <span className="font-semibold"> · {formatPrice(order.dispute_amount)}</span>
+                  )}
+                </p>
+                {order.dispute_reason && (
+                  <p className="pl-3 text-xs text-red-600/70 border-l-2 border-red-200">
+                    Raison Stripe : {order.dispute_reason}
+                  </p>
+                )}
+                {order.dispute_status && (
+                  <p className="pl-3 text-xs text-red-600/70 border-l-2 border-red-200">
+                    Statut : {order.dispute_status}
+                    {order.dispute_id && (
+                      <a
+                        href={`https://dashboard.stripe.com/disputes/${order.dispute_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 underline hover:text-red-800"
+                      >
+                        Voir sur Stripe →
+                      </a>
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -180,6 +237,68 @@ export default async function OrderDetailPage({
         </Card>
       </div>
 
+      {/* Mode de livraison + point relais (V1 Mondial Relay) */}
+      <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
+        <CardHeader>
+          <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Livraison</CardTitle>
+        </CardHeader>
+        <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-3 text-sm">
+          <div className="grid grid-cols-2 gap-2 text-[#1a1510]/60">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Mode</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.shipping_method ? SHIPPING_METHODS[order.shipping_method].label : 'Domicile (legacy)'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Transporteur</p>
+              <p className="text-[#1a1510] font-medium capitalize">
+                {(order.shipping_carrier ?? 'colissimo').replace('_', ' ')}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">Pays</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.shipping_country
+                  ? SHIPPING_COUNTRIES.find((c) => c.code === order.shipping_country)?.name ?? order.shipping_country
+                  : order.customer.country}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40">T&eacute;l&eacute;phone</p>
+              <p className="text-[#1a1510] font-medium">
+                {order.customer.phone ? (
+                  <a href={`tel:${order.customer.phone}`} className="hover:underline">{order.customer.phone}</a>
+                ) : '—'}
+              </p>
+            </div>
+          </div>
+
+          {order.pickup_point && (
+            <div className="rounded-lg border border-[#E8D9C4] bg-[#FFFBF7] p-4">
+              <p className="text-xs uppercase tracking-wider text-[#B89547] font-medium mb-2">
+                Point Relais à recopier dans le dashboard MR Pro
+              </p>
+              <p className="font-medium text-[#1a1510]">{order.pickup_point.name}</p>
+              <p className="text-[#1a1510]/70 mt-1">{order.pickup_point.address}</p>
+              <p className="text-[#1a1510]/70">
+                {order.pickup_point.postalCode} {order.pickup_point.city} · {order.pickup_point.country}
+              </p>
+              <p className="mt-2 font-mono text-xs text-[#1a1510]/60">
+                ID: <span className="text-[#1a1510]">{order.pickup_point.id}</span>
+              </p>
+            </div>
+          )}
+
+          {order.tracking_number && (
+            <div className="border-t border-[#F0EBE4] pt-3">
+              <p className="text-xs uppercase tracking-wider text-[#1a1510]/40 mb-1">N° de suivi</p>
+              <p className="font-mono text-[#1a1510]">{order.tracking_number}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Order items */}
       <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
         <CardHeader>
@@ -215,6 +334,18 @@ export default async function OrderDetailPage({
               <span>Livraison</span>
               <span>{order.shipping === 0 ? 'Gratuite' : formatPrice(order.shipping)}</span>
             </div>
+            {order.promo_code && promoDiscount > 0 && (
+              <div className="flex justify-between text-sm text-[#1a1510]/60">
+                <span>Code promo ({order.promo_code})</span>
+                <span className="text-[#B89547]">-{formatPrice(promoDiscount)}</span>
+              </div>
+            )}
+            {order.gift_card_code && giftCardAmount > 0 && (
+              <div className="flex justify-between text-sm text-[#1a1510]/60">
+                <span>Carte cadeau ({order.gift_card_code})</span>
+                <span className="text-[#B89547]">-{formatPrice(giftCardAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-semibold text-[#1a1510] mt-1">
               <span>Total TTC</span>
               <span>{formatPrice(order.total)}</span>
@@ -226,6 +357,31 @@ export default async function OrderDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      {/* Facture PDF */}
+      {(order.invoice_number || order.invoice_pdf_url) && (
+        <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
+          <CardHeader>
+            <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Facture</CardTitle>
+          </CardHeader>
+          <CardContent className="font-[family-name:var(--font-montserrat)] flex items-center justify-between text-sm">
+            <div>
+              <p className="text-[#1a1510]/40 text-xs uppercase tracking-wider">Numéro</p>
+              <p className="font-mono text-[#1a1510]">{order.invoice_number ?? '—'}</p>
+            </div>
+            {order.invoice_pdf_url && (
+              <a
+                href={order.invoice_pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#B89547]/30 text-[#B89547] hover:bg-[#FEF9EF] transition-colors text-sm font-medium"
+              >
+                Télécharger le PDF
+              </a>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Payment info */}
       <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
@@ -264,11 +420,53 @@ export default async function OrderDetailPage({
         currentStatus={order.status}
         currentTrackingNumber={order.tracking_number}
         currentAdminNotes={order.admin_notes}
-        currentRefundAmount={order.refund_amount}
-        currentRefundReason={order.refund_reason}
         currentCancelReason={order.cancel_reason}
-        orderTotal={order.total}
       />
+
+      {/* Refund via Stripe (passe par /api/admin/orders/:id/refund) */}
+      {order.payment_provider === 'stripe' && (
+        <RefundDialog
+          orderId={order.id}
+          orderTotal={Number(order.total)}
+          alreadyRefunded={Number(order.refund_amount ?? 0)}
+          status={order.status}
+          orderItems={order.items.map(i => ({
+            id: i.id,
+            product_id: i.product_id,
+            product_name: i.product_name,
+            size: i.size,
+            color: i.color,
+            quantity: i.quantity,
+            price: Number(i.price),
+          }))}
+          alreadyRefundedQtyMap={alreadyRefundedQtyByItemId}
+        />
+      )}
     </div>
   );
+}
+
+// Construit { [order_item.id]: qtyDejaRembourse } à partir des refunds Stripe parsés.
+async function buildAlreadyRefundedQtyByItemId(order: OrderDetail): Promise<Record<string, number>> {
+  if (!order.payment_id || !process.env.STRIPE_SECRET_KEY) return {};
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const refundedMap = await getAlreadyRefundedQtyMap(stripe, order.payment_id);
+    const result: Record<string, number> = {};
+    for (const item of order.items) {
+      // Items legacy avec product_id supprimé : on les marque comme totalement
+      // déjà remboursés pour éviter d'afficher "0 déjà remboursé" qui tromperait
+      // l'admin. Le RefundDialog les filtre ensuite via i.product_id === null.
+      if (!item.product_id) {
+        result[item.id] = item.quantity;
+        continue;
+      }
+      const key = refundItemKey(item.product_id, item.size, item.color);
+      const qty = refundedMap.get(key) ?? 0;
+      if (qty > 0) result[item.id] = qty;
+    }
+    return result;
+  } catch {
+    return {};
+  }
 }
