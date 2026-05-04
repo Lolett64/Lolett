@@ -1,100 +1,55 @@
-# Session State — 2026-05-04 (LAUNCH JOUR J — site en prod, 6 bugs détectés)
+# Session State — 2026-05-04 (LAUNCH JOUR J — toutes fixes prod déployées)
 
 ## Branch + Deploy
-- **Branch** : `main` HEAD `5fa27f0` (Merge preview → main: launch-ready)
-- **Vercel prod** : `dpl_8NRzMgrRzJmALkbi1FMWqgcpi28T` ✅ READY
-- **URL prod** : https://lolettshop.com (HTTP 200, 660ms)
-- **Preview** : https://lolett-njdbm1h6e-lolett64s-projects.vercel.app (HEAD `bec49fc`)
+- **Branch** : `main` HEAD `d64ebf0` (clean, pushé origin)
+- **Vercel prod actuel** : `lolett-6drlkwf85-lolett64s-projects.vercel.app` ✅ Ready
+- **URL prod** : https://lolettshop.com (HTTP 200, 768ms)
 
 ## Completed CETTE session
-1. ✅ Fix Vitest CartSummary `Total` → `Total TTC`
-2. ✅ Vitest 74/74 + TSC clean
-3. ✅ Code review pré-merge (1 trade-off account enumeration accepté, mémoire ajoutée)
-4. ✅ Playwright 22/9 (9 fails = faux positifs cookie overlay, ignorés)
-5. ✅ Commit `bec49fc` (test fix + vitest exclude e2e + .gitignore test-results)
-6. ✅ Merge preview → main (`5fa27f0`) + Vitest+TSC OK sur main
-7. ✅ Audit migrations prod : 3 RPCs manquantes identifiées
-8. ✅ Lyes a appliqué les 3 SQL via dashboard Supabase (`redeem_gift_card_atomic`, `delete_user_account_atomic`, `restock_order_items_partial`)
-9. ✅ `vercel --prod` deploy réussi → `lolettshop.com`
+1. ✅ BUG 2 checkout Stripe — env vars `CHECKOUT_REDIRECT_URL` + `NEXT_PUBLIC_BASE_URL` avaient un `\n` trailing → corrigé via dashboard Vercel + redeploy
+2. ✅ BUG 5 admin sidebar : `lg:sticky lg:top-0 lg:h-screen` + `overflow-y-auto`
+3. ✅ BUG 6 admin commande détail : retire `max-w-4xl`
+4. ✅ BUG 1 favoris : tab masquée du `CompteNav` (post-launch : redirect `/compte/favoris` à ajouter)
+5. ✅ BUG 4 panier "Vous aimerez aussi" → vraies suggestions intelligentes par genre (homme/femme/both, exclu items panier, priorise même catégorie). API `/api/products/suggestions`
+6. ✅ Notif email admin sur nouvelle commande payée (`lib/email/order-new-admin.ts`) — branchée webhook Stripe + cas full-discount checkout. Best-effort non bloquant. Subject sanitize CR/LF + cap 200.
+7. ✅ URLs réseaux Lola (lolett.eshop) : Footer fallback + SocialDropdown + MobileMenu + DB site_content (SQL appliqué)
+8. ✅ Section "Suis l'aventure" (Insta/TikTok/Facebook) ajoutée au template `launch-invitation-v3.ts`
+9. ✅ Workflow MR clarifié : Lola devra générer ses étiquettes manuellement sur connect.mondialrelay.com pour le launch
+10. ✅ Feature **Fiche d'expédition imprimable** par commande (`/admin/orders/[id]/expedition`) — pré-remplit toutes infos (destinataire, point relais, colis, poids estimé), boutons "Copier" par champ + "Tout copier" + "Imprimer". CSS print masque sidebar/header
+11. ✅ 2 code reviews passées (caf1d07 + d64ebf0), 0 critical 0 high, 1 fix mineur appliqué (warning point relais manquant)
+12. ✅ Vars Mondial Relay API 2 (CC23VAU1) ajoutées sur Vercel prod : MONDIAL_RELAY_BRAND_ID, MONDIAL_RELAY_API_LOGIN, MONDIAL_RELAY_API_PASSWORD (pour v1.1)
 
-## 🐛 6 BUGS DÉTECTÉS (détail dans `.planning/BUGS_LAUNCH_2026-05-04.md`)
+## ⚠️ BUG 3 contact form — différé v1.1
+- SMTP Gmail `getaddrinfo EBUSY` intermittent en serverless Vercel
+- Pas un bug récent — pattern aléatoire sur cold starts
+- **Fix prévu** : ajouter retry 200ms dans `lib/email-provider.ts` `sendViaSmtp` avant fallback Resend, OU basculer Resend primary une fois domaine `lolettshop.com` Verified (DNS Pending depuis 24h)
+- État Resend : DKIM + SPF/MX + SPF/TXT tous **Pending** sur https://resend.com/domains (Namecheap propagation lente)
 
-### 🔴 Critiques bloquants
-- **BUG 2** : `/checkout` → bouton "Payer 209€" ne redirige PAS vers Stripe. Aucune commande possible. Fichiers : `app/api/checkout/stripe/route.ts`, composant CheckoutContent.
-- **BUG 3** : `/contact` → UI dit "Merci envoyé" MAIS aucun email reçu sur `contact.lolett@gmail.com`. Fichiers : `app/api/contact/route.ts`, `lib/email/*`.
+## 🎯 Next Task — Validation prod + envoi WhatsApp Lola
 
-### 🟡 Cosmétiques/UX
-- **BUG 1** : `/favoris` (Zustand local) ≠ `/compte/favoris` (Supabase). 2 sources non synchronisées. Quick fix : masquer tab compte.
-- **BUG 4** : `/panier` "Vous aimerez aussi" affiche fake data homme (Polo Lin Riviera, Pantalon Coton Provence, Veste Lin Cannes, T-shirt Coton Bio) avec photos type Sézane non Lolett.
-- **BUG 5** : Admin sidebar scroll avec contenu (devrait être `position: sticky`).
-- **BUG 6** : `/admin/orders/[id]` layout étroit, beaucoup d'espace blanc à droite (max-width trop petit).
+### Immédiat (Lyes peut faire seul)
+1. **Test prod final** : aller sur lolettshop.com, faire 1 vrai paiement test (avec ta CB ou code 100%) → vérifier 3 emails arrivent (confirmation client + admin notif + facture PDF)
+2. **Si emails OK** → envoyer WhatsApp à Lola (`.planning/MESSAGE_LOLA.md`) en mentionnant que la fiche d'expédition est dispo dans l'admin
+3. **Lola lance campagne 107 contacts** depuis `/admin/launch-campaign`
 
-## 📧 Campagne ouverture (107 contacts EN ATTENTE)
-- Lola a importé 107 contacts via `/admin/launch-campaign`, aucun envoyé encore.
-- Lola demande d'**ajouter ses réseaux sociaux** dans l'email + qu'on rende le **template éditable** depuis l'admin.
-- URLs reçues de Lyes :
-  - Instagram : `https://www.instagram.com/lolett.eshop`
-  - TikTok : `https://www.tiktok.com/@lolett.eshop`
-  - Facebook : `https://www.facebook.com/share/1Lgs5JMnHZ/?mibextid=wwXIfr`
-- Template actuel : `lolett-app/lib/email/templates/launch-invitation-v3.ts` (HTML inline). À refacto pour lire depuis `email_settings` ou nouvelle table avec édition admin.
-- ⚠️ DB `site_content` contient des fallbacks `instagram.com/lolett` (sans .eshop) — à corriger aussi pour cohérence footer/header.
-- Hardcodes à fixer : `components/layout/header-parts/SocialDropdown.tsx:34,47` et `MobileMenu.tsx:127,136`.
-
-## 💬 Message à Lola (préparé, pas encore envoyé)
-- `.planning/MESSAGE_LOLA.md` contient le brouillon WhatsApp.
-- ⏸️ ON HOLD : impossible d'envoyer Lola tant que BUG 2 (checkout) bloque les ventes.
-- Lola a déjà été informée par Lyes qu'elle peut bosser sur l'admin (modifier stocks/prix) pendant le fix.
-
-## 🎯 Next Task — Fix groupé (PROCHAINE SESSION post-/compact)
-
-**Ordre recommandé** :
-
-### Phase A — Fixes critiques (~1h)
-1. **BUG 2 checkout Stripe** :
-   - `vercel inspect <deployment-url> --logs` pour voir l'erreur serveur au clic "Payer"
-   - Vérifier env vars Vercel prod (STRIPE_SECRET_KEY, STRIPE_PUBLIC_KEY, NEXT_PUBLIC_BASE_URL)
-   - Lire `app/api/checkout/stripe/route.ts` + `app/checkout/CheckoutContent.tsx`
-   - Tester en local avec mêmes env vars que prod
-2. **BUG 3 contact email** :
-   - Vérifier table DB pour voir si message persisté (= bug envoi seulement) ou pas (= bug API)
-   - `vercel logs` pour `/api/contact`
-   - Vérifier dossier Spam Gmail
-   - Comparer config SMTP Gmail avec emails de commande qui marchent
-
-### Phase B — Quick fixes UX (~30 min)
-3. **BUG 5 sidebar admin** : `position: sticky; top: 0` sur `app/admin/layout.tsx` ou `AdminSidebar.tsx`
-4. **BUG 6 layout commande** : remplacer `max-w-3xl` par `max-w-7xl` ou retirer max-width sur `/admin/orders/[id]/page.tsx`
-5. **BUG 1 favoris** : masquer tab "Mes favoris" du SidebarMenu de `/compte` (refacto Supabase post-launch)
-6. **BUG 4 fake data panier** : retirer la section "Vous aimerez aussi" du panier
-
-### Phase C — URLs réseaux + cohérence (~15 min)
-7. UPDATE `site_content` SET value = '<vraie URL>' WHERE key IN ('instagram_url', 'tiktok_url', 'facebook_url')
-8. Fixer fallbacks hardcodés dans `SocialDropdown.tsx` + `MobileMenu.tsx` → utiliser content depuis CMS
-
-### Phase D — Feature email éditable (~45 min)
-9. Migration : ajouter row `template_key='launch_invitation'` dans `email_settings` (ou nouvelle table)
-10. Refacto `launch-invitation-v3.ts` pour lire depuis DB (subject, intro, paragraphes, CTA, signature, social URLs)
-11. UI admin : ajouter bloc "Édition email lancement" dans `/admin/launch-campaign/page.tsx` avec textareas + bouton "Aperçu" + bouton "Sauvegarder"
-
-### Phase E — Validation + envoi (~30 min)
-12. `vercel --prod` redeploy
-13. Lyes re-teste sur lolettshop.com : checkout end-to-end avec carte 25€ + refund + contact form
-14. Lyes envoie WhatsApp à Lola (`.planning/MESSAGE_LOLA.md`) avec mention "édition email dispo dans admin"
-15. Lola peut lancer campagne 107 contacts quand prête
+### V1.1 (post-launch, à reprendre prochaine session)
+- BUG 3 : retry SMTP Gmail dans email-provider.ts (5 lignes) OU bascule Resend primary
+- Auto-étiquette Mondial Relay via API 2 (REST/XML — `connect-api.mondialrelay.com/api/shipment`) — credentials déjà sur Vercel. Workflow validé : modale pré-remplie + validation 2 étapes Lola pour éviter facturation accidentelle (~3,90€/étiquette)
+- Redirect `/compte/favoris` → `/compte/profil` (route orpheline)
 
 ## 🔑 Key Context
-- **Vercel projet** : `lolett64s-projects/lolett`
-- **Supabase project** : `qczdwrudgmozyxkdidmr` (PRODUCTION branch `main`)
-- **Stripe LIVE** : 4 webhooks configurés sur `lolettshop.com/api/webhooks/stripe`
-- **MCP Supabase** : `mcp__supabase-lola__execute_sql` reste read-only ; apply migration → SQL Editor manuel
-- **3 RPCs ajoutées en prod aujourd'hui** : redeem_gift_card_atomic, delete_user_account_atomic, restock_order_items_partial
-- **Tests prod faits par Lyes** : compte créé, panier 4 articles, mais checkout bloqué — pas de paiement réussi en prod encore
+- **Stripe LIVE** webhook actif sur lolettshop.com/api/webhooks/stripe ✅
+- **Supabase Redirect URLs** : `localhost:3000/**` ajouté pour dev local (pas casser prod)
+- **Mondial Relay** : Lola génère étiquettes manuellement sur connect.mondialrelay.com pour le launch. Code marque `CC23VAU1`. Auto via API en v1.1
+- **Stripe metadata sanitization** : `cleanFirst`, `cleanLast` retirent CR/LF + cap 200 chars dans subject mail admin
+- **Suggestions panier** : pool de 24 produits récents, shuffle Fisher-Yates, priorise même catégorie. Si pool insuffisant pour le genre détecté, élargit à tout le catalogue
+- **Email "from"** : toujours `contact.lolett@gmail.com` via SMTP Gmail. Resend utilisé qu'en fallback (et le sera plus en primary une fois domaine Verified)
 
 ## Pour reprendre PROCHAINE session
-Dis : **"on attaque les bugs prod, BUG 2 checkout en premier"**
-→ Je relis SESSION.md + BUGS_LAUNCH_2026-05-04.md, je lance vercel logs et tsc, et on fixe dans l'ordre proposé.
+Dis : **"on attaque la v1.1, fix BUG 3 retry SMTP en premier"** ou **"on attaque l'auto-étiquette Mondial Relay"**
+→ Je relis SESSION.md + git log, et on enchaîne.
 
 ## Notes
-- **Leçon migrations** : la prod Supabase n'a PAS le système de migration automatique du repo. À chaque feature qui ajoute des RPCs/triggers/colonnes, vérifier manuellement via MCP avant de merger en main. Pattern à intégrer dans `/token-saver fin`.
-- **Leçon read-only MCP** : `mcp__supabase-lola__execute_sql` est read-only par config, donc apply_migration ne fonctionne pas via MCP. Toujours préparer un fichier SQL et faire copier-coller à Lyes via dashboard.
-- **Pattern de bugs critiques en prod** : 2 features serveur (checkout + contact) qui marchaient en preview ne marchent pas en prod → 80% probabilité = env var manquante ou différente entre preview/prod Vercel. À vérifier en priorité avant de creuser le code.
+- **Pattern bug "feature qui marche en preview, casse en prod"** : presque toujours = env var manquante ou mal saisie. Vérifier `vercel env ls` + valeur exacte (pas de `\n` trailing) avant de creuser le code.
+- **Email serverless** : Gmail SMTP n'est PAS fait pour Vercel lambda. Resend (HTTP) est le bon choix long terme. EBUSY ~5-10% des envois en moyenne.
+- **Code reviews systematiques avant push** : pratique validée 2× cette session, prend 2 min, évite des bugs critiques (le subject SMTP non sanitisé aurait pu casser des envois sur des prénoms exotiques).
