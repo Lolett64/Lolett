@@ -1,73 +1,125 @@
-# Session State — 2026-05-03 (Refund par articles + audit UX P0/P1 livré)
+# Session State — 2026-05-04 (Pré-merge launch — étapes 1-6 sur 11)
 
 ## Branch
-preview — HEAD `64a2e41` poussé + déployé Vercel preview validé
+preview — HEAD `967cb7d` poussé + déployé Vercel preview
 
 ## Completed CETTE session
 
-### Phase 1 — Refund par articles (Scénario B) — commits 15071d6 + 5cc79f7
-- Migration SQL `restock_order_items_partial` appliquée prod Supabase ✅
-- Endpoint POST refund avec Zod discriminatedUnion (`items` | `commercial_gesture`)
-- Recalcul montant côté serveur depuis order_items (sécurité)
-- Webhook `charge.refunded` dispatch sur metadata.refund_kind
-- UI Tabs items/commercial avec dropdown qty (Select shadcn) — items qty>1 = dropdown, qty=1 = checkbox seule
-- Smoke test refund TOTAL + PARTIEL VALIDÉ ✅ (LOL-MOJ4GAZC-D6VX 234€/49€ restant après 185€ remboursés)
+### Phase 1 — Auth fixes (commits fe0030d + 967cb7d)
+- **Validation mot de passe temps réel** dans `RegisterForm.tsx` :
+  - 3 règles affichées avec coches vertes (≥8 chars, 1 majuscule, 1 chiffre)
+  - Bouton submit désactivé tant que règles + confirmation pas OK
+  - Composant inline `<PasswordRule />` ajouté en bas du fichier
+  - Message succès mis à jour ("compte créé" au lieu de "email de confirmation envoyé")
+- **emailRedirectTo defense-in-depth** dans `signUp()` (commit 967cb7d) :
+  - `emailRedirectTo: \`${window.location.origin}/auth/callback\``
+  - Code prévention si confirmation email réactivée plus tard côté Supabase
+- **Côté Lyes** : confirmation email Supabase désactivée + politique mdp serveur Supabase activée (lowercase + uppercase + digits, min 8 chars)
 
-### Phase 2 — Audit UX complet P0+P1 — commit 64a2e41 (1401 insertions / 171 deletions / 26 fichiers)
-- **4 agents en parallèle** ont fixé 18 edge cases (Refund, Catalog, Promos, Cart)
-- **4 code reviews en parallèle** → 17 findings (1 faux positif identifié)
-- **4 fix-it agents en parallèle** ont corrigé les 16 findings VRAI
-- Fix manuel additionnel : `refund_amount` NULL en DB (utilisation `.is()` au lieu `.eq()`)
-- 10 cas P2 sauvegardés dans `memory/project_ux_audit_p2_followup.md` pour follow-up post-launch
+### Phase 2 — Plan launch validé `/Users/trikilyes/.claude/plans/je-crois-qu-on-a-groovy-porcupine.md`
+Approuvé en mode Plan. 11 étapes pour merge preview → main robuste.
 
-### Détails fixes Phase 2 livrés
-- **Refund/Orders** : tracking par-item via stripe.refunds.list, verrou applicatif anti-double-refund (UPDATE atomique conditionnel + rollback), items_json byteLength UTF-8, accents labels client (Confirmée/Payée/Expédiée…)
-- **Catalog/Delete** : endpoints /references, DELETE produit bloque sur orders+carts avec `?force=true`, errors Supabase propagées 500, LookForm warning touched, PUT look check delete
-- **Promos/Gift Cards** : badges Expiré/Épuisé, validation expires_at via strings ISO TZ-safe, cancel gift card UPDATE atomique idempotent, accents (Réduction/Désactiver)
-- **Cart/Checkout** : stock par variant, auto-clamp banner rouge si stock changé, getVariantStock retourne null pour variant inconnu, validation live promo/gift-card debouncée 500ms+AbortController, erreur Supabase générique inscription
+### Phase 3 — Étapes externes 2-6 du plan launch (Lyes manuel sur dashboards)
 
-### Smoke test sur preview Vercel — confirmation utilisateur
-- ✅ Refund partiel : items déjà remboursés filtrés du dialog (LOL-MOJ4GAZC-D6VX → seul Emoticoeurs Noir XL refundable)
-- ✅ Bouton "+" panier : se grise au max stock + warning "Plus que 2 en stock"
-- ✅ Statuts commande accentués côté client
-- ❌ Pas testé : promo expiré (pas de données), suppression produit dépendances
+**Étape 2 — Vercel env vars ✅**
+- `NEXT_PUBLIC_BASE_URL` configuré (Production = lolettshop.com)
+- `NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID` : code enseigne PROD + TEST par environnement
 
-## Next Task (PROCHAINE SESSION) — Auth fixes + finitions
+**Étape 3 — Stripe Dashboard LIVE ✅**
+- 4 events configurés sur webhook live `https://lolettshop.com/api/webhooks/stripe` :
+  - `checkout.session.completed`
+  - `charge.refunded`
+  - `charge.dispute.created`
+  - `charge.dispute.closed`
+- `STRIPE_WEBHOOK_SECRET` mis à jour dans Vercel Production
 
-**3 vrais bugs identifiés au smoke test** :
-1. **Confirmation email Supabase obligatoire** bloque les nouveaux comptes ; `lyestriki@yahoo.fr` créé sans pouvoir se connecter
-2. **Inscription accepte n'importe quel mdp** (pas de validation client/serveur)
-3. **Compte yahoo cassé** (mdp perdu côté Lyes) — décision : on le garde, on ne le supprime pas
+**Étape 4 — Supabase URL Configuration ✅**
+- 2 wildcards Vercel preview ajoutés aux Redirect URLs :
+  - `https://lolett-*.vercel.app/**`
+  - `https://*-lolett64s-projects.vercel.app/**`
+- Site URL conservée sur `https://lolettshop.com`
 
-**Décisions actées** :
-- Désactiver la confirmation email côté Supabase (config dashboard, NON-faisable via MCP, à faire par Lyes manuellement)
-- Validation mot de passe règles classiques : 8 chars min + 1 majuscule + 1 chiffre, feedback temps réel avec coches vertes
-- Statuts commande : on GARDE la matrice stricte (pas de retours arrière)
+**Étape 5 — Resend domaine 🟡 (3/4 records validés)**
+- Domaine `lolettshop.com` ajouté sur Resend
+- Namecheap passé en **Custom MX** (Email Forwarding désactivé, sans impact car Lyes n'utilise aucune adresse `@lolettshop.com`)
+- Records DNS via dig publics :
+  - DKIM (`resend._domainkey`) : ✅ Verified
+  - SPF TXT (`send`) : ✅ Verified DNS, ⏳ Resend pending (re-check)
+  - DMARC (`_dmarc`) : ✅ Verified
+  - **MX (`send`)** : ❌ impossible à ajouter sur Namecheap (type MX absent du dropdown malgré Custom MX). **Skip pour le launch** (cosmétique : sert au tracking précis bounces, n'empêche pas l'envoi)
 
-**Plan implémentation prochaine session** (~30 min) :
-- Étape 1 — Lyes désactive confirmation email dans Supabase Dashboard → Auth → Providers → Email → "Confirm email" off
-- Étape 2 — Modifier `components/auth/RegisterForm.tsx` : ajouter `<PasswordRules />` qui affiche en temps réel les 3 règles (≥8 chars, 1 maj, 1 chiffre) avec coches vertes Tailwind. Bouton submit disabled tant que les 3 règles pas satisfaites
-- Étape 3 — Validation serveur defence-in-depth : où ? Soit dans `RegisterForm.tsx` avant `supabase.auth.signUp()` (mais c'est client), soit créer `/api/auth/signup` qui fait le check serveur avant relayer à Supabase. **À voir** selon l'archi actuelle de `RegisterForm.tsx`
-- Étape 4 — Tester l'inscription complète : nouveau compte avec mdp faible doit être rejeté, mdp fort doit pouvoir se connecter immédiatement
-- Étape 5 — Optionnel : créer un promo expiré en DB pour tester le badge "Expiré" visuellement
-- Étape 6 — TSC + commit + push + redeploy + smoke test final
+**Étape 6 — SMTP Gmail ✅**
+- Tests d'email depuis admin preview "Envoyer un test" → reçus sur boîte Gmail
+- SMTP Gmail fonctionne, mot de passe app valide
+
+## Next Task (PROCHAINE SESSION) — Chemin B (~3h)
+
+**Plan validé par Lyes : Chemin B (lancement demain, plus safe)**
+
+### Étape 7 — Tests
+1. **Fix test Vitest CartSummary** : `screen.getByText('Total')` → `screen.getByText('Total TTC')` dans `__tests__/cart/CartSummary.test.tsx:24`. Régression cosmétique du label après audit UX.
+2. **Run Playwright E2E** : `cd lolett-app && npm run test:e2e` (32 tests Chromium, ~5-10 min). Le serveur Next démarre automatiquement.
+3. **Investiguer bug emails refund** :
+   - Lyes vérifie URL webhook Stripe TEST (Stripe Dashboard mode test → Developers → Webhooks)
+   - Comparer avec URL preview courante : `https://lolett-njdbm1h6e-lolett64s-projects.vercel.app`
+   - Si différentes : mettre à jour l'URL du webhook test pour pointer sur la nouvelle preview
+   - Si identiques : creuser autre cause (peut-être hypothèse 3 : bug spécifique `order_refunded` template)
+
+### Refacto reportée — Expéditeur unique global
+**Décidé Option 1** (refacto post-launch). Aujourd'hui chaque template a son propre `from_email`/`from_name` dans `email_settings` table. Lyes utilise toujours la même adresse → duplication source de bug.
+- Migration : créer table `email_global_settings` (1 row) ou colonne dédiée
+- Backend : modifier les 6 fichiers `lib/email/*.ts` pour lire l'expéditeur global au lieu du template
+- UI admin : section "Expéditeur" séparée + retirer champ from_email de chaque template
+- Estimation : 1h30-2h, plus tests
+
+### Étape 7.2 — Smoke test manuel preview
+Sur URL preview courante :
+- [ ] Inscription nouveau compte → reste sur preview (pas redirect prod)
+- [ ] Login OAuth Google → revient sur preview
+- [ ] Forgot password → mail reçu, lien sur preview
+- [ ] Catalogue → ajout panier → checkout test 4242 4242 4242 4242 + point relais Mondial Relay
+- [ ] Email confirmation commande reçu
+- [ ] Page tracking commande affichée
+- [ ] Admin refund partiel par article → email reçu, stock restocké ⚠️ DÉPEND DU FIX WEBHOOK STRIPE TEST
+- [ ] Achat carte cadeau → code reçu par mail destinataire
+- [ ] Tentative inscription mdp faible → bloquée
+
+### Étape 8 — Merge preview → main
+```bash
+cd /Users/trikilyes/Desktop/Privé/Lorett
+git checkout main && git pull origin main
+git merge --no-ff preview -m "Merge preview → main: launch-ready (P0-P3 audit + refunds L2.5 + auth fixes)"
+git push origin main
+```
+
+### Étape 9 — Validation post-merge prod (~30 min)
+- Build prod vert sur Vercel
+- Send test webhook Stripe live `checkout.session.completed` → 200 OK
+- Vrai paiement test : Lyes commande gift card 25€ avec sa carte perso → vérifier email + admin + Stripe live affiche paiement
+- Refund test prod → email + Stripe live affiche refund
+- Vérifier points relais Mondial Relay live (vrais points, pas BDTEST)
+
+### Étapes 10-11 — Rollback prêt + Monitoring 24h
+- Rollback Vercel : Deployments → précédent prod → Promote to Production (30 sec)
+- Monitoring : Vercel Logs production, Stripe Events, Supabase Logs, Resend Logs, boîte gmail
 
 ## Blockers
 
-- **Webhook GitHub→Vercel cassé** : déploiement via `vercel deploy --yes` **depuis racine `/Lorett`** (path `lolett-app` doublé sinon depuis le sous-dossier)
-- **Webhook Stripe TEST pointe sur l'ancienne URL preview** : à mettre à jour sur la nouvelle URL avant chaque smoke test refund réel. Ou créer alias stable Vercel.
-- **Webhook Stripe LIVE incomplet** (1 event seulement, à étendre aux 4 avant merge prod)
-- Risque #A1 différé post-launch : double-refund même item possible théoriquement (borné par `amount > remaining`, demande colonne DB `quantity_refunded` ou parsing refunds Stripe historiques)
+- **Email refund admin réel ne part pas** alors que tests d'email UI marchent. Cause probable : webhook Stripe TEST pointe sur ancienne URL preview (de la session 2-3 mai). À investiguer prochaine session.
+- **Record MX Resend** : impossible à ajouter sur Namecheap malgré Custom MX activé. Type "MX Record" absent du dropdown Add New Record. Pourrait nécessiter contact support Namecheap. Non bloquant pour le launch (DKIM + SPF + DMARC suffisent pour la délivrabilité).
+- **Webhook Stripe TEST** à mettre à jour vers nouvelle URL preview avant chaque smoke test refund (voir blocker récurrent depuis session 2-3 mai)
 
 ## Key Context
 
-- **URL preview Vercel courante** : `https://lolett-drhmhv3et-lolett64s-projects.vercel.app`
-- **Webhook Stripe TEST** : `https://dashboard.stripe.com/test/webhooks` → "Lolett preview - test mode" → 4 events (à pointer sur nouvelle URL avant test refund)
-- **Migrations Supabase appliquées prod** : `restock_order_items_partial` (2026-05-02) ✅
+- **URL preview Vercel courante** : `https://lolett-njdbm1h6e-lolett64s-projects.vercel.app`
+- **Plan launch** : `/Users/trikilyes/.claude/plans/je-crois-qu-on-a-groovy-porcupine.md` (11 étapes)
+- **Domaine email vérifié Resend** : `lolettshop.com` ✅ (mais Lyes utilise `contact.lolett@gmail.com` via SMTP Gmail, donc le domaine Resend est seulement pour fallback éventuel)
+- **DB email_settings** : 6 templates, tous avec `from_email = 'contact.lolett@gmail.com'` (modifiés via UI admin par Lyes cette session, anciennes valeurs `contact@lolett.fr` issues de migrations remplacées). À CONFIRMER en prochaine session via SQL select.
 - **TSC** : EXIT=0 ✅
-- **Carte test Stripe** : `4242 4242 4242 4242`, exp `12/30`, CVC `123`
+- **Vitest** : 73/74 passent (1 cassé : CartSummary label `Total` → `Total TTC`)
+- **Playwright E2E** : pas encore lancé
 - **MCP Supabase** : `mcp__supabase-lola__execute_sql` (read-only). Apply migration → SQL Editor manuel via dashboard
-- **Compte test fonctionnel** : `lyestriki@gmail.com` (créé 2026-04-22, confirmed). Compte yahoo créé 2026-05-02 confirmé manuellement mais mdp perdu.
+- **Carte test Stripe** : `4242 4242 4242 4242` exp `12/30` CVC `123`
 
 ## Phases restantes plan launch
 
@@ -75,25 +127,25 @@ preview — HEAD `64a2e41` poussé + déployé Vercel preview validé
 - ✅ P2 (E2E tests 32) commit 11f2c73
 - ✅ P3 (légal CGV/RGPD) commit b4e1a7c
 - ✅ Niveau 2 BONUS (refund admin + disputes) commit 5931f91
-- ✅ **Niveau 2.5** (refund par articles Scénario B) commits 15071d6 + 5cc79f7
-- ✅ **Audit UX P0+P1** commit 64a2e41 ← CETTE SESSION
-- ⏳ **Auth fixes + validation mdp** — PROCHAINE SESSION (~30 min)
-- ⏳ P4 (rotation clés Stripe live + Resend live + Supabase PITR)
-- ⏳ P5 (Mondial Relay credentials pro)
-- ⏳ P6 (merge preview → main)
-- ⏳ P7 (validation post-merge prod)
-- ⏳ P8 (backlog post-launch incluant les 10 P2 du UX audit)
+- ✅ Niveau 2.5 (refund par articles Scénario B) commits 15071d6 + 5cc79f7
+- ✅ Audit UX P0+P1 commit 64a2e41
+- ✅ **Auth fixes + validation mdp** commits fe0030d + 967cb7d ← CETTE SESSION
+- ✅ **Étapes 1-6 plan launch** (config externe Stripe/Supabase/Resend/Vercel/Mondial Relay) ← CETTE SESSION
+- ⏳ **Étapes 7-11 plan launch** — PROCHAINE SESSION (~3h, chemin B)
+- ⏳ P8 (backlog post-launch incluant les 10 P2 du UX audit + refacto expéditeur global)
 
 ## Pour reprendre PROCHAINE session
 
-Dis : **"on attaque les fixes auth (désactiver confirmation email + validation mdp client/serveur), plan dans SESSION.md"**
+Dis : **"on reprend le plan launch chemin B, étape 7"**
 
-→ Je relis SESSION.md, je guide Lyes pour désactiver confirmation email Supabase, puis je modifie RegisterForm.tsx + endpoint signup, on teste l'inscription bout en bout.
+→ Je relis SESSION.md, on commence par fixer le test Vitest CartSummary (1 min), puis on debug le webhook Stripe TEST avec toi (URL à mettre à jour), puis on lance Playwright E2E, puis smoke test manuel, puis merge.
+
+Plan dans : `/Users/trikilyes/.claude/plans/je-crois-qu-on-a-groovy-porcupine.md`
 
 ## Notes session
 
-- **Pattern 4 agents en parallèle validé** : très efficace. 18 fixes en ~5 min wallclock + 16 fixes review en ~2 min. À reproduire pour les phases suivantes.
-- **Code reviews systématiques** ont attrapé 1 faux positif (auth admin "manquante" alors qu'elle est dans middleware.ts) + 1 risque réel (refund_amount NULL pour les commandes pré-Niveau 2). Toujours vérifier les findings agent contre la DB réelle.
-- **Décision sécu inscription** : pas de check live email (account enumeration) — message clair au submit + CTAs. Validée Lyes.
-- **Stripe metadata** : limite 500 BYTES UTF-8 par value (pas chars). admin_reason et items_json tous deux protégés par Buffer.byteLength.
-- **Verrou applicatif refund** : UPDATE atomique avec `.eq()` ou `.is()` selon que la valeur précédente est null ou pas. Évite migration SQL FOR UPDATE.
+- **Découverte importante** : la DB `email_settings` contenait `contact@lolett.fr` issu de mauvaises migrations seedées par moi (Claude) en mars/avril. Lyes utilise `contact.lolett@gmail.com`. Bug masqué pendant 2 mois car Resend mode test acceptait, ou SMTP Gmail couvrait. Découvert quand on a vérifié l'envoi des emails refund.
+- **Pattern à éviter** : seeder des valeurs spécifiques (emails, domaines) dans les migrations SQL sans demander confirmation. Toujours utiliser des placeholders (`__CONFIGURE_ME__`) ou laisser NULL avec contrainte.
+- **Webhook Stripe TEST URL fragile** : à chaque deploy preview Vercel, l'URL change. Devrait soit utiliser un alias stable Vercel (e.g. `lolett-preview-stable.vercel.app`), soit créer un webhook Stripe wildcard, soit accepter le coût manuel à chaque session.
+- **Resend domaine ajouté tardivement** : le domaine vérifié sur Resend (`lolettshop.com`) ne sert finalement que de fallback. SMTP Gmail primaire suffit. Mais avoir un domaine vérifié est nécessaire si on bascule sur Resend en primaire un jour.
+- **Décision Chemin B** validée par Lyes : prendre du temps demain pour bien finir au lieu de bâcler aujourd'hui. Bon réflexe pre-launch.
