@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import React from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 // Ordre des providers : Brevo (HTTP API, fiable serverless) → SMTP Gmail
 // (fallback, ~70% en serverless) → Resend (fallback final, mode test).
@@ -163,7 +164,22 @@ export async function sendHtmlEmail(opts: SendOptions): Promise<SendResult> {
   if (smtpResult.success) return smtpResult;
 
   console.warn('[Email] SMTP failed, falling back to Resend...');
-  return sendViaResend(opts);
+  const resendResult = await sendViaResend(opts);
+  if (resendResult.success) return resendResult;
+
+  // Tous les providers ont échoué : alerte critique. La commande peut déjà
+  // être marquée 'paid' en DB sans qu'aucun email n'ait été envoyé au client.
+  Sentry.captureMessage('All email providers failed (Brevo + SMTP + Resend)', {
+    level: 'fatal',
+    extra: {
+      to: opts.to,
+      subject: opts.subject,
+      brevoError: brevoResult.error,
+      smtpError: smtpResult.error,
+      resendError: resendResult.error,
+    },
+  });
+  return resendResult;
 }
 
 /**
