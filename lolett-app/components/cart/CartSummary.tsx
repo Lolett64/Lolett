@@ -435,15 +435,21 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
           force un rechargement complet du document /checkout pour que la
           CSP avec 'unsafe-eval' soit appliquée — sinon le widget Mondial
           Relay (qui utilise eval() pour parser sa réponse JSONP) est bloqué.
-          Voir docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md */}
-      <a href="/checkout" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
-        <button style={{
-          width: '100%', padding: '14px 0', background: '#B89547', color: '#FDF5E6', border: 'none',
-          borderRadius: 999, fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13,
-          fontWeight: 600, letterSpacing: 1, cursor: 'pointer', textTransform: 'uppercase',
-        }}>
-          Passer commande
-        </button>
+          Voir docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md
+          On fusionne <a><button> en un seul <a> stylé : nesting interactif
+          interdit par HTML5 §4.5.1, NVDA/JAWS l'annonçaient en double. */}
+      <a
+        href="/checkout"
+        style={{
+          display: 'block', width: '100%', padding: '14px 0', marginTop: 24,
+          background: '#B89547', color: '#FDF5E6', border: 'none',
+          borderRadius: 999, fontFamily: 'var(--font-montserrat), sans-serif',
+          fontSize: 13, fontWeight: 600, letterSpacing: 1, cursor: 'pointer',
+          textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center',
+          boxSizing: 'border-box',
+        }}
+      >
+        Passer commande
       </a>
       <Link href="/shop" style={{
         display: 'block', textAlign: 'center', marginTop: 16,
