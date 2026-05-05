@@ -136,12 +136,16 @@ export function CartBadge() {
                   >
                     Voir mon panier
                   </Link>
-                  <Link
+                  {/* <a> natif (hard nav) au lieu de <Link> Next.js (soft-nav) :
+                      force un rechargement du document /checkout pour la CSP avec
+                      'unsafe-eval' (widget Mondial Relay). Voir
+                      docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md */}
+                  <a
                     href="/checkout"
                     className="rounded-full bg-[#1B0B94] px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-[#130970]"
                   >
                     Commander
-                  </Link>
+                  </a>
                 </div>
               </>
             )}
