@@ -20,10 +20,11 @@ function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-// Sender vérifié dans Brevo. Identique en prod et en dev pour éviter qu'un
-// staging/preview avec NODE_ENV !== 'production' échoue silencieusement
-// quand BREVO_API_KEY est présent (Brevo refuse les senders non vérifiés).
-const DEFAULT_FROM = 'LOLETT <contact.lolett@gmail.com>';
+// Sender vérifié dans Brevo (domaine lolettshop.com authentifié DKIM+SPF).
+// Identique en prod et en dev pour éviter qu'un staging/preview avec
+// NODE_ENV !== 'production' échoue silencieusement quand BREVO_API_KEY est
+// présent (Brevo refuse les senders non vérifiés).
+const DEFAULT_FROM = 'LOLETT <bonjour@lolettshop.com>';
 
 export interface EmailAttachment {
   filename: string;
@@ -32,6 +33,7 @@ export interface EmailAttachment {
 
 interface SendOptions {
   from?: string;
+  replyTo?: string;
   to: string;
   subject: string;
   html: string;
@@ -40,6 +42,7 @@ interface SendOptions {
 
 interface SendReactOptions {
   from?: string;
+  replyTo?: string;
   to: string;
   subject: string;
   react: React.ReactElement;
@@ -50,7 +53,7 @@ interface SendResult {
   error?: string;
 }
 
-// Parse "LOLETT <contact.lolett@gmail.com>" → { name: 'LOLETT', email: 'contact.lolett@gmail.com' }
+// Parse "LOLETT <bonjour@lolettshop.com>" → { name: 'LOLETT', email: 'bonjour@lolettshop.com' }
 // Brevo exige un objet { email, name? } et non une chaîne formatée.
 function parseFromAddress(from: string): { email: string; name?: string } {
   const match = from.match(/^(.+?)\s*<(.+)>$/);
@@ -116,6 +119,10 @@ async function sendViaBrevoOnce(opts: SendOptions): Promise<SendResult> {
     htmlContent: opts.html,
   };
 
+  if (opts.replyTo) {
+    body.replyTo = parseFromAddress(opts.replyTo);
+  }
+
   if (opts.attachments?.length) {
     body.attachment = opts.attachments.map((a) => ({
       name: a.filename,
@@ -161,6 +168,7 @@ async function sendViaSmtpOnce(opts: SendOptions): Promise<SendResult> {
   try {
     await smtpTransport.sendMail({
       from: opts.from || DEFAULT_FROM,
+      replyTo: opts.replyTo,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
@@ -183,6 +191,7 @@ async function sendViaResend(opts: SendOptions): Promise<SendResult> {
   try {
     const { error } = await getResendClient().emails.send({
       from: opts.from || DEFAULT_FROM,
+      replyTo: opts.replyTo,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
@@ -240,6 +249,7 @@ export async function sendReactEmail(opts: SendReactOptions): Promise<SendResult
 
   return sendHtmlEmail({
     from: opts.from,
+    replyTo: opts.replyTo,
     to: opts.to,
     subject: opts.subject,
     html,

@@ -59,6 +59,7 @@ export async function POST(req: Request) {
 
         const send = await sendHtmlEmail({
           to: contact.email,
+          replyTo: 'bonjour@lolettshop.com',
           subject,
           html,
         });

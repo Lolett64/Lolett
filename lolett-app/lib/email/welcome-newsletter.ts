@@ -19,10 +19,11 @@ export async function sendWelcomeNewsletterEmail(
     });
 
     const fromName = 'LOLETT';
-    const fromEmail = process.env.NEWSLETTER_FROM_EMAIL || 'contact.lolett@gmail.com';
+    const fromEmail = process.env.NEWSLETTER_FROM_EMAIL || 'bonjour@lolettshop.com';
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
+      replyTo: 'bonjour@lolettshop.com',
       to: data.to,
       subject: 'Bienvenue chez LOLETT',
       html,
