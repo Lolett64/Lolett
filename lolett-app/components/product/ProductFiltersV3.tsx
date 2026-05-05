@@ -5,6 +5,7 @@ import { X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterState } from './ProductFilters';
 import type { Product } from '@/types';
+import { AVAILABLE_SIZES } from '@/components/admin/product-form/types';
 
 interface ProductFiltersV3Props {
   products: Product[];
@@ -35,7 +36,9 @@ export function ProductFiltersV3({
     products.forEach((p) => {
       p.sizes.forEach((s) => sizes.add(s));
     });
-    return Array.from(sizes).sort();
+    // Tri par l'ordre canonique d'AVAILABLE_SIZES (TU/XS→XXL puis 29→48 puis S/M, M/L)
+    // au lieu d'un .sort() lexico qui mélange lettres et chiffres ('1, 10, 2' ou 'L, M, S, XL').
+    return AVAILABLE_SIZES.filter((s) => sizes.has(s));
   }, [products]);
 
   const toggleSize = (size: string) => {
