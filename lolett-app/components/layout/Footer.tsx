@@ -72,7 +72,7 @@ export function Footer({ content }: FooterProps) {
               </a>
               {/* Email - bleu LOLETT */}
               <a
-                href={`mailto:${content?.email || 'contact.lolett@gmail.com'}`}
+                href={`mailto:${content?.email || 'bonjour@lolettshop.com'}`}
                 className="hover:bg-lolett-gold touch-target flex items-center justify-center rounded-full bg-white/10 p-2.5 transition-all duration-300"
                 aria-label="Email"
               >

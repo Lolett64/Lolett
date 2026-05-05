@@ -35,7 +35,9 @@ export async function GET(
   // Mode 2 — Guest avec session_id Stripe : valide via Stripe API
   // Le order.paymentId DOIT correspondre au payment_intent de la session
   // (lien posé par fulfillOrder lors de la création de la commande).
-  if (sessionId && process.env.STRIPE_SECRET_KEY) {
+  // Si STRIPE_SECRET_KEY manque (misconfig), getStripe() jettera et le
+  // try/catch loggera l'erreur — meilleur signal qu'un 401 silencieux.
+  if (sessionId) {
     try {
       const session = await getStripe().checkout.sessions.retrieve(sessionId);
 

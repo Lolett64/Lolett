@@ -158,7 +158,7 @@ export function ContactV2({ content, visibleSections }: ContactV2Props) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
 
-  const contactEmail = content?.email || 'contact.lolett@gmail.com';
+  const contactEmail = content?.email || 'bonjour@lolettshop.com';
   const contactAddress = content?.address || 'Sud de la France';
 
   const faqItems = [

@@ -66,7 +66,7 @@ const organizationJsonLd = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    email: 'contact.lolett@gmail.com',
+    email: 'bonjour@lolettshop.com',
     contactType: 'customer service',
     availableLanguage: 'French',
   },

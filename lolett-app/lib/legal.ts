@@ -12,7 +12,7 @@ export const LEGAL = {
   country: 'France',
   vatRegime: 'exonere' as 'exonere' | 'assujetti',
   vatMention: 'TVA non applicable, art. 293 B du CGI',
-  email: 'contact.lolett@gmail.com',
+  email: 'bonjour@lolettshop.com',
   website: 'lolettshop.com',
 } as const;
 
