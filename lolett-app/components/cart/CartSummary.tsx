@@ -431,7 +431,12 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
         )}
       </div>
 
-      <Link href="/checkout" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
+      {/* <a> natif (hard nav) au lieu de <Link> Next.js (soft-nav) :
+          force un rechargement complet du document /checkout pour que la
+          CSP avec 'unsafe-eval' soit appliquée — sinon le widget Mondial
+          Relay (qui utilise eval() pour parser sa réponse JSONP) est bloqué.
+          Voir docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md */}
+      <a href="/checkout" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
         <button style={{
           width: '100%', padding: '14px 0', background: '#B89547', color: '#FDF5E6', border: 'none',
           borderRadius: 999, fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 13,
@@ -439,7 +444,7 @@ export function CartSummary({ subtotal, shipping, total, isFreeShipping, amountU
         }}>
           Passer commande
         </button>
-      </Link>
+      </a>
       <Link href="/shop" style={{
         display: 'block', textAlign: 'center', marginTop: 16,
         fontFamily: 'var(--font-montserrat), sans-serif', fontSize: 12, color: '#9B8E82',
