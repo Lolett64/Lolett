@@ -23,7 +23,7 @@ export default function ConfidentialitePage() {
             <p>
               Le responsable du traitement des données personnelles est <strong>LOLETT</strong>,
               dont le siège social est situé au 30 avenue Honoré Baradat, 64000 Pau, France.
-              Contact : <a href="mailto:contact.lolett@gmail.com" className="underline hover:text-[#B89547] transition-colors">contact.lolett@gmail.com</a>.
+              Contact : <a href="mailto:bonjour@lolettshop.com" className="underline hover:text-[#B89547] transition-colors">bonjour@lolettshop.com</a>.
             </p>
           </section>
 
@@ -78,7 +78,7 @@ export default function ConfidentialitePage() {
               <li><strong>Stripe</strong> — traitement des paiements</li>
               <li><strong>Vercel</strong> — hébergement du site</li>
               <li><strong>Supabase</strong> — base de données et authentification</li>
-              <li><strong>Google (Gmail SMTP) et Resend</strong> — envoi d'emails transactionnels et marketing</li>
+              <li><strong>Brevo (Sendinblue SAS, France)</strong> — envoi d&apos;emails transactionnels et marketing. SMTP Google et Resend sont conservés en fallback de secours en cas d&apos;indisponibilité Brevo.</li>
               <li><strong>Transporteurs</strong> (La Poste / Colissimo, Mondial Relay) — livraison des commandes</li>
             </ul>
             <p className="mt-2">
