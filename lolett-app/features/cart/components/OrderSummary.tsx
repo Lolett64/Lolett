@@ -113,15 +113,21 @@ export function OrderSummary({ items, variant }: OrderSummaryProps) {
             T&apos;es à deux clics d&apos;être le plus stylé de ta terrasse.
           </p>
 
+          {/* <a> natif (hard nav) au lieu de <Link> Next.js (soft-nav) :
+              force un rechargement du document /checkout pour appliquer la CSP
+              avec 'unsafe-eval' — requis par le widget Mondial Relay (eval JSONP).
+              <Button asChild> clone ses classes sur le <a>, donc DOM final = <a>
+              stylé comme bouton — pas de nesting interactif §4.5.1.
+              Voir docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md */}
           <Button
             asChild
             size="lg"
             className="bg-lolett-gold hover:bg-lolett-gold-light mt-6 w-full rounded-full"
           >
-            <Link href="/checkout">
+            <a href="/checkout">
               <span>Passer commande</span>
               <ArrowRight className="ml-2 h-4 w-4 flex-shrink-0" />
-            </Link>
+            </a>
           </Button>
 
           <Button asChild variant="ghost" className="text-lolett-gray-600 mt-3 w-full">
