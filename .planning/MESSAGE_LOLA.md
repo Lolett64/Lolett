@@ -1,68 +1,41 @@
-# Message WhatsApp/SMS pour Lola — à envoyer après merge prod réussi
+# Message WhatsApp à envoyer à Lola — Code Namecheap pour finaliser emails
 
-## Version courte (recommandée)
+## Version recommandée
 
 ```
-Salut Lola ! 🎉
+Coucou Lola,
 
-Le site est en ligne : https://lolettshop.com
+On a presque tout fini ! Le site est en ligne et tous les tests
+sont OK :
 
-Avant qu'on annonce officiellement, t'as 24h pour le tester
-tranquille (et le faire tester à 2-3 proches si tu veux des retours).
+→ https://lolettshop.com
 
-Ce que j'aimerais que tu valides :
+Tu peux y aller te balader, tester avec un code promo si tu veux.
+Les emails de confirmation arrivent bien.
 
-1️⃣ Visuel — photos, textes, prix, branding : tout est OK ?
+Il reste juste UNE dernière étape pour que les emails partent
+depuis une adresse pro (genre bonjour@lolettshop.com) au lieu
+de l'adresse temporaire actuelle.
 
-2️⃣ Achat test : commande une carte cadeau 25€ (ou 1 article
-   pas cher) avec ta CB perso. Je te rembourse direct après.
-   Vérifie bien que tu reçois l'email de confirmation 📧
+On a presque tout fait, mais Namecheap (le registrar du domaine)
+va t'envoyer un code de vérification par mail sur ton adresse perso.
 
-3️⃣ Compte client : crée un compte + teste "mot de passe oublié"
+Dis-nous juste quand t'es dispo (5 min suffisent), on lance la
+demande de notre côté → tu reçois le code dans ta boîte mail →
+tu nous l'envoies → on finalise. Et après les emails partiront
+en bonjour@lolettshop.com.
 
-4️⃣ Si tout est bon → tu me dis "go" et on annonce ! 🚀
-
-Bug ou truc bizarre ? Capture d'écran + WhatsApp.
-
-Bon test 💪
+Étienne et Lyes
 ```
 
 ## Notes Lyes
 
-- **Quand envoyer** : après que tu aies fait toi-même le vrai paiement test prod (gift card 25€) + refund OK + email reçu. Pas avant.
-- **Stripe garde ~3% de frais sur le refund** (~0.75€ sur 25€). Lyes peut prévenir Lola : "ne t'inquiète pas si y'a un petit écart au remboursement, c'est les frais Stripe non remboursables, je couvre".
-- **Si Lola demande "et si quelqu'un essaie de s'inscrire avec mon email ?"** → le site dit "cet email est déjà associé à un compte" (trade-off UX validé, à durcir post-launch si besoin).
-- **Joindre un screenshot de la home** pour le hype : optionnel mais sympa.
-- **Deadline floue**: "24h si possible" laisse une marge sans être sec.
+- **Ce que tu attends d'elle** : juste sa dispo (5 min). Tu lances la demande sur Brevo qui va déclencher l'envoi du code Namecheap sur l'email perso de Lola. Elle te transmet le code, tu le saisis sur Brevo.
+- **Email Namecheap de Lola** : visible dans la modale = `l********t@g*******m` (probablement Gmail perso). Code arrive là.
+- **Délai du code** : valide ~10-15 min en général, donc faut que vous soyez en sync.
+- **Une fois le code validé** : Brevo crée les 3 records DNS automatiquement sur Namecheap. Vérification ~1-2h max.
+- **Côté code post-validation** : changer `DEFAULT_FROM` dans `lib/email-provider.ts` ligne 26 + UPDATE SQL sur `email_settings.from_email` pour basculer vers `bonjour@lolettshop.com` (ou autre choix).
 
-## Variantes
+## Pour mémoire — anciens messages
 
-### Plus formel (si Lola préfère)
-```
-Bonjour Lola,
-
-Le site est en ligne sur https://lolettshop.com
-
-Avant l'annonce officielle, je te propose une fenêtre de 24h pour
-recetter le site et le faire tester à quelques proches.
-
-Validation demandée :
-- Visuel et contenu (photos, textes, prix)
-- Un achat test réel avec ta CB (je rembourse derrière)
-- Création de compte + reset mot de passe
-
-Préviens-moi quand tu as fini, on lance la communication officielle.
-
-Lyes
-```
-
-### Plus chill (si tutoiement habituel)
-```
-Holaaa 🎉
-Site en ligne : https://lolettshop.com
-
-Teste-le à fond (et fais-le tester à des proches !), je veux ton OK
-avant qu'on annonce. Achat test réel avec ta CB → je rembourse après.
-
-Tu me fais un retour dans les 24h ?
-```
+Avant ce message, on avait préparé un message de recette à 24h. Plus pertinent (tests faits par Lyes). Garde uniquement le message ci-dessus.
