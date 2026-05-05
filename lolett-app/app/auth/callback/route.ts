@@ -4,7 +4,11 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/compte';
+  const rawNext = searchParams.get('next') ?? '/compte';
+  // Sécurité: n'accepte que les chemins internes. Rejette '//evil.com' qui
+  // serait sinon interprété comme protocole-relatif et redirigerait vers
+  // un site externe (phishing post-login).
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/compte';
 
   if (code) {
     const supabase = await createClient();
