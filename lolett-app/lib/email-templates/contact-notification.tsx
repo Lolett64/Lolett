@@ -3,6 +3,8 @@
  * Matches the order email style: golden accents, Cormorant Garamond, generous whitespace
  */
 
+import { escapeHtml } from '@/lib/utils/escape-html';
+
 export interface ContactNotificationProps {
   name: string;
   email: string;
@@ -12,8 +14,13 @@ export interface ContactNotificationProps {
 }
 
 export function renderContactNotification({ name, email, subject, message, sentAt }: ContactNotificationProps): string {
-  const replyHref = `mailto:${email}?subject=Re: ${encodeURIComponent(subject)}`;
-  const escapedMessage = message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br/>');
+  const safeSentAt = escapeHtml(sentAt);
+  const safeFirstName = escapeHtml(name.split(' ')[0] || '');
+  const replyHref = `mailto:${encodeURIComponent(email)}?subject=Re: ${encodeURIComponent(subject)}`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -59,7 +66,7 @@ export function renderContactNotification({ name, email, subject, message, sentA
           </tr>
           <tr>
             <td align="center" style="padding-bottom: 40px;">
-              <p style="margin: 0; font-size: 12px; color: #9B8E82; letter-spacing: 0.06em;">${sentAt}</p>
+              <p style="margin: 0; font-size: 12px; color: #9B8E82; letter-spacing: 0.06em;">${safeSentAt}</p>
             </td>
           </tr>
 
@@ -78,24 +85,24 @@ export function renderContactNotification({ name, email, subject, message, sentA
                   <td style="padding: 32px;">
                     <!-- Name -->
                     <p style="margin: 0 0 4px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Nom</p>
-                    <p style="margin: 0 0 20px; font-size: 15px; color: #2C2420; font-family: 'Cormorant Garamond', Georgia, serif;">${name}</p>
+                    <p style="margin: 0 0 20px; font-size: 15px; color: #2C2420; font-family: 'Cormorant Garamond', Georgia, serif;">${safeName}</p>
 
                     <!-- Email -->
                     <p style="margin: 0 0 4px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Email</p>
                     <p style="margin: 0 0 20px; font-size: 14px; color: #2C2420;">
-                      <a href="mailto:${email}" style="color: #2C2420; text-decoration: none;">${email}</a>
+                      <a href="${replyHref}" style="color: #2C2420; text-decoration: none;">${safeEmail}</a>
                     </p>
 
                     <!-- Subject -->
                     <p style="margin: 0 0 4px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Sujet</p>
-                    <p style="margin: 0 0 20px; font-size: 15px; color: #2C2420; font-family: 'Cormorant Garamond', Georgia, serif;">${subject}</p>
+                    <p style="margin: 0 0 20px; font-size: 15px; color: #2C2420; font-family: 'Cormorant Garamond', Georgia, serif;">${safeSubject}</p>
 
                     <!-- Separator -->
                     <div style="height: 1px; background: #F0EBE4; margin: 8px 0 20px;"></div>
 
                     <!-- Message -->
                     <p style="margin: 0 0 4px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Message</p>
-                    <p style="margin: 0; font-size: 14px; color: #5A4D3E; line-height: 1.7;">${escapedMessage}</p>
+                    <p style="margin: 0; font-size: 14px; color: #5A4D3E; line-height: 1.7;">${safeMessage}</p>
                   </td>
                 </tr>
               </table>
@@ -109,7 +116,7 @@ export function renderContactNotification({ name, email, subject, message, sentA
                 <tr>
                   <td style="background: #C4956A; border-radius: 50px; padding: 14px 48px;">
                     <a href="${replyHref}" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 500; color: #FFFFFF; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase;">
-                      Répondre à ${name.split(' ')[0]}
+                      Répondre à ${safeFirstName}
                     </a>
                   </td>
                 </tr>
