@@ -3,6 +3,8 @@
  * Ultra-refined, airy, thin golden accents, code in an outlined pill
  */
 
+import { getEmailSiteUrl } from '@/lib/email/site-url';
+
 interface WelcomeEmailData {
   firstName?: string;
   promoCode: string;
@@ -17,6 +19,7 @@ export interface EmailOverrides {
 }
 
 export function renderWelcomeNewsletterV3(data: WelcomeEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   const name = data.firstName || '';
 
   return `<!DOCTYPE html>
@@ -112,7 +115,7 @@ export function renderWelcomeNewsletterV3(data: WelcomeEmailData, overrides?: Em
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="background-color: #C4956A; border-radius: 50px; padding: 14px 44px;">
-                    <a href="#" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #FFFFFF; text-decoration: none; letter-spacing: 0.04em;">
+                    <a href="${siteUrl}/shop" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #FFFFFF; text-decoration: none; letter-spacing: 0.04em;">
                       ${overrides?.cta_text || 'Découvrir la collection'}
                     </a>
                   </td>
@@ -135,7 +138,7 @@ export function renderWelcomeNewsletterV3(data: WelcomeEmailData, overrides?: Em
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                Pour vous désabonner, écrivez à <a href="mailto:bonjour@lolettshop.com" style="color: #B5A99A;">bonjour@lolettshop.com</a> &middot; <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>

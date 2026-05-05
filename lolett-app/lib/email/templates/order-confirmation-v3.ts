@@ -11,6 +11,7 @@ interface OrderItem {
 }
 
 import type { ShippingMethod, PickupPoint } from '@/types';
+import { getEmailSiteUrl } from '@/lib/email/site-url';
 
 interface OrderEmailData {
   firstName: string;
@@ -52,6 +53,7 @@ function buildMapsUrl(p: PickupPoint): string {
 }
 
 export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   const itemsHtml = data.items
     .map(
       (item) => `
@@ -216,20 +218,7 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
             </td>
           </tr>
 
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding: 8px 0 40px;">
-              <table role="presentation" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="border: 1px solid #C4956A; border-radius: 50px; padding: 13px 44px;">
-                    <a href="#" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
-                      ${overrides?.cta_text || 'Suivre ma commande'}
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          <!-- (CTA "Suivre ma commande" supprimé — pas de page de suivi guest disponible.) -->
 
           <!-- Sign-off -->
           <tr>
@@ -245,7 +234,7 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>

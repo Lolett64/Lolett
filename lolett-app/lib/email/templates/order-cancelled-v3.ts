@@ -4,6 +4,8 @@
  * Si déjà payée, mentionne que le remboursement suivra.
  */
 
+import { getEmailSiteUrl } from '@/lib/email/site-url';
+
 interface CancelledEmailData {
   firstName: string;
   orderNumber: string;
@@ -18,6 +20,7 @@ interface EmailOverrides {
 }
 
 export function renderOrderCancelledV3(data: CancelledEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   const refundNotice = data.wasPaid
     ? 'Le remboursement est en cours de traitement — tu le reverras sur ton compte sous 5 à 10 jours ouvrés selon ta banque.'
     : '';
@@ -124,7 +127,7 @@ export function renderOrderCancelledV3(data: CancelledEmailData, overrides?: Ema
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>
