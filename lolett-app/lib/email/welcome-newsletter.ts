@@ -19,7 +19,7 @@ export async function sendWelcomeNewsletterEmail(
     });
 
     const fromName = 'LOLETT';
-    const fromEmail = process.env.NEWSLETTER_FROM_EMAIL || 'onboarding@resend.dev';
+    const fromEmail = process.env.NEWSLETTER_FROM_EMAIL || 'contact.lolett@gmail.com';
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,

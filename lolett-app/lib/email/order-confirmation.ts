@@ -61,7 +61,7 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
     }, overrides);
 
     const fromName = settings?.from_name || 'LOLETT';
-    const fromEmail = settings?.from_email || 'onboarding@resend.dev';
+    const fromEmail = settings?.from_email || 'contact.lolett@gmail.com';
     const subject = settings?.subject_template?.replace('{orderNumber}', data.orderNumber)
       || `Confirmation de commande ${data.orderNumber}`;
 

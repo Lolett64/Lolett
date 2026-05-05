@@ -20,10 +20,10 @@ function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-const DEFAULT_FROM =
-  process.env.NODE_ENV === 'production'
-    ? 'LOLETT <contact.lolett@gmail.com>'
-    : 'LOLETT <onboarding@resend.dev>';
+// Sender vérifié dans Brevo. Identique en prod et en dev pour éviter qu'un
+// staging/preview avec NODE_ENV !== 'production' échoue silencieusement
+// quand BREVO_API_KEY est présent (Brevo refuse les senders non vérifiés).
+const DEFAULT_FROM = 'LOLETT <contact.lolett@gmail.com>';
 
 export interface EmailAttachment {
   filename: string;
@@ -62,10 +62,6 @@ function parseFromAddress(from: string): { email: string; name?: string } {
 
 async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
   const apiKey = process.env.BREVO_API_KEY;
-  // DEBUG TEMPORAIRE — à retirer après diagnostic
-  console.log('[Email][DEBUG] BREVO_API_KEY length:', apiKey?.length ?? 0,
-    '| prefix:', apiKey ? apiKey.slice(0, 8) : 'EMPTY',
-    '| suffix:', apiKey ? apiKey.slice(-4) : 'EMPTY');
   if (!apiKey) {
     return { success: false, error: 'BREVO_API_KEY not configured' };
   }
