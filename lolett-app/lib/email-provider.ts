@@ -62,6 +62,10 @@ function parseFromAddress(from: string): { email: string; name?: string } {
 
 async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
   const apiKey = process.env.BREVO_API_KEY;
+  // DEBUG TEMPORAIRE — à retirer après diagnostic
+  console.log('[Email][DEBUG] BREVO_API_KEY length:', apiKey?.length ?? 0,
+    '| prefix:', apiKey ? apiKey.slice(0, 8) : 'EMPTY',
+    '| suffix:', apiKey ? apiKey.slice(-4) : 'EMPTY');
   if (!apiKey) {
     return { success: false, error: 'BREVO_API_KEY not configured' };
   }
