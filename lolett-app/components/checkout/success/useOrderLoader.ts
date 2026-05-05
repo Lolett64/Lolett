@@ -33,7 +33,12 @@ export function useOrderLoader() {
           return;
         }
 
-        const res = await fetch(`/api/orders/${resolvedOrderId}`);
+        // Pass session_id pour permettre l'auth guest côté serveur
+        // (utilisateur non connecté qui revient de Stripe).
+        const url = sessionId
+          ? `/api/orders/${resolvedOrderId}?session_id=${encodeURIComponent(sessionId)}`
+          : `/api/orders/${resolvedOrderId}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error('Not found');
         const data = await res.json();
         setOrder(data);
