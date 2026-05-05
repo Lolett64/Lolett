@@ -1,47 +1,66 @@
-# Session State — 2026-05-04 23:30 (LAUNCH J — bloqué sur emails Brevo)
+# Session State — 2026-05-05 14:30 (LAUNCH J — quasi-finalisé)
 
 ## Branch + Deploy
-- **Branch** : `main` HEAD `<à committer>` (clean après ce save)
-- **Vercel prod** : dernier deploy `bqqsl9wge` Ready (rebuild post-set BREVO_API_KEY CLI)
-- **URL prod** : https://lolettshop.com
+- **Branch** : `main` HEAD `50b88b9` (clean)
+- **Vercel prod** : `jvxz99uce` Ready (auto-deploy revenu, déclenché par push)
+- **URL prod** : https://lolettshop.com (DNS fixé sur 76.76.21.21 par Lyes)
 
-## Completed CETTE session
-1. ✅ Widget Mondial Relay réparé en prod (3 fixes en cascade) :
-   - Var `NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID` créée Vercel (Lyes)
-   - CSP : ajout `widget.mondialrelay.com` à `style-src`/`img-src`/`font-src` (commit `16fdd44`)
-   - CSP : `'unsafe-eval'` autorisé **uniquement sur `/checkout`** (commit `eba972a`) — requis par plugin jQuery MR pour eval JSONP
-2. ✅ Connexion GitHub↔Vercel réparée : remote `origin` pointait sur `lyestriki-29/Lorett` (compte perso) au lieu de `Lolett64/Lolett` (compte Lola). Vercel écoutait Lola → pas de webhook depuis 1 mois. Remote local nettoyé : `origin` = Lola uniquement
-3. ✅ 3 PATs Supabase compromis dans historique git → révoqués par Lyes sur Supabase dashboard
-4. ✅ Migration email : Brevo HTTP API en provider primary (Brevo → SMTP Gmail → Resend), commit `290c6af`
-5. ✅ Sender `contact.lolett@gmail.com` validé sur Brevo
-6. ✅ Whitelist IP désactivée sur Brevo (Vercel = IPs changeantes)
-7. ✅ Code review post-fix : ajout `Sentry.captureMessage('All email providers failed', level:'fatal')` quand Brevo+SMTP+Resend échouent tous → fix critique pour éviter commande payée sans email
+## Completed CETTE session (énorme — 6 fixes critiques)
 
-## 🚨 BLOCKER — emails ne partent toujours pas en prod
-- **Symptôme** : commande à 0€ sur lolettshop.com → DB OK (`status=paid`) mais 0 email reçu
-- **Logs Vercel runtime** : `[Email] Brevo error: Brevo HTTP 401: {"...` → clé invalide côté runtime
-- **MAIS** : appel direct à Brevo depuis CLI Mac avec la clé `<BREVO_API_KEY — voir Vercel env ou Lyes>` → marche (messageId reçu)
-- **Hypothèse** : Vercel a la var en mode `sensitive` qui masque tout (length=0 retourné par API même si valeur présente). J'ai supprimé/recréé via `vercel env add` → toujours sensitive. Redeploy `bqqsl9wge` Ready mais pas testé après.
-- **Action immédiate prochaine session** : refaire commande test sur lolettshop.com → vérifier logs runtime → si encore 401, recréer la var via dashboard Vercel **SANS cocher Sensitive** pour pouvoir vérifier la valeur
+1. ✅ **Bug Brevo emails (résolu)** — `BREVO_API_KEY length: 89` confirmé en runtime, le bug d'hier était juste un cache Vercel. Premier email reçu à 11:01.
 
-## Next Task (PRIORITÉ ABSOLUE)
-1. Test commande à 0€ sur lolettshop.com → lire `vercel logs --no-follow | grep Brevo` → si "Sent via Brevo" = victoire
-2. Si encore 401 :
-   - Dashboard Vercel → Settings → Env Vars → supprimer `BREVO_API_KEY` → recréer **sans Sensitive** avec valeur `<BREVO_API_KEY — voir Vercel env ou Lyes>`
-   - Vérifier via `vercel env pull /tmp/.env.prod --environment=production --yes` que length > 0
-   - Redeploy : `vercel deploy --prod --yes`
-3. Une fois emails OK → tester les 3 emails (client confirmation + admin notif + facture PDF) reçus
-4. Setup DNS Brevo pour `noreply@lolettshop.com` : Brevo → Settings → Domaines → authentifier `lolettshop.com` → 3 records DNS sur Namecheap → attendre propagation → bascule `DEFAULT_FROM` dans `email-provider.ts` ligne 26
-5. Si tout OK → envoyer WhatsApp à Lola (`.planning/MESSAGE_LOLA.md`) + lancement campagne 107 contacts
+2. ✅ **6 fallbacks `onboarding@resend.dev` → `contact.lolett@gmail.com`** (commit `e969840`) :
+   - 5 templates email (welcome-newsletter, order-confirmation/refunded/cancelled/delivered/shipped)
+   - + DEFAULT_FROM dans `email-provider.ts` unifié prod/dev
+   - + Migration SQL `20260505120000_fix_email_settings_sender.sql` qui UPDATE les rows existantes + ALTER COLUMN SET DEFAULT (à appliquer côté Supabase, Lyes a fait "done" → considéré appliqué)
+
+3. ✅ **Pattern fire-and-forget → `after()` Next 15** (commit `c55a04a`) — VRAI root cause des newsletters perdues :
+   - `sendXxxEmail(...).catch(...)` lancé sans await avant `return NextResponse.json()` → Vercel Fluid Compute suspend la lambda → le fetch Brevo en cours est tué brutalement → `fetch failed` systématique
+   - Fix : 4 routes wrappées dans `after(async () => { ... })` :
+     - `/api/newsletter/subscribe`
+     - `/api/admin/orders/[id]` PATCH (×3 emails)
+     - `/api/checkout/stripe`
+     - `/api/webhooks/stripe`
+   - + Helper `withRetry` réseau-transient-only (3 tentatives Brevo, 2 SMTP, backoff 0/500/1500ms)
+   - + **Fix critique latent** : webhook Stripe `sendOrderConfirmation` wrappé try/catch (sans ça, throw → 500 → Stripe retry → idempotency check skip → email perdu pour toujours)
+
+4. ✅ **Mondial Relay widget — fix race + TOCTOU + memory leak + IDs** (commit `874f1d2`) :
+   - 4 problèmes en cascade qui faisaient nécessiter un hard refresh
+   - `waitForPluginReady()` poll toutes les 50ms (timeout 8s)
+   - `loadScript` re-check `data-loaded` après attachement listener (TOCTOU)
+   - Cancel signal passé à waitForPluginReady (memory leak unmount)
+   - `useId()` React pour IDs uniques par instance (collision)
+
+5. ✅ **DNS fixé** — record A Namecheap `216.198.79.1` (IP Vercel obsolète, en panne) → `76.76.21.21` (IP Vercel actuelle). Site est revenu accessible après cache flush.
+
+6. ✅ **Tailles 45/46/47/48 ajoutées** (commit `50b88b9`) — pour jeans grandes tailles. 3 endroits triplés (types, AVAILABLE_SIZES, VALID_SIZES webhook). Bonus fix bug pré-existant : `ProductFiltersV3` triait en lexico → maintenant sur ordre canonique.
+
+## Next Tasks (par priorité)
+
+1. **Lola : code Namecheap pour Brevo domain auth** (message WhatsApp prêt dans `.planning/MESSAGE_LOLA.md`).
+   - Workflow : Lyes envoie message → Lola répond "dispo" → Lyes clique "Continuer" sur Brevo → code envoyé sur Gmail perso de Lola → elle le transmet → Lyes saisit dans modale Brevo → Brevo écrit auto les 3 records DNS sur Namecheap → vérification ~1-2h.
+   - **Une fois validé** : changer `DEFAULT_FROM` dans `lib/email-provider.ts:26` vers `bonjour@lolettshop.com` + UPDATE SQL `email_settings.from_email`.
+
+2. **Annulation commandes 0€ avec restock** (en pause depuis ce matin) :
+   - Bug actuel : Lola ne peut PAS annuler commandes payées 100% par carte cadeau ou code promo (`payment_id = 'promo_xxx'`/`giftcard_xxx'` rejeté par Stripe.refunds.create)
+   - Scope minimal validé par Lyes :
+     - Ajouter route `/api/admin/orders/[id]/cancel` qui ne passe PAS par Stripe
+     - Marque `cancelled` + ré-incrémente stock (RPC inverse `decrementStockForOrder`) + recrédite carte cadeau si applicable + décrémente `used_count` promo + décrémente loyalty
+     - Pour les vraies commandes Stripe, déclencher refund Stripe en parallèle via le code existant
+   - Garde-fou : uniquement statut `paid` non encore expédié
+
+3. **Tester en prod cache vide** (incognito) que Mondial Relay marche maintenant sans hard refresh.
+
+4. **Tester en prod** que la migration SQL email_settings est bien appliquée (commande test → vérifier from_email = `contact.lolett@gmail.com` dans email reçu).
 
 ## 🔑 Key Context
-- **Vercel "Sensitive" trap** : les vars Sensitive masquent leur valeur partout (CLI + API + dashboard). Impossible de vérifier de l'extérieur si une var Sensitive est vide ou pleine. Toujours créer en non-Sensitive d'abord, basculer Sensitive après confirmation.
-- **Pipeline GitHub → Vercel** : maintenant fonctionnelle (auto-deploy sur push origin/main confirmé : push `290c6af` a déclenché build `1s4fduj6y` automatiquement)
-- **CSP `/checkout`** : `unsafe-eval` autorisé pour widget jQuery MR. `/checkout/success` et reste du site = strict (regex négative `/((?!checkout$).*)`)
-- **Brevo limits** : 300 emails/jour gratuit, 4MB/attachment, 20MB total. PDFs facture ~50-300KB → OK
-- **Sender Brevo** : `contact.lolett@gmail.com` Verified mais Gmail = "freemail" → délivrabilité dégradée tant que domaine `lolettshop.com` pas authentifié
-- **Resend en fallback final = mort en prod** : `gmail.com` non vérifiable sur Resend. Brevo + SMTP doivent suffire. Sentry alert si tout fail.
+
+- **Vercel auto-deploy** : marche à nouveau (commit `50b88b9` = `jvxz99uce` deploy auto). La connexion GitHub↔Vercel avait re-laché entre `c55a04a` et `874f1d2` (fix Mondial Relay), Lyes a dû déployer à la main via `vercel deploy --prod` depuis la racine du repo (en copiant `.vercel/` à la racine, supprimé après).
+- **Vercel CLI piège** : `vercel deploy --prod --yes` depuis `lolett-app/` échoue avec "path does not exist" car Root Directory du projet Vercel est déjà configuré sur `lolett-app`. Solution : copier `.vercel/` à la racine du repo et deploy depuis là.
+- **Fluid Compute fire-and-forget = MORT** : ne JAMAIS faire `sendXxx(...).catch(...)` sans await ou `after()`. La lambda peut être suspendue dès le `return`. Toute opération réseau post-réponse DOIT être dans `after()`.
+- **`after()` syntax** : prend une **fonction** (`after(async () => { ... })`), pas une promesse déjà créée (`after(promise)` = ne marche pas comme attendu).
+- **Brevo wrap** : tant que domaine `lolettshop.com` pas authentifié, sender réécrit en `contact.lolett@11155531.brevosend.com`. Cache Lyes/Lola : c'est moche mais ça marche, fix avec auth domaine (étape Lola en cours).
+- **Tailles** : système hardcoded 4 endroits (3 dans le code, 1 dans le filtre). Pour ajouter dynamiquement : ~4-6h refactor (table DB + perte type safety + page admin). DIFFÉRÉ post-launch.
 
 ## Pour reprendre PROCHAINE session
-Dis : **"on attaque le bug Brevo, fais un test commande puis lis les logs"**
-→ Je ferai test commande prod → lecture logs → fix selon symptôme.
+Dis : **"on attaque l'annulation commandes 0€"** ou **"Lola a envoyé le code Brevo"**.
