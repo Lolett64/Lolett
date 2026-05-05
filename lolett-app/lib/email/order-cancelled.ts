@@ -45,13 +45,14 @@ export async function sendOrderCancelled(data: CancelledEmailData) {
     }, overrides);
 
     const fromName = settings?.from_name || 'LOLETT';
-    const fromEmail = settings?.from_email || 'contact.lolett@gmail.com';
+    const fromEmail = settings?.from_email || 'bonjour@lolettshop.com';
     const subject = settings?.subject_template
       ? interpolate(settings.subject_template, vars)
       : `Votre commande ${data.orderNumber} a été annulée`;
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
+      replyTo: 'bonjour@lolettshop.com',
       to: data.to,
       subject,
       html,

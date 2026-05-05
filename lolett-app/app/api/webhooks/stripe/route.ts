@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
           });
           const deliveryRes = await sendHtmlEmail({
             to: existingGc.recipient_email,
+            replyTo: 'bonjour@lolettshop.com',
             subject: `${existingGc.purchaser_name ? `${existingGc.purchaser_name} vous offre` : 'Une carte cadeau'} une carte cadeau LOLETT`,
             html: deliveryHtml,
           });
@@ -190,6 +191,7 @@ export async function POST(req: NextRequest) {
           });
           const purchaseRes = await sendHtmlEmail({
             to: existingGc.purchaser_email,
+            replyTo: 'bonjour@lolettshop.com',
             subject: 'Votre achat de carte cadeau LOLETT',
             html: purchaseHtml,
           });

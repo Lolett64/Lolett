@@ -148,9 +148,11 @@ export async function POST(request: NextRequest) {
     minute: '2-digit',
   });
 
-  // Envoi de la notification admin (best-effort)
+  // Envoi de la notification admin (best-effort).
+  // replyTo = email du visiteur pour que Lola puisse répondre directement.
   const notificationResult = await sendHtmlEmail({
     to: adminEmail,
+    replyTo: trimmedEmail,
     subject: `[LOLETT Contact] ${trimmedSubject}`,
     html: renderContactNotification({
       name: trimmedName,
@@ -168,6 +170,7 @@ export async function POST(request: NextRequest) {
   // Envoi de l'accusé de réception au visiteur (best-effort)
   const ackResult = await sendHtmlEmail({
     to: trimmedEmail,
+    replyTo: 'bonjour@lolettshop.com',
     subject: 'On a bien reçu ton message — LOLETT',
     html: renderContactAcknowledgment({
       name: trimmedName,

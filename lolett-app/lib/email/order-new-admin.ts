@@ -154,6 +154,8 @@ export async function sendNewOrderAlertToAdmin(data: AdminOrderAlertData) {
   const rawSubject = `Nouvelle commande ${data.orderNumber} — ${data.total.toFixed(2)} € — ${cleanFirst} ${cleanLast}`;
   const subject = rawSubject.length > 200 ? rawSubject.slice(0, 197) + '...' : rawSubject;
 
+  // Pas de replyTo : email admin → admin (Lola se notifie elle-même).
+  // Action attendue = aller dans /admin, pas répondre par email.
   return sendHtmlEmail({
     to: adminEmail,
     subject,

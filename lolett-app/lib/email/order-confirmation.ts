@@ -61,12 +61,13 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
     }, overrides);
 
     const fromName = settings?.from_name || 'LOLETT';
-    const fromEmail = settings?.from_email || 'contact.lolett@gmail.com';
+    const fromEmail = settings?.from_email || 'bonjour@lolettshop.com';
     const subject = settings?.subject_template?.replace('{orderNumber}', data.orderNumber)
       || `Confirmation de commande ${data.orderNumber}`;
 
     const result = await sendHtmlEmail({
       from: `${fromName} <${fromEmail}>`,
+      replyTo: 'bonjour@lolettshop.com',
       to: data.to,
       subject,
       html,
