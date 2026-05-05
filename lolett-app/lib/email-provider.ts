@@ -60,7 +60,48 @@ function parseFromAddress(from: string): { email: string; name?: string } {
   return { email: from.trim() };
 }
 
-async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Erreurs réseau transientes qui valent un retry. Les erreurs HTTP (401, 4xx,
+// 5xx) ne sont PAS dans cette liste : si Brevo répond 401, retry inutile.
+const TRANSIENT_PATTERNS = [
+  'fetch failed',           // undici timeout/connect error
+  'ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND',
+  'EBUSY',                  // DNS lookup busy (vu sur Vercel Fluid Compute)
+  'EAI_AGAIN',              // DNS résolu temporairement indisponible
+  'socket hang up',
+];
+
+function isTransientNetworkError(message: string): boolean {
+  return TRANSIENT_PATTERNS.some((p) => message.includes(p));
+}
+
+// Retry uniquement sur erreurs réseau transientes. Backoff exponentiel court
+// (max ~2s total) pour rester sous le timeout serverless. Les erreurs API
+// (HTTP 4xx/5xx) sont propagées immédiatement sans retry.
+async function withRetry<T extends { success: boolean; error?: string }>(
+  label: string,
+  fn: () => Promise<T>,
+  maxAttempts = 3,
+): Promise<T> {
+  let lastResult: T | undefined;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const result = await fn();
+    if (result.success) return result;
+    lastResult = result;
+
+    const isLast = attempt === maxAttempts;
+    const transient = result.error ? isTransientNetworkError(result.error) : false;
+    if (isLast || !transient) return result;
+
+    const delayMs = attempt === 1 ? 500 : 1500;
+    console.warn(`[Email][${label}] attempt ${attempt}/${maxAttempts} failed, retrying in ${delayMs}ms (${result.error})`);
+    await sleep(delayMs);
+  }
+  return lastResult!;
+}
+
+async function sendViaBrevoOnce(opts: SendOptions): Promise<SendResult> {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
     return { success: false, error: 'BREVO_API_KEY not configured' };
@@ -109,7 +150,11 @@ async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
   }
 }
 
-async function sendViaSmtp(opts: SendOptions): Promise<SendResult> {
+async function sendViaBrevo(opts: SendOptions): Promise<SendResult> {
+  return withRetry('Brevo', () => sendViaBrevoOnce(opts), 3);
+}
+
+async function sendViaSmtpOnce(opts: SendOptions): Promise<SendResult> {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
     return { success: false, error: 'SMTP not configured' };
   }
@@ -128,6 +173,10 @@ async function sendViaSmtp(opts: SendOptions): Promise<SendResult> {
     console.error('[Email] SMTP failed:', message);
     return { success: false, error: message };
   }
+}
+
+async function sendViaSmtp(opts: SendOptions): Promise<SendResult> {
+  return withRetry('SMTP', () => sendViaSmtpOnce(opts), 2);
 }
 
 async function sendViaResend(opts: SendOptions): Promise<SendResult> {

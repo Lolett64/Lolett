@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -94,9 +95,16 @@ export async function POST(req: NextRequest | Request) {
     return NextResponse.json({ error: 'Storage error' }, { status: 500 });
   }
 
-  // Fire-and-forget welcome email
-  sendWelcomeNewsletterEmail({ to: email }).catch((err) => {
-    console.warn('[newsletter] welcome email failed:', err);
+  // Welcome email envoyé APRÈS la réponse via after() de Next 15 : ne bloque
+  // pas le retour user, mais garde la lambda vivante jusqu'à la fin de l'envoi.
+  // Sans after(), Vercel Fluid Compute peut suspendre la fonction à la réponse,
+  // tuant le fetch Brevo en cours → "fetch failed" systématique.
+  after(async () => {
+    try {
+      await sendWelcomeNewsletterEmail({ to: email });
+    } catch (err) {
+      console.warn('[newsletter] welcome email failed:', err);
+    }
   });
 
   return NextResponse.json({ ok: true });

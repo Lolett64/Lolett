@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -159,43 +159,64 @@ export async function PATCH(
         .select('product_name, size, quantity, price')
         .eq('order_id', id);
 
-      sendOrderShipped({
-        to: customer.email,
-        orderNumber,
-        items: (orderItems ?? []).map((i: { product_name: string; size: string; quantity: number; price: number }) => ({
-          productName: i.product_name,
-          size: i.size,
-          quantity: i.quantity,
-          price: i.price,
-        })),
-        customer,
-        subtotal: Number(updated.total) - Number(updated.shipping),
-        shipping: Number(updated.shipping),
-        total: Number(updated.total),
-        trackingNumber: body.trackingNumber || (updated.tracking_number as string | undefined),
-        shippingMethod: (updated.shipping_method as 'home' | 'mondial_relay' | null) ?? undefined,
-        shippingCarrier: (updated.shipping_carrier as 'colissimo' | 'mondial_relay' | null) ?? undefined,
-        pickupPoint: (updated.pickup_point as import('@/types').PickupPoint | null) ?? null,
-      }).catch((err: unknown) => console.error('[Admin orders PATCH] Shipped email error:', err));
+      // after() : envoi post-réponse pour ne pas bloquer l'admin, mais garde
+      // la lambda vivante (sinon Vercel suspend la fonction et le fetch Brevo
+      // est tué → "fetch failed").
+      after(async () => {
+        try {
+          await sendOrderShipped({
+            to: customer.email,
+            orderNumber,
+            items: (orderItems ?? []).map((i: { product_name: string; size: string; quantity: number; price: number }) => ({
+              productName: i.product_name,
+              size: i.size,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+            customer,
+            subtotal: Number(updated.total) - Number(updated.shipping),
+            shipping: Number(updated.shipping),
+            total: Number(updated.total),
+            trackingNumber: body.trackingNumber || (updated.tracking_number as string | undefined),
+            shippingMethod: (updated.shipping_method as 'home' | 'mondial_relay' | null) ?? undefined,
+            shippingCarrier: (updated.shipping_carrier as 'colissimo' | 'mondial_relay' | null) ?? undefined,
+            pickupPoint: (updated.pickup_point as import('@/types').PickupPoint | null) ?? null,
+          });
+        } catch (err) {
+          console.error('[Admin orders PATCH] Shipped email error:', err);
+        }
+      });
     }
 
     if (body.status === 'delivered') {
-      sendOrderDelivered({
-        to: customer.email,
-        orderNumber,
-        firstName: customer.firstName,
-      }).catch((err: unknown) => console.error('[Admin orders PATCH] Delivered email error:', err));
+      after(async () => {
+        try {
+          await sendOrderDelivered({
+            to: customer.email,
+            orderNumber,
+            firstName: customer.firstName,
+          });
+        } catch (err) {
+          console.error('[Admin orders PATCH] Delivered email error:', err);
+        }
+      });
     }
 
     if (body.status === 'cancelled') {
       const wasPaid = ['paid', 'confirmed', 'shipped', 'delivered'].includes(currentOrder.status);
-      sendOrderCancelled({
-        to: customer.email,
-        orderNumber,
-        firstName: customer.firstName,
-        reason: body.cancelReason,
-        wasPaid,
-      }).catch((err: unknown) => console.error('[Admin orders PATCH] Cancelled email error:', err));
+      after(async () => {
+        try {
+          await sendOrderCancelled({
+            to: customer.email,
+            orderNumber,
+            firstName: customer.firstName,
+            reason: body.cancelReason,
+            wasPaid,
+          });
+        } catch (err) {
+          console.error('[Admin orders PATCH] Cancelled email error:', err);
+        }
+      });
     }
 
     // Note : pas de branche 'refunded' ici — l'email de remboursement est

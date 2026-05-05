@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -405,43 +405,58 @@ export async function POST(req: NextRequest) {
         console.error('[Stripe webhook] Invoice generation failed:', err);
       }
 
-      // 5. Confirmation email
-      await sendOrderConfirmation({
-        to: customer.email,
-        orderNumber: order.orderNumber,
-        items: items.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
-          productName: i.productName,
-          size: i.size,
-          quantity: i.quantity,
-          price: i.price,
-        })),
-        customer,
-        subtotal: grossTotal - shipping,
-        shipping,
-        total: finalTotal,
-        promoCode,
-        promoDiscount,
-        giftCardCode,
-        giftCardAmount,
-        shippingMethod,
-        pickupPoint,
-        invoicePdf,
-      });
+      // 5. Confirmation email — try/catch impératif : si l'email throw, le
+      // webhook Stripe retournerait 500 → Stripe retry → idempotency check
+      // hit la unique constraint sur stripe_webhook_events → skip l'envoi sur
+      // le retry → email perdu pour toujours.
+      try {
+        await sendOrderConfirmation({
+          to: customer.email,
+          orderNumber: order.orderNumber,
+          items: items.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
+            productName: i.productName,
+            size: i.size,
+            quantity: i.quantity,
+            price: i.price,
+          })),
+          customer,
+          subtotal: grossTotal - shipping,
+          shipping,
+          total: finalTotal,
+          promoCode,
+          promoDiscount,
+          giftCardCode,
+          giftCardAmount,
+          shippingMethod,
+          pickupPoint,
+          invoicePdf,
+        });
+      } catch (emailErr) {
+        console.error('[Stripe webhook] Confirmation email failed:', emailErr);
+      }
 
-      // 5b. Admin notification (non-blocking — must never fail the webhook)
-      sendNewOrderAlertToAdmin({
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        customer,
-        items,
-        subtotal: grossTotal - shipping,
-        shipping,
-        total: finalTotal,
-        shippingMethod,
-        pickupPoint,
-        promoCode,
-        giftCardCode,
-      }).catch((err: unknown) => console.error('[Stripe webhook] Admin alert email failed:', err));
+      // 5b. Admin notification (post-réponse via after() — ne doit jamais
+      // bloquer le webhook, mais doit garder la lambda vivante pour finir le
+      // fetch Brevo, sinon Vercel suspend la fonction et "fetch failed".
+      after(async () => {
+        try {
+          await sendNewOrderAlertToAdmin({
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            customer,
+            items,
+            subtotal: grossTotal - shipping,
+            shipping,
+            total: finalTotal,
+            shippingMethod,
+            pickupPoint,
+            promoCode,
+            giftCardCode,
+          });
+        } catch (err) {
+          console.error('[Stripe webhook] Admin alert email failed:', err);
+        }
+      });
 
       // 7. Increment promo_codes.used_count if a promo was applied
       try {

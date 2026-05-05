@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -350,25 +350,33 @@ export async function POST(req: NextRequest) {
         console.error('[POST /api/checkout/stripe] email error:', emailErr);
       }
 
-      // Admin notification — non-blocking
-      sendNewOrderAlertToAdmin({
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        customer,
-        items: verifiedItems.map((i) => ({
-          productName: i.productName,
-          size: i.size,
-          quantity: i.quantity,
-          price: i.price,
-        })),
-        subtotal,
-        shipping,
-        total: finalTotal,
-        shippingMethod,
-        pickupPoint,
-        promoCode: promoValidatedCode ?? undefined,
-        giftCardCode: giftCardValidatedCode ?? undefined,
-      }).catch((err: unknown) => console.error('[POST /api/checkout/stripe] admin alert failed:', err));
+      // Admin notification — post-réponse via after() pour ne pas bloquer le
+      // user, mais garde la lambda vivante (sinon Vercel suspend la fonction
+      // et le fetch Brevo est tué → "fetch failed").
+      after(async () => {
+        try {
+          await sendNewOrderAlertToAdmin({
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            customer,
+            items: verifiedItems.map((i) => ({
+              productName: i.productName,
+              size: i.size,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+            subtotal,
+            shipping,
+            total: finalTotal,
+            shippingMethod,
+            pickupPoint,
+            promoCode: promoValidatedCode ?? undefined,
+            giftCardCode: giftCardValidatedCode ?? undefined,
+          });
+        } catch (err) {
+          console.error('[POST /api/checkout/stripe] admin alert failed:', err);
+        }
+      });
 
       return NextResponse.json({
         url: `${siteUrl}/checkout/success?gift_card=1&order_id=${order.id}`,
