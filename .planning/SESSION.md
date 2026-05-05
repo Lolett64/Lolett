@@ -1,66 +1,69 @@
-# Session State — 2026-05-05 18:00 (LAUNCH J — quasi-finalisé)
+# Session State — 2026-05-05 22:30 (Brevo sender switch DONE)
 
 ## Branch + Deploy
-- **Branch** : `main` HEAD `e46a62f` (clean, push à jour)
-- **Vercel prod** : `gj5n78wa1` Ready (auto-deploy validé en 2 min)
-- **URL prod** : https://lolettshop.com (testé OK par Lyes en privée)
+- **Branch** : `main` HEAD `7b2d86f` (clean, push à jour)
+- **Vercel prod** : auto-deployed après merge — testé OK par Lyes
+- **URL prod** : https://lolettshop.com (mail test reçu avec bon sender)
 
 ## Completed CETTE session
 
-### 1. ✅ Bug Mondial Relay autocomplete RÉSOLU (vraie cause cette fois)
-**Cause racine identifiée via brainstorming superpower** : ce n'était PAS un bug JS de timing (les 4 fixes du commit `874f1d2` d'hier étaient sur la mauvaise piste). C'est une **CSP héritée par soft-nav Next.js** :
-- `/panier` a une CSP **stricte** (sans `'unsafe-eval'`)
-- `/checkout` a une CSP **avec `'unsafe-eval'`** (cf. `next.config.ts:19` — requis par le plugin jQuery MR qui parse JSONP via `eval()`)
-- Quand utilisateur clique `<Link href="/checkout">` depuis `/panier`, soft-nav Next.js → la CSP de `/panier` reste active → `eval()` du widget MR bloqué → 0 résultat / autocomplete vide
-- Hard refresh fixait parce qu'il rechargeait le document avec la bonne CSP
+### ✅ Switch sender Brevo → bonjour@lolettshop.com (DONE end-to-end)
 
-**Fix** : remplacer `<Link href="/checkout">` par `<a href="/checkout">` natif sur les **3 points d'entrée** vers checkout pour forcer un hard reload.
+**Objectif initial** : tous les emails transactionnels partaient avec `contact.lolett@gmail.com` → Gmail/Outlook ajoutaient "via brevosend.com" → branding moche pré-launch. Maintenant que `lolettshop.com` est authentifié dans Brevo (DKIM brevo1+brevo2, SPF spf.brevo.com, DMARC), on peut signer cryptographiquement au nom du domaine.
 
-**4 commits** (en plus spec + plan committés) :
-- `ea00c50` fix(checkout): hard nav vers /checkout depuis CartSummary
-- `3ac1a75` fix(a11y): fusionne <a><button> en <a> seul dans CartSummary (issue MEDIUM HTML5 §4.5.1 nesting interactif relevée par code-reviewer)
-- `2bb0275` fix(checkout): hard nav vers /checkout depuis OrderSummary (Button asChild + a, OK)
-- `e46a62f` fix(checkout): hard nav vers /checkout depuis CartBadge mini-panier
+**Code (commit `fc6db76` mergé via merge commit `7b2d86f`)** :
+- `lib/email-provider.ts` : `DEFAULT_FROM` → `LOLETT <bonjour@lolettshop.com>` + support `replyTo` propagé sur Brevo HTTP API + SMTP nodemailer + Resend SDK
+- 6 templates email (`order-confirmation`, `order-shipped`, `order-delivered`, `order-cancelled`, `order-refunded`, `welcome-newsletter`) : fallback bonjour@ + `replyTo: 'bonjour@lolettshop.com'`
+- 3 routes API (`/api/contact`, `/api/admin/launch-campaign/send`, `/api/webhooks/stripe` gift cards) : replyTo
+- `order-new-admin.ts` + `dispute-alert.ts` : pas de replyTo (admin→admin, doc inline)
+- Test `order-cancelled.test.ts` : assertions alignées + nouveau check `replyTo`
+- Migration SQL `20260505190000_switch_sender_to_lolettshop_com.sql` : UPDATE email_settings + ALTER DEFAULT (appliquée en prod via SQL Editor par Lyes)
 
-**Process suivi** : superpower brainstorming → spec validée par Lyes (`docs/superpowers/specs/2026-05-05-mondial-relay-csp-soft-nav-fix-design.md`) → writing-plans → subagent-driven-development (1 implémenteur + 2 reviewers par task : spec compliance + code quality) → final code review feature-dev:code-reviewer → push → test prod OK.
+**Infra (côté Lyes)** :
+- Sender `Lolett <bonjour@lolettshop.com>` ajouté + Vérifié dans Brevo (https://app.brevo.com/senders/list)
+- Forwarder Namecheap `bonjour → contact.lolett@gmail.com` confirmé (déjà en place)
+- SPF Brevo ajouté DNS Namecheap : `v=spf1 include:spf.brevo.com ~all` (TXT @)
+- DMARC enrichi : `v=DMARC1; p=none; rua=mailto:bonjour@lolettshop.com; ruf=mailto:bonjour@lolettshop.com; fo=1` (propagation 5-30 min)
+- `BREVO_API_KEY` env var Vercel : ajoutée Preview environment (était Production-only — cause du bug initial qui faisait fallback SMTP Gmail → réécriture du From)
 
-**1 issue HIGH différée P2** : dropdown CartBadge piloté uniquement par `onMouseEnter/onMouseLeave`, inaccessible au clavier (pré-existant, workaround icône sac → /panier viable). Fix prévu : ajouter `onFocus/onBlur` sur le `<div ref={containerRef}>`. Ajouté dans `memory/project_ux_audit_p2_followup.md`.
+**Process suivi** : code review feature-dev:code-reviewer 2× (1 pré-push + 1 final) → triage VRAI/FAUX POSITIF → fix issues VRAIES → tsc clean → tests 4/4 → preview Vercel testée → merge → vérif prod testée par Lyes.
 
-### 2. ✅ Domaine `lolettshop.com` AUTHENTIFIÉ dans Brevo
-- Lola a envoyé le code Namecheap → saisie OK → DKIM/DMARC posés → Brevo affiche **"Authentifié"** (point vert sur `app.brevo.com/senders/domain/list`)
-- ⚠️ **Code PAS encore mis à jour** pour utiliser `bonjour@lolettshop.com` — les emails partent toujours depuis `contact.lolett@11155531.brevosend.com` (sender Brevo générique)
+## 🐛 Bug appris (à ne PAS oublier)
+
+**SMTP Gmail réécrit le From** : si Brevo échoue (ex: env var manquante) → fallback SMTP Gmail → Gmail réécrit silencieusement le `From:` à l'adresse du compte SMTP authentifié pour empêcher l'usurpation. Symptôme : mail reçu avec sender ancien sans erreur visible côté code. Diagnostic : checker logs Vercel `[Email] Brevo failed, falling back to SMTP...`.
+
+**Lesson** : toujours vérifier que les env vars critiques (BREVO_API_KEY, etc.) sont définies sur **toutes** les environments Vercel (Production + Preview + Development) — Vercel ne le fait pas par défaut.
 
 ## Next Tasks (par priorité)
 
-### 1. **Brevo : switch DEFAULT_FROM vers bonjour@lolettshop.com** (15-20 min, prochaine session neuve demandée par Lyes)
+### 1. **Annulation commandes 0€ avec restock** (en pause depuis 3 sessions, gros chantier)
+Bug : Lola ne peut PAS annuler commandes payées 100% par carte cadeau ou code promo (`payment_id = 'promo_xxx'/'giftcard_xxx'` rejeté par `Stripe.refunds.create`).
+Scope minimal validé par Lyes : route `/api/admin/orders/[id]/cancel` qui ne passe PAS par Stripe — marque `cancelled` + ré-incrémente stock + recrédite carte cadeau si applicable + décrémente `used_count` promo + décrémente loyalty. Pour les vraies commandes Stripe, déclencher refund Stripe en parallèle. Garde-fou : uniquement statut `paid` non encore expédié.
 
-**Scope minimal validé** :
-- Changer `DEFAULT_FROM` dans `lolett-app/lib/email-provider.ts` (ligne ~26) vers `bonjour@lolettshop.com`
-- UPDATE SQL `email_settings.from_email` côté Supabase prod
-- Test : envoyer un email (newsletter ou commande test) → vérifier que le `From:` du mail reçu est bien `bonjour@lolettshop.com` (et non plus `contact.lolett@11155531.brevosend.com`)
+### 2. **Indexation Search Console — diagnostic** (15 min)
+Lyes a partagé un screenshot SC : 4 pages soumises, 2 problèmes (1 "Page avec redirection", 1 "Explorée actuellement non indexée"). Demander à Lyes les URLs exactes en cliquant sur chaque ligne SC, puis fix au cas par cas (probablement trailing slash ou www/non-www).
 
-**Pourquoi maintenant** : tant que c'est pas fait, les emails clients partent avec une adresse expediteur Brevo générique (moche pour le branding pré-launch). Risque zéro maintenant que le domaine est authentifié.
+### 3. **DMARC durcissement post 2 semaines** (P3)
+Une fois 2 semaines de rapports DMARC propres reçus dans Gmail Lola, durcir `p=none` → `p=quarantine` puis `p=reject`. Permet de blinder contre l'usurpation de domaine.
 
-### 2. **Annulation commandes 0€ avec restock** (en pause depuis 2 sessions)
-- Bug : Lola ne peut PAS annuler commandes payées 100% par carte cadeau ou code promo (`payment_id = 'promo_xxx'/'giftcard_xxx'` rejeté par `Stripe.refunds.create`)
-- Scope minimal validé par Lyes :
-  - Route `/api/admin/orders/[id]/cancel` qui ne passe PAS par Stripe
-  - Marque `cancelled` + ré-incrémente stock (RPC inverse `decrementStockForOrder`) + recrédite carte cadeau si applicable + décrémente `used_count` promo + décrémente loyalty
-  - Pour les vraies commandes Stripe, déclencher refund Stripe en parallèle via le code existant
-- Garde-fou : uniquement statut `paid` non encore expédié
+### 4. **Filtre Gmail pour rapports DMARC** (P3, 5 min)
+Lola va recevoir 1-3 mails XML/jour à `bonjour@lolettshop.com` (forwardés vers Gmail). Créer filtre Gmail : `from:noreply-dmarc-support@google.com OR from:dmarc@yahoo-inc.com OR subject:"Report Domain"` → archiver auto + label "DMARC Reports".
 
-### 3. **Erreurs annexes console prod** (P2, post-launch)
-- `Brand%20story%20background.jpeg` 404 (×2) — image manquante dans le storytelling
-- Minified React error #418 — hydration mismatch (probablement `OurStory` ou similaire)
+### 5. **Erreurs annexes console prod** (P2, post-launch)
+- `Brand%20story%20background.jpeg` 404 (×2) — image manquante storytelling
+- Minified React error #418 — hydration mismatch (probablement OurStory ou similaire)
 - A11y dropdown CartBadge clavier (cf. memory P2 follow-up)
+
+### 6. **Refactor Mondial Relay v1.1** (P3, post-launch)
+Remplacer le widget jQuery MR par notre propre composant React + route API serveur appelant l'API officielle Mondial Relay. Permettra de supprimer `'unsafe-eval'` partout.
 
 ## 🔑 Key Context
 
-- **Soft-nav Next.js + CSP différentes** : si jamais on a une autre page avec CSP particulière, **toujours** vérifier que les liens entrants forcent un hard reload (`<a href>` natif, pas `<Link>`). C'est un piège récurrent.
-- **CSP stricte ailleurs préservée** : on n'a PAS étendu `'unsafe-eval'` à tout le site (sécurité maintenue). C'était un choix conscient documenté dans `next.config.ts:14-18`.
-- **Refactor MR v1.1 post-launch** : remplacer le widget jQuery MR par notre propre composant React + route API serveur appelant l'API officielle Mondial Relay. Permettra de supprimer `'unsafe-eval'` partout. Toujours planifié.
-- **Brevo domain `lolettshop.com`** : maintenant Authentifié. La prochaine session doit JUSTE faire le switch code/SQL — pas besoin de retoucher la conf DNS/Brevo.
-- **Process subagent-driven-development testé et validé** : 4 implémenteurs Haiku + 4 spec reviewers + 4 code reviewers + 1 final review = ~30 min pour un fix critical pré-launch avec qualité bossée. Pattern à reproduire pour les fixes futurs non triviaux.
+- **CSP soft-nav Next.js piège** : si une page a une CSP particulière, **toujours** vérifier que les liens entrants forcent un hard reload (`<a href>` natif, pas `<Link>`). Pattern récurrent (cf. fix Mondial Relay session précédente).
+- **Brevo Senders ≠ Domaines** : 2 systèmes séparés. Authentifier le domaine ne suffit pas — il faut aussi ajouter chaque sender (`bonjour@`, etc.) individuellement dans https://app.brevo.com/senders/list.
+- **Vercel env vars par environment** : ne pas oublier de cocher "Preview" + "Production" + "Development" pour les vars critiques. Sinon les previews tombent silencieusement sur les fallbacks.
+- **Process subagent-driven-development + code-reviewer 2× validé** : pré-push + post-merge final = qualité bossée. Pattern à reproduire.
+- **Resend conservé** : 3-tier fallback Brevo → SMTP Gmail → Resend. Coût zéro, filet de sécurité critique pour les emails de commande. À réévaluer +3 mois post-launch.
 
 ## Pour reprendre PROCHAINE session
-Dis : **"on attaque le switch DEFAULT_FROM Brevo vers bonjour@lolettshop.com"** ou **"on attaque l'annulation commandes 0€"**.
+Dis : **"on attaque l'annulation commandes 0€"** ou **"on diagnostique l'indexation Search Console"** ou **"check les rapports DMARC"**.
