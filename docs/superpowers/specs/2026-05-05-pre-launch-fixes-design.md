@@ -189,9 +189,15 @@ twitter: {
 
 ---
 
-### NOUVEAU — Page `/desabonnement` minimaliste (LÉGAL marketing)
+### NOUVEAU — Page `/desabonnement` minimaliste (LÉGAL marketing) — **REPORTÉ POST-LAUNCH**
 
-**Contexte** : décision Lyes — on ne fixe pas le lien désabo dans l'email transactionnel (#6) mais on le doit pour les emails **marketing** (newsletter, launch-campaign). Scope minimal validé.
+**Décision Lyes (2026-05-05)** : feature reportée à la session suivante. Pour le launch, on se contente de **retirer les liens `href="#"` cassés** dans les templates marketing existants (`welcome-newsletter.ts`, `launch-invitation-v3.ts`) et de mettre à la place un texte "Pour vous désabonner, écrivez à bonjour@lolettshop.com" — légalement suffisant à court terme.
+
+Le scope complet ci-dessous reste documenté pour la prochaine session.
+
+---
+
+**Contexte** : on ne fixe pas le lien désabo dans l'email transactionnel (#6) mais on le doit pour les emails **marketing** (newsletter, launch-campaign). Scope minimal validé.
 
 **Fichiers à créer** :
 
@@ -334,10 +340,11 @@ Test manuel après deploy preview :
 
 | Var | Production | Preview | Development | Notes |
 |-----|------------|---------|-------------|-------|
-| `UNSUBSCRIBE_TOKEN_SECRET` | ✅ | ✅ | ✅ | Random 32+ chars hex, ne jamais le révoquer (les liens deviendraient invalides) |
-| `NEXT_PUBLIC_SITE_URL` | ✅ | ✅ | ✅ | `https://lolettshop.com` en prod, URL preview en preview, `http://localhost:3000` en dev — utilisé pour construire les liens emails |
+| `NEXT_PUBLIC_SITE_URL` | ✅ | ✅ | ✅ | `https://lolettshop.com` en prod, URL preview en preview, `http://localhost:3000` en dev — utilisé pour construire le lien "Mentions légales" dans les emails (#6) |
 
-⚠️ Action manuelle Lyes : ajouter ces 2 vars dans Vercel avant deploy.
+⚠️ Action manuelle Lyes : ajouter cette var dans Vercel avant deploy.
+
+**Reporté post-launch** : `UNSUBSCRIBE_TOKEN_SECRET` (sera ajoutée quand on implémentera la feature désabonnement).
 
 ---
 
@@ -353,11 +360,12 @@ Test manuel après deploy preview :
 | #7 page politique cookies | 25 min | 5 min |
 | #8 mentions périmées | 10 min | 5 min |
 | #9 OG image | 3 min | 5 min (partage test) |
-| Désabo page + token + helpers | 40 min | 10 min |
+| ~~Désabo page + token + helpers~~ | ~~40 min~~ | ~~10 min~~ | reporté post-launch |
+| Retrait liens cassés templates marketing + texte fallback | 5 min | — |
 | **Code review final + fix issues** | 20 min | — |
-| **Total** | **~2h30** | **~1h** |
+| **Total** | **~1h55** | **~50 min** |
 
-= **~3h30** total, marge de sécurité incluse.
+= **~2h45** total, marge de sécurité incluse.
 
 ---
 
