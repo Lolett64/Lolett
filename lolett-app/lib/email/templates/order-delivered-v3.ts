@@ -92,7 +92,7 @@ export function renderOrderDeliveredV3(data: DeliveredEmailData, overrides?: Ema
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="border: 1px solid #C4956A; border-radius: 50px; padding: 13px 44px;">
-                    <a href="${overrides?.cta_url || '#'}" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
+                    <a href="${overrides?.cta_url || `${siteUrl}/contact`}" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
                       ${overrides?.cta_text || 'Donner mon avis'}
                     </a>
                   </td>
