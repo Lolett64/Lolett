@@ -143,12 +143,89 @@ export function OrderStatusUpdate({
     void performUpdate();
   }
 
+  // Workflow visuel : étapes principales du cycle de vie d'une commande
+  const WORKFLOW_STEPS: { value: string; label: string; icon: string }[] = [
+    { value: 'paid', label: 'Payée', icon: '💳' },
+    { value: 'confirmed', label: 'Confirmée', icon: '✓' },
+    { value: 'shipped', label: 'Expédiée', icon: '📦' },
+    { value: 'delivered', label: 'Livrée', icon: '🏠' },
+  ];
+  const currentStepIndex = WORKFLOW_STEPS.findIndex((s) => s.value === currentStatus);
+  const showWorkflow = currentStepIndex >= 0;
+  const nextStep = showWorkflow && currentStepIndex < WORKFLOW_STEPS.length - 1
+    ? WORKFLOW_STEPS[currentStepIndex + 1]
+    : null;
+
   return (
     <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
       <CardHeader>
         <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Gérer la commande</CardTitle>
       </CardHeader>
       <CardContent className="font-[family-name:var(--font-montserrat)] flex flex-col gap-4">
+        {/* Workflow visuel — montre les étapes successives et où on en est */}
+        {showWorkflow && (
+          <div className="rounded-lg border border-[#e8e0d6] bg-[#fdfaf5] p-4">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40 mb-3">
+              Cycle de vie de la commande
+            </p>
+            <div className="flex items-center justify-between gap-1 mb-3">
+              {WORKFLOW_STEPS.map((step, idx) => {
+                const isPast = idx < currentStepIndex;
+                const isCurrent = idx === currentStepIndex;
+                const isFuture = idx > currentStepIndex;
+                return (
+                  <div key={step.value} className="flex items-center flex-1">
+                    <div className="flex flex-col items-center flex-1">
+                      <div
+                        className={[
+                          'flex items-center justify-center rounded-full size-8 text-sm transition-colors',
+                          isCurrent && 'bg-[#1B0B94] text-white ring-2 ring-[#1B0B94]/20',
+                          isPast && 'bg-emerald-100 text-emerald-700',
+                          isFuture && 'bg-[#1a1510]/5 text-[#1a1510]/30',
+                        ].filter(Boolean).join(' ')}
+                      >
+                        {step.icon}
+                      </div>
+                      <span
+                        className={[
+                          'mt-1.5 text-[11px] text-center',
+                          isCurrent && 'font-semibold text-[#1B0B94]',
+                          isPast && 'text-emerald-700',
+                          isFuture && 'text-[#1a1510]/40',
+                        ].filter(Boolean).join(' ')}
+                      >
+                        {step.label}
+                      </span>
+                    </div>
+                    {idx < WORKFLOW_STEPS.length - 1 && (
+                      <div
+                        className={[
+                          'h-0.5 flex-1 -mt-5',
+                          idx < currentStepIndex ? 'bg-emerald-300' : 'bg-[#1a1510]/10',
+                        ].join(' ')}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {nextStep && (
+              <p className="text-[12px] text-[#1a1510]/70 leading-relaxed">
+                <span className="font-medium text-[#1B0B94]">Prochaine étape :</span>{' '}
+                passer en <strong>{nextStep.label}</strong>
+                {nextStep.value === 'confirmed' && ' — vérifier le stock et préparer le colis.'}
+                {nextStep.value === 'shipped' && ' — entrer le n° Mondial Relay (un email de suivi sera envoyé au client).'}
+                {nextStep.value === 'delivered' && ' — confirmer la réception (un email final sera envoyé au client).'}
+              </p>
+            )}
+            {!nextStep && currentStatus === 'delivered' && (
+              <p className="text-[12px] text-emerald-700 leading-relaxed">
+                ✓ Commande terminée. Aucune action supplémentaire requise.
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <Label className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">Statut</Label>
           <Select value={status} onValueChange={setStatus} disabled={isLockedStatus}>
