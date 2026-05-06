@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     firstName,
     promoCode,
     discountLabel: `-${discount}%`,
-    shopUrl: `${baseUrl}/shop`,
+    shopUrl: `${baseUrl}/`,
   });
 
   return new NextResponse(html, {

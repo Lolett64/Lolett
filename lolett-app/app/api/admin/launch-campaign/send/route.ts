@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { renderLaunchInvitationV3 } from '@/lib/email/templates/launch-invitation-v3';
 import { sendHtmlEmail } from '@/lib/email-provider';
 
-const SHOP_PATH = '/shop';
+const SHOP_PATH = '/';
 const PARALLELISM = 5;
 
 export async function POST(req: Request) {
