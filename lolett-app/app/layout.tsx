@@ -53,11 +53,21 @@ export const metadata: Metadata = {
     siteName: 'LOLETT',
     title: 'LOLETT | Mode du Sud-Ouest',
     description: 'Mode du Sud-Ouest pour homme et femme. Née ici, portée partout.',
+    url: 'https://lolettshop.com',
+    images: [
+      {
+        url: '/og-lolett.jpg',
+        width: 1200,
+        height: 1200,
+        alt: 'LOLETT — Mode du Sud-Ouest',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'LOLETT | Mode du Sud-Ouest',
     description: 'Mode du Sud-Ouest pour homme et femme. Née ici, portée partout.',
+    images: ['/og-lolett.jpg'],
   },
 };
 

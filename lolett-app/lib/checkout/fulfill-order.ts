@@ -1,3 +1,4 @@
+import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
@@ -80,20 +81,30 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
     }
   }
 
-  sendOrderConfirmation({
-    to: customer.email,
-    orderNumber: order.orderNumber,
-    items: items.map((i) => ({
-      productName: i.productName,
-      size: i.size,
-      quantity: i.quantity,
-      price: i.price,
-    })),
-    customer,
-    subtotal: total - shipping,
-    shipping,
-    total,
-  }).catch((err) => console.error('[fulfillOrder] Email error:', err));
+  // after() garde la lambda Vercel vivante jusqu'à l'envoi du mail,
+  // sans bloquer la réponse HTTP. Sans ça, fire-and-forget pouvait
+  // tronquer l'envoi quand fulfillOrder est appelé depuis la session
+  // endpoint (pas le webhook qui a son propre after()).
+  after(async () => {
+    try {
+      await sendOrderConfirmation({
+        to: customer.email,
+        orderNumber: order.orderNumber,
+        items: items.map((i) => ({
+          productName: i.productName,
+          size: i.size,
+          quantity: i.quantity,
+          price: i.price,
+        })),
+        customer,
+        subtotal: total - shipping,
+        shipping,
+        total,
+      });
+    } catch (err) {
+      console.error('[fulfillOrder] Email error:', err);
+    }
+  });
 
   console.log(`[fulfillOrder] Order ${order.orderNumber} created`);
   return order.id;

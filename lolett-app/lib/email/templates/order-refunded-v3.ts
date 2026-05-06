@@ -4,6 +4,8 @@
  * Affiche le montant et, si fournie, la raison.
  */
 
+import { getEmailSiteUrl } from '@/lib/email/site-url';
+
 interface RefundedEmailData {
   firstName: string;
   orderNumber: string;
@@ -18,6 +20,7 @@ interface EmailOverrides {
 }
 
 export function renderOrderRefundedV3(data: RefundedEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -124,7 +127,7 @@ export function renderOrderRefundedV3(data: RefundedEmailData, overrides?: Email
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>

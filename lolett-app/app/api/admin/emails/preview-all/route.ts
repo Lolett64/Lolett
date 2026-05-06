@@ -64,7 +64,7 @@ function indexPage() {
     <div class="card">
       <div class="who">&rarr; Admin</div>
       <h3>Notification contact</h3>
-      <p>Reçu par contact.lolett@gmail.com quand un visiteur envoie un message.</p>
+      <p>Reçu par bonjour@lolettshop.com quand un visiteur envoie un message.</p>
       <a href="?template=contact-notification" target="_blank">Voir</a>
     </div>
     <div class="card">

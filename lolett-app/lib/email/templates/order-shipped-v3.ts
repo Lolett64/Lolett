@@ -5,6 +5,7 @@
 
 import { getTrackingUrl } from '@/lib/constants';
 import type { ShippingCarrier, ShippingMethod, PickupPoint } from '@/types';
+import { getEmailSiteUrl } from '@/lib/email/site-url';
 
 interface ShippedItem {
   productName: string;
@@ -42,6 +43,7 @@ export interface EmailOverrides {
 }
 
 export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   const itemsHtml = data.items
     .map(
       (item) => `
@@ -207,20 +209,9 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
           </tr>`;
           })() : ''}
 
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding: 8px 0 40px;">
-              <table role="presentation" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="border: 1px solid #C4956A; border-radius: 50px; padding: 13px 44px;">
-                    <a href="#" style="font-family: 'DM Sans', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; color: #C4956A; text-decoration: none; letter-spacing: 0.04em;">
-                      ${overrides?.cta_text || 'Suivre ma livraison'}
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          <!-- (CTA "Suivre ma livraison" supprimé — le lien de tracking
+               est déjà fourni dans le bloc carrier ci-dessus quand
+               trackingNumber est disponible.) -->
 
           <!-- Sign-off -->
           <tr>
@@ -236,7 +227,7 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>

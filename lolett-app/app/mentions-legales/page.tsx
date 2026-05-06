@@ -40,8 +40,8 @@ export default function MentionsLegalesPage() {
             <h2 className="text-lg font-bold mb-3">3. Contact</h2>
             <p>
               Email :{' '}
-              <a href="mailto:contact.lolett@gmail.com" className="underline hover:text-[#B89547] transition-colors">
-                contact.lolett@gmail.com
+              <a href="mailto:bonjour@lolettshop.com" className="underline hover:text-[#B89547] transition-colors">
+                bonjour@lolettshop.com
               </a><br />
               <a href="/contact" className="underline hover:text-[#B89547] transition-colors">Formulaire de contact</a>
             </p>
@@ -71,8 +71,8 @@ export default function MentionsLegalesPage() {
               Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et
               Libertés, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos
               données personnelles. Pour exercer ces droits, contactez-nous à{' '}
-              <a href="mailto:contact.lolett@gmail.com" className="underline hover:text-[#B89547] transition-colors">
-                contact.lolett@gmail.com
+              <a href="mailto:bonjour@lolettshop.com" className="underline hover:text-[#B89547] transition-colors">
+                bonjour@lolettshop.com
               </a>{' '}
               ou via notre{' '}
               <a href="/contact" className="underline hover:text-[#B89547] transition-colors">page de contact</a>.

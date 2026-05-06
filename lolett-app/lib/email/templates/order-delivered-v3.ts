@@ -3,6 +3,8 @@
  * Simplified: no items, no address, no totals — just a warm delivery notice + review CTA
  */
 
+import { getEmailSiteUrl } from '@/lib/email/site-url';
+
 interface DeliveredEmailData {
   firstName: string;
   orderNumber: string;
@@ -17,6 +19,7 @@ interface EmailOverrides {
 }
 
 export function renderOrderDeliveredV3(data: DeliveredEmailData, overrides?: EmailOverrides): string {
+  const siteUrl = getEmailSiteUrl();
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -112,7 +115,7 @@ export function renderOrderDeliveredV3(data: DeliveredEmailData, overrides?: Ema
             <td align="center">
               <div style="height: 1px; background: #E8E0D6; margin-bottom: 20px;"></div>
               <p style="margin: 0; font-size: 11px; color: #B5A99A; line-height: 1.8;">
-                <a href="#" style="color: #B5A99A; text-decoration: none;">Se désabonner</a> &middot; <a href="#" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
+                <a href="${siteUrl}/mentions-legales" style="color: #B5A99A; text-decoration: none;">Mentions légales</a>
               </p>
             </td>
           </tr>
