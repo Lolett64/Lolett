@@ -1,69 +1,80 @@
-# Session State — 2026-05-05 22:30 (Brevo sender switch DONE)
+# Session State — 2026-05-06 02:00 — Pre-launch fixes branch READY (pas mergée)
 
-## Branch + Deploy
-- **Branch** : `main` HEAD `7b2d86f` (clean, push à jour)
-- **Vercel prod** : auto-deployed après merge — testé OK par Lyes
-- **URL prod** : https://lolettshop.com (mail test reçu avec bon sender)
+## Branch
+- `feat/pre-launch-fixes` (12 commits, pushée sur GitHub, **pas encore mergée sur main**)
+- HEAD = `12414a9` (politique-cookies design pro)
 
-## Completed CETTE session
+## Completed CETTE session (2026-05-06)
 
-### ✅ Switch sender Brevo → bonjour@lolettshop.com (DONE end-to-end)
+### ✅ 8 issues pré-launch fixées sur branche `feat/pre-launch-fixes`
 
-**Objectif initial** : tous les emails transactionnels partaient avec `contact.lolett@gmail.com` → Gmail/Outlook ajoutaient "via brevosend.com" → branding moche pré-launch. Maintenant que `lolettshop.com` est authentifié dans Brevo (DKIM brevo1+brevo2, SPF spf.brevo.com, DMARC), on peut signer cryptographiquement au nom du domaine.
+**Process suivi rigoureusement** : audit 3 sub-agents → vérif manuelle de chaque finding (1 faux positif détecté #1 cartes cadeaux via démo incognito) → spec brainstorming → plan TDD → implémentation Task par Task avec tsc/tests entre chaque → code-reviewer final → triage (1 faux positif F2 + 2 vrais F1/F3 fixés).
 
-**Code (commit `fc6db76` mergé via merge commit `7b2d86f`)** :
-- `lib/email-provider.ts` : `DEFAULT_FROM` → `LOLETT <bonjour@lolettshop.com>` + support `replyTo` propagé sur Brevo HTTP API + SMTP nodemailer + Resend SDK
-- 6 templates email (`order-confirmation`, `order-shipped`, `order-delivered`, `order-cancelled`, `order-refunded`, `welcome-newsletter`) : fallback bonjour@ + `replyTo: 'bonjour@lolettshop.com'`
-- 3 routes API (`/api/contact`, `/api/admin/launch-campaign/send`, `/api/webhooks/stripe` gift cards) : replyTo
-- `order-new-admin.ts` + `dispute-alert.ts` : pas de replyTo (admin→admin, doc inline)
-- Test `order-cancelled.test.ts` : assertions alignées + nouveau check `replyTo`
-- Migration SQL `20260505190000_switch_sender_to_lolettshop_com.sql` : UPDATE email_settings + ALTER DEFAULT (appliquée en prod via SQL Editor par Lyes)
+**Fixes mergés sur la branche** :
+- **#2 BLOQUANT** Commande guest 401 → dual-mode auth (`session_id` Stripe valide via `payment_intent === order.paymentId`) — `app/api/orders/[id]/route.ts` + `useOrderLoader.ts`
+- **#3 BLOQUANT** Email confirmation perdu → `after()` dans `fulfillOrder` — `lib/checkout/fulfill-order.ts`
+- **#4 HIGH** Open redirect `/auth/callback` → reject `//evil.com`
+- **#5 HIGH** XSS contact email → `lib/utils/escape-html.ts` + 6 tests TDD + apply contact-notification
+- **#6 LÉGAL** 11 liens cassés `href="#"` dans 6 templates email → suppression CTA suivi (transac), fallback texte désabo (marketing), helper `lib/email/site-url.ts`
+- **#7 LÉGAL** Page `/politique-cookies` complète (9 sections, tableaux structurés, conformité CNIL renforcée — durée 13 mois, transferts US Data Privacy Framework, 6 droits RGPD, liens directs paramètres navigateurs)
+- **#8 HIGH** Mentions légales + confidentialité → `bonjour@lolettshop.com` partout + provider Brevo (au lieu de Gmail SMTP/Resend)
+- **#9 SEO** OG image `og-lolett.jpg` (1200×1200 carrée, suboptimal Twitter — à régénérer 1200×630 post-launch)
 
-**Infra (côté Lyes)** :
-- Sender `Lolett <bonjour@lolettshop.com>` ajouté + Vérifié dans Brevo (https://app.brevo.com/senders/list)
-- Forwarder Namecheap `bonjour → contact.lolett@gmail.com` confirmé (déjà en place)
-- SPF Brevo ajouté DNS Namecheap : `v=spf1 include:spf.brevo.com ~all` (TXT @)
-- DMARC enrichi : `v=DMARC1; p=none; rua=mailto:bonjour@lolettshop.com; ruf=mailto:bonjour@lolettshop.com; fo=1` (propagation 5-30 min)
-- `BREVO_API_KEY` env var Vercel : ajoutée Preview environment (était Production-only — cause du bug initial qui faisait fallback SMTP Gmail → réécriture du From)
+**Code review final** (post Tasks 1→10) :
+- F1 VRAI BLOQUANT — 6 occurrences `contact.lolett@gmail.com` oubliées (Footer, **lib/legal.ts** factures PDF !, ContactV2, page.tsx schema.org, admin preview, ContactInfo orphelin) — toutes fixées dans commit `644c2a5`
+- F3 VRAI — guard `STRIPE_SECRET_KEY` superflue retirée
+- F2 FAUX POSITIF — `NEXT_PUBLIC_BASE_URL` est cohérent avec le reste du projet (cgv, mentions, sitemap, robots, toutes les pages utilisent cette var). `NEXT_PUBLIC_SITE_URL` est volontairement exclusive aux emails.
 
-**Process suivi** : code review feature-dev:code-reviewer 2× (1 pré-push + 1 final) → triage VRAI/FAUX POSITIF → fix issues VRAIES → tsc clean → tests 4/4 → preview Vercel testée → merge → vérif prod testée par Lyes.
+### ⚠️ Pas testé en preview à cause de `CHECKOUT_REDIRECT_URL`
 
-## 🐛 Bug appris (à ne PAS oublier)
+`app/api/checkout/stripe/route.ts:200` → `siteUrl = process.env.CHECKOUT_REDIRECT_URL || 'http://localhost:3000'`. Cette var est hardcodée prod sur Vercel → toute commande lancée depuis preview → Stripe redirige vers prod après paiement → impossible de valider mes fixes sur preview.
 
-**SMTP Gmail réécrit le From** : si Brevo échoue (ex: env var manquante) → fallback SMTP Gmail → Gmail réécrit silencieusement le `From:` à l'adresse du compte SMTP authentifié pour empêcher l'usurpation. Symptôme : mail reçu avec sender ancien sans erreur visible côté code. Diagnostic : checker logs Vercel `[Email] Brevo failed, falling back to SMTP...`.
+Lyes a tenté un test guest checkout : carte test 4242 sur Stripe test, redirigé vers prod live (différentes clés Stripe entre preview test et prod live), session Stripe orpheline en prod live, page success affichée sans récap, **email pas reçu** (cohérent avec les bugs #2 et #3 que la branche fix).
 
-**Lesson** : toujours vérifier que les env vars critiques (BREVO_API_KEY, etc.) sont définies sur **toutes** les environments Vercel (Production + Preview + Development) — Vercel ne le fait pas par défaut.
+## Next Tasks (par priorité — pour la prochaine session)
 
-## Next Tasks (par priorité)
+### 1. **Décider du merge prod (CRITIQUE pour le launch ce soir)**
 
-### 1. **Annulation commandes 0€ avec restock** (en pause depuis 3 sessions, gros chantier)
-Bug : Lola ne peut PAS annuler commandes payées 100% par carte cadeau ou code promo (`payment_id = 'promo_xxx'/'giftcard_xxx'` rejeté par `Stripe.refunds.create`).
-Scope minimal validé par Lyes : route `/api/admin/orders/[id]/cancel` qui ne passe PAS par Stripe — marque `cancelled` + ré-incrémente stock + recrédite carte cadeau si applicable + décrémente `used_count` promo + décrémente loyalty. Pour les vraies commandes Stripe, déclencher refund Stripe en parallèle. Garde-fou : uniquement statut `paid` non encore expédié.
+Choix Lyes :
+- Soit merge direct main + test live avec vraie carte 1-2€ (Apple Pay carte cadeau au minimum) sur lolettshop.com → rollback `git revert` si régression (30 sec)
+- Soit fixer `CHECKOUT_REDIRECT_URL` pour pointer vers preview en preview, tester proprement, puis merge
 
-### 2. **Indexation Search Console — diagnostic** (15 min)
-Lyes a partagé un screenshot SC : 4 pages soumises, 2 problèmes (1 "Page avec redirection", 1 "Explorée actuellement non indexée"). Demander à Lyes les URLs exactes en cliquant sur chaque ligne SC, puis fix au cas par cas (probablement trailing slash ou www/non-www).
+Recommandation: **Option A merge direct**. Code solide (tsc clean, 79/80 tests passent, code review OK, 12 commits propres). Risque minimal car fix très ciblé.
 
-### 3. **DMARC durcissement post 2 semaines** (P3)
-Une fois 2 semaines de rapports DMARC propres reçus dans Gmail Lola, durcir `p=none` → `p=quarantine` puis `p=reject`. Permet de blinder contre l'usurpation de domaine.
+### 2. **Erreurs annexes console prod** (P2, post-launch)
+- `Brand%20story%20background.jpeg` 404 (×2)
+- React error #418 hydration mismatch (probable OurStory)
+- A11y dropdown CartBadge clavier
 
-### 4. **Filtre Gmail pour rapports DMARC** (P3, 5 min)
-Lola va recevoir 1-3 mails XML/jour à `bonjour@lolettshop.com` (forwardés vers Gmail). Créer filtre Gmail : `from:noreply-dmarc-support@google.com OR from:dmarc@yahoo-inc.com OR subject:"Report Domain"` → archiver auto + label "DMARC Reports".
+### 3. **Annulation commandes 0€** (gros chantier en pause depuis 4 sessions, post-launch)
 
-### 5. **Erreurs annexes console prod** (P2, post-launch)
-- `Brand%20story%20background.jpeg` 404 (×2) — image manquante storytelling
-- Minified React error #418 — hydration mismatch (probablement OurStory ou similaire)
-- A11y dropdown CartBadge clavier (cf. memory P2 follow-up)
+### 4. **Page `/desabonnement`** (reportée post-launch — décision Lyes)
+Système token HMAC + page minimaliste pour fix légal lien désabo emails marketing. Spec déjà documentée dans `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`.
 
-### 6. **Refactor Mondial Relay v1.1** (P3, post-launch)
-Remplacer le widget jQuery MR par notre propre composant React + route API serveur appelant l'API officielle Mondial Relay. Permettra de supprimer `'unsafe-eval'` partout.
+### 5. **OG image 1200×630** dédiée Twitter/Insta (5 min)
+
+### 6. **Diagnostic indexation Search Console** (15 min, demandé Lyes session précédente)
+
+## 🐛 Bugs appris cette session
+
+**1. Sub-agents ratent du contexte** : 2 démonstrations claires.
+- Audit sécurité a flag `/api/admin/gift-cards` "CRITIQUE" sans voir le middleware Next.js qui protège déjà toutes les routes admin (Lyes a vérifié en incognito : middleware répond 401 ✅).
+- Code-reviewer a flagé 1 occurrence Footer de l'ancien email — j'ai trouvé 5 autres dont **`lib/legal.ts` utilisée par les factures PDF**. Sans le double-check, factures clients shippées avec mauvaise adresse.
+- **Lesson** : toujours vérifier les findings d'un agent avec grep/Read/SQL avant de fixer aveuglément.
+
+**2. Mismatch test/live entre envs Vercel** : `STRIPE_SECRET_KEY` prod = `sk_live`, mais clé test sur preview → sessions Stripe créées en preview test ne peuvent pas être retrieve en prod live → bug de routing checkout preview→prod.
+
+**3. `CHECKOUT_REDIRECT_URL` hardcodée prod** : empêche de tester checkout en preview proprement. À fixer en post-launch en utilisant l'URL preview Vercel automatiquement.
+
+**4. Test pré-existant cassé** : `__tests__/api/newsletter-subscribe.test.ts` plante sur mock `after()`. Ne pas faire confiance au "1 test failed" — vérifier que c'est ce test précis avant de stresser.
 
 ## 🔑 Key Context
 
-- **CSP soft-nav Next.js piège** : si une page a une CSP particulière, **toujours** vérifier que les liens entrants forcent un hard reload (`<a href>` natif, pas `<Link>`). Pattern récurrent (cf. fix Mondial Relay session précédente).
-- **Brevo Senders ≠ Domaines** : 2 systèmes séparés. Authentifier le domaine ne suffit pas — il faut aussi ajouter chaque sender (`bonjour@`, etc.) individuellement dans https://app.brevo.com/senders/list.
-- **Vercel env vars par environment** : ne pas oublier de cocher "Preview" + "Production" + "Development" pour les vars critiques. Sinon les previews tombent silencieusement sur les fallbacks.
-- **Process subagent-driven-development + code-reviewer 2× validé** : pré-push + post-merge final = qualité bossée. Pattern à reproduire.
-- **Resend conservé** : 3-tier fallback Brevo → SMTP Gmail → Resend. Coût zéro, filet de sécurité critique pour les emails de commande. À réévaluer +3 mois post-launch.
+- **Spec** : `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`
+- **Plan** : `docs/superpowers/plans/2026-05-05-pre-launch-fixes.md`
+- **Process superpowers (brainstorming → writing-plans → execution + code review)** validé. Prochaine fois, reproduire ce pattern pour les gros chantiers.
+- **Décision Lyes**: page `/desabonnement` reportée, fallback texte "écrivez à bonjour@lolettshop.com" suffisant pour launch.
+- **Process subagent-driven-development sceptique** : Lyes (à raison) ne fait pas confiance aux agents. Inline execution validée comme mode privilégié, avec code-reviewer final + triage manuel rigoureux.
 
 ## Pour reprendre PROCHAINE session
-Dis : **"on attaque l'annulation commandes 0€"** ou **"on diagnostique l'indexation Search Console"** ou **"check les rapports DMARC"**.
+Dis : **"on merge prod"** OU **"on attaque les erreurs console prod"** OU **"on fix CHECKOUT_REDIRECT_URL pour tester en preview"**.
