@@ -44,6 +44,11 @@ export interface EmailOverrides {
 
 export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOverrides): string {
   const siteUrl = getEmailSiteUrl();
+  // Sous-total dérivé des items (price × quantity) pour rester correct
+  // même quand un code promo couvre 100% du total. data.subtotal du caller
+  // peut être faux (= total - shipping post-promo).
+  const computedSubtotal = data.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const subtotal = computedSubtotal > 0 ? computedSubtotal : data.subtotal;
   const itemsHtml = data.items
     .map(
       (item) => `
@@ -142,7 +147,7 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 8px;">
                       <tr>
                         <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; letter-spacing: 0.03em;">Sous-total</td>
-                        <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; text-align: right;">${data.subtotal.toFixed(2)}&nbsp;&euro;</td>
+                        <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; text-align: right;">${subtotal.toFixed(2)}&nbsp;&euro;</td>
                       </tr>
                       <tr>
                         <td style="padding: 6px 0; font-size: 12px; color: #B5A99A; letter-spacing: 0.03em;">Livraison</td>

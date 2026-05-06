@@ -174,7 +174,7 @@ export async function PATCH(
               price: i.price,
             })),
             customer,
-            subtotal: Number(updated.total) - Number(updated.shipping),
+            subtotal: Number(updated.total) - Number(updated.shipping) + Number(updated.promo_discount ?? 0) + Number(updated.gift_card_amount ?? 0),
             shipping: Number(updated.shipping),
             total: Number(updated.total),
             trackingNumber: body.trackingNumber || (updated.tracking_number as string | undefined),
