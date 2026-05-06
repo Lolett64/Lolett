@@ -25,7 +25,7 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="bg-[#f5f0e8] relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl">
+      <div className="bg-white relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl">
         <Image
           src={images[selectedImage]}
           alt={name}
