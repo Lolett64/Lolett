@@ -1,80 +1,83 @@
-# Session State — 2026-05-06 02:00 — Pre-launch fixes branch READY (pas mergée)
+# Session State — 2026-05-06 16:45 — LAUNCH DAY 🚀 site live + 6 hotfixes
 
 ## Branch
-- `feat/pre-launch-fixes` (12 commits, pushée sur GitHub, **pas encore mergée sur main**)
-- HEAD = `12414a9` (politique-cookies design pro)
+- `main` (HEAD = `1b9b039`)
+- Branche `feat/pre-launch-fixes` mergée via `--no-ff` (commit `257cc29`), 14 commits ramenés
+- Ahead remote : 0 (tout pushé)
 
 ## Completed CETTE session (2026-05-06)
 
-### ✅ 8 issues pré-launch fixées sur branche `feat/pre-launch-fixes`
+### ✅ Pré-launch CLOSED
+- **Clean DB Supabase** : 3 migrations exécutées en prod (RPC restore_stock_for_order + DELETE 13 commandes test/30u stock restauré + RLS site_content/content_history). Vérifs OK : orders=0, advisor 0 tables sans RLS.
+- **Merge `feat/pre-launch-fixes` → `main`** : 14 commits, 31 fichiers modifiés, deploy Vercel auto OK.
+- **Ajout taille 28** à `AVAILABLE_SIZES` (admin produits).
 
-**Process suivi rigoureusement** : audit 3 sub-agents → vérif manuelle de chaque finding (1 faux positif détecté #1 cartes cadeaux via démo incognito) → spec brainstorming → plan TDD → implémentation Task par Task avec tsc/tests entre chaque → code-reviewer final → triage (1 faux positif F2 + 2 vrais F1/F3 fixés).
+### ✅ 6 hotfixes post-merge (site déjà live, fixes hot-deployed)
+1. `c5078ef` Bouton "Donner mon avis" email delivered : `href="#"` → `${siteUrl}/contact`
+2. `0310f9d` Workflow visuel admin commande : 4 étapes Payée→Confirmée→Expédiée→Livrée avec icônes + texte contextualisé "Prochaine étape" (Lola ne savait pas qu'il fallait passer Confirmé avant Expédié)
+3. `3fe555c` Migration ALTER TABLE orders ADD COLUMN tracking_number text — la colonne avait été oubliée dans `20260423150000_orders_workflow_fields.sql` alors que le code admin l'utilisait. Symptôme : "Could not find the 'tracking_number' column"
+4. `46fb6b6` Calcul subtotal email expédié : ajoute promo_discount + gift_card_amount dans `route.ts` + recalcul défensif via items dans `order-shipped-v3.ts`. Bug constaté : sous-total à 0€ avec code promo 100%.
+5. `52e18cf` Bouton campagne launch : `${baseUrl}/shop` → `${baseUrl}/` (page d'accueil plus engageante)
+6. `1b9b039` `/shop/femme` et `/shop/homme` : limit 24 → 200. Lola avait 40 produits femme dont 16 cachés.
 
-**Fixes mergés sur la branche** :
-- **#2 BLOQUANT** Commande guest 401 → dual-mode auth (`session_id` Stripe valide via `payment_intent === order.paymentId`) — `app/api/orders/[id]/route.ts` + `useOrderLoader.ts`
-- **#3 BLOQUANT** Email confirmation perdu → `after()` dans `fulfillOrder` — `lib/checkout/fulfill-order.ts`
-- **#4 HIGH** Open redirect `/auth/callback` → reject `//evil.com`
-- **#5 HIGH** XSS contact email → `lib/utils/escape-html.ts` + 6 tests TDD + apply contact-notification
-- **#6 LÉGAL** 11 liens cassés `href="#"` dans 6 templates email → suppression CTA suivi (transac), fallback texte désabo (marketing), helper `lib/email/site-url.ts`
-- **#7 LÉGAL** Page `/politique-cookies` complète (9 sections, tableaux structurés, conformité CNIL renforcée — durée 13 mois, transferts US Data Privacy Framework, 6 droits RGPD, liens directs paramètres navigateurs)
-- **#8 HIGH** Mentions légales + confidentialité → `bonjour@lolettshop.com` partout + provider Brevo (au lieu de Gmail SMTP/Resend)
-- **#9 SEO** OG image `og-lolett.jpg` (1200×1200 carrée, suboptimal Twitter — à régénérer 1200×630 post-launch)
+### ✅ Fix CMS direct (UPDATE site_content sans deploy)
+- `section IN ('contact','footer') AND key='email'` : `contact.lolett@gmail.com` → `bonjour@lolettshop.com` (2 rows)
 
-**Code review final** (post Tasks 1→10) :
-- F1 VRAI BLOQUANT — 6 occurrences `contact.lolett@gmail.com` oubliées (Footer, **lib/legal.ts** factures PDF !, ContactV2, page.tsx schema.org, admin preview, ContactInfo orphelin) — toutes fixées dans commit `644c2a5`
-- F3 VRAI — guard `STRIPE_SECRET_KEY` superflue retirée
-- F2 FAUX POSITIF — `NEXT_PUBLIC_BASE_URL` est cohérent avec le reste du projet (cgv, mentions, sitemap, robots, toutes les pages utilisent cette var). `NEXT_PUBLIC_SITE_URL` est volontairement exclusive aux emails.
+### ✅ Tests effectués par Lyes
+- Email confirmation Stripe → reçu OK
+- Email expédié (avec n° suivi MR123456789) → reçu OK
+- Workflow admin Payée→Confirmée→Expédiée → fonctionne après fix tracking_number
+- Footer mailto → bonjour@lolettshop.com confirmé
 
-### ⚠️ Pas testé en preview à cause de `CHECKOUT_REDIRECT_URL`
+### ✅ Code review post-launch (cf token-saver fin)
+- 1 finding HAUTE → **FAUX POSITIF** : `order_items.price` = prix catalogue HT confirmé via `app/api/checkout/route.ts:64-70` (priceMap depuis DB, pas post-promo). computedSubtotal correct dans tous les cas.
+- 1 finding HAUTE DIFFÉRÉ : `WORKFLOW_STEPS` recréé à chaque render (admin peu sollicitée, impact perf nul, cleanup futur).
+- Aucun finding CRITIQUE, aucun revert nécessaire.
 
-`app/api/checkout/stripe/route.ts:200` → `siteUrl = process.env.CHECKOUT_REDIRECT_URL || 'http://localhost:3000'`. Cette var est hardcodée prod sur Vercel → toute commande lancée depuis preview → Stripe redirige vers prod après paiement → impossible de valider mes fixes sur preview.
+## Next Tasks (ordre de priorité, prochaine session)
 
-Lyes a tenté un test guest checkout : carte test 4242 sur Stripe test, redirigé vers prod live (différentes clés Stripe entre preview test et prod live), session Stripe orpheline en prod live, page success affichée sans récap, **email pas reçu** (cohérent avec les bugs #2 et #3 que la branche fix).
+### 1. **2 commandes test résiduelles à supprimer** (dernière action avant launch officiel)
+Lyes a passé 1 vraie commande Stripe + 1 commande SQL pour tester les emails. SQL prêt à coller (cf chat précédent ou regénérer) :
+```sql
+DO $$ BEGIN
+  PERFORM restore_stock_for_order(id) FROM orders WHERE stock_decremented_at IS NOT NULL;
+  DELETE FROM orders;
+  DELETE FROM gift_card_redemptions WHERE order_id IS NULL;
+  DELETE FROM stripe_webhook_events;
+END $$;
+```
 
-## Next Tasks (par priorité — pour la prochaine session)
+### 2. **Tester emails annulé + remboursé** (P2 post-launch)
+Bouton "Rembourser via Stripe" dans `/admin/orders/[id]` → email refunded. Pas testé.
 
-### 1. **Décider du merge prod (CRITIQUE pour le launch ce soir)**
+### 3. **CHECKOUT_REDIRECT_URL hardcodée prod** (P3, pré-existant)
+Empêche de tester checkout en preview proprement. Post-launch.
 
-Choix Lyes :
-- Soit merge direct main + test live avec vraie carte 1-2€ (Apple Pay carte cadeau au minimum) sur lolettshop.com → rollback `git revert` si régression (30 sec)
-- Soit fixer `CHECKOUT_REDIRECT_URL` pour pointer vers preview en preview, tester proprement, puis merge
-
-Recommandation: **Option A merge direct**. Code solide (tsc clean, 79/80 tests passent, code review OK, 12 commits propres). Risque minimal car fix très ciblé.
-
-### 2. **Erreurs annexes console prod** (P2, post-launch)
-- `Brand%20story%20background.jpeg` 404 (×2)
+### 4. **Erreurs console prod** (P3 post-launch)
+- `Brand%20story%20background.jpeg` 404 ×2
 - React error #418 hydration mismatch (probable OurStory)
 - A11y dropdown CartBadge clavier
 
-### 3. **Annulation commandes 0€** (gros chantier en pause depuis 4 sessions, post-launch)
+### 5. **OG image 1200×630 dédiée Twitter** (5 min)
 
-### 4. **Page `/desabonnement`** (reportée post-launch — décision Lyes)
-Système token HMAC + page minimaliste pour fix légal lien désabo emails marketing. Spec déjà documentée dans `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`.
+### 6. **Diagnostic Search Console** (15 min)
 
-### 5. **OG image 1200×630** dédiée Twitter/Insta (5 min)
+### 7. **Annulation commandes 0€** (gros chantier en pause, post-launch)
 
-### 6. **Diagnostic indexation Search Console** (15 min, demandé Lyes session précédente)
+## 🐛 Bugs/leçons appris cette session
 
-## 🐛 Bugs appris cette session
-
-**1. Sub-agents ratent du contexte** : 2 démonstrations claires.
-- Audit sécurité a flag `/api/admin/gift-cards` "CRITIQUE" sans voir le middleware Next.js qui protège déjà toutes les routes admin (Lyes a vérifié en incognito : middleware répond 401 ✅).
-- Code-reviewer a flagé 1 occurrence Footer de l'ancien email — j'ai trouvé 5 autres dont **`lib/legal.ts` utilisée par les factures PDF**. Sans le double-check, factures clients shippées avec mauvaise adresse.
-- **Lesson** : toujours vérifier les findings d'un agent avec grep/Read/SQL avant de fixer aveuglément.
-
-**2. Mismatch test/live entre envs Vercel** : `STRIPE_SECRET_KEY` prod = `sk_live`, mais clé test sur preview → sessions Stripe créées en preview test ne peuvent pas être retrieve en prod live → bug de routing checkout preview→prod.
-
-**3. `CHECKOUT_REDIRECT_URL` hardcodée prod** : empêche de tester checkout en preview proprement. À fixer en post-launch en utilisant l'URL preview Vercel automatiquement.
-
-**4. Test pré-existant cassé** : `__tests__/api/newsletter-subscribe.test.ts` plante sur mock `after()`. Ne pas faire confiance au "1 test failed" — vérifier que c'est ce test précis avant de stresser.
+1. **Migration oubliée** : `tracking_number` ajouté côté code applicatif sans migration. Toujours vérifier qu'une colonne existe en SELECT avant d'écrire dedans.
+2. **Sub-agent overconfident** sur subtotal HAUTE : 5 minutes de vérif manuelle ont prouvé que c'était un FAUX POSITIF (le rapport disait "à vérifier en base" mais flaguait HAUTE quand même). **Pattern récurrent** : toujours vérifier les findings agents avec grep/Read AVANT de paniquer.
+3. **CMS site_content** invisible aux LLMs : 2 emails legacy traînaient en base sans qu'aucun grep code ne les trouve. La migration RLS a évité un risque sécurité critique (n'importe qui pouvait modifier les textes du site).
+4. **Workflow statuts non documenté côté UX** : Lola aurait pu cliquer "Annulé" en pensant que c'était la seule option visible. UX devrait toujours expliquer pourquoi un choix est limité.
+5. **`SHOP_PATH = '/shop'` const "magic"** : les hotfixes prod ont changé une constante hardcodée pour un chemin email. Si ça avait été dans une variable env ou CMS, fix sans deploy.
 
 ## 🔑 Key Context
 
-- **Spec** : `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`
-- **Plan** : `docs/superpowers/plans/2026-05-05-pre-launch-fixes.md`
-- **Process superpowers (brainstorming → writing-plans → execution + code review)** validé. Prochaine fois, reproduire ce pattern pour les gros chantiers.
-- **Décision Lyes**: page `/desabonnement` reportée, fallback texte "écrivez à bonjour@lolettshop.com" suffisant pour launch.
-- **Process subagent-driven-development sceptique** : Lyes (à raison) ne fait pas confiance aux agents. Inline execution validée comme mode privilégié, avec code-reviewer final + triage manuel rigoureux.
-
-## Pour reprendre PROCHAINE session
-Dis : **"on merge prod"** OU **"on attaque les erreurs console prod"** OU **"on fix CHECKOUT_REDIRECT_URL pour tester en preview"**.
+- **Spec pré-launch** : `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`
+- **Plan pré-launch** : `docs/superpowers/plans/2026-05-05-pre-launch-fixes.md`
+- **Plan clean session** : `~/.claude/plans/j-aimerais-qu-on-pr-pare-un-idempotent-platypus.md`
+- **Process superpowers + code review systématique** validé. Reproduire pour gros chantiers.
+- **Décision Lyes** : pas d'interface "créer commande" admin (commandes via checkout client uniquement).
+- **`order_items.price`** = prix catalogue HT (confirmé via checkout route ligne 64-70). Sécurise le `computedSubtotal` défensif dans email shipped.
+- **Branche `feat/pre-launch-fixes`** mergée mais conservée localement et sur GitHub (pas supprimée). Peut être nettoyée plus tard.
