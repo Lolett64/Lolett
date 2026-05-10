@@ -44,8 +44,8 @@ export function useCookieConsent() {
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const [analytics, setAnalytics] = useState(true);
-  const [marketing, setMarketing] = useState(true);
+  const [analytics, setAnalytics] = useState(false);
+  const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
     const stored = getStoredConsent();
