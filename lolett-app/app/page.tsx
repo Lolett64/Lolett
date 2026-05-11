@@ -55,7 +55,12 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'LOLETT',
   url: BASE_URL,
-  logo: `${BASE_URL}/og-lolett.jpg`,
+  logo: {
+    '@type': 'ImageObject',
+    url: `${BASE_URL}/logo.png`,
+    width: 512,
+    height: 512,
+  },
   description: 'Mode du Sud-Ouest pour homme et femme. Née ici, portée partout.',
   foundingDate: '2024',
   founder: { '@type': 'Person', name: 'Lola Senfft Von Pilsach' },
