@@ -22,7 +22,11 @@ export default function ForgotPasswordForm() {
     });
 
     if (error) {
-      setError(error.message);
+      const msg =
+        typeof error.message === 'string' && error.message.trim()
+          ? error.message
+          : 'Impossible d’envoyer l’email pour le moment. Réessayez dans quelques minutes.';
+      setError(msg);
       setLoading(false);
       return;
     }
