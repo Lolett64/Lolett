@@ -1,83 +1,92 @@
-# Session State — 2026-05-06 16:45 — LAUNCH DAY 🚀 site live + 6 hotfixes
+# Session State — 2026-05-11 11:00
 
 ## Branch
-- `main` (HEAD = `1b9b039`)
-- Branche `feat/pre-launch-fixes` mergée via `--no-ff` (commit `257cc29`), 14 commits ramenés
-- Ahead remote : 0 (tout pushé)
+- `main` (HEAD = `d919c59`)
+- 3 commits pushés cette session, branche à jour avec remote
+- 1 fichier modifié non commité (volontaire) : `lolett-app/app/api/checkout/stripe/route.ts`
 
-## Completed CETTE session (2026-05-06)
+## Completed CETTE session (2026-05-11)
 
-### ✅ Pré-launch CLOSED
-- **Clean DB Supabase** : 3 migrations exécutées en prod (RPC restore_stock_for_order + DELETE 13 commandes test/30u stock restauré + RLS site_content/content_history). Vérifs OK : orders=0, advisor 0 tables sans RLS.
-- **Merge `feat/pre-launch-fixes` → `main`** : 14 commits, 31 fichiers modifiés, deploy Vercel auto OK.
-- **Ajout taille 28** à `AVAILABLE_SIZES` (admin produits).
+### ✅ Audit livraison V1 — bouclé
+Triage des 6 findings du code-review post-correctifs du 2026-05-08 :
+- 🔴 Critique #1 (pickupPoint dans hash idempotent) → DÉJÀ FIX dans le code local
+- 🟠 Important #2 (coupons.create idempoté) → DÉJÀ FIX dans le code local
+- 🟠 Important #3 (password_requirements) → DÉJÀ FIX en prod Supabase (vérifié dashboard)
+- 🟡 Mineur #4 (CookieConsent edge case) → DIFFÉRÉ (non-bloquant)
+- 🟡 Mineur #5 (email dans hash) → DIFFÉRÉ (SHA256 non-réversible)
+- 🟡 Mineur #6 (doc SPF lookup) → DÉJÀ PRÉSENT dans dns-changes.md
+→ **Commit `c13a61b`** : 4 fichiers safe pushés (CookieConsent, config.toml, LoginForm, dns-changes.md)
+→ **route.ts laissé en local** (à tester en local avant push, risque paiement live)
 
-### ✅ 6 hotfixes post-merge (site déjà live, fixes hot-deployed)
-1. `c5078ef` Bouton "Donner mon avis" email delivered : `href="#"` → `${siteUrl}/contact`
-2. `0310f9d` Workflow visuel admin commande : 4 étapes Payée→Confirmée→Expédiée→Livrée avec icônes + texte contextualisé "Prochaine étape" (Lola ne savait pas qu'il fallait passer Confirmé avant Expédié)
-3. `3fe555c` Migration ALTER TABLE orders ADD COLUMN tracking_number text — la colonne avait été oubliée dans `20260423150000_orders_workflow_fields.sql` alors que le code admin l'utilisait. Symptôme : "Could not find the 'tracking_number' column"
-4. `46fb6b6` Calcul subtotal email expédié : ajoute promo_discount + gift_card_amount dans `route.ts` + recalcul défensif via items dans `order-shipped-v3.ts`. Bug constaté : sous-total à 0€ avec code promo 100%.
-5. `52e18cf` Bouton campagne launch : `${baseUrl}/shop` → `${baseUrl}/` (page d'accueil plus engageante)
-6. `1b9b039` `/shop/femme` et `/shop/homme` : limit 24 → 200. Lola avait 40 produits femme dont 16 cachés.
+### ✅ Brevo SMTP custom configuré dans Supabase
+- Brevo identifié comme provider principal Lolett (pas Resend — confirmé via `lib/email-provider.ts`)
+- Setup Supabase : `smtp-relay.brevo.com:587`, login `aa384b001@smtp-brevo.com`, sender `bonjour@lolettshop.com`
+- 2 erreurs initiales corrigées : port `584`→`587`, username "Supabase Auth Lolett" (nom de clé) → vrai login SMTP Brevo
+- Email reset password reçu de `LOLETT <bonjour@lolettshop.com>` ✅ (plus de noreply@mail.app.supabase.io)
 
-### ✅ Fix CMS direct (UPDATE site_content sans deploy)
-- `section IN ('contact','footer') AND key='email'` : `contact.lolett@gmail.com` → `bonjour@lolettshop.com` (2 rows)
+### ✅ 3 templates email auth "Luxe Whisper" créés + collés en Supabase
+- `auth-recovery-v3.html` — Reset Password
+- `auth-email-change-v3.html` — Change Email Address (avec bloc Ancienne/Nouvelle adresse via `{{ .NewEmail }}`)
+- `auth-signup-confirm-v3.html` — Confirm Signup (avec teaser "Ce qui vous attend")
+- DA cohérente avec order-confirmation-v3 : palette `#FAF7F2` / `#2C2420` / `#C4956A`, Cormorant Garamond + DM Sans
+- **Bug encodage UTF-8 → entités HTML** : `é`→`&eacute;`, `à`→`&agrave;`, etc. (sinon mojibake `R√©initialisez` observé)
+- Commit `f7b5ff4` + ces fichiers sont dans le repo pour traçabilité (pas wired au code, juste collés dans Supabase Dashboard)
 
-### ✅ Tests effectués par Lyes
-- Email confirmation Stripe → reçu OK
-- Email expédié (avec n° suivi MR123456789) → reçu OK
-- Workflow admin Payée→Confirmée→Expédiée → fonctionne après fix tracking_number
-- Footer mailto → bonjour@lolettshop.com confirmé
+### ✅ Fix UI ForgotPasswordForm
+Affichage parasite `{}` quand Supabase renvoie une erreur sans `.message` exploitable. Fallback FR ajouté. Commit `f7b5ff4`.
 
-### ✅ Code review post-launch (cf token-saver fin)
-- 1 finding HAUTE → **FAUX POSITIF** : `order_items.price` = prix catalogue HT confirmé via `app/api/checkout/route.ts:64-70` (priceMap depuis DB, pas post-promo). computedSubtotal correct dans tous les cas.
-- 1 finding HAUTE DIFFÉRÉ : `WORKFLOW_STEPS` recréé à chaque render (admin peu sollicitée, impact perf nul, cleanup futur).
-- Aucun finding CRITIQUE, aucun revert nécessaire.
+### ✅ Favicon SVG amélioré (commit `f7b5ff4`)
+Avant : SVG 32×32 avec L serif fin → Google le rendait en cercle bleu uni illisible.
+Après : SVG `viewBox 0 0 64`, L géométrique blanc occupant 80% du carré bleu `#1B0B94`.
+
+### ✅ Logo Lolett pour Google Knowledge Panel (commit `d919c59`)
+- `/public/logo.png` (512×512) — wordmark LOLETT blanc + T incliné, fond bleu, recadré depuis `/public/images/Logo Lolett.jpeg` (896×890) via Python PIL (sips ne centrait pas correctement)
+- `/public/logo-transparent.png` (512×512) — variante fond transparent pour Rich Results
+- Schema.org `Organization.logo` en prod migré : `og-lolett.jpg` (hero lifestyle) → `ImageObject {url, width, height}` propre
+
+### ✅ Google Search Console
+- Sitemap soumis (mais "Impossible de récupérer" affiché en rouge — vraisemblablement temporaire, à re-vérifier sous 24-48h)
+- Demande d'indexation pour `https://lolettshop.com/` envoyée
 
 ## Next Tasks (ordre de priorité, prochaine session)
 
-### 1. **2 commandes test résiduelles à supprimer** (dernière action avant launch officiel)
-Lyes a passé 1 vraie commande Stripe + 1 commande SQL pour tester les emails. SQL prêt à coller (cf chat précédent ou regénérer) :
-```sql
-DO $$ BEGIN
-  PERFORM restore_stock_for_order(id) FROM orders WHERE stock_decremented_at IS NOT NULL;
-  DELETE FROM orders;
-  DELETE FROM gift_card_redemptions WHERE order_id IS NULL;
-  DELETE FROM stripe_webhook_events;
-END $$;
-```
+### 1. **Tester `route.ts` Stripe idempotency en local**
+Le fichier `lolett-app/app/api/checkout/stripe/route.ts` est modifié (idempotency key SHA256 sur `coupons.create` + `checkout.sessions.create`, inclut `pickupPoint.id`) mais **pas commité ni pushé**. Avant push :
+- `npm run dev`
+- Tester un checkout avec carte Stripe test `4242 4242 4242 4242`
+- Vérifier que la session Stripe se crée OK
+- Si OK → commit + push
+- Si KO → diagnostiquer (probable cause : variable indéfinie dans le `JSON.stringify`)
 
-### 2. **Tester emails annulé + remboursé** (P2 post-launch)
-Bouton "Rembourser via Stripe" dans `/admin/orders/[id]` → email refunded. Pas testé.
+### 2. **Vérifier statut sitemap Google sous 24-48h**
+Si toujours "Impossible de récupérer le sitemap" → diagnostiquer (CSP, timeout, format)
 
-### 3. **CHECKOUT_REDIRECT_URL hardcodée prod** (P3, pré-existant)
-Empêche de tester checkout en preview proprement. Post-launch.
+### 3. **Google Business Profile (gratuit, ~10 min)**
+Crée le panel encart à droite (style "Léo et Violette") avec photo, adresse, horaires. URL : https://business.google.com — utiliser bonjour@lolettshop.com.
 
-### 4. **Erreurs console prod** (P3 post-launch)
-- `Brand%20story%20background.jpeg` 404 ×2
-- React error #418 hydration mismatch (probable OurStory)
+### 4. **Tester emails annulé + remboursé** (P2 post-launch, déjà noté session précédente)
+
+### 5. **OG image 1200×630 dédiée Twitter** (5 min, déjà noté)
+
+### 6. **Erreurs console prod** (P3, déjà noté)
+- React error #418 hydration mismatch
 - A11y dropdown CartBadge clavier
 
-### 5. **OG image 1200×630 dédiée Twitter** (5 min)
+## 🐛 Bugs/leçons apprises cette session
 
-### 6. **Diagnostic Search Console** (15 min)
-
-### 7. **Annulation commandes 0€** (gros chantier en pause, post-launch)
-
-## 🐛 Bugs/leçons appris cette session
-
-1. **Migration oubliée** : `tracking_number` ajouté côté code applicatif sans migration. Toujours vérifier qu'une colonne existe en SELECT avant d'écrire dedans.
-2. **Sub-agent overconfident** sur subtotal HAUTE : 5 minutes de vérif manuelle ont prouvé que c'était un FAUX POSITIF (le rapport disait "à vérifier en base" mais flaguait HAUTE quand même). **Pattern récurrent** : toujours vérifier les findings agents avec grep/Read AVANT de paniquer.
-3. **CMS site_content** invisible aux LLMs : 2 emails legacy traînaient en base sans qu'aucun grep code ne les trouve. La migration RLS a évité un risque sécurité critique (n'importe qui pouvait modifier les textes du site).
-4. **Workflow statuts non documenté côté UX** : Lola aurait pu cliquer "Annulé" en pensant que c'était la seule option visible. UX devrait toujours expliquer pourquoi un choix est limité.
-5. **`SHOP_PATH = '/shop'` const "magic"** : les hotfixes prod ont changé une constante hardcodée pour un chemin email. Si ça avait été dans une variable env ou CMS, fix sans deploy.
+1. **Encodage UTF-8 templates Supabase** : ne jamais coller du français avec accents Unicode dans l'éditeur HTML Supabase → toujours utiliser entités HTML. Aligné sur ce que font les templates Resend order-*-v3.
+2. **Brevo SMTP login ≠ nom de clé** : le champ Username Supabase attend l'identifiant numérique de connexion Brevo (`aa384b001@smtp-brevo.com`), pas le nom donné à la clé SMTP.
+3. **Brevo a 2 systèmes de clés** : "Clé API v3" (`xkeysib-...`, pour HTTP API) vs "Clé SMTP" (`xsmtpsib-...`, pour SMTP). Ne pas confondre.
+4. **sips macOS pad vers haut/gauche, pas centré** : pour centrer une image dans un canvas, utiliser Python PIL plutôt que `sips -p`.
+5. **Schema.org Organization.logo en ImageObject** : préférer la forme `{@type: ImageObject, url, width, height}` à une simple string URL. Google Search Central recommande explicitement pour 2026.
+6. **Sub-agent overconfidence (rappel)** : le code-review du 2026-05-08 listait 6 findings dont 3 étaient déjà fix dans le code modifié non commité. Vérifier toujours avec Read avant de paniquer.
 
 ## 🔑 Key Context
 
-- **Spec pré-launch** : `docs/superpowers/specs/2026-05-05-pre-launch-fixes-design.md`
-- **Plan pré-launch** : `docs/superpowers/plans/2026-05-05-pre-launch-fixes.md`
-- **Plan clean session** : `~/.claude/plans/j-aimerais-qu-on-pr-pare-un-idempotent-platypus.md`
-- **Process superpowers + code review systématique** validé. Reproduire pour gros chantiers.
-- **Décision Lyes** : pas d'interface "créer commande" admin (commandes via checkout client uniquement).
-- **`order_items.price`** = prix catalogue HT (confirmé via checkout route ligne 64-70). Sécurise le `computedSubtotal` défensif dans email shipped.
-- **Branche `feat/pre-launch-fixes`** mergée mais conservée localement et sur GitHub (pas supprimée). Peut être nettoyée plus tard.
+- **Brevo SMTP** : `smtp-relay.brevo.com:587`, login `aa384b001@smtp-brevo.com`, clés gérées sur https://app.brevo.com/settings/keys/smtp
+- **Supabase project** : `qczdwrudgmozyxkdidmr` (`lolett-app/.env.local` → `NEXT_PUBLIC_SUPABASE_URL`)
+- **Logo source** : `/public/images/Logo Lolett.jpeg` (896×890, wordmark blanc + T incliné sur fond bleu `#1B0B94`)
+- **Composant Logo** : `components/brand/Logo.tsx` — 2 variantes (`default` JPEG / `white` CSS Montserrat + T incliné 15°)
+- **Templates email** : `lib/email/templates/*-v3.ts|.html` — DA "Luxe Whisper", palette `#FAF7F2`/`#2C2420`/`#C4956A`
+- **Pas de code review formel cette session** : code touché trivial (assets, fallbacks défensifs, schema markup) — aucun critical path runtime modifié et pushé.
+- **Délai SEO Google** : favicon SERP 1-2 semaines après re-crawl, Knowledge Panel apparaît après Google Business Profile.
