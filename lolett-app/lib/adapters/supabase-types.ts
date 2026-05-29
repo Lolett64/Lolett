@@ -1,4 +1,4 @@
-import type { CustomerInfo, Order, PickupPoint } from '@/types';
+import type { CustomerInfo, Order } from '@/types';
 
 export type DbProduct = {
   id: string;
@@ -68,13 +68,18 @@ export type DbOrder = {
   shipping_method: Order['shippingMethod'] | null;
   shipping_carrier: Order['shippingCarrier'] | null;
   shipping_country: string | null;
-  pickup_point: PickupPoint | null;
+  // Snapshot JSONB brut : les lignes legacy n'ont PAS le discriminant `provider`.
+  // Le type reflète la donnée réelle ; mapPickupPoint produit le PickupPoint conforme.
+  pickup_point: Record<string, unknown> | null;
   invoice_pdf_url: string | null;
   invoice_number: string | null;
   status: Order['status'];
   payment_provider: Order['paymentProvider'] | null;
   payment_id: string | null;
   user_id: string | null;
+  ready_for_pickup_at: string | null;
+  picked_up_at: string | null;
+  pickup_code: string | null;
   created_at: string;
   updated_at: string;
   order_items: {

@@ -1,4 +1,4 @@
-import type { Product, Look, Category, Order, Size, Gender, ProductVariant } from '@/types';
+import type { Product, Look, Category, Order, Size, Gender, ProductVariant, PickupPoint, ShippingMethod, PickupPointProvider } from '@/types';
 import type { DbProduct, DbLook, DbCategory, DbOrder, DbProductVariant } from './supabase-types';
 
 export function mapVariant(row: DbProductVariant): ProductVariant {
@@ -66,6 +66,21 @@ export function mapCategory(row: DbCategory): Category {
   };
 }
 
+// Normalise le snapshot JSONB pickup_point en union discriminée.
+// Backfill du discriminant `provider` pour les snapshots legacy (sans provider) :
+// click_collect si la méthode l'indique, sinon mondial_relay (historique).
+export function mapPickupPoint(
+  raw: unknown,
+  shippingMethod: ShippingMethod | null
+): PickupPoint | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const point = raw as Record<string, unknown>;
+  const provider: PickupPointProvider =
+    (point.provider as PickupPointProvider | undefined) ??
+    (shippingMethod === 'click_collect' ? 'click_collect' : 'mondial_relay');
+  return { ...point, provider } as unknown as PickupPoint;
+}
+
 export function mapOrder(row: DbOrder): Order {
   return {
     id: row.id,
@@ -80,13 +95,16 @@ export function mapOrder(row: DbOrder): Order {
     shippingMethod: row.shipping_method ?? undefined,
     shippingCarrier: row.shipping_carrier ?? undefined,
     shippingCountry: (row.shipping_country as Order['shippingCountry']) ?? undefined,
-    pickupPoint: row.pickup_point ?? null,
+    pickupPoint: mapPickupPoint(row.pickup_point, row.shipping_method ?? null),
     invoiceNumber: row.invoice_number ?? undefined,
     invoicePdfUrl: row.invoice_pdf_url ?? undefined,
     status: row.status,
     paymentProvider: row.payment_provider ?? undefined,
     paymentId: row.payment_id ?? undefined,
     userId: row.user_id ?? undefined,
+    readyForPickupAt: row.ready_for_pickup_at ?? undefined,
+    pickedUpAt: row.picked_up_at ?? undefined,
+    pickupCode: row.pickup_code ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     items: (row.order_items ?? []).map((item) => ({
