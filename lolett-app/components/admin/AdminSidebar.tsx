@@ -18,6 +18,7 @@ import {
   Shirt,
   Send,
   Gift,
+  Store,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -111,6 +112,7 @@ export function AdminSidebar({ pendingOrders = 0 }: { pendingOrders?: number }) 
         { href: '/admin/orders', label: 'Commandes', icon: Package, exact: false, badge: pendingOrders },
         { href: '/admin/promos', label: 'Codes Promo', icon: Tag, exact: false },
         { href: '/admin/gift-cards', label: 'Cartes cadeaux', icon: Gift, exact: false },
+        { href: '/admin/pickup-points', label: 'Points de retrait', icon: Store, exact: false },
         { href: '/admin/emails', label: 'Emails', icon: Mail, exact: false },
         { href: '/admin/launch-campaign', label: 'Campagne ouverture', icon: Send, exact: false },
       ],
