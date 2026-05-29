@@ -23,6 +23,7 @@ export const VARIABLES_BY_TEMPLATE: Record<string, string[]> = {
   order_cancelled: ['{firstName}', '{orderNumber}'],
   order_refunded: ['{firstName}', '{orderNumber}', '{amount}'],
   welcome_newsletter: ['{firstName}', '{promoCode}'],
+  order_ready_for_pickup: ['{firstName}', '{orderNumber}', '{pickupCode}', '{pickupPointName}'],
 };
 
 export function formatDate(iso: string) {

@@ -7,6 +7,7 @@ import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3
 import { renderOrderCancelledV3 } from '@/lib/email/templates/order-cancelled-v3';
 import { renderOrderRefundedV3 } from '@/lib/email/templates/order-refunded-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
+import { renderOrderReadyForPickupV3 } from '@/lib/email/templates/order-ready-for-pickup-v3';
 import { sendHtmlEmail } from '@/lib/email-provider';
 
 const MOCK_ORDER_DATA = {
@@ -96,6 +97,34 @@ export async function POST(request: Request) {
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
       subject = settings?.subject_template || 'Bienvenue chez LOLETT';
+    } else if (template_key === 'order_ready_for_pickup') {
+      html = renderOrderReadyForPickupV3(
+        {
+          firstName: 'Marie',
+          orderNumber: 'LOL-20260530-TEST',
+          pickupCode: 'LOL-A7K2X',
+          pickupPoint: {
+            provider: 'click_collect',
+            id: 'pp-demo',
+            name: 'Boutique du Marais',
+            address: '12 rue de Bretagne',
+            postalCode: '75003',
+            city: 'Paris',
+            country: 'FR',
+            hours: 'Lun-Sam 10h-19h',
+            instructions: "Sonner à l'interphone LOLETT",
+          },
+        },
+        settings
+          ? { greeting: settings.greeting, body_text: settings.body_text, signoff: settings.signoff }
+          : undefined
+      );
+      subject = settings?.subject_template
+        ?.replace('{{orderNumber}}', 'LOL-20260530-TEST')
+        .replace('{orderNumber}', 'LOL-20260530-TEST')
+        .replace('{{pickupCode}}', 'LOL-A7K2X')
+        .replace('{pickupCode}', 'LOL-A7K2X')
+        || 'Votre commande LOL-20260530-TEST est prête au retrait — code LOL-A7K2X';
     } else {
       return NextResponse.json({ error: `Template inconnu: ${template_key}` }, { status: 400 });
     }

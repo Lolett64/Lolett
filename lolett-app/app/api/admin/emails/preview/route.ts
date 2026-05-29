@@ -7,6 +7,7 @@ import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3
 import { renderOrderCancelledV3 } from '@/lib/email/templates/order-cancelled-v3';
 import { renderOrderRefundedV3 } from '@/lib/email/templates/order-refunded-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
+import { renderOrderReadyForPickupV3, type EmailOverrides as ReadyForPickupOverrides } from '@/lib/email/templates/order-ready-for-pickup-v3';
 
 const MOCK_ORDER_DATA = {
   firstName: 'Marie',
@@ -61,6 +62,23 @@ const MOCK_REFUNDED_DATA = {
   orderNumber: 'LOL-20260220-DEMO',
   amount: 238.00,
   reason: 'Retour accepté',
+};
+
+const MOCK_PICKUP_DATA = {
+  firstName: 'Marie',
+  orderNumber: 'LOL-20260530-TEST',
+  pickupCode: 'LOL-A7K2X',
+  pickupPoint: {
+    provider: 'click_collect' as const,
+    id: 'pp-demo',
+    name: 'Boutique du Marais',
+    address: '12 rue de Bretagne',
+    postalCode: '75003',
+    city: 'Paris',
+    country: 'FR',
+    hours: 'Lun-Sam 10h-19h',
+    instructions: "Sonner à l'interphone LOLETT",
+  },
 };
 
 function applyOverrides(html: string, settings: Partial<EmailSettings>): string {
@@ -124,6 +142,17 @@ export async function POST(request: Request) {
       html = renderOrderRefundedV3(MOCK_REFUNDED_DATA);
     } else if (template_key === 'welcome_newsletter') {
       html = renderWelcomeNewsletterV3(MOCK_WELCOME_DATA);
+    } else if (template_key === 'order_ready_for_pickup') {
+      // Ce template n'est PAS couvert par applyOverrides() (dont les regex ciblent
+      // l'ancien template confirmation). On passe les overrides CMS DIRECTEMENT au
+      // template via son param `overrides`, puis on `return` pour SAUTER applyOverrides.
+      const pickupOverrides: ReadyForPickupOverrides = {
+        greeting: merged.greeting,
+        body_text: merged.body_text,
+        signoff: merged.signoff,
+      };
+      const pickupHtml = renderOrderReadyForPickupV3(MOCK_PICKUP_DATA, pickupOverrides);
+      return NextResponse.json({ html: pickupHtml });
     } else {
       return NextResponse.json({ error: `Template inconnu: ${template_key}` }, { status: 400 });
     }

@@ -3,6 +3,7 @@ import { renderOrderConfirmationV3 } from '@/lib/email/templates/order-confirmat
 import { renderOrderShippedV3 } from '@/lib/email/templates/order-shipped-v3';
 import { renderOrderDeliveredV3 } from '@/lib/email/templates/order-delivered-v3';
 import { renderWelcomeNewsletterV3 } from '@/lib/email/templates/welcome-newsletter-v3';
+import { renderOrderReadyForPickupV3 } from '@/lib/email/templates/order-ready-for-pickup-v3';
 
 const mockItems = [
   { productName: 'Hoodie Émoticoeurs Noir', size: 'M', quantity: 1, price: 89 },
@@ -41,7 +42,7 @@ function indexPage() {
 </head>
 <body>
   <h1>Emails LOLETT</h1>
-  <p class="sub">6 templates — cliquez pour voir le rendu</p>
+  <p class="sub">7 templates — cliquez pour voir le rendu</p>
   <div class="grid">
     <div class="card">
       <div class="who">&rarr; Client</div>
@@ -78,6 +79,12 @@ function indexPage() {
       <h3>Bienvenue newsletter</h3>
       <p>Envoyé à l'inscription newsletter avec code promo -10%.</p>
       <a href="?template=welcome-newsletter" target="_blank">Voir</a>
+    </div>
+    <div class="card">
+      <div class="who">&rarr; Client</div>
+      <h3>Commande prête au retrait</h3>
+      <p>Click & Collect : envoyé quand l'admin marque "Prête au retrait". Contient le code de retrait.</p>
+      <a href="?template=order-ready-for-pickup" target="_blank">Voir</a>
     </div>
   </div>
 </body>
@@ -150,6 +157,25 @@ export async function GET(request: NextRequest) {
         html = renderWelcomeNewsletterV3({
           firstName: 'Lola',
           promoCode: 'BIENVENUE10',
+        });
+        break;
+
+      case 'order-ready-for-pickup':
+        html = renderOrderReadyForPickupV3({
+          firstName: 'Lola',
+          orderNumber: 'LOL-2026-0042',
+          pickupCode: 'LOL-A7K2X',
+          pickupPoint: {
+            provider: 'click_collect',
+            id: 'pp-demo',
+            name: 'Boutique du Marais',
+            address: '12 rue de Bretagne',
+            postalCode: '75003',
+            city: 'Paris',
+            country: 'FR',
+            hours: 'Lun-Sam 10h-19h',
+            instructions: "Sonner à l'interphone LOLETT",
+          },
         });
         break;
 
