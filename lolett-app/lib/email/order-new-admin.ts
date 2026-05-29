@@ -1,4 +1,5 @@
 import { sendHtmlEmail } from '@/lib/email-provider';
+import { escapeHtml } from '@/lib/utils/escape-html';
 import type { ShippingMethod, PickupPoint } from '@/types';
 
 interface AdminOrderAlertData {
@@ -24,15 +25,6 @@ interface AdminOrderAlertData {
   giftCardCode?: string;
 }
 
-function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function renderAdminOrderAlert(data: AdminOrderAlertData, baseUrl: string): string {
   const safe = {
     orderNumber: escapeHtml(data.orderNumber),
@@ -45,19 +37,24 @@ function renderAdminOrderAlert(data: AdminOrderAlertData, baseUrl: string): stri
     country: escapeHtml(data.customer.country || 'France'),
   };
 
-  const isMR = data.shippingMethod === 'mondial_relay';
   const pp = data.pickupPoint;
+  const hasPickupPoint =
+    !!pp &&
+    (data.shippingMethod === 'mondial_relay' || data.shippingMethod === 'click_collect');
+  const isClickCollect = pp?.provider === 'click_collect';
+  const carrierLabel = isClickCollect ? 'Click &amp; Collect' : 'Mondial Relay';
 
-  const shippingBlock = isMR && pp
+  const shippingBlock = hasPickupPoint && pp
     ? `<tr>
         <td style="padding: 10px 0; color: #666; vertical-align: top;">Livraison</td>
         <td style="padding: 10px 0; font-weight: 600;">
-          Mondial Relay<br/>
+          ${carrierLabel}<br/>
           <span style="font-weight: 400; color: #1a1510;">${escapeHtml(pp.name || '')}</span><br/>
           <span style="font-weight: 400; color: #666; font-size: 13px;">
             ${escapeHtml(pp.address || '')}<br/>
             ${escapeHtml(pp.postalCode || '')} ${escapeHtml(pp.city || '')}
           </span>
+          ${isClickCollect ? `<br/><span style="font-weight: 400; color: #B89547; font-size: 13px;">Action attendue : relayer la commande au point de vente, puis marquer « Prête au retrait » dans l'admin.</span>` : ''}
         </td>
       </tr>`
     : `<tr>

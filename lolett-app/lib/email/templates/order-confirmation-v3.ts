@@ -77,6 +77,14 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
     )
     .join('');
 
+  const showPickup =
+    !!data.pickupPoint &&
+    (data.shippingMethod === 'mondial_relay' || data.shippingMethod === 'click_collect');
+  const isClickCollect = data.pickupPoint?.provider === 'click_collect';
+  const pickupTitle = isClickCollect
+    ? 'Point de retrait Click &amp; Collect'
+    : 'Point Relais Mondial Relay';
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -198,15 +206,19 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
                 <tr>
                   <td style="width: 3px; background: #C4956A; border-radius: 2px;"></td>
                   <td style="padding-left: 18px;">
-                    ${data.shippingMethod === 'mondial_relay' && data.pickupPoint ? `
-                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Point Relais Mondial Relay</p>
+                    ${showPickup && data.pickupPoint ? `
+                    <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">${pickupTitle}</p>
                     <p style="margin: 0; font-size: 13px; font-weight: 500; color: #2C2420;">${data.pickupPoint.name}</p>
                     <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.pickupPoint.address}</p>
                     <p style="margin: 3px 0 0; font-size: 13px; color: #7A6E62;">${data.pickupPoint.postalCode} ${data.pickupPoint.city} &middot; ${data.pickupPoint.country}</p>
+                    ${data.pickupPoint.provider === 'mondial_relay' ? `
                     <p style="margin: 10px 0 0;">
                       <a href="${buildMapsUrl(data.pickupPoint)}" style="font-size: 12px; color: #C4956A; text-decoration: none; border-bottom: 1px solid #E8D9C4; padding-bottom: 1px;">Voir sur Google Maps &rarr;</a>
                     </p>
                     ${data.phone ? `<p style="margin: 12px 0 0; font-size: 11px; color: #B5A99A; line-height: 1.5;">Vous serez notifi&eacute; par SMS au ${data.phone} d&egrave;s que votre colis sera disponible au retrait.</p>` : ''}
+                    ` : `
+                    <p style="margin: 12px 0 0; font-size: 11px; color: #B5A99A; line-height: 1.5;">Vous recevrez un nouvel email avec votre code de retrait d&egrave;s que votre commande sera pr&ecirc;te.</p>
+                    `}
                     ` : `
                     <p style="margin: 0 0 6px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #C4956A;">Livraison &agrave; domicile</p>
                     <p style="margin: 0; font-size: 13px; color: #2C2420;">${data.address.firstName} ${data.address.lastName}</p>
