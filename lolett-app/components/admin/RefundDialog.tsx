@@ -24,6 +24,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { REFUNDABLE_STATUSES } from '@/lib/constants';
+import type { OrderStatus } from '@/types';
 
 interface OrderItemForRefund {
   id: string;
@@ -49,15 +51,13 @@ interface RefundDialogProps {
   alreadyRefundedQtyMap?: Record<string, number>;
 }
 
-const REFUNDABLE_STATUSES = ['paid', 'confirmed', 'shipped', 'delivered', 'partially_refunded'];
-
 type RefundMode = 'items' | 'commercial';
 
 export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, orderItems, alreadyRefundedQtyMap }: RefundDialogProps) {
   const router = useRouter();
   const refundedQtyMap = alreadyRefundedQtyMap ?? {};
   const remaining = +(orderTotal - alreadyRefunded).toFixed(2);
-  const canRefund = REFUNDABLE_STATUSES.includes(status) && remaining > 0;
+  const canRefund = REFUNDABLE_STATUSES.includes(status as OrderStatus) && remaining > 0;
 
   // Items refundables = ceux qui ont un product_id (sinon impossible de matcher variant en DB)
   // ET qui ont encore au moins 1 unité non remboursée.

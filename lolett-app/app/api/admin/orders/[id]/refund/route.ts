@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAlreadyRefundedQtyMap, refundItemKey } from '@/lib/orders/refund-tracking';
+import { REFUNDABLE_STATUSES } from '@/lib/constants';
+import type { OrderStatus } from '@/types';
 
 // Refund par articles (Scénario B) — 2 modes :
 // - 'items' : Lola coche les articles retournés. Montant calculé serveur depuis
@@ -32,8 +34,6 @@ const RefundSchema = z.discriminatedUnion('kind', [
     nonce: z.string().min(8).max(64),
   }),
 ]);
-
-const REFUNDABLE_STATUSES = ['paid', 'confirmed', 'shipped', 'delivered', 'partially_refunded'] as const;
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -87,7 +87,7 @@ export async function POST(
     return NextResponse.json({ error: 'Aucun paiement à rembourser' }, { status: 400 });
   }
 
-  if (!REFUNDABLE_STATUSES.includes(order.status as typeof REFUNDABLE_STATUSES[number])) {
+  if (!REFUNDABLE_STATUSES.includes(order.status as OrderStatus)) {
     return NextResponse.json(
       { error: `Impossible de rembourser une commande en statut "${order.status}"` },
       { status: 400 },
