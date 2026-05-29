@@ -50,8 +50,8 @@ export default function LivraisonPage() {
                 {SHIPPING_COUNTRIES.map((c) => (
                   <tr key={c.code} className="border-t border-[#1B0B94]/10">
                     <td className="px-4 py-3 font-medium">{c.name}</td>
-                    <td className="px-4 py-3 text-right">{SHIPPING_RATES[c.zone].home.toFixed(2)} €</td>
-                    <td className="px-4 py-3 text-right">{SHIPPING_RATES[c.zone].mondial_relay.toFixed(2)} €</td>
+                    <td className="px-4 py-3 text-right">{SHIPPING_RATES[c.zone].home != null ? `${SHIPPING_RATES[c.zone].home!.toFixed(2)} €` : '—'}</td>
+                    <td className="px-4 py-3 text-right">{SHIPPING_RATES[c.zone].mondial_relay != null ? `${SHIPPING_RATES[c.zone].mondial_relay!.toFixed(2)} €` : '—'}</td>
                     <td className="px-4 py-3 text-right">{formatThreshold(SHIPPING_FREE_THRESHOLD[c.zone])}</td>
                     <td className="px-4 py-3 text-right text-[#1B0B94]/70">{SHIPPING_DELAYS[c.zone]}</td>
                   </tr>

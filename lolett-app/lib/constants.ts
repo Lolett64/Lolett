@@ -1,4 +1,9 @@
-import type { ShippingMethod, ShippingCountryCode } from '@/types';
+import type {
+  OrderStatus,
+  ShippingMethod,
+  ShippingCarrier,
+  ShippingCountryCode,
+} from '@/lib/types/domain';
 
 export const STOCK = {
   LOW_THRESHOLD: 3,
@@ -23,6 +28,80 @@ export function computeVAT(ttc: number, rate: number = VAT.RATE) {
 
 export type ShippingZone = 'FR' | 'BENELUX' | 'IBERIA';
 
+// ============================================================================
+// STATUTS DE COMMANDE — source de vérité unique (13 statuts alignés DB)
+// ============================================================================
+
+// Ré-export pratique pour les consommateurs (PR4 OrderFilters dérive la liste).
+export { ORDER_STATUS_VALUES } from '@/lib/types/domain';
+
+// Labels FR au féminin (cohérent avec « commande »)
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending:            'En attente',
+  paid:               'Payée',
+  confirmed:          'Confirmée',
+  shipped:            'Expédiée',
+  delivered:          'Livrée',
+  ready_for_pickup:   'Prête au retrait',
+  picked_up:          'Retirée',
+  cancelled:          'Annulée',
+  refunded:           'Remboursée',
+  partially_refunded: 'Remb. partiel',
+  disputed:           'Litige Stripe',
+  expired:            'Expirée',
+  payment_review:     'À vérifier',
+};
+
+// Couleurs unifiées : hex (Recharts), tw (préfixe), twFull (classes badge complètes)
+export const ORDER_STATUS_COLORS: Record<OrderStatus, { hex: string; tw: string; twFull: string }> = {
+  pending:            { hex: '#94a3b8', tw: 'slate',   twFull: 'bg-slate-50 text-slate-700 border-slate-200' },
+  paid:               { hex: '#3b82f6', tw: 'blue',    twFull: 'bg-blue-50 text-blue-700 border-blue-200' },
+  confirmed:          { hex: '#8b5cf6', tw: 'violet',  twFull: 'bg-violet-50 text-violet-700 border-violet-200' },
+  shipped:            { hex: '#f59e0b', tw: 'amber',   twFull: 'bg-amber-50 text-amber-700 border-amber-200' },
+  delivered:          { hex: '#10b981', tw: 'emerald', twFull: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  ready_for_pickup:   { hex: '#06b6d4', tw: 'cyan',    twFull: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  picked_up:          { hex: '#14b8a6', tw: 'teal',    twFull: 'bg-teal-50 text-teal-700 border-teal-200' },
+  cancelled:          { hex: '#ef4444', tw: 'red',     twFull: 'bg-red-50 text-red-700 border-red-200' },
+  refunded:           { hex: '#f97316', tw: 'orange',  twFull: 'bg-orange-50 text-orange-700 border-orange-200' },
+  partially_refunded: { hex: '#fb923c', tw: 'orange',  twFull: 'bg-orange-50 text-orange-600 border-orange-200' },
+  disputed:           { hex: '#dc2626', tw: 'red',     twFull: 'bg-red-100 text-red-800 border-red-300' },
+  expired:            { hex: '#6b7280', tw: 'gray',    twFull: 'bg-gray-50 text-gray-600 border-gray-200' },
+  payment_review:     { hex: '#eab308', tw: 'yellow',  twFull: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
+};
+
+// Transitions autorisées par statut (workflow domicile + Click & Collect, spec §4.5)
+export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  pending:            ['paid', 'cancelled', 'expired', 'payment_review'],
+  paid:               ['confirmed', 'cancelled', 'refunded'],
+  confirmed:          ['shipped', 'ready_for_pickup', 'cancelled', 'refunded'],
+  shipped:            ['delivered', 'refunded'],
+  delivered:          ['refunded', 'partially_refunded'],
+  ready_for_pickup:   ['picked_up', 'cancelled', 'refunded'],
+  picked_up:          ['refunded', 'partially_refunded'],
+  cancelled:          [],
+  refunded:           [],
+  partially_refunded: [],
+  disputed:           ['refunded'],
+  expired:            [],
+  payment_review:     ['paid', 'cancelled'],
+};
+
+// Statuts gérés par les webhooks Stripe (non éditables manuellement depuis l'admin)
+export const STRIPE_MANAGED_STATUSES: OrderStatus[] = [
+  'refunded', 'partially_refunded', 'disputed', 'payment_review',
+];
+
+// Statuts éligibles à un refund Stripe depuis l'admin (inclut ready_for_pickup : no-show C&C)
+export const REFUNDABLE_STATUSES: OrderStatus[] = [
+  'paid', 'confirmed', 'shipped', 'delivered',
+  'ready_for_pickup',
+  'partially_refunded',
+];
+
+// Étapes parcours timeline (UI client + admin workflow viz)
+export const ORDER_STEPS_HOME   = ['pending', 'confirmed', 'paid', 'shipped', 'delivered'] as const;
+export const ORDER_STEPS_PICKUP = ['pending', 'confirmed', 'paid', 'ready_for_pickup', 'picked_up'] as const;
+
 export const SHIPPING_COUNTRIES: ReadonlyArray<{
   code: ShippingCountryCode;
   name: string;
@@ -40,14 +119,18 @@ export const SHIPPING_COUNTRIES: ReadonlyArray<{
   { code: 'PT', name: 'Portugal',   zone: 'IBERIA',  phonePrefix: '+351', phoneRegex: /^\+351\d{9}$/,                  postalCodeRegex: /^\d{4}-\d{3}$/,      postalCodeExample: '1100-148' },
 ];
 
-export const SHIPPING_METHODS: Record<ShippingMethod, { id: ShippingMethod; label: string; carrier: 'colissimo' | 'mondial_relay' }> = {
-  home:          { id: 'home',          label: 'Livraison à domicile',         carrier: 'colissimo' },
-  mondial_relay: { id: 'mondial_relay', label: 'Point Relais Mondial Relay',   carrier: 'mondial_relay' },
+export const SHIPPING_METHODS: Record<ShippingMethod, { id: ShippingMethod; label: string; carrier: ShippingCarrier }> = {
+  home:          { id: 'home',          label: 'Livraison à domicile',                  carrier: 'colissimo' },
+  mondial_relay: { id: 'mondial_relay', label: 'Point Relais Mondial Relay',            carrier: 'mondial_relay' },
+  click_collect: { id: 'click_collect', label: 'Retrait en boutique (Click & Collect)', carrier: 'click_collect' },
 };
 
-// Tarifs plats (€) par zone × méthode.
-export const SHIPPING_RATES: Record<ShippingZone, Record<ShippingMethod, number>> = {
-  FR:      { home: 5.90, mondial_relay: 4.90 },
+// Dérivé dynamiquement — source unique pour la validation Stripe/webhook.
+export const VALID_SHIPPING_METHODS = Object.keys(SHIPPING_METHODS) as ShippingMethod[];
+
+// Tarifs plats (€) par zone × méthode. click_collect UNIQUEMENT en FR (gratuit).
+export const SHIPPING_RATES: Record<ShippingZone, Partial<Record<ShippingMethod, number>>> = {
+  FR:      { home: 5.90, mondial_relay: 4.90, click_collect: 0 },
   BENELUX: { home: 7.90, mondial_relay: 6.90 },
   IBERIA:  { home: 9.90, mondial_relay: 7.90 },
 };
@@ -82,19 +165,27 @@ export function computeShippingCost(
   country: ShippingCountryCode,
   method: ShippingMethod
 ): number {
+  // Garde sécurisée — Click & Collect FR-only au niveau code (anti-DevTools).
+  if (method === 'click_collect') {
+    if (country !== 'FR') {
+      throw new Error('Click & Collect est disponible uniquement en France');
+    }
+    return 0;
+  }
   const zone = getShippingZone(country);
   if (!zone) return 0;
   const threshold = SHIPPING_FREE_THRESHOLD[zone];
   if (threshold !== null && subtotal >= threshold) return 0;
-  return SHIPPING_RATES[zone][method];
+  return SHIPPING_RATES[zone][method] ?? 0;
 }
 
-export function getShippingCarrier(method: ShippingMethod): 'colissimo' | 'mondial_relay' {
+export function getShippingCarrier(method: ShippingMethod): ShippingCarrier {
   return SHIPPING_METHODS[method].carrier;
 }
 
-// URL publique de suivi par transporteur. Utilisée dans l'email "Expédié".
-export function getTrackingUrl(carrier: 'colissimo' | 'mondial_relay', trackingNumber: string): string {
+// URL publique de suivi par transporteur. null pour click_collect (pas de suivi).
+export function getTrackingUrl(carrier: ShippingCarrier, trackingNumber: string): string | null {
+  if (carrier === 'click_collect') return null;
   if (carrier === 'mondial_relay') {
     const brand = process.env.NEXT_PUBLIC_MONDIAL_RELAY_BRAND_ID ?? '';
     return `https://www.mondialrelay.com/suivi-de-colis/?codeMarque=${encodeURIComponent(brand)}&NumeroExpedition=${encodeURIComponent(trackingNumber)}`;
@@ -108,6 +199,6 @@ export function getTrackingUrl(carrier: 'colissimo' | 'mondial_relay', trackingN
 // doivent utiliser computeShippingCost().
 // ============================================================================
 export const SHIPPING = {
-  COST: SHIPPING_RATES.FR.home,
+  COST: SHIPPING_RATES.FR.home ?? 0,
   FREE_THRESHOLD: SHIPPING_FREE_THRESHOLD.FR ?? 100,
 } as const;
