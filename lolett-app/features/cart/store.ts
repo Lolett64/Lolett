@@ -2,7 +2,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartItem, Size, ShippingCountryCode, ShippingMethod, PickupPoint } from '@/types';
+import type { CartItem, Size, ShippingCountryCode, ShippingMethod, PickupPoint, PickupPointProvider } from '@/types';
+import { VALID_SHIPPING_METHODS } from '@/lib/constants';
 
 export interface AppliedGiftCard {
   code: string;
@@ -33,6 +34,47 @@ interface CartState {
   setShippingCountry: (country: ShippingCountryCode) => void;
   setShippingMethod: (method: ShippingMethod) => void;
   setPickupPoint: (point: PickupPoint | null) => void;
+}
+
+// Champs réellement persistés (zustand re-fusionne les actions après migrate).
+type PersistedCartState = {
+  items?: CartItem[];
+  giftCard?: CartState['giftCard'];
+  promo?: { code?: string } | null;
+  shippingCountry?: ShippingCountryCode;
+  shippingMethod?: ShippingMethod;
+  pickupPoint?: (Record<string, unknown> & { provider?: PickupPointProvider }) | null;
+};
+
+// Migration pure et testable du panier persisté.
+// v1→v2 : normalise la forme de `promo`. v2→v3 : backfill `provider='mondial_relay'`
+// sur l'ancien pickupPoint (sur une COPIE, sans muter l'entrée), reset
+// shippingMethod→home + pickupPoint→null si la méthode n'est plus valide.
+export function migrateCart(persisted: unknown, version: number): PersistedCartState {
+  const input = (persisted ?? {}) as PersistedCartState;
+  // Copie de surface — ne jamais muter l'objet passé par zustand/l'appelant.
+  const state: PersistedCartState = { ...input };
+
+  // v1→v2 : forme du promo.
+  if (version < 2 && state.promo) {
+    state.promo = state.promo.code ? { code: state.promo.code } : null;
+  }
+
+  // v3 : backfill du discriminant provider sur les snapshots legacy (sur une copie).
+  if (version < 3 && state.pickupPoint && !state.pickupPoint.provider) {
+    state.pickupPoint = { ...state.pickupPoint, provider: 'mondial_relay' };
+  }
+
+  // Reset si la méthode persistée n'est plus supportée (revert deploy / cookie ancien).
+  if (
+    !state.shippingMethod ||
+    !VALID_SHIPPING_METHODS.includes(state.shippingMethod)
+  ) {
+    state.shippingMethod = 'home';
+    state.pickupPoint = null;
+  }
+
+  return state;
 }
 
 export const useCartStore = create<CartState>()(
@@ -117,7 +159,9 @@ export const useCartStore = create<CartState>()(
       setShippingCountry: (country) => set({ shippingCountry: country, shippingMethod: 'home', pickupPoint: null }),
       setShippingMethod: (method) => set((state) => ({
         shippingMethod: method,
-        pickupPoint: method === 'home' ? null : state.pickupPoint,
+        // Reset au CHANGEMENT de méthode (évite un résidu MR↔C&C).
+        // Re-sélectionner la même méthode conserve le point déjà choisi (spec §5.5).
+        pickupPoint: state.shippingMethod !== method ? null : state.pickupPoint,
       })),
       setPickupPoint: (point) => set({ pickupPoint: point }),
 
@@ -134,14 +178,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'lolett-cart',
-      version: 2,
-      migrate: (persisted: unknown, version: number) => {
-        const state = (persisted ?? {}) as Partial<CartState> & { promo?: { code?: string } | null };
-        if (version < 2 && state.promo) {
-          state.promo = state.promo.code ? { code: state.promo.code } : null;
-        }
-        return state as CartState;
-      },
+      version: 3,
+      migrate: (persisted: unknown, version: number) =>
+        migrateCart(persisted, version) as unknown as CartState,
     }
   )
 );
