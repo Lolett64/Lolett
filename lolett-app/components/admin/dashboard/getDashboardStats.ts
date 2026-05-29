@@ -15,6 +15,7 @@ export interface DashboardStats {
   totalProducts: number;
   ordersToday: number;
   ordersPending: number;
+  ordersReadyForPickup: number;
   totalStock: number;
   totalRevenue: number;
   recentOrders: RecentOrder[];
@@ -55,6 +56,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     { count: totalProducts },
     { count: ordersToday },
     { count: ordersPending },
+    { count: ordersReadyForPickup },
     { data: stockSumData },
     { data: recentOrders },
     { data: lowStockProducts },
@@ -71,6 +73,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .in('status', ['pending', 'paid']),
+    supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'ready_for_pickup'),
     supabase.from('products').select('stock'),
     supabase
       .from('orders')
@@ -149,6 +155,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     totalProducts: totalProducts ?? 0,
     ordersToday: ordersToday ?? 0,
     ordersPending: ordersPending ?? 0,
+    ordersReadyForPickup: ordersReadyForPickup ?? 0,
     totalStock,
     totalRevenue: Math.round(totalRevenue * 100) / 100,
     recentOrders: (recentOrders ?? []) as RecentOrder[],

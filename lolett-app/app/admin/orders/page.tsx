@@ -6,6 +6,7 @@ import { OrdersPagination } from '@/components/admin/OrdersPagination';
 
 interface SearchParams {
   status?: string;
+  shipping_method?: string;
   sort?: string;
   order?: string;
   page?: string;
@@ -47,6 +48,7 @@ async function getOrders(params: SearchParams): Promise<{ orders: OrderRow[]; to
     );
 
   if (params.status) query = query.eq('status', params.status);
+  if (params.shipping_method) query = query.eq('shipping_method', params.shipping_method);
 
   const validSortFields = ['created_at', 'total', 'status'];
   const sortField = validSortFields.includes(params.sort ?? '') ? params.sort! : 'created_at';

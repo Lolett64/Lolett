@@ -14,24 +14,8 @@ import {
 } from 'recharts';
 import type { DailyRevenue, StatusCount } from './getDashboardStats';
 import { formatPrice } from '@/lib/utils';
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: '#B89547',
-  paid: '#1B0B94',
-  shipped: '#6366f1',
-  delivered: '#22c55e',
-  cancelled: '#ef4444',
-  refunded: '#a3a3a3',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'En attente',
-  paid: 'Payée',
-  shipped: 'Expédiée',
-  delivered: 'Livrée',
-  cancelled: 'Annulée',
-  refunded: 'Remboursée',
-};
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants';
+import type { OrderStatus } from '@/types';
 
 function formatDay(dateStr: string) {
   const d = new Date(dateStr + 'T00:00:00');
@@ -45,11 +29,14 @@ interface Props {
 
 export function DashboardCharts({ ordersByDay, ordersByStatus }: Props) {
   const statusData = ordersByStatus
-    .map((s) => ({
-      ...s,
-      label: STATUS_LABELS[s.status] || s.status,
-      fill: STATUS_COLORS[s.status] || '#B89547',
-    }))
+    .map((s) => {
+      const isKnown = s.status in ORDER_STATUS_LABELS;
+      return {
+        ...s,
+        label: isKnown ? ORDER_STATUS_LABELS[s.status as OrderStatus] : s.status,
+        fill: isKnown ? ORDER_STATUS_COLORS[s.status as OrderStatus].hex : '#B89547',
+      };
+    })
     .sort((a, b) => b.count - a.count);
 
   return (

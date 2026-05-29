@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Package, ShoppingBag, Clock, Layers, TrendingUp } from 'lucide-react';
+import { Package, ShoppingBag, Clock, Layers, TrendingUp, Store } from 'lucide-react';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/admin/utils';
 import { OrderStatusBadge } from '@/components/admin/OrderStatusBadge';
@@ -41,6 +41,12 @@ async function DashboardContent() {
       href: '/admin/orders?status=pending',
     },
     {
+      label: 'À retirer (Click & Collect)',
+      value: stats.ordersReadyForPickup,
+      icon: Store,
+      href: '/admin/orders?status=ready_for_pickup',
+    },
+    {
       label: 'Stock total',
       value: stats.totalStock,
       icon: Layers,
@@ -61,7 +67,7 @@ async function DashboardContent() {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 gap-5 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-6">
         {statCards.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="bg-white border border-gray-200/50 shadow-none hover:shadow-md hover:border-[#B89547]/30 transition-all duration-300 cursor-pointer">
@@ -210,8 +216,8 @@ function DashboardSkeleton() {
         <div className="h-9 w-40 rounded bg-[#B89547]/10 animate-pulse" />
         <div className="h-4 w-60 rounded bg-[#B89547]/10 animate-pulse mt-2" />
       </div>
-      <div className="grid grid-cols-2 gap-5 lg:grid-cols-5">
-        {[...Array<undefined>(5)].map((_, i) => (
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-6">
+        {[...Array<undefined>(6)].map((_, i) => (
           <div key={i} className="h-32 rounded-xl bg-[#B89547]/10 animate-pulse" />
         ))}
       </div>

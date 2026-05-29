@@ -9,6 +9,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCallback, useTransition } from 'react';
+import {
+  ORDER_STATUS_VALUES,
+  ORDER_STATUS_LABELS,
+  SHIPPING_METHODS,
+} from '@/lib/constants';
+import { SHIPPING_METHOD_VALUES } from '@/lib/types/domain';
 
 export function OrderFilters() {
   const router = useRouter();
@@ -41,14 +47,28 @@ export function OrderFilters() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Tous les statuts</SelectItem>
-          <SelectItem value="pending">En attente</SelectItem>
-          <SelectItem value="paid">Payé</SelectItem>
-          <SelectItem value="confirmed">Confirmé</SelectItem>
-          <SelectItem value="shipped">Expédié</SelectItem>
-          <SelectItem value="delivered">Livré</SelectItem>
-          <SelectItem value="cancelled">Annulé</SelectItem>
-          <SelectItem value="refunded">Remboursé</SelectItem>
-          <SelectItem value="expired">Expiré</SelectItem>
+          {ORDER_STATUS_VALUES.map((s) => (
+            <SelectItem key={s} value={s}>
+              {ORDER_STATUS_LABELS[s]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        defaultValue={searchParams.get('shipping_method') ?? 'all'}
+        onValueChange={(v) => updateFilter('shipping_method', v)}
+      >
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="Mode de livraison" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Tous les modes</SelectItem>
+          {SHIPPING_METHOD_VALUES.map((m) => (
+            <SelectItem key={m} value={m}>
+              {SHIPPING_METHODS[m].label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

@@ -1,45 +1,28 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'En attente',
-  paid: 'Payé',
-  confirmed: 'Confirmé',
-  shipped: 'Expédié',
-  delivered: 'Livré',
-  cancelled: 'Annulé',
-  refunded: 'Remboursé',
-  partially_refunded: 'Remb. partiel',
-  disputed: 'Litige',
-  payment_review: 'Vérif paiement',
-  expired: 'Expiré',
-};
-
-const STATUS_CLASSES: Record<string, string> = {
-  pending: 'bg-amber-50 text-amber-700 border-amber-200/60',
-  paid: 'bg-sky-50 text-sky-700 border-sky-200/60',
-  confirmed: 'bg-indigo-50 text-indigo-700 border-indigo-200/60',
-  shipped: 'bg-violet-50 text-violet-700 border-violet-200/60',
-  delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
-  cancelled: 'bg-rose-50 text-rose-700 border-rose-200/60',
-  refunded: 'bg-orange-50 text-orange-700 border-orange-200/60',
-  partially_refunded: 'bg-orange-50 text-orange-600 border-orange-200/60',
-  disputed: 'bg-red-100 text-red-800 border-red-300 font-semibold',
-  payment_review: 'bg-yellow-50 text-yellow-700 border-yellow-200/60',
-  expired: 'bg-stone-50 text-stone-500 border-stone-200/60',
-};
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/constants';
+import type { OrderStatus } from '@/types';
 
 interface OrderStatusBadgeProps {
   status: string;
 }
 
+function isOrderStatus(value: string): value is OrderStatus {
+  return value in ORDER_STATUS_LABELS;
+}
+
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
+  const label = isOrderStatus(status) ? ORDER_STATUS_LABELS[status] : status;
+  const twFull = isOrderStatus(status)
+    ? ORDER_STATUS_COLORS[status].twFull
+    : ORDER_STATUS_COLORS.expired.twFull;
+
   return (
     <Badge
       variant="outline"
-      className={cn('text-[10px] font-medium rounded-md tracking-wide', STATUS_CLASSES[status] ?? STATUS_CLASSES.expired)}
+      className={cn('text-[10px] font-medium rounded-md tracking-wide', twFull)}
     >
-      {STATUS_LABELS[status] ?? status}
+      {label}
     </Badge>
   );
 }

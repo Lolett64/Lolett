@@ -22,37 +22,29 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const STATUSES = [
-  { value: 'pending', label: 'En attente' },
-  { value: 'paid', label: 'Payé' },
-  { value: 'confirmed', label: 'Confirmé' },
-  { value: 'shipped', label: 'Expédié' },
-  { value: 'delivered', label: 'Livré' },
-  { value: 'cancelled', label: 'Annulé' },
-  { value: 'payment_review', label: 'Vérif paiement (gift card)' },
-  { value: 'expired', label: 'Expiré' },
-  // 'refunded' / 'partially_refunded' / 'disputed' ne sont PAS éditables manuellement.
-];
+import {
+  ORDER_STATUS_LABELS,
+  ORDER_STATUS_VALUES,
+  ORDER_STATUS_TRANSITIONS,
+  STRIPE_MANAGED_STATUSES,
+} from '@/lib/constants';
+import type { OrderStatus, ShippingMethod } from '@/types';
 
-// Transitions logiques autorisées. Statuts terminaux (refunded/partially_refunded/disputed/expired/cancelled)
-// non éditables ici → ne contiennent rien.
-const VALID_TRANSITIONS: Record<string, string[]> = {
-  pending: ['paid', 'expired', 'cancelled'],
-  paid: ['confirmed', 'cancelled'],
-  confirmed: ['shipped', 'cancelled'],
-  shipped: ['delivered', 'cancelled'],
-  delivered: [],
-  payment_review: ['paid', 'cancelled'],
-  expired: [],
-  cancelled: [],
-  refunded: [],
-  partially_refunded: [],
-  disputed: [],
-};
+// Liste des statuts proposables = tous SAUF ceux gérés par Stripe.
+const SELECTABLE_STATUSES: { value: OrderStatus; label: string }[] = ORDER_STATUS_VALUES
+  .filter((s) => !STRIPE_MANAGED_STATUSES.includes(s))
+  .map((s) => ({ value: s, label: ORDER_STATUS_LABELS[s] }));
 
-// Statuts pour lesquels une annulation est sensible (déjà payée/expédiée).
-// Aligné avec VALID_TRANSITIONS : 'delivered' n'a pas de transition possible donc exclu.
-const CANCEL_REQUIRES_CONFIRM = ['paid', 'confirmed', 'shipped'];
+// Transitions manuelles autorisées depuis un statut = transitions centralisées
+// (PR2) moins les statuts gérés par Stripe (qu'on ne pose jamais à la main).
+function manualTransitions(from: OrderStatus): OrderStatus[] {
+  return (ORDER_STATUS_TRANSITIONS[from] ?? []).filter(
+    (s) => !STRIPE_MANAGED_STATUSES.includes(s),
+  );
+}
+
+// Annulation sensible (commande déjà payée/préparée/expédiée/prête).
+const CANCEL_REQUIRES_CONFIRM: OrderStatus[] = ['paid', 'confirmed', 'shipped', 'ready_for_pickup'];
 
 interface OrderStatusUpdateProps {
   orderId: string;
@@ -60,6 +52,7 @@ interface OrderStatusUpdateProps {
   currentTrackingNumber?: string | null;
   currentAdminNotes?: string | null;
   currentCancelReason?: string | null;
+  shippingMethod?: ShippingMethod | null;
 }
 
 export function OrderStatusUpdate({
@@ -68,6 +61,7 @@ export function OrderStatusUpdate({
   currentTrackingNumber,
   currentAdminNotes,
   currentCancelReason,
+  shippingMethod,
 }: OrderStatusUpdateProps) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);
@@ -78,16 +72,23 @@ export function OrderStatusUpdate({
   const [error, setError] = useState('');
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
-  const allowedNextStatuses = VALID_TRANSITIONS[currentStatus] ?? [];
-  // Le statut actuel reste affiché (pour permettre d'éditer tracking/notes sans changer de statut).
-  const availableStatuses = STATUSES.filter(
+  const isClickCollect = shippingMethod === 'click_collect';
+  const currentStatusTyped = currentStatus as OrderStatus;
+  const allowedNextStatuses = manualTransitions(currentStatusTyped);
+  // Options = transitions autorisées + le statut courant, TOUJOURS affiché (même
+  // s'il est géré par Stripe comme payment_review/refunded — sinon le Select
+  // afficherait un trigger vide pour ces statuts non « selectable »).
+  const baseStatuses = SELECTABLE_STATUSES.filter(
     (s) => s.value === currentStatus || allowedNextStatuses.includes(s.value),
   );
+  const availableStatuses = baseStatuses.some((s) => s.value === currentStatus)
+    ? baseStatuses
+    : [{ value: currentStatusTyped, label: ORDER_STATUS_LABELS[currentStatusTyped] ?? currentStatus }, ...baseStatuses];
   const isLockedStatus = allowedNextStatuses.length === 0;
 
   const isStatusChange = status !== currentStatus;
-  const isInvalidTransition = isStatusChange && !allowedNextStatuses.includes(status);
-  const isSensitiveCancel = isStatusChange && status === 'cancelled' && CANCEL_REQUIRES_CONFIRM.includes(currentStatus);
+  const isInvalidTransition = isStatusChange && !allowedNextStatuses.includes(status as OrderStatus);
+  const isSensitiveCancel = isStatusChange && status === 'cancelled' && CANCEL_REQUIRES_CONFIRM.includes(currentStatusTyped);
 
   const isDirty =
     isStatusChange
@@ -143,13 +144,20 @@ export function OrderStatusUpdate({
     void performUpdate();
   }
 
-  // Workflow visuel : étapes principales du cycle de vie d'une commande
-  const WORKFLOW_STEPS: { value: string; label: string; icon: string }[] = [
-    { value: 'paid', label: 'Payée', icon: '💳' },
-    { value: 'confirmed', label: 'Confirmée', icon: '✓' },
-    { value: 'shipped', label: 'Expédiée', icon: '📦' },
-    { value: 'delivered', label: 'Livrée', icon: '🏠' },
-  ];
+  // Workflow visuel : étapes du cycle de vie selon le mode de livraison.
+  // C&C : Payée → Confirmée → Prête au retrait → Retirée. Sinon : flux domicile.
+  const STEP_ICONS: Record<string, string> = {
+    paid: '💳', confirmed: '✓', shipped: '📦', delivered: '🏠',
+    ready_for_pickup: '🛍️', picked_up: '✅',
+  };
+  const workflowStatuses = isClickCollect
+    ? ['paid', 'confirmed', 'ready_for_pickup', 'picked_up']
+    : ['paid', 'confirmed', 'shipped', 'delivered'];
+  const WORKFLOW_STEPS = workflowStatuses.map((value) => ({
+    value,
+    label: ORDER_STATUS_LABELS[value as OrderStatus],
+    icon: STEP_ICONS[value] ?? '•',
+  }));
   const currentStepIndex = WORKFLOW_STEPS.findIndex((s) => s.value === currentStatus);
   const showWorkflow = currentStepIndex >= 0;
   const nextStep = showWorkflow && currentStepIndex < WORKFLOW_STEPS.length - 1
@@ -216,9 +224,11 @@ export function OrderStatusUpdate({
                 {nextStep.value === 'confirmed' && ' — vérifier le stock et préparer le colis.'}
                 {nextStep.value === 'shipped' && ' — entrer le n° Mondial Relay (un email de suivi sera envoyé au client).'}
                 {nextStep.value === 'delivered' && ' — confirmer la réception (un email final sera envoyé au client).'}
+                {nextStep.value === 'ready_for_pickup' && ' — un code de retrait est généré et envoyé au client par email.'}
+                {nextStep.value === 'picked_up' && ' — confirmer que le client a récupéré sa commande (aucun email).'}
               </p>
             )}
-            {!nextStep && currentStatus === 'delivered' && (
+            {!nextStep && (currentStatus === 'delivered' || currentStatus === 'picked_up') && (
               <p className="text-[12px] text-emerald-700 leading-relaxed">
                 ✓ Commande terminée. Aucune action supplémentaire requise.
               </p>
@@ -249,18 +259,18 @@ export function OrderStatusUpdate({
             <p className="text-[11px] text-[#1a1510]/40">
               Transitions autorisées :{' '}
               {allowedNextStatuses
-                .map((v) => STATUSES.find((s) => s.value === v)?.label ?? v)
+                .map((v) => SELECTABLE_STATUSES.find((s) => s.value === v)?.label ?? v)
                 .join(' · ')}
             </p>
           )}
           {isInvalidTransition && (
             <p className="text-xs text-red-600">
-              Transition non autorisée depuis &laquo; {STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus} &raquo;.
+              Transition non autorisée depuis &laquo; {SELECTABLE_STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus} &raquo;.
             </p>
           )}
         </div>
 
-        {status === 'shipped' && (
+        {status === 'shipped' && !isClickCollect && (
           <div className="flex flex-col gap-2">
             <Label htmlFor="tracking" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">N° Mondial Relay</Label>
             <Input
@@ -303,6 +313,27 @@ export function OrderStatusUpdate({
           <p className="text-sm text-red-600">{error}</p>
         )}
 
+        {isClickCollect && currentStatus === 'confirmed' && (
+          <Button
+            type="button"
+            onClick={() => { setStatus('ready_for_pickup'); }}
+            variant="outline"
+            className="w-fit border-cyan-500 text-cyan-700 hover:bg-cyan-50 font-[family-name:var(--font-montserrat)]"
+          >
+            Marquer prête au retrait
+          </Button>
+        )}
+        {isClickCollect && currentStatus === 'ready_for_pickup' && (
+          <Button
+            type="button"
+            onClick={() => { setStatus('picked_up'); }}
+            variant="outline"
+            className="w-fit border-teal-500 text-teal-700 hover:bg-teal-50 font-[family-name:var(--font-montserrat)]"
+          >
+            Marquer retirée
+          </Button>
+        )}
+
         <Button
           onClick={handleSubmit}
           disabled={saving || !isDirty || isInvalidTransition}
@@ -317,7 +348,7 @@ export function OrderStatusUpdate({
           <DialogHeader>
             <DialogTitle>Confirmer l&rsquo;annulation</DialogTitle>
             <DialogDescription className="text-[#1a1510]/70 leading-relaxed">
-              Cette commande est déjà <span className="font-semibold">{STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus}</span>.
+              Cette commande est déjà <span className="font-semibold">{SELECTABLE_STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus}</span>.
               L&rsquo;annuler ne déclenche <span className="font-semibold">PAS</span> le remboursement automatique.
               Tu dois rembourser manuellement via le bouton « Rembourser via Stripe » ci-dessous.
               Confirmer l&rsquo;annulation ?
