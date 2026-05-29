@@ -58,6 +58,9 @@ interface OrderDetail {
   cancel_reason: string | null;
   shipped_at: string | null;
   delivered_at: string | null;
+  ready_for_pickup_at: string | null;
+  picked_up_at: string | null;
+  pickup_code: string | null;
   cancelled_at: string | null;
   refunded_at: string | null;
   disputed_at: string | null;
@@ -124,7 +127,7 @@ export default async function OrderDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          {(order.status === 'paid' || order.status === 'confirmed') && (
+          {(order.status === 'paid' || order.status === 'confirmed') && order.shipping_method !== 'click_collect' && (
             <Link
               href={`/admin/orders/${order.id}/expedition`}
               className="font-[family-name:var(--font-montserrat)] inline-flex items-center gap-2 rounded-lg border border-[#1B0B94] bg-white px-4 py-2 text-sm font-medium text-[#1B0B94] hover:bg-[#FDF5E6] transition-colors"
@@ -138,7 +141,7 @@ export default async function OrderDetailPage({
       </div>
 
       {/* Lifecycle history (shipped / delivered / cancelled / refunded / disputed) */}
-      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at || order.disputed_at) && (
+      {(order.shipped_at || order.delivered_at || order.cancelled_at || order.refunded_at || order.disputed_at || order.ready_for_pickup_at || order.picked_up_at) && (
         <Card className="bg-white border border-gray-200/50 shadow-none rounded-xl">
           <CardHeader>
             <CardTitle className="font-[family-name:var(--font-montserrat)] text-sm font-medium text-[#1a1510]">Historique</CardTitle>
@@ -153,6 +156,17 @@ export default async function OrderDetailPage({
             {order.delivered_at && (
               <p className="text-[#1a1510]/70">
                 <span className="font-medium text-[#1a1510]">Livrée</span> — {formatDate(order.delivered_at)}
+              </p>
+            )}
+            {order.ready_for_pickup_at && (
+              <p className="text-[#1a1510]/70">
+                <span className="font-medium text-[#1a1510]">Prête au retrait</span> — {formatDate(order.ready_for_pickup_at)}
+                {order.pickup_code && <span className="text-[#1a1510]/50"> · Code {order.pickup_code}</span>}
+              </p>
+            )}
+            {order.picked_up_at && (
+              <p className="text-[#1a1510]/70">
+                <span className="font-medium text-[#1a1510]">Retirée</span> — {formatDate(order.picked_up_at)}
               </p>
             )}
             {order.cancelled_at && (
@@ -285,7 +299,26 @@ export default async function OrderDetailPage({
             </div>
           </div>
 
-          {order.pickup_point && (
+          {order.pickup_point && order.pickup_point.provider === 'click_collect' && (
+            <div className="rounded-lg border border-cyan-200 bg-cyan-50/50 p-4">
+              <p className="text-xs uppercase tracking-wider text-cyan-700 font-medium mb-2">
+                Point de retrait Click &amp; Collect
+              </p>
+              <p className="font-medium text-[#1a1510]">{order.pickup_point.name}</p>
+              <p className="text-[#1a1510]/70 mt-1">{order.pickup_point.address}</p>
+              <p className="text-[#1a1510]/70">
+                {order.pickup_point.postalCode} {order.pickup_point.city}
+              </p>
+              {order.pickup_point.hours && (
+                <p className="text-[#1a1510]/60 mt-1 text-xs">Horaires : {order.pickup_point.hours}</p>
+              )}
+              {order.pickup_point.instructions && (
+                <p className="text-[#1a1510]/60 mt-1 text-xs italic">{order.pickup_point.instructions}</p>
+              )}
+            </div>
+          )}
+
+          {order.pickup_point && order.pickup_point.provider === 'mondial_relay' && (
             <div className="rounded-lg border border-[#E8D9C4] bg-[#FFFBF7] p-4">
               <p className="text-xs uppercase tracking-wider text-[#B89547] font-medium mb-2">
                 Point Relais à recopier dans le dashboard MR Pro
@@ -297,6 +330,20 @@ export default async function OrderDetailPage({
               </p>
               <p className="mt-2 font-mono text-xs text-[#1a1510]/60">
                 ID: <span className="text-[#1a1510]">{order.pickup_point.id}</span>
+              </p>
+            </div>
+          )}
+
+          {order.pickup_code && order.shipping_method === 'click_collect' && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-4">
+              <p className="text-xs uppercase tracking-wider text-amber-700 font-medium mb-1">
+                Code de retrait à présenter
+              </p>
+              <p className="font-mono text-2xl tracking-[0.2em] text-[#1a1510] select-all">
+                {order.pickup_code}
+              </p>
+              <p className="text-xs text-[#1a1510]/50 mt-1">
+                Le client a reçu ce code par email. Sélectionnez-le pour le copier.
               </p>
             </div>
           )}
@@ -432,6 +479,7 @@ export default async function OrderDetailPage({
         currentTrackingNumber={order.tracking_number}
         currentAdminNotes={order.admin_notes}
         currentCancelReason={order.cancel_reason}
+        shippingMethod={order.shipping_method}
       />
 
       {/* Refund via Stripe (passe par /api/admin/orders/:id/refund) */}

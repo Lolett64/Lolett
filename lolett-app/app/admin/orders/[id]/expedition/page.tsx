@@ -57,6 +57,33 @@ export default async function ShippingLabelInfoPage({
   if (!data) notFound();
 
   const { order, items } = data;
+
+  // §7.5 — Click & Collect : aucune étiquette ni transporteur. Écran dédié.
+  if (order.shipping_method === 'click_collect') {
+    return (
+      <div className="flex flex-col gap-6 max-w-2xl">
+        <div className="print:hidden">
+          <Link
+            href={`/admin/orders/${order.id}`}
+            className="font-[family-name:var(--font-montserrat)] flex items-center gap-1.5 text-sm text-[#1a1510]/40 hover:text-[#B89547] transition-colors"
+          >
+            <ChevronLeft className="size-4" />
+            Retour à la commande
+          </Link>
+        </div>
+        <div className="rounded-xl border border-[#E8D9C4] bg-[#FFFBF7] p-8 text-center">
+          <p className="font-[family-name:var(--font-newsreader)] text-2xl font-light text-[#1a1510]">
+            Commande en retrait magasin
+          </p>
+          <p className="font-[family-name:var(--font-montserrat)] mt-3 text-sm text-[#1a1510]/70 leading-relaxed">
+            Cette commande est en retrait magasin (Click &amp; Collect). Aucune étiquette ni transporteur n&rsquo;est nécessaire.
+            Marquez-la « Prête au retrait » depuis la fiche commande pour générer le code et prévenir le client.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const weight = estimateWeightGrams(items);
 
   return (
