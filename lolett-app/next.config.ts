@@ -17,7 +17,15 @@ const baseScriptSrc = [
 // d'attaque XSS au reste du site. À supprimer quand on remplacera ce widget
 // par notre propre composant React + API serveur (v1.1).
 const checkoutScriptSrc = [...baseScriptSrc, "'unsafe-eval'"].join(' ');
-const defaultScriptSrc = baseScriptSrc.join(' ');
+
+// En dev, Next.js et React Fast Refresh utilisent eval() pour le HMR — sans
+// 'unsafe-eval', le bundle client crash au chargement et plus aucun JS React
+// ne tourne (formulaires figés, etc.). Strictement dev-only : en prod
+// NODE_ENV === 'production' donc la CSP reste stricte.
+const defaultScriptSrc =
+  process.env.NODE_ENV === 'development'
+    ? [...baseScriptSrc, "'unsafe-eval'"].join(' ')
+    : baseScriptSrc.join(' ');
 
 function buildCsp(scriptSrc: string): string {
   return [
