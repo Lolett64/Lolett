@@ -25,7 +25,7 @@ interface ShippingLabelInfoProps {
   };
   items: OrderItem[];
   pickupPoint: PickupPoint | null;
-  shippingMethod: 'home' | 'mondial_relay' | null;
+  shippingMethod: 'home' | 'mondial_relay' | 'click_collect' | null;
   weightEstimateGrams: number;
 }
 

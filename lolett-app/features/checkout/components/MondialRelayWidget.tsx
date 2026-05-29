@@ -180,6 +180,7 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
           ShowResultsOnMap: true,
           OnParcelShopSelected: (data: MondialRelayPoint) => {
             const point: PickupPoint = {
+              provider: 'mondial_relay',
               id: data.ID,
               name: data.Nom,
               address: [data.Adresse1, data.Adresse2].filter(Boolean).join(' '),

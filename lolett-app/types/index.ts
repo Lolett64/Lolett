@@ -1,3 +1,19 @@
+import type {
+  OrderStatus,
+  ShippingMethod,
+  ShippingCarrier,
+  ShippingCountryCode,
+  PickupPointProvider,
+} from '@/lib/types/domain';
+
+export type {
+  OrderStatus,
+  ShippingMethod,
+  ShippingCarrier,
+  ShippingCountryCode,
+  PickupPointProvider,
+};
+
 export type Gender = 'homme' | 'femme' | 'both';
 
 export type Size =
@@ -80,20 +96,28 @@ export interface FavoriteItem {
   addedAt: string;
 }
 
-export type ShippingMethod = 'home' | 'mondial_relay';
-export type ShippingCarrier = 'colissimo' | 'mondial_relay';
-export type ShippingCountryCode = 'FR' | 'BE' | 'LU' | 'NL' | 'ES' | 'PT';
-
-export interface PickupPoint {
+interface BasePickupPoint {
   id: string;
   name: string;
   address: string;
   postalCode: string;
   city: string;
   country: string;
+}
+
+export interface MondialRelayPickupPoint extends BasePickupPoint {
+  provider: 'mondial_relay';
   lat?: number;
   lng?: number;
 }
+
+export interface ClickCollectPickupPoint extends BasePickupPoint {
+  provider: 'click_collect';
+  hours?: string | null;
+  instructions?: string | null;
+}
+
+export type PickupPoint = MondialRelayPickupPoint | ClickCollectPickupPoint;
 
 export interface Order {
   id: string;
@@ -112,7 +136,7 @@ export interface Order {
   pickupPoint?: PickupPoint | null;
   invoiceNumber?: string;
   invoicePdfUrl?: string;
-  status: 'pending' | 'confirmed' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'expired';
+  status: OrderStatus;
   paymentProvider?: 'stripe' | 'paypal';
   paymentId?: string;
   userId?: string;
@@ -125,6 +149,9 @@ export interface Order {
   refundAmount?: number;
   refundReason?: string;
   cancelReason?: string;
+  readyForPickupAt?: string;
+  pickedUpAt?: string;
+  pickupCode?: string | null;
   createdAt: string;
   updatedAt?: string;
 }

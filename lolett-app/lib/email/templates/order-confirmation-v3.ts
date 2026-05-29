@@ -45,8 +45,10 @@ export interface EmailOverrides {
 }
 
 function buildMapsUrl(p: PickupPoint): string {
-  if (typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)) {
-    return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const lat = p.provider === 'mondial_relay' ? p.lat : undefined;
+  const lng = p.provider === 'mondial_relay' ? p.lng : undefined;
+  if (typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   }
   const q = encodeURIComponent(`${p.name}, ${p.address}, ${p.postalCode} ${p.city}, ${p.country}`);
   return `https://www.google.com/maps/search/?api=1&query=${q}`;
