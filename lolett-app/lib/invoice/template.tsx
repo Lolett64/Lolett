@@ -51,6 +51,7 @@ export function InvoiceTemplate({ invoiceNumber, invoiceDate, order }: InvoiceTe
   const total = Number(order.total ?? 0);
 
   const isMondialRelay = order.shippingMethod === 'mondial_relay';
+  const isClickCollect = order.shippingMethod === 'click_collect';
   const pickup = order.pickupPoint;
 
   return (
@@ -85,18 +86,25 @@ export function InvoiceTemplate({ invoiceNumber, invoiceDate, order }: InvoiceTe
             <Text style={styles.colLine}>{customer.email}</Text>
           </View>
           <View style={styles.col}>
-            <Text style={styles.colTitle}>Livraison</Text>
-            {isMondialRelay && pickup ? (
+            <Text style={styles.colTitle}>
+              {isClickCollect
+                ? 'Point de retrait Click & Collect'
+                : isMondialRelay
+                  ? 'Point Relais Mondial Relay'
+                  : 'Livraison à domicile'}
+            </Text>
+            {(isClickCollect || isMondialRelay) && pickup ? (
               <>
-                <Text style={styles.colLine}>Point Relais Mondial Relay</Text>
                 <Text style={styles.colLine}>{pickup.name}</Text>
                 <Text style={styles.colLine}>{pickup.address}</Text>
                 <Text style={styles.colLine}>{pickup.postalCode} {pickup.city}</Text>
                 <Text style={styles.colLine}>{pickup.country}</Text>
+                {isClickCollect && pickup.provider === 'click_collect' && pickup.hours ? (
+                  <Text style={styles.colLine}>Horaires : {pickup.hours}</Text>
+                ) : null}
               </>
             ) : (
               <>
-                <Text style={styles.colLine}>Livraison à domicile</Text>
                 <Text style={styles.colLine}>{customer.firstName} {customer.lastName}</Text>
                 <Text style={styles.colLine}>{customer.address}</Text>
                 <Text style={styles.colLine}>{customer.postalCode} {customer.city}</Text>
@@ -140,10 +148,17 @@ export function InvoiceTemplate({ invoiceNumber, invoiceDate, order }: InvoiceTe
               <Text style={styles.totalValue}>-{giftCardAmount.toFixed(2)} €</Text>
             </View>
           )}
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Frais de livraison</Text>
-            <Text style={styles.totalValue}>{shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} €`}</Text>
-          </View>
+          {isClickCollect ? (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Retrait en boutique (Click & Collect)</Text>
+              <Text style={styles.totalValue}>Offert</Text>
+            </View>
+          ) : (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Frais de livraison</Text>
+              <Text style={styles.totalValue}>{shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} €`}</Text>
+            </View>
+          )}
           <View style={styles.totalGrand}>
             <Text style={styles.totalGrandLabel}>Total payé TTC</Text>
             <Text style={styles.totalGrandValue}>{total.toFixed(2)} €</Text>
