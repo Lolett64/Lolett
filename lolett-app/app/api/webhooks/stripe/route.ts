@@ -13,12 +13,11 @@ import { renderGiftCardDeliveryV3 } from '@/lib/email/templates/gift-card-delive
 import { renderGiftCardPurchaseConfirmationV3 } from '@/lib/email/templates/gift-card-purchase-confirmation-v3';
 import { sendOrderRefunded } from '@/lib/email/order-refunded';
 import { sendDisputeAlertToAdmin, sendDisputeClosedToAdmin } from '@/lib/email/dispute-alert';
-import { SHIPPING_COUNTRIES } from '@/lib/constants';
+import { SHIPPING_COUNTRIES, VALID_SHIPPING_METHODS } from '@/lib/constants';
 import type { ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
 import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
 
 const VALID_COUNTRY_CODES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
-const VALID_SHIPPING_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
 
 const VALID_SIZES = [
   'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL',
@@ -236,7 +235,11 @@ export async function POST(req: NextRequest) {
       const rawCountry = metadata.shippingCountry as ShippingCountryCode | undefined;
       const shippingMethod: ShippingMethod = rawMethod && VALID_SHIPPING_METHODS.includes(rawMethod) ? rawMethod : 'home';
       const shippingCountry: ShippingCountryCode = rawCountry && VALID_COUNTRY_CODES.includes(rawCountry) ? rawCountry : 'FR';
-      const shippingCarrier = shippingMethod === 'mondial_relay' ? 'mondial_relay' : 'colissimo';
+      const shippingCarrier = shippingMethod === 'mondial_relay'
+        ? 'mondial_relay'
+        : shippingMethod === 'click_collect'
+          ? 'click_collect'
+          : 'colissimo';
       let pickupPoint: PickupPoint | null = null;
       if (metadata.pickupPoint) {
         try {
@@ -265,6 +268,67 @@ export async function POST(req: NextRequest) {
 
       // Vérifie aussi les autres early returns dans cette branche (lignes ~210, 215)
       // qui retournent {received:true} sans markEventProcessed
+
+      // --- Garde Click & Collect : valider le point AVANT de marquer paid ---
+      // Si le point n'est plus valide (désactivé entre paiement et webhook, ou
+      // provider falsifié), on crée l'order mais on le met en payment_review et
+      // on N'ENVOIE PAS l'email de confirmation (Lola traite manuellement).
+      // On lit metadata.pickup_point_id (clé plate snake = lookup), JAMAIS le
+      // snapshot JSON metadata.pickupPoint (camelCase, affichage seulement).
+      if (shippingMethod === 'click_collect') {
+        const pickupPointId = metadata.pickup_point_id || '';
+        const pickupProvider = metadata.pickup_provider || '';
+        let pointValid = false;
+        if (pickupPointId && pickupProvider === 'click_collect') {
+          // D3 : .maybeSingle() (convention partagée avec assignPickupCodeAtomic
+          // et les mocks PR6) — 0 ligne renvoie { data: null } sans erreur PGRST116.
+          const { data: dbPoint } = await admin
+            .from('pickup_points')
+            .select('id, is_active')
+            .eq('id', pickupPointId)
+            .maybeSingle();
+          pointValid = dbPoint?.is_active === true;
+        }
+
+        if (!pointValid) {
+          const orderRepoReview = new SupabaseOrderRepository();
+          const reviewOrder = await orderRepoReview.create({
+            items,
+            customer,
+            total: finalTotal,
+            shipping,
+            promoCode,
+            promoDiscount,
+            giftCardCode,
+            giftCardAmount,
+            shippingMethod,
+            shippingCarrier,
+            shippingCountry,
+            pickupPoint,
+            userId,
+            paymentProvider: 'stripe',
+          });
+          await admin
+            .from('orders')
+            .update({
+              status: 'payment_review',
+              payment_id: session.payment_intent as string,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', reviewOrder.id);
+          Sentry.captureMessage('C&C order without valid pickup_point at webhook', {
+            tags: { feature: 'click_and_collect', step: 'webhook' },
+            extra: {
+              orderId: reviewOrder.id,
+              pickupPointId,
+              pickupProvider,
+              sessionId: session.id,
+            },
+          });
+          await markEventProcessed(event);
+          return NextResponse.json({ received: true, warning: 'click_collect_invalid_pickup' });
+        }
+      }
 
       // 1. Create order
       const orderRepo = new SupabaseOrderRepository();

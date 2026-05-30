@@ -6,6 +6,7 @@ import {
   computeShippingCost,
   getShippingCarrier,
   SHIPPING_COUNTRIES,
+  VALID_SHIPPING_METHODS,
 } from '@/lib/constants';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
@@ -17,7 +18,7 @@ import type { Size, ShippingMethod, ShippingCountryCode, PickupPoint } from '@/t
 import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
 
 const VALID_COUNTRIES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
-const VALID_METHODS: ShippingMethod[] = ['home', 'mondial_relay'];
+const VALID_METHODS: ShippingMethod[] = VALID_SHIPPING_METHODS;
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -73,16 +74,65 @@ export async function POST(req: NextRequest) {
     const shippingMethod: ShippingMethod = (rawMethod && VALID_METHODS.includes(rawMethod)) ? rawMethod : 'home';
     const shippingCarrier = getShippingCarrier(shippingMethod);
 
-    if (shippingMethod === 'mondial_relay' && (!rawPickup || !rawPickup.id)) {
+    // Click & Collect : disponible uniquement en France (les points sont en FR).
+    if (shippingMethod === 'click_collect' && shippingCountry !== 'FR') {
       return NextResponse.json(
-        { error: 'Point relais Mondial Relay manquant' },
+        { error: 'Click & Collect est disponible uniquement en France' },
         { status: 400 }
       );
     }
-    const pickupPoint: PickupPoint | null = shippingMethod === 'mondial_relay' ? (rawPickup ?? null) : null;
+
+    const requiresPickupPoint = shippingMethod === 'mondial_relay' || shippingMethod === 'click_collect';
+    if (requiresPickupPoint && (!rawPickup || !rawPickup.id)) {
+      return NextResponse.json(
+        { error: 'Point de retrait manquant' },
+        { status: 400 }
+      );
+    }
+
+    // Pour mondial_relay on garde le snapshot client (revérifié par le transporteur) ;
+    // pour click_collect il sera ÉCRASÉ par la reconstruction BD ci-dessous.
+    let pickupPoint: PickupPoint | null = requiresPickupPoint ? (rawPickup ?? null) : null;
+
+    // Client admin (service_role) — utilisé pour la vérif produits/prix, promo,
+    // gift card ET la re-vérification du point C&C ci-dessous. Une seule instance.
+    const admin = createAdminClient();
+
+    // Click & Collect : on ne fait JAMAIS confiance au snapshot client. On
+    // vérifie que le point existe et est actif, puis on RECONSTRUIT le snapshot
+    // depuis la BD (anti-DevTools : un client peut forger name/address/id).
+    if (shippingMethod === 'click_collect') {
+      if (!rawPickup || rawPickup.provider !== 'click_collect') {
+        return NextResponse.json({ error: 'Provider invalide' }, { status: 400 });
+      }
+      // .maybeSingle() (convention D3, alignée sur le webhook) : 0 ligne renvoie
+      // { data: null, error: null } sans bruit PGRST116. Le guard !dbPoint attrape l'absence.
+      const { data: dbPoint } = await admin
+        .from('pickup_points')
+        .select('id, name, address, postal_code, city, country, hours, instructions, is_active')
+        .eq('id', rawPickup.id)
+        .eq('is_active', true)
+        .maybeSingle();
+      if (!dbPoint) {
+        return NextResponse.json(
+          { error: 'Point de retrait introuvable ou inactif' },
+          { status: 400 }
+        );
+      }
+      pickupPoint = {
+        provider: 'click_collect',
+        id: dbPoint.id,
+        name: dbPoint.name,
+        address: dbPoint.address,
+        postalCode: dbPoint.postal_code,
+        city: dbPoint.city,
+        country: dbPoint.country,
+        hours: dbPoint.hours,
+        instructions: dbPoint.instructions,
+      };
+    }
 
     // Server-side price verification
-    const admin = createAdminClient();
     const productIds = items.map((i) => i.productId);
     const { data: dbProducts, error: dbError } = await admin
       .from('products')
@@ -457,9 +507,15 @@ export async function POST(req: NextRequest) {
       ...(stripeCustomerId
         ? { customer: stripeCustomerId, customer_update: { shipping: 'auto', address: 'auto', name: 'auto' } }
         : { customer_email: customer.email }),
-      shipping_address_collection: {
-        allowed_countries: VALID_COUNTRIES as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
-      },
+      // Pas de collecte d'adresse de livraison en Click & Collect (retrait boutique).
+      // Ce spread REMPLACE l'ancien bloc shipping_address_collection inconditionnel :
+      // ne pas réintroduire de version inconditionnelle après ce spread, sinon elle
+      // écraserait l'omission C&C (dernière clé du littéral gagne).
+      ...(shippingMethod !== 'click_collect' && {
+        shipping_address_collection: {
+          allowed_countries: VALID_COUNTRIES as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
+        },
+      }),
       metadata: {
         customer: JSON.stringify(customer),
         items: JSON.stringify(
@@ -476,7 +532,16 @@ export async function POST(req: NextRequest) {
         shippingMethod,
         shippingCarrier,
         shippingCountry,
+        // --- Snapshot complet du point (JSON, clés camelCase: postalCode, provider, hours…).
+        // Sert à reconstruire l'affichage client. NE PAS lire pour le lookup webhook.
         pickupPoint: pickupPoint ? JSON.stringify(pickupPoint) : '',
+        // --- Clés PLATES snake_case = lookup rapide côté webhook (re-vérification BD).
+        // Distinctes du snapshot ci-dessus. Pour mondial_relay, pickup_provider
+        // provient du snapshot client (non re-vérifié serveur, acceptable : MR ne
+        // déclenche pas la garde C&C du webhook). Pour click_collect, ces valeurs
+        // viennent du point reconstruit depuis la BD.
+        pickup_point_id: requiresPickupPoint && pickupPoint ? pickupPoint.id : '',
+        pickup_provider: requiresPickupPoint && pickupPoint ? pickupPoint.provider : '',
         userId: userId || '',
       },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
