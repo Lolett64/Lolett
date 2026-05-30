@@ -15,6 +15,9 @@ import type { PickupPoint, ShippingCountryCode } from '@/types';
 declare global {
   interface JQueryWidget {
     MR_ParcelShopPicker: (config: Record<string, unknown>) => void;
+    // Méthodes jQuery utilisées au cleanup (chaînables).
+    empty: () => JQueryWidget;
+    removeData: () => JQueryWidget;
   }
   interface Window {
     jQuery?: ((selector: string | HTMLElement) => JQueryWidget) & {
@@ -134,6 +137,7 @@ function waitForPluginReady(
 
 export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
   const setPickupPoint = useCartStore((s) => s.setPickupPoint);
   const pickupPoint = useCartStore((s) => s.pickupPoint);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -152,7 +156,9 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
   }, [country]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     const cancelSignal = { cancelled: false };
+    const containerNode = containerRef.current;
 
     async function init() {
       try {
@@ -179,6 +185,10 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
           Responsive: true,
           ShowResultsOnMap: true,
           OnParcelShopSelected: (data: MondialRelayPoint) => {
+            // Garde-fou : si le widget a été démonté (bascule vers C&C / home)
+            // entre le rendu de la liste MR et le clic utilisateur, on ignore
+            // l'événement pour ne pas écraser un point C&C déjà sélectionné.
+            if (!isMountedRef.current) return;
             const point: PickupPoint = {
               provider: 'mondial_relay',
               id: data.ID,
@@ -204,7 +214,20 @@ export function MondialRelayWidget({ postalCode, country }: MondialRelayWidgetPr
 
     init();
     return () => {
+      isMountedRef.current = false;
       cancelSignal.cancelled = true;
+      // Détruit proprement le widget jQuery + la carte Leaflet pour éviter
+      // les fuites (carte fantôme, handlers orphelins) et les collisions d'ID
+      // au re-mount. empty().removeData() retire le markup et les data jQuery
+      // attachées au conteneur (le plugin MR injecte la carte dans ce nœud).
+      const $ = window.jQuery;
+      if ($ && containerNode) {
+        try {
+          $(`#${containerNode.id}`).empty().removeData();
+        } catch {
+          // jQuery indisponible / déjà nettoyé — no-op.
+        }
+      }
     };
     // Re-init si pays change pour rebrancher le widget sur le bon pays.
     // eslint-disable-next-line react-hooks/exhaustive-deps

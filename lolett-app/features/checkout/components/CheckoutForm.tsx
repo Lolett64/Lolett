@@ -19,6 +19,16 @@ const MondialRelayWidget = dynamic(
   },
 );
 
+const ClickCollectPicker = dynamic(
+  () => import('./ClickCollectPicker').then((m) => ({ default: m.ClickCollectPicker })),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-sm text-stone-500">Chargement des points de retrait…</p>
+    ),
+  },
+);
+
 type CheckoutHook = ReturnType<typeof useCheckout>;
 
 interface CheckoutFormProps {
@@ -316,6 +326,8 @@ export function CheckoutForm({
             country={formData.country}
           />
         )}
+
+        {shippingMethod === 'click_collect' && <ClickCollectPicker />}
 
         {formErrors.pickupPoint && (
           <p style={{ marginTop: 12, fontSize: 12, color: '#B85555', fontFamily: "'DM Sans', sans-serif" }}>

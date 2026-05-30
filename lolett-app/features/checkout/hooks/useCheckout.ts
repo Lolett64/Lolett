@@ -7,7 +7,20 @@ import { useAuth } from '@/lib/auth/context';
 import { getProfile } from '@/lib/adapters/supabase-user';
 import { getAddresses } from '@/lib/adapters/supabase-user';
 import { SHIPPING_COUNTRIES, getShippingCarrier, getShippingCountry } from '@/lib/constants';
-import type { UserAddress, ShippingCountryCode } from '@/types';
+import type { UserAddress, ShippingCountryCode, ShippingMethod, PickupPoint } from '@/types';
+
+// Helper pur (testable) : détermine si un point de retrait est requis et
+// s'il manque. mondial_relay ET click_collect exigent un point sélectionné.
+export function computePickupValidity(
+  method: ShippingMethod,
+  pickupPoint: PickupPoint | null,
+): { requiresPickupPoint: boolean; missing: boolean } {
+  const requiresPickupPoint = method === 'mondial_relay' || method === 'click_collect';
+  return {
+    requiresPickupPoint,
+    missing: requiresPickupPoint && !pickupPoint,
+  };
+}
 
 export interface CheckoutFormData {
   firstName: string;
@@ -169,7 +182,7 @@ export function useCheckout() {
         shippingMethod,
         shippingCarrier: getShippingCarrier(shippingMethod),
         shippingCountry: formData.country,
-        pickupPoint: shippingMethod === 'mondial_relay' ? pickupPoint : null,
+        pickupPoint: computePickupValidity(shippingMethod, pickupPoint).requiresPickupPoint ? pickupPoint : null,
         ...(giftCard?.code ? { giftCardCode: giftCard.code } : {}),
         ...(promo?.code ? { promoCode: promo.code } : {}),
       };
@@ -238,8 +251,9 @@ export function useCheckout() {
       errors.postalCode = `Format invalide (ex: ${country.postalCodeExample})`;
     }
 
-    if (shippingMethod === 'mondial_relay' && !pickupPoint) {
-      errors.pickupPoint = 'Merci de sélectionner un point relais';
+    const { missing: pickupMissing } = computePickupValidity(shippingMethod, pickupPoint);
+    if (pickupMissing) {
+      errors.pickupPoint = 'Merci de sélectionner un point de retrait';
     }
 
     return { errors, isValid: Object.keys(errors).length === 0 };

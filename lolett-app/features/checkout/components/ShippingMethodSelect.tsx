@@ -1,6 +1,7 @@
 'use client';
 
-import { Truck, MapPin } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { Truck, MapPin, Store } from 'lucide-react';
 import {
   SHIPPING_METHODS,
   SHIPPING_DELAYS,
@@ -9,10 +10,18 @@ import {
 } from '@/lib/constants';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/features/cart';
-import type { ShippingMethod } from '@/types';
+import type { ShippingMethod, ShippingCountryCode } from '@/types';
 
 interface ShippingMethodSelectProps {
   subtotal: number;
+}
+
+interface MethodOption {
+  id: ShippingMethod;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  restrictTo?: ShippingCountryCode[];
 }
 
 export function ShippingMethodSelect({ subtotal }: ShippingMethodSelectProps) {
@@ -22,24 +31,49 @@ export function ShippingMethodSelect({ subtotal }: ShippingMethodSelectProps) {
   const zone = getShippingZone(country);
   const delay = zone ? SHIPPING_DELAYS[zone] : '';
 
-  const options: Array<{ id: ShippingMethod; label: string; description: string; icon: React.ReactNode }> = [
-    {
-      id: 'home',
-      label: SHIPPING_METHODS.home.label,
-      description: 'À votre adresse, par Colissimo',
-      icon: <Truck size={18} />,
-    },
-    {
-      id: 'mondial_relay',
-      label: SHIPPING_METHODS.mondial_relay.label,
-      description: 'Retrait dans un point relais proche de chez vous',
-      icon: <MapPin size={18} />,
-    },
-  ];
+  const filteredOptions = useMemo<MethodOption[]>(() => {
+    const allOptions: MethodOption[] = [
+      {
+        id: 'home',
+        label: SHIPPING_METHODS.home.label,
+        description: 'À votre adresse, par Colissimo',
+        icon: <Truck size={18} />,
+      },
+      {
+        id: 'mondial_relay',
+        label: SHIPPING_METHODS.mondial_relay.label,
+        description: 'Retrait dans un point relais proche de chez vous',
+        icon: <MapPin size={18} />,
+      },
+      {
+        id: 'click_collect',
+        label: SHIPPING_METHODS.click_collect.label,
+        description: 'Retrait gratuit en boutique partenaire',
+        icon: <Store size={18} />,
+        restrictTo: ['FR'],
+      },
+    ];
+    // Le filtre dépend uniquement de `country` (les options et leur `restrictTo`
+    // sont statiques). On reconstruit `allOptions` dans le useMemo pour que le
+    // tableau JSX (icônes incluses) soit stable tant que le pays ne change pas.
+    return allOptions.filter((o) => !o.restrictTo || o.restrictTo.includes(country));
+  }, [country]);
+
+  // Reset auto si la méthode courante n'est plus disponible (bascule de pays :
+  // ex. click_collect sélectionné puis passage en BE → retombe sur 'home').
+  useEffect(() => {
+    if (!filteredOptions.find((o) => o.id === method)) {
+      setMethod('home');
+    }
+  }, [filteredOptions, method, setMethod]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
-      {options.map((opt) => {
+    <div
+      role="radiogroup"
+      aria-label="Mode de livraison"
+      style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}
+    >
+      {filteredOptions.map((opt) => {
         const cost = computeShippingCost(subtotal, country, opt.id);
         const isFree = cost === 0 && subtotal > 0;
         const selected = method === opt.id;
@@ -47,6 +81,8 @@ export function ShippingMethodSelect({ subtotal }: ShippingMethodSelectProps) {
           <button
             key={opt.id}
             type="button"
+            role="radio"
+            aria-checked={selected}
             onClick={() => setMethod(opt.id)}
             style={{
               width: '100%',
