@@ -111,16 +111,52 @@ export function SuccessContent() {
 
                 <div className="ckv-recap-divider" />
 
-                {/* Address */}
+                {/* Point de retrait / adresse — narrowing sur provider */}
                 <div style={{ textAlign: 'left' as const }}>
-                  <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9B8E82', margin: '0 0 8px' }}>Adresse de livraison</p>
-                  <p style={{ fontSize: 13, color: '#2C2420', margin: 0 }}>
-                    {order.customer.firstName} {order.customer.lastName}
-                  </p>
-                  <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>{order.customer.address}</p>
-                  <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>
-                    {order.customer.postalCode} {order.customer.city}, {order.customer.country}
-                  </p>
+                  {order.shippingMethod === 'click_collect' && order.pickupPoint?.provider === 'click_collect' ? (
+                    <>
+                      <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9B8E82', margin: '0 0 8px' }}>Point de retrait</p>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', margin: 0 }}>{order.pickupPoint.name}</p>
+                      <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>
+                        {order.pickupPoint.address}, {order.pickupPoint.postalCode} {order.pickupPoint.city}
+                      </p>
+                      {order.pickupPoint.hours && (
+                        <p style={{ fontSize: 12, color: '#9B8E82', margin: '4px 0 0' }}>Horaires : {order.pickupPoint.hours}</p>
+                      )}
+                      {order.pickupPoint.instructions && (
+                        <p style={{ fontSize: 12, color: '#9B8E82', margin: '2px 0 0', fontStyle: 'italic' }}>{order.pickupPoint.instructions}</p>
+                      )}
+                      {order.pickupCode ? (
+                        <div style={{ marginTop: 12, padding: '12px 16px', borderRadius: 8, background: '#FFFBF0', borderLeft: '3px solid #C4956A' }}>
+                          <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9B8E82', margin: 0 }}>Code à présenter</p>
+                          <p style={{ fontFamily: 'monospace', fontSize: 20, letterSpacing: '0.12em', color: '#2C2420', margin: '4px 0 0' }}>{order.pickupCode}</p>
+                        </div>
+                      ) : (
+                        <p style={{ fontSize: 12, color: '#9B8E82', margin: '10px 0 0', fontStyle: 'italic' }}>
+                          Vous recevrez un email avec votre code de retrait dès que votre commande sera prête en boutique.
+                        </p>
+                      )}
+                    </>
+                  ) : order.shippingMethod === 'mondial_relay' && order.pickupPoint?.provider === 'mondial_relay' ? (
+                    <>
+                      <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9B8E82', margin: '0 0 8px' }}>Point Relais Mondial Relay</p>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', margin: 0 }}>{order.pickupPoint.name}</p>
+                      <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>
+                        {order.pickupPoint.address}, {order.pickupPoint.postalCode} {order.pickupPoint.city}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9B8E82', margin: '0 0 8px' }}>Adresse de livraison</p>
+                      <p style={{ fontSize: 13, color: '#2C2420', margin: 0 }}>
+                        {order.customer.firstName} {order.customer.lastName}
+                      </p>
+                      <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>{order.customer.address}</p>
+                      <p style={{ fontSize: 13, color: '#7A6E62', margin: '2px 0 0' }}>
+                        {order.customer.postalCode} {order.customer.city}, {order.customer.country}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

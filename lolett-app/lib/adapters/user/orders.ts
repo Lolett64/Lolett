@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
-import type { Order } from '@/types';
+import { mapPickupPoint } from '@/lib/adapters/supabase-mappers';
+import type { Order, ShippingMethod, ShippingCarrier, ShippingCountryCode } from '@/types';
 
 export async function getUserOrders(userId: string): Promise<Order[]> {
   const supabase = createClient();
@@ -59,6 +60,11 @@ export async function getOrderById(orderId: string, userId: string): Promise<Ord
     total: data.total,
     shipping: data.shipping,
     status: data.status,
+    shippingMethod: (data.shipping_method as ShippingMethod | null) ?? undefined,
+    shippingCarrier: (data.shipping_carrier as ShippingCarrier | null) ?? undefined,
+    shippingCountry: (data.shipping_country as ShippingCountryCode | null) ?? undefined,
+    pickupPoint: mapPickupPoint(data.pickup_point, (data.shipping_method as ShippingMethod | null) ?? null),
+    pickupCode: data.pickup_code ?? null,
     paymentProvider: data.payment_provider,
     paymentId: data.payment_id,
     createdAt: data.created_at,

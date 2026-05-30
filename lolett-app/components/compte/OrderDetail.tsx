@@ -2,26 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Package } from 'lucide-react';
+import { ArrowLeft, Package, Clock } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getOrderById } from '@/lib/adapters/supabase-user';
-import type { Order } from '@/types';
+import { ORDER_STATUS_LABELS, ORDER_STEPS_HOME, ORDER_STEPS_PICKUP } from '@/lib/constants';
+import type { Order, OrderStatus } from '@/types';
 import { cn, formatPrice } from '@/lib/utils';
-
-const statusSteps = ['pending', 'confirmed', 'paid', 'shipped', 'delivered'];
-const statusLabels: Record<string, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmée',
-  paid: 'Payée',
-  shipped: 'Expédiée',
-  delivered: 'Livrée',
-  cancelled: 'Annulée',
-  refunded: 'Remboursée',
-  partially_refunded: 'Partiellement remboursée',
-  disputed: 'Litige en cours',
-  payment_review: 'Vérification paiement',
-  expired: 'Expirée',
-};
 
 export function OrderDetail({ orderId }: { orderId: string }) {
   const { user } = useAuth();
@@ -59,7 +45,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
     );
   }
 
-  const currentStep = statusSteps.indexOf(order.status);
+  // Timeline adaptée au mode : C&C suit le parcours retrait, sinon livraison.
+  // Fallback 'home' pour les commandes legacy sans shipping_method.
+  const steps: readonly OrderStatus[] =
+    (order.shippingMethod ?? 'home') === 'click_collect' ? ORDER_STEPS_PICKUP : ORDER_STEPS_HOME;
+  const currentStep = steps.indexOf(order.status);
 
   return (
     <div>
@@ -78,7 +68,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         {!['cancelled', 'refunded', 'partially_refunded', 'disputed', 'expired'].includes(order.status) && (
           <div className="mb-8">
             <div className="flex items-center justify-between">
-              {statusSteps.map((step, i) => (
+              {steps.map((step, i) => (
                 <div key={step} className="flex flex-col items-center flex-1">
                   <div className={cn(
                     'h-3 w-3 rounded-full mb-1',
@@ -88,7 +78,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                     'text-[10px] font-body',
                     i <= currentStep ? 'text-[#1B0B94]' : 'text-[#8a7d6b]'
                   )}>
-                    {statusLabels[step]}
+                    {ORDER_STATUS_LABELS[step]}
                   </span>
                 </div>
               ))}
@@ -96,7 +86,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             <div className="relative mt-[-22px] mx-[6px] h-0.5 bg-[#c4b49c]/20">
               <div
                 className="absolute h-full bg-[#1B0B94] transition-all"
-                style={{ width: `${Math.max(0, currentStep / (statusSteps.length - 1)) * 100}%` }}
+                style={{ width: `${Math.max(0, currentStep / (steps.length - 1)) * 100}%` }}
               />
             </div>
           </div>
@@ -138,8 +128,38 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           </div>
         </div>
 
-        {/* Shipping address */}
-        {order.customer && (
+        {/* Point de retrait / adresse — narrowing sur provider */}
+        {order.shippingMethod === 'click_collect' && order.pickupPoint?.provider === 'click_collect' ? (
+          <div>
+            <h3 className="font-body text-sm font-semibold text-[#1a1510] mb-2">Point de retrait</h3>
+            <p className="text-sm text-[#1a1510] font-body font-medium">{order.pickupPoint.name}</p>
+            <p className="text-sm text-[#5a4d3e] font-body">
+              {order.pickupPoint.address}, {order.pickupPoint.postalCode} {order.pickupPoint.city}
+            </p>
+            {order.pickupPoint.hours && (
+              <p className="text-xs text-[#8a7d6b] font-body mt-1 flex items-center gap-1">
+                <Clock className="h-3 w-3" /> {order.pickupPoint.hours}
+              </p>
+            )}
+            {order.pickupPoint.instructions && (
+              <p className="text-xs text-[#8a7d6b] font-body italic mt-1">{order.pickupPoint.instructions}</p>
+            )}
+            {order.pickupCode && (
+              <div className="mt-3 p-3 bg-[#FFFBF0] border-l-2 border-[#C4956A] rounded">
+                <span className="text-[10px] uppercase tracking-wider text-[#8a7d6b] font-body">Code à présenter</span>
+                <p className="font-mono text-lg tracking-widest text-[#1a1510]">{order.pickupCode}</p>
+              </div>
+            )}
+          </div>
+        ) : order.shippingMethod === 'mondial_relay' && order.pickupPoint?.provider === 'mondial_relay' ? (
+          <div>
+            <h3 className="font-body text-sm font-semibold text-[#1a1510] mb-2">Point Relais Mondial Relay</h3>
+            <p className="text-sm text-[#1a1510] font-body font-medium">{order.pickupPoint.name}</p>
+            <p className="text-sm text-[#5a4d3e] font-body">
+              {order.pickupPoint.address}, {order.pickupPoint.postalCode} {order.pickupPoint.city}
+            </p>
+          </div>
+        ) : order.customer ? (
           <div>
             <h3 className="font-body text-sm font-semibold text-[#1a1510] mb-2">Adresse de livraison</h3>
             <p className="text-sm text-[#5a4d3e] font-body">
@@ -149,7 +169,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               {order.customer.country}
             </p>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
