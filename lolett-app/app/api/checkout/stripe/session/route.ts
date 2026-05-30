@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fulfillOrder } from '@/lib/checkout/fulfill-order';
+import { VALID_SHIPPING_METHODS } from '@/lib/constants';
+import type { ShippingMethod, ShippingCarrier, ShippingCountryCode, PickupPoint } from '@/types';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -49,6 +51,22 @@ export async function GET(req: NextRequest) {
     const shipping = parseFloat(metadata.shipping || '0');
     const userId = metadata.userId || undefined;
 
+    // Livraison / Click & Collect — mêmes clés metadata que le webhook, pour que
+    // le chemin inline (page succès avant webhook) ne perde NI le mode NI le point
+    // de retrait, et applique la même garde C&C (payment_review si point invalide).
+    const rawMethod = metadata.shippingMethod as ShippingMethod | undefined;
+    const shippingMethod: ShippingMethod =
+      rawMethod && VALID_SHIPPING_METHODS.includes(rawMethod) ? rawMethod : 'home';
+    const shippingCountry = (metadata.shippingCountry as ShippingCountryCode) || 'FR';
+    const shippingCarrier: ShippingCarrier =
+      shippingMethod === 'mondial_relay' ? 'mondial_relay'
+      : shippingMethod === 'click_collect' ? 'click_collect'
+      : 'colissimo';
+    let pickupPoint: PickupPoint | null = null;
+    if (metadata.pickupPoint) {
+      try { pickupPoint = JSON.parse(metadata.pickupPoint) as PickupPoint; } catch { pickupPoint = null; }
+    }
+
     const orderId = await fulfillOrder({
       items,
       customer,
@@ -57,6 +75,12 @@ export async function GET(req: NextRequest) {
       userId,
       paymentProvider: 'stripe',
       paymentId: paymentIntent,
+      shippingMethod,
+      shippingCarrier,
+      shippingCountry,
+      pickupPoint,
+      pickupPointId: metadata.pickup_point_id || undefined,
+      pickupProvider: metadata.pickup_provider || undefined,
     });
 
     return NextResponse.json({ orderId, status: 'paid' });

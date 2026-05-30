@@ -1,9 +1,10 @@
 import { after } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { SupabaseOrderRepository } from '@/lib/adapters/supabase';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
-import type { Size } from '@/types';
+import type { Size, ShippingMethod, ShippingCarrier, ShippingCountryCode, PickupPoint } from '@/types';
 
 interface FulfillOrderParams {
   items: Array<{
@@ -29,10 +30,22 @@ interface FulfillOrderParams {
   userId?: string;
   paymentProvider: 'stripe' | 'paypal' | 'demo';
   paymentId: string;
+  // Livraison / Click & Collect — mêmes données que le webhook (cohérence).
+  shippingMethod?: ShippingMethod;
+  shippingCarrier?: ShippingCarrier;
+  shippingCountry?: ShippingCountryCode;
+  pickupPoint?: PickupPoint | null;
+  // Clés plates snake (metadata Stripe) pour la re-validation C&C en BD.
+  pickupPointId?: string;
+  pickupProvider?: string;
 }
 
 export async function fulfillOrder(params: FulfillOrderParams): Promise<string> {
-  const { items, customer, total, shipping, userId, paymentProvider, paymentId } = params;
+  const {
+    items, customer, total, shipping, userId, paymentProvider, paymentId,
+    shippingMethod, shippingCarrier, shippingCountry, pickupPoint,
+    pickupPointId, pickupProvider,
+  } = params;
   const admin = createAdminClient();
 
   const { data: existing } = await admin
@@ -46,6 +59,23 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
     return existing.id;
   }
 
+  // Garde Click & Collect (miroir du webhook §10.3) : on revérifie que le point
+  // est TOUJOURS actif (il a pu être désactivé entre paiement et fulfillment).
+  // On lit la clé plate pickup_point_id (lookup), JAMAIS le snapshot JSON.
+  // D3 : .maybeSingle() — 0 ligne → { data: null } sans bruit PGRST116.
+  let pointValid = true;
+  if (shippingMethod === 'click_collect') {
+    pointValid = false;
+    if (pickupPointId && pickupProvider === 'click_collect') {
+      const { data: dbPoint } = await admin
+        .from('pickup_points')
+        .select('id, is_active')
+        .eq('id', pickupPointId)
+        .maybeSingle();
+      pointValid = dbPoint?.is_active === true;
+    }
+  }
+
   const orderRepo = new SupabaseOrderRepository();
   const order = await orderRepo.create({
     items,
@@ -54,15 +84,33 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
     shipping,
     userId,
     paymentProvider,
+    shippingMethod,
+    shippingCarrier,
+    shippingCountry,
+    pickupPoint,
   });
+
+  const now = new Date().toISOString();
+
+  // C&C avec point invalide → payment_review, AUCUN email, pas de décrément stock
+  // ni de points fidélité (Lola traite manuellement). Identique au webhook.
+  if (shippingMethod === 'click_collect' && !pointValid) {
+    await admin
+      .from('orders')
+      .update({ status: 'payment_review', payment_id: paymentId, updated_at: now })
+      .eq('id', order.id);
+    Sentry.captureMessage('C&C order without valid pickup_point at fulfillment (inline)', {
+      level: 'error',
+      tags: { feature: 'click_and_collect', step: 'fulfill' },
+      extra: { orderId: order.id, pickupPointId, pickupProvider },
+    });
+    console.warn(`[fulfillOrder] Order ${order.orderNumber} → payment_review (C&C point invalide)`);
+    return order.id;
+  }
 
   await admin
     .from('orders')
-    .update({
-      status: 'paid',
-      payment_id: paymentId,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ status: 'paid', payment_id: paymentId, updated_at: now })
     .eq('id', order.id);
 
   await decrementStockForOrder(order.id);
@@ -100,6 +148,9 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
         subtotal: total - shipping,
         shipping,
         total,
+        // Provider-aware : affiche le bloc point de retrait (MR / C&C) dans l'email.
+        shippingMethod,
+        pickupPoint,
       });
     } catch (err) {
       console.error('[fulfillOrder] Email error:', err);
