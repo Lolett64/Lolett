@@ -27,6 +27,7 @@ import {
   ORDER_STATUS_VALUES,
   ORDER_STATUS_TRANSITIONS,
   STRIPE_MANAGED_STATUSES,
+  SHIPPING_CARRIER_LABELS,
 } from '@/lib/constants';
 import type { OrderStatus, ShippingMethod } from '@/types';
 
@@ -73,6 +74,9 @@ export function OrderStatusUpdate({
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
   const isClickCollect = shippingMethod === 'click_collect';
+  // Transporteur du n° de suivi : domicile → Colissimo, point relais → Mondial Relay.
+  const trackingCarrier = shippingMethod === 'mondial_relay' ? 'mondial_relay' : 'colissimo';
+  const carrierLabel = SHIPPING_CARRIER_LABELS[trackingCarrier];
   const currentStatusTyped = currentStatus as OrderStatus;
   const allowedNextStatuses = manualTransitions(currentStatusTyped);
   // Options = transitions autorisées + le statut courant, TOUJOURS affiché (même
@@ -222,7 +226,7 @@ export function OrderStatusUpdate({
                 <span className="font-medium text-[#1B0B94]">Prochaine étape :</span>{' '}
                 passer en <strong>{nextStep.label}</strong>
                 {nextStep.value === 'confirmed' && ' — vérifier le stock et préparer le colis.'}
-                {nextStep.value === 'shipped' && ' — entrer le n° Mondial Relay (un email de suivi sera envoyé au client).'}
+                {nextStep.value === 'shipped' && ` — entrer le n° de suivi ${carrierLabel} (un email de suivi sera envoyé au client).`}
                 {nextStep.value === 'delivered' && ' — confirmer la réception (un email final sera envoyé au client).'}
                 {nextStep.value === 'ready_for_pickup' && ' — un code de retrait est généré et envoyé au client par email.'}
                 {nextStep.value === 'picked_up' && ' — confirmer que le client a récupéré sa commande (aucun email).'}
@@ -272,12 +276,12 @@ export function OrderStatusUpdate({
 
         {status === 'shipped' && !isClickCollect && (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="tracking" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">N° Mondial Relay</Label>
+            <Label htmlFor="tracking" className="font-[family-name:var(--font-montserrat)] text-[10px] uppercase tracking-[0.12em] text-[#1a1510]/40">N° de suivi {carrierLabel}</Label>
             <Input
               id="tracking"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder="Ex : 123456789"
+              placeholder={trackingCarrier === 'mondial_relay' ? 'Ex : 123456789' : 'Ex : 6A01234567890'}
             />
             <p className="text-[11px] text-[#1a1510]/50">Un lien de suivi automatique sera inclus dans l&rsquo;email d&rsquo;expédition.</p>
           </div>

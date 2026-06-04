@@ -3,7 +3,7 @@
  * Ultra-refined, generous whitespace, thin lines, soft golden touches
  */
 
-import { getTrackingUrl } from '@/lib/constants';
+import { getTrackingUrl, SHIPPING_CARRIER_LABELS } from '@/lib/constants';
 import type { ShippingCarrier, ShippingMethod, PickupPoint } from '@/types';
 import { getEmailSiteUrl } from '@/lib/email/site-url';
 
@@ -189,7 +189,7 @@ export function renderOrderShippedV3(data: ShippedEmailData, overrides?: EmailOv
           <!-- Tracking (only if provided) — adapté au transporteur -->
           ${data.trackingNumber ? (() => {
             const carrier: ShippingCarrier = data.shippingCarrier ?? (data.shippingMethod === 'mondial_relay' ? 'mondial_relay' : 'colissimo');
-            const carrierLabel = carrier === 'mondial_relay' ? 'Mondial Relay' : 'Colissimo';
+            const carrierLabel = SHIPPING_CARRIER_LABELS[carrier];
             const trackingUrl = getTrackingUrl(carrier, data.trackingNumber!);
             const pickupBlock = (carrier === 'mondial_relay' && data.pickupPoint) ? `
                     <p style="margin: 8px 0 0; font-size: 12px; color: #7A6E62; line-height: 1.5;">

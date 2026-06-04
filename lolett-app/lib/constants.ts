@@ -128,6 +128,13 @@ export const SHIPPING_METHODS: Record<ShippingMethod, { id: ShippingMethod; labe
 // Dérivé dynamiquement — source unique pour la validation Stripe/webhook.
 export const VALID_SHIPPING_METHODS = Object.keys(SHIPPING_METHODS) as ShippingMethod[];
 
+// Libellés transporteur — source unique pour l'admin et les emails.
+export const SHIPPING_CARRIER_LABELS: Record<ShippingCarrier, string> = {
+  colissimo: 'Colissimo',
+  mondial_relay: 'Mondial Relay',
+  click_collect: 'Click & Collect',
+};
+
 // Tarifs plats (€) par zone × méthode. click_collect UNIQUEMENT en FR (gratuit).
 export const SHIPPING_RATES: Record<ShippingZone, Partial<Record<ShippingMethod, number>>> = {
   FR:      { home: 5.90, mondial_relay: 4.90, click_collect: 0 },

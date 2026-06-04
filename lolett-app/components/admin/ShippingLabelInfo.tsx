@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { Copy, Check, Printer } from 'lucide-react';
 import type { PickupPoint } from '@/types';
 
+// Espaces d'affranchissement en ligne des transporteurs (génération manuelle des étiquettes).
+const COLISSIMO_PRO_URL = 'https://www.laposte.fr/professionnel/envoi-colis/colissimo-en-ligne/parcours';
+const MONDIAL_RELAY_PRO_URL = 'https://connect.mondialrelay.com/';
+
 interface OrderItem {
   product_name: string;
   size: string;
@@ -120,7 +124,7 @@ export function ShippingLabelInfo({
             {orderNumber}
           </h2>
           <p className="text-xs text-[#1a1510]/60 mt-1">
-            {isMR ? 'Mondial Relay — Point relais' : 'Livraison à domicile'}
+            {isMR ? 'Mondial Relay — Point relais' : 'Colissimo — Livraison à domicile'}
           </p>
         </div>
 
@@ -131,7 +135,7 @@ export function ShippingLabelInfo({
           <Row
             label="Téléphone"
             value={customer.phone || '—'}
-            warning={!customer.phone ? 'Manquant — requis pour Mondial Relay HOM' : undefined}
+            warning={isMR && !customer.phone ? 'Manquant — requis pour Mondial Relay' : undefined}
           />
         </Section>
 
@@ -194,27 +198,51 @@ export function ShippingLabelInfo({
           <p className="text-[11px] uppercase tracking-wide text-[#B89547] font-semibold mb-2">
             Prochaines étapes
           </p>
-          <ol className="list-decimal ml-5 text-sm text-[#1a1510]/80 space-y-1">
-            <li>
-              Va sur{' '}
-              <a
-                href="https://connect.mondialrelay.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-[#1B0B94] hover:text-[#130970]"
-              >
-                connect.mondialrelay.com
-              </a>{' '}
-              et crée une nouvelle expédition.
-            </li>
-            <li>Recopie les informations ci-dessus dans le formulaire Mondial Relay.</li>
-            <li>Télécharge l&rsquo;étiquette PDF et imprime-la.</li>
-            <li>
-              Reviens sur la fiche commande, mets le statut à <strong>&laquo; Expédié &raquo;</strong> et
-              colle le numéro de suivi Mondial Relay.
-            </li>
-            <li>Colle l&rsquo;étiquette sur le colis et dépose-le.</li>
-          </ol>
+          {isMR ? (
+            <ol className="list-decimal ml-5 text-sm text-[#1a1510]/80 space-y-1">
+              <li>
+                Va sur{' '}
+                <a
+                  href={MONDIAL_RELAY_PRO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-[#1B0B94] hover:text-[#130970]"
+                >
+                  connect.mondialrelay.com
+                </a>{' '}
+                et crée une nouvelle expédition.
+              </li>
+              <li>Recopie les informations ci-dessus dans le formulaire Mondial Relay.</li>
+              <li>Télécharge l&rsquo;étiquette PDF et imprime-la.</li>
+              <li>
+                Reviens sur la fiche commande, mets le statut à <strong>&laquo; Expédié &raquo;</strong> et
+                colle le numéro de suivi Mondial Relay.
+              </li>
+              <li>Colle l&rsquo;étiquette sur le colis et dépose-le.</li>
+            </ol>
+          ) : (
+            <ol className="list-decimal ml-5 text-sm text-[#1a1510]/80 space-y-1">
+              <li>
+                Va sur ton espace{' '}
+                <a
+                  href={COLISSIMO_PRO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-[#1B0B94] hover:text-[#130970]"
+                >
+                  Colissimo Pro
+                </a>{' '}
+                et crée une nouvelle expédition « Colissimo Domicile ».
+              </li>
+              <li>Recopie l&rsquo;adresse du destinataire et le poids ci-dessus dans le formulaire Colissimo.</li>
+              <li>Télécharge l&rsquo;étiquette PDF et imprime-la.</li>
+              <li>
+                Reviens sur la fiche commande, mets le statut à <strong>&laquo; Expédié &raquo;</strong> et
+                colle le numéro de suivi Colissimo (13 caractères).
+              </li>
+              <li>Colle l&rsquo;étiquette sur le colis et dépose-le en bureau de poste ou point de collecte.</li>
+            </ol>
+          )}
         </div>
       </div>
     </div>
