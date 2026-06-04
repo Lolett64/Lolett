@@ -81,7 +81,7 @@ export function SuccessContent() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', margin: 0 }}>{item.productName}</p>
                         <p style={{ fontSize: 11, color: '#9B8E82', margin: '3px 0 0' }}>
-                          Taille {item.size}{item.color ? ` \u00B7 ${item.color}` : ''} \u00B7 Qte {item.quantity}
+                          Taille {item.size}{item.color ? ` \u00B7 ${item.color}` : ''} &middot; Qt&eacute; {item.quantity}
                         </p>
                       </div>
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#2C2420', flexShrink: 0 }}>
