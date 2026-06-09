@@ -30,8 +30,8 @@ describe('computeShippingCost', () => {
   it('keeps the real existing rates (mondial_relay FR = 4.90, not 4.50)', () => {
     expect(SHIPPING_RATES.FR.mondial_relay).toBe(4.90);
     expect(SHIPPING_RATES.FR.click_collect).toBe(0);
-    expect(SHIPPING_RATES.BENELUX.home).toBe(7.90);
-    expect(SHIPPING_RATES.IBERIA.home).toBe(9.90);
+    expect(SHIPPING_RATES.BENELUX.home).toBe(12.90);
+    expect(SHIPPING_RATES.IBERIA.home).toBe(12.90);
     expect(SHIPPING_RATES.BENELUX.click_collect).toBeUndefined();
     expect(SHIPPING_RATES.IBERIA.click_collect).toBeUndefined();
   });

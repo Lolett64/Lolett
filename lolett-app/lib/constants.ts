@@ -138,14 +138,14 @@ export const SHIPPING_CARRIER_LABELS: Record<ShippingCarrier, string> = {
 // Tarifs plats (€) par zone × méthode. click_collect UNIQUEMENT en FR (gratuit).
 export const SHIPPING_RATES: Record<ShippingZone, Partial<Record<ShippingMethod, number>>> = {
   FR:      { home: 5.90, mondial_relay: 4.90, click_collect: 0 },
-  BENELUX: { home: 7.90, mondial_relay: 6.90 },
-  IBERIA:  { home: 9.90, mondial_relay: 7.90 },
+  BENELUX: { home: 12.90, mondial_relay: 6.90 },
+  IBERIA:  { home: 12.90, mondial_relay: 7.90 },
 };
 
 // Seuil de livraison gratuite (sous-total ≥ seuil → port = 0). null = pas de gratuit.
 export const SHIPPING_FREE_THRESHOLD: Record<ShippingZone, number | null> = {
   FR: 100,
-  BENELUX: 150,
+  BENELUX: null,
   IBERIA: null,
 };
 
