@@ -16,14 +16,14 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lolettshop.com';
 export const metadata: Metadata = {
   title: 'LOLETT — Mode Homme & Femme | Looks complets prêt à sortir',
   description:
-    'LOLETT, la mode méditerranéenne pour homme et femme. Des looks complets, pensés au Sud et prêts à porter. Lin, coton, style solaire — livraison offerte dès 100 €.',
+    'LOLETT, prêt-à-porter homme et femme. Vêtements, bijoux et accessoires choisis pour sublimer votre quotidien. Livraison offerte dès 100 €.',
   alternates: {
     canonical: BASE_URL,
   },
   openGraph: {
     title: 'LOLETT — Mode Homme & Femme | Looks complets prêt à sortir',
     description:
-      'Des looks complets pensés au Sud. Pour lui, pour elle. Livraison offerte dès 100 €.',
+      'Prêt-à-porter homme et femme : vêtements, bijoux et accessoires choisis pour sublimer votre quotidien. Livraison offerte dès 100 €.',
     url: BASE_URL,
     siteName: 'LOLETT',
     locale: 'fr_FR',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'LOLETT — Mode Homme & Femme | Looks complets prêt à sortir',
-    description: 'Des looks complets pensés au Sud. Pour lui, pour elle.',
+    description: 'Prêt-à-porter homme et femme. Vêtements, bijoux et accessoires choisis pour sublimer votre quotidien.',
     images: [`${BASE_URL}/og-lolett.jpg`],
   },
 };
