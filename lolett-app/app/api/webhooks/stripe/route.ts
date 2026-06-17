@@ -20,9 +20,9 @@ import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
 const VALID_COUNTRY_CODES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
 
 const VALID_SIZES = [
-  'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL',
-  '29', '30', '31', '32', '33', '34', '35', '36', '37', '38',
-  '39', '40', '41', '42', '43', '44', '45', '46', '47', '48',
+  'TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'XXXXL',
+  '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38',
+  '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '50', '52',
   'S/M', 'M/L',
 ] as const;
 
