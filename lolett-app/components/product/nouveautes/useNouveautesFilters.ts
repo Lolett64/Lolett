@@ -5,24 +5,26 @@ import type { SortOption } from '../ProductSorting';
 import type { FilterState } from '../ProductFilters';
 import type { ActiveFilter } from '../ActiveFilters';
 import type { Product, Size } from '@/types';
+import { matchesShopGender, type ShopGender } from '@/lib/gender';
 
 export function useNouveautesFilters(products: Product[]) {
-  const [activeGender, setActiveGender] = useState<'femme' | 'homme'>('femme');
+  const [activeGender, setActiveGender] = useState<ShopGender>('femme');
   const [sort, setSort] = useState<SortOption>('newest');
   const [filters, setFilters] = useState<FilterState>({ sizes: [] });
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
   const [page, setPage] = useState(1);
   const PRODUCTS_PER_PAGE = 12;
 
-  const handleGenderChange = (gender: 'femme' | 'homme') => {
+  const handleGenderChange = (gender: ShopGender) => {
     setActiveGender(gender);
     setFilters({ sizes: [] });
     setSort('newest');
     setPage(1);
   };
 
+  // Un produit unisexe appartient aux deux onglets.
   const genderProducts = useMemo(
-    () => products.filter((p) => p.gender === activeGender),
+    () => products.filter((p) => matchesShopGender(p.gender, activeGender)),
     [products, activeGender],
   );
 
