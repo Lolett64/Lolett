@@ -3,6 +3,7 @@ import type { ProductRepository } from './types';
 import type { Product, ProductVariant } from '@/types';
 import type { DbProduct, DbProductVariant } from './supabase-types';
 import { mapProduct, mapVariant } from './supabase-mappers';
+import { genderQueryValues, isShopGender } from '@/lib/gender';
 
 /**
  * Trie en place un tableau de produits en plaçant les produits épuisés
@@ -107,8 +108,8 @@ export class SupabaseProductRepository implements ProductRepository {
     // exactement comme dans findMany() — sinon ils apparaissent sur /shop/homme
     // mais disparaissent de /shop/homme/hauts.
     let query = supabase.from('products').select('*').eq('category_slug', categorySlug);
-    if (gender !== 'both') {
-      query = query.in('gender', [gender, 'both']);
+    if (isShopGender(gender)) {
+      query = query.in('gender', genderQueryValues(gender));
     }
 
     const { data, error } = await query;

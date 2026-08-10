@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { UNISEX } from '@/lib/gender';
 
 export interface DailyRevenue {
   date: string;
@@ -22,7 +23,7 @@ export interface DashboardStats {
   lowStockProducts: LowStockProduct[];
   ordersByDay: DailyRevenue[];
   ordersByStatus: StatusCount[];
-  productsByGender: { homme: number; femme: number };
+  productsByGender: { homme: number; femme: number; unisexe: number };
 }
 
 export interface RecentOrder {
@@ -146,9 +147,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   // Products by gender
   let homme = 0;
   let femme = 0;
+  let unisexe = 0;
   for (const p of allProductsGender ?? []) {
-    if ((p.gender as string) === 'homme') homme++;
-    else if ((p.gender as string) === 'femme') femme++;
+    const g = p.gender as string;
+    if (g === 'homme') homme++;
+    else if (g === 'femme') femme++;
+    else if (g === UNISEX) unisexe++;
   }
 
   return {
@@ -162,6 +166,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     lowStockProducts: (lowStockProducts ?? []) as LowStockProduct[],
     ordersByDay,
     ordersByStatus,
-    productsByGender: { homme, femme },
+    productsByGender: { homme, femme, unisexe },
   };
 }

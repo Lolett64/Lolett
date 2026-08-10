@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { genderQueryValues, isShopGender } from '@/lib/gender';
 
 const VariantSchema = z.object({
   colorName: z.string(),
@@ -44,7 +45,14 @@ export async function GET(request: Request) {
   const supabase = createAdminClient();
   let query = supabase.from('products').select('*');
 
-  if (gender) query = query.eq('gender', gender);
+  // Le selecteur de produits d'un look demande les articles d'un genre : les unisexes
+  // doivent en faire partie, sinon ils sont impossibles a ajouter a un look.
+  // Une demande explicite de `both` reste stricte (afficher uniquement les unisexes).
+  if (gender) {
+    query = isShopGender(gender)
+      ? query.in('gender', genderQueryValues(gender))
+      : query.eq('gender', gender);
+  }
   if (category) query = query.eq('category_slug', category);
   if (search) query = query.ilike('name', `%${search}%`);
 

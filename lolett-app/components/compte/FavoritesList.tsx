@@ -86,7 +86,7 @@ export function FavoritesList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((p) => (
             <div key={p.id} className="bg-[#FEFAF3] rounded-xl border border-[#c4b49c]/15 shadow-sm overflow-hidden group">
-              <Link href={`/shop/${p.gender}/${p.slug}`}>
+              <Link href={`/produit/${p.slug}`}>
                 <div className="aspect-[3/4] bg-[#f3efe8] overflow-hidden">
                   {p.images?.[0] && (
                     <img
@@ -98,7 +98,7 @@ export function FavoritesList() {
                 </div>
               </Link>
               <div className="p-4">
-                <Link href={`/shop/${p.gender}/${p.slug}`}>
+                <Link href={`/produit/${p.slug}`}>
                   <h3 className="text-sm font-medium text-[#1a1510] font-body hover:text-[#1B0B94] transition-colors">{p.name}</h3>
                 </Link>
                 <div className="flex items-center justify-between mt-2">
