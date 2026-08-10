@@ -8,8 +8,16 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avi
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 
-// Max file size: 50MB
-const MAX_FILE_SIZE = 50 * 1024 * 1024;
+// Max file size: 4 Mo.
+//
+// ATTENTION — ne pas remonter cette valeur sans changer d'architecture.
+// Vercel refuse tout corps de requête au-delà d'environ 4,5 Mo et renvoie un 413
+// AVANT que cette route ne s'exécute (limite plateforme, non configurable). Une
+// limite affichée plus haute serait donc une promesse intenable : l'utilisateur
+// verrait un « Erreur 413 » brut au lieu du message clair ci-dessous.
+// Pour accepter des fichiers plus lourds, il faut soit compresser dans le
+// navigateur avant l'envoi, soit uploader en direct vers Supabase Storage.
+const MAX_FILE_SIZE = 4 * 1024 * 1024;
 
 /**
  * Extract file extension from MIME type
@@ -68,7 +76,7 @@ export async function POST(request: Request) {
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: `File too large. Maximum size is 50MB. Your file: ${(file.size / 1024 / 1024).toFixed(2)}MB` },
+        { error: `Fichier trop lourd : ${(file.size / 1024 / 1024).toFixed(1)} Mo (maximum 4 Mo).` },
         { status: 400 }
       );
     }
