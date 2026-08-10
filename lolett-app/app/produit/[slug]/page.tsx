@@ -6,6 +6,7 @@ import { ProductLooks } from '@/components/product/ProductLooks';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { productRepository, lookRepository, categoryRepository } from '@/lib/adapters';
 import { buildProductJsonLd } from '@/lib/seo/product-jsonld';
+import { UNISEX, genderLabel, shopHrefForGender } from '@/lib/gender';
 
 export const revalidate = 60;
 
@@ -72,9 +73,9 @@ export default async function ProductPage({ params }: PageProps) {
   // Produits unisexes : aucune boutique /shop/both n'existe (la route [gender] renvoie
   // un 404 pour tout genre autre que homme/femme), donc le fil d'Ariane pointe vers la
   // boutique générale au lieu d'un lien mort — y compris dans les données envoyées à Google.
-  const isUnisex = product.gender === 'both';
-  const genderLabel = isUnisex ? 'Unisexe' : product.gender === 'homme' ? 'Homme' : 'Femme';
-  const genderHref = isUnisex ? '/shop' : `/shop/${product.gender}`;
+  const isUnisex = product.gender === UNISEX;
+  const genderLabelText = genderLabel(product.gender);
+  const genderHref = shopHrefForGender(product.gender);
 
   // Un produit unisexe est listé à la fois sous /shop/homme/… et /shop/femme/… :
   // aucune des deux pages ne fait autorité, on retire donc ce niveau du fil d'Ariane.
@@ -100,7 +101,7 @@ export default async function ProductPage({ params }: PageProps) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Shop', item: `${BASE_URL}/shop` },
-      { '@type': 'ListItem', position: 2, name: genderLabel, item: `${BASE_URL}${genderHref}` },
+      { '@type': 'ListItem', position: 2, name: genderLabelText, item: `${BASE_URL}${genderHref}` },
       ...(categoryCrumb ? [{ '@type': 'ListItem', position: 3, name: categoryCrumb.label, item: `${BASE_URL}${categoryCrumb.href}` }] : []),
       { '@type': 'ListItem', position: categoryCrumb ? 4 : 3, name: product.name },
     ],
@@ -157,7 +158,7 @@ export default async function ProductPage({ params }: PageProps) {
         <Breadcrumbs
           items={[
             { label: 'Shop', href: '/shop' },
-            { label: genderLabel, href: genderHref },
+            { label: genderLabelText, href: genderHref },
             ...(categoryCrumb ? [categoryCrumb] : []),
             { label: product.name },
           ]}
