@@ -68,7 +68,20 @@ export default async function ProductPage({ params }: PageProps) {
 
   const looks = await lookRepository.findLooksForProduct(product.id);
   const category = await categoryRepository.findBySlug(product.gender, product.categorySlug);
-  const genderLabel = product.gender === 'homme' ? 'Homme' : 'Femme';
+
+  // Produits unisexes : aucune boutique /shop/both n'existe (la route [gender] renvoie
+  // un 404 pour tout genre autre que homme/femme), donc le fil d'Ariane pointe vers la
+  // boutique générale au lieu d'un lien mort — y compris dans les données envoyées à Google.
+  const isUnisex = product.gender === 'both';
+  const genderLabel = isUnisex ? 'Unisexe' : product.gender === 'homme' ? 'Homme' : 'Femme';
+  const genderHref = isUnisex ? '/shop' : `/shop/${product.gender}`;
+
+  // Un produit unisexe est listé à la fois sous /shop/homme/… et /shop/femme/… :
+  // aucune des deux pages ne fait autorité, on retire donc ce niveau du fil d'Ariane.
+  const categoryCrumb =
+    category && !isUnisex
+      ? { label: category.label, href: `/shop/${product.gender}/${category.slug}` }
+      : null;
 
   const lookProductsEntries = await Promise.all(
     looks.map(async (look: { id: string; productIds: string[] }) => {
@@ -87,9 +100,9 @@ export default async function ProductPage({ params }: PageProps) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Shop', item: `${BASE_URL}/shop` },
-      { '@type': 'ListItem', position: 2, name: genderLabel, item: `${BASE_URL}/shop/${product.gender}` },
-      ...(category ? [{ '@type': 'ListItem', position: 3, name: category.label, item: `${BASE_URL}/shop/${product.gender}/${category.slug}` }] : []),
-      { '@type': 'ListItem', position: category ? 4 : 3, name: product.name },
+      { '@type': 'ListItem', position: 2, name: genderLabel, item: `${BASE_URL}${genderHref}` },
+      ...(categoryCrumb ? [{ '@type': 'ListItem', position: 3, name: categoryCrumb.label, item: `${BASE_URL}${categoryCrumb.href}` }] : []),
+      { '@type': 'ListItem', position: categoryCrumb ? 4 : 3, name: product.name },
     ],
   };
 
@@ -144,10 +157,8 @@ export default async function ProductPage({ params }: PageProps) {
         <Breadcrumbs
           items={[
             { label: 'Shop', href: '/shop' },
-            { label: genderLabel, href: `/shop/${product.gender}` },
-            ...(category
-              ? [{ label: category.label, href: `/shop/${product.gender}/${category.slug}` }]
-              : []),
+            { label: genderLabel, href: genderHref },
+            ...(categoryCrumb ? [categoryCrumb] : []),
             { label: product.name },
           ]}
         />
