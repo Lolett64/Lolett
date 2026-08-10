@@ -32,6 +32,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 const GENDER_CONFIG = {
   femme: { label: 'Femme', emoji: '👗' },
   homme: { label: 'Homme', emoji: '👔' },
+  both: { label: 'Unisexe', emoji: '👕' },
 } as const;
 
 async function getProducts(params: SearchParams): Promise<Product[]> {
@@ -63,7 +64,7 @@ function groupByGenderThenCategory(products: Product[]): GenderGroup[] {
     if (!genderMap.has(g)) genderMap.set(g, []);
     genderMap.get(g)!.push(p);
   }
-  const genderOrder = ['femme', 'homme'];
+  const genderOrder = ['femme', 'homme', 'both'];
   const sortedGenders = Array.from(genderMap.keys()).sort((a, b) => {
     const ai = genderOrder.indexOf(a);
     const bi = genderOrder.indexOf(b);

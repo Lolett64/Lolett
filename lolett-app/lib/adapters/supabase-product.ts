@@ -103,11 +103,15 @@ export class SupabaseProductRepository implements ProductRepository {
 
   async findByCategory(gender: string, categorySlug: string): Promise<Product[]> {
     const supabase = createPublicClient();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('gender', gender)
-      .eq('category_slug', categorySlug);
+    // Les produits unisexes ('both') doivent remonter dans les deux boutiques,
+    // exactement comme dans findMany() — sinon ils apparaissent sur /shop/homme
+    // mais disparaissent de /shop/homme/hauts.
+    let query = supabase.from('products').select('*').eq('category_slug', categorySlug);
+    if (gender !== 'both') {
+      query = query.in('gender', [gender, 'both']);
+    }
+
+    const { data, error } = await query;
     if (error) {
       console.error('[SupabaseProductRepository.findByCategory]', error.message);
       return [];

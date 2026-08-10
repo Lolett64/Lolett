@@ -94,7 +94,7 @@ export function ContentVideoUpload({ value, onChange, label }: ContentVideoUploa
             <span className="text-sm text-gray-500">
               Glissez une vidéo ou cliquez pour sélectionner
             </span>
-            <span className="text-xs text-gray-400 mt-1">MP4, WebM — max 50 Mo</span>
+            <span className="text-xs text-gray-400 mt-1">MP4, WebM — max 4 Mo</span>
           </>
         )}
       </div>

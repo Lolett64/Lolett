@@ -55,6 +55,7 @@ export function ProductFilters() {
           <SelectItem value="all">Tous genres</SelectItem>
           <SelectItem value="homme">Homme</SelectItem>
           <SelectItem value="femme">Femme</SelectItem>
+          <SelectItem value="both">Unisexe</SelectItem>
         </SelectContent>
       </Select>
 
