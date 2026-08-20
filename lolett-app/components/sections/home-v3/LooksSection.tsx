@@ -40,15 +40,15 @@ export function LooksSection({ looks, lookProducts = {}, content, hexColor = '#F
 
         {/* Section header */}
         <ScrollReveal className="mb-16 md:mb-20">
-          <div className="flex items-start gap-6">
-            <div>
+          <div className="flex items-start justify-center gap-6">
+            <div className="text-center">
               <span className="text-[#B89547] text-[9px] uppercase tracking-[0.4em] font-semibold mb-4 block">
                 {content?.eyebrow || 'Prêt à sortir'}
               </span>
               <h2 className="font-[family-name:var(--font-newsreader)] text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#1B0B94] leading-[0.95]">
                 {content?.title || 'Le Look Complet'}
               </h2>
-              <p className="text-[#1B0B94]/50 text-base mt-4 max-w-md font-[family-name:var(--font-montserrat)]">
+              <p className="text-[#1B0B94]/50 text-base mt-4 max-w-md mx-auto font-[family-name:var(--font-montserrat)]">
                 {content?.subtitle || 'Pas envie de réfléchir ? On a composé des ensembles pour toi.'}
               </p>
             </div>
