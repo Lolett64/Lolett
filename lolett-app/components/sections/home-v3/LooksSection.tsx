@@ -28,7 +28,7 @@ export function LooksSection({ looks, lookProducts = {}, content, hexColor = '#F
   };
 
   return (
-    <section className="py-24 md:py-32" style={{ backgroundColor: hexColor }}>
+    <section className="py-8 md:py-11" style={{ backgroundColor: hexColor }}>
       <style>{`
         @keyframes lookFadeIn {
           from { opacity: 0; transform: translateY(12px); }

@@ -13,7 +13,7 @@ export function NewArrivalsSection({ products, content, hexColor = '#FFFFFF' }: 
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32" style={{ backgroundColor: hexColor }}>
+    <section className="py-8 md:py-11" style={{ backgroundColor: hexColor }}>
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10">
 
         {/* Editorial header */}
