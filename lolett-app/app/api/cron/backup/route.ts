@@ -10,7 +10,10 @@ const BACKUP_TABLES = [
   'order_items',
   'looks',
   'materials',
-  'promos',
+  // La table s'appelle promo_codes, pas promos : la sauvegarde echouait
+  // integralement sur ce nom errone (constate le 2026-08-20, jamais vu avant
+  // parce qu'aucune sauvegarde n'avait jamais pu s'executer).
+  'promo_codes',
   'site_content',
   'email_settings',
   'newsletter_subscribers',
