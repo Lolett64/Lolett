@@ -1,13 +1,16 @@
 # Scripts d'installation autorisés.
 #
 # pnpm 11 refuse d'exécuter un script post-installation sans autorisation
-# explicite, et fait désormais échouer `pnpm install` (ERR_PNPM_IGNORED_BUILDS)
-# au lieu d'avertir. Le réglage ne se met plus dans package.json : ce fichier
-# est son seul emplacement valide.
+# explicite, et fait échouer `pnpm install` (ERR_PNPM_IGNORED_BUILDS) au lieu
+# d'avertir. Le réglage ne vit plus dans package.json, et `onlyBuiltDependencies`
+# a été remplacé par la table `allowBuilds`.
 #
-# sharp est le plus important : sans son script, le redimensionnement d'images
+# sharp est le point critique : sans son script, le redimensionnement d'images
 # casse en production sans la moindre erreur de compilation.
-onlyBuiltDependencies:
-  - '@sentry/cli'
-  - sharp
-  - unrs-resolver
+#
+# Quand pnpm ajoute ici une ligne « set this to true or false », c'est qu'une
+# dépendance nouvelle veut exécuter un script : trancher, ne pas supprimer.
+allowBuilds:
+  '@sentry/cli': true
+  sharp: true
+  unrs-resolver: true
