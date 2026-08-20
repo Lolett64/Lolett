@@ -53,6 +53,12 @@ ENV HOSTNAME=0.0.0.0
 # Destination des sauvegardes, montée sur un volume persistant par Coolify.
 ENV BACKUP_DIR=/data/backups
 
+# curl sert aux tâches planifiées Coolify, qui appellent les routes /api/cron
+# depuis l'intérieur du conteneur. Debian slim ne l'embarque pas.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --gid 1001 nodejs && useradd --uid 1001 --gid nodejs --create-home nextjs
 
 COPY --from=builder /app/public ./public
