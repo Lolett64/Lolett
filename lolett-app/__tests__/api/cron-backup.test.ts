@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@vercel/blob', () => ({
-  put: vi.fn().mockResolvedValue({
-    url: 'https://blob.vercel-storage.com/backups/lolett-2026-04-24.json',
-  }),
+vi.mock('@/lib/backup/storage', () => ({
+  putBackup: vi.fn((path: string) => Promise.resolve({ path })),
 }));
 
 vi.mock('@/lib/supabase/admin', () => ({
@@ -48,7 +46,16 @@ describe('GET /api/cron/backup', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ok).toBe(true);
-    expect(body.url).toContain('backups/');
+    expect(body.path).toContain('db/');
     expect(body.rows).toBeDefined();
+  });
+
+  it('refuses to run when CRON_SECRET is missing', async () => {
+    delete process.env.CRON_SECRET;
+    const req = new Request('http://x/api/cron/backup', {
+      headers: { authorization: 'Bearer undefined' },
+    });
+    const res = await GET(req);
+    expect(res.status).toBe(503);
   });
 });
