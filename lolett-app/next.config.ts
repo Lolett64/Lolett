@@ -65,6 +65,10 @@ const checkoutSecurityHeaders = [
 
 const nextConfig: NextConfig = {
   ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
+  // Produit un serveur autonome (.next/standalone) embarquant uniquement les
+  // dépendances réellement utilisées. Nécessaire pour l'image Docker déployée
+  // sur le VPS ; sans effet sur une construction Vercel.
+  output: 'standalone',
   poweredByHeader: false,
   eslint: {
     ignoreDuringBuilds: true,
@@ -84,6 +88,19 @@ const nextConfig: NextConfig = {
         hostname: 'qczdwrudgmozyxkdidmr.supabase.co',
       },
     ],
+  },
+  async redirects() {
+    // Reprise de la règle qui vivait dans vercel.json : hors de Vercel, ce
+    // fichier n'est plus lu. `has: [{ type: 'host' }]` est une fonction de
+    // Next.js lui-même, donc valable en auto-hébergé comme sur Vercel.
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: 'www.lolettshop.com' }],
+        destination: 'https://lolettshop.com/:path*',
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     // CSP loose ('unsafe-eval') uniquement sur /checkout exact où le widget

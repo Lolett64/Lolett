@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { putBackup } from '@/lib/backup/storage';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const BACKUP_TABLES = [
@@ -36,8 +36,15 @@ async function fetchAll(supabase: ReturnType<typeof createAdminClient>, table: s
 }
 
 export async function GET(req: Request) {
+  // Sans secret configuré, la comparaison ci-dessous se ferait contre la chaîne
+  // "Bearer undefined" : on refuse explicitement plutôt que d'exposer la route.
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'misconfigured' }, { status: 503 });
+  }
+
   const auth = req.headers.get('authorization');
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (auth !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
@@ -55,21 +62,16 @@ export async function GET(req: Request) {
   }
 
   const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `backups/lolett-${timestamp}.json`;
+  const filename = `db/lolett-${timestamp}.json`;
 
-  // addRandomSuffix: true rend l'URL non-énumérable (PII RGPD).
-  // L'URL reste accessible publiquement par Vercel Blob (limite v2 SDK)
-  // mais sans la connaître on ne peut pas la deviner.
-  const { url } = await put(filename, JSON.stringify(snapshot, null, 2), {
-    access: 'public',
-    contentType: 'application/json',
-    addRandomSuffix: true,
-    cacheControlMaxAge: 0,
-  });
+  // Le fichier contient des données personnelles (commandes, abonnés). Il vit
+  // désormais sur un volume privé du VPS, jamais exposé par HTTP — contrairement
+  // au stockage Vercel dont toutes les URL étaient publiques.
+  const { path } = await putBackup(filename, JSON.stringify(snapshot, null, 2));
 
   return NextResponse.json({
     ok: true,
-    url,
+    path,
     rows: Object.fromEntries(
       Object.entries(snapshot).map(([t, rows]) => [t, rows.length]),
     ),

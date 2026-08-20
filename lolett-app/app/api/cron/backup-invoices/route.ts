@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put, list, type ListBlobResultBlob } from '@vercel/blob';
+import { listBackups, putBackup, readBackup } from '@/lib/backup/storage';
 import * as Sentry from '@sentry/nextjs';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -16,36 +16,23 @@ function currentMonthPrefix(): string {
   return `invoices-backup/${year}-${month}`;
 }
 
-async function listAllBlobs(prefix: string): Promise<ListBlobResultBlob[]> {
-  const all: ListBlobResultBlob[] = [];
-  let cursor: string | undefined;
-  while (true) {
-    const res = await list({ prefix, cursor });
-    all.push(...res.blobs);
-    if (!res.hasMore || !res.cursor) break;
-    cursor = res.cursor;
-  }
-  return all;
-}
-
 type Manifest = {
   month: string;
-  archivedFiles: Record<string, { uploadedAt: string; blobUrl: string }>;
+  archivedFiles: Record<string, { uploadedAt: string; backupPath: string }>;
 };
 
 async function loadManifest(monthPrefix: string): Promise<Manifest> {
   const month = monthPrefix.split('/')[1];
-  const manifestBlobs = await listAllBlobs(`${monthPrefix}/_manifest-`);
-  if (manifestBlobs.length === 0) {
+  const manifests = await listBackups(`${monthPrefix}/_manifest-`);
+  if (manifests.length === 0) {
     return { month, archivedFiles: {} };
   }
-  const latest = manifestBlobs.sort((a, b) =>
-    b.uploadedAt.toString().localeCompare(a.uploadedAt.toString()),
+  const latest = manifests.sort(
+    (a, b) => b.modifiedAt.getTime() - a.modifiedAt.getTime(),
   )[0];
   try {
-    const res = await fetch(latest.url);
-    if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
-    const data = (await res.json()) as Manifest;
+    const raw = await readBackup(latest.path);
+    const data = JSON.parse(raw.toString('utf8')) as Manifest;
     return data;
   } catch (err) {
     Sentry.captureMessage('backup-invoices: manifest load failed, restarting from empty', {
@@ -57,15 +44,9 @@ async function loadManifest(monthPrefix: string): Promise<Manifest> {
 }
 
 async function saveManifest(monthPrefix: string, manifest: Manifest): Promise<void> {
-  await put(
+  await putBackup(
     `${monthPrefix}/_manifest-${Date.now()}.json`,
     JSON.stringify(manifest),
-    {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: true,
-      cacheControlMaxAge: 0,
-    },
   );
 }
 
@@ -144,15 +125,10 @@ export async function GET(req: Request) {
         }
 
         try {
-          const { url } = await put(`${monthPrefix}/${file.name}`, pdfBlob, {
-            access: 'public',
-            contentType: 'application/pdf',
-            addRandomSuffix: true,
-            cacheControlMaxAge: 0,
-          });
+          const { path } = await putBackup(`${monthPrefix}/${file.name}`, pdfBlob);
           manifest.archivedFiles[file.name] = {
             uploadedAt: new Date().toISOString(),
-            blobUrl: url,
+            backupPath: path,
           };
           archived++;
         } catch (uploadErr) {
