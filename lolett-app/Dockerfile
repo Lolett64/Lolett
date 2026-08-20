@@ -11,7 +11,9 @@ RUN corepack enable
 # --- Dépendances -------------------------------------------------------------
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+# pnpm-workspace.yaml porte la liste des scripts d'installation autorisés :
+# sans lui, pnpm 11 s'arrête sur ERR_PNPM_IGNORED_BUILDS.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # --- Construction ------------------------------------------------------------
