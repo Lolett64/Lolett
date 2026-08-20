@@ -92,7 +92,11 @@ export default function NotreHistoireContent({ content = {}, visibleSections }: 
                 <div style={{
                   width: 72, height: 72, borderRadius: '50%', border: `1.5px solid ${GOLD}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 24, color: GOLD, marginBottom: 10, background: 'rgba(184,149,71,0.06)',
+                  fontSize: 24, color: GOLD, background: 'rgba(184,149,71,0.06)',
+                  // Le textAlign du parent ne centre que le contenu en ligne : ce
+                  // bloc de largeur fixe restait colle a gauche des etiquettes
+                  // longues (« Polyester recycle »). Il se centre lui-meme.
+                  margin: '0 auto 10px',
                 }}>
                   {m.icon}
                 </div>
