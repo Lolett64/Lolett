@@ -139,7 +139,9 @@ export function LooksSection({ looks, lookProducts = {}, content, hexColor = '#F
             </div>
 
             {/* Right — Look image (crossfade stack) */}
-            <div className="relative aspect-[3/4] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)] bg-[#e5ddd2]">
+            {/* Format 4/5 plafonne a 500 px : au-dela, l'image dictait la hauteur
+                de toute la section et creusait un vide sous le texte. */}
+            <div className="relative aspect-[4/5] max-h-[500px] overflow-hidden order-1 lg:order-2 shadow-[0_20px_80px_rgba(27,11,148,0.08)] bg-[#e5ddd2]">
               {looks.map((l, i) => (
                 <Image
                   key={l.id}
