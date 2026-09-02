@@ -25,18 +25,22 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="bg-white relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl">
-        <Image
-          src={images[selectedImage]}
-          alt={name}
-          fill
-          className="object-contain"
-          priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
-        <div className="absolute top-3 left-3 flex flex-col gap-2 sm:top-4 sm:left-4">
-          {isNew && <BrandBadge variant="new">Nouveau</BrandBadge>}
-          {isLowStock && <BrandBadge variant="lowStock">Plus que {stockCount}</BrandBadge>}
+      {/* Le cadre épouse la photo (pas de ratio imposé) : aucune bande vide autour */}
+      <div className="flex justify-center">
+        <div className="relative w-fit overflow-hidden rounded-xl sm:rounded-2xl">
+          <Image
+            src={images[selectedImage]}
+            alt={name}
+            width={1080}
+            height={1920}
+            className="h-auto max-h-screen w-auto max-w-full"
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
+          <div className="absolute top-3 left-3 flex flex-col gap-2 sm:top-4 sm:left-4">
+            {isNew && <BrandBadge variant="new">Nouveau</BrandBadge>}
+            {isLowStock && <BrandBadge variant="lowStock">Plus que {stockCount}</BrandBadge>}
+          </div>
         </div>
       </div>
 
