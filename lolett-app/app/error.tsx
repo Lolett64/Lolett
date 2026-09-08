@@ -1,16 +1,20 @@
 'use client';
 
 import Link from 'next/link';
+import { captureException } from '@sentry/nextjs';
+import { useEffect } from 'react';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { BrandHeading } from '@/components/brand/BrandHeading';
 import { Button } from '@/components/ui/button';
 
 export default function Error({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => { captureException(error); }, [error]);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-20 pb-16 text-center">
       <div className="mx-auto max-w-lg">

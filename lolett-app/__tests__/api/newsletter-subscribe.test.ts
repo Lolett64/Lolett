@@ -1,4 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+
+const { deferred } = vi.hoisted(() => ({ deferred: [] as Array<() => Promise<void>> }));
+vi.mock('next/server', async (importOriginal) => ({
+  ...await importOriginal<typeof import('next/server')>(),
+  after: vi.fn((task: () => Promise<void>) => { deferred.push(task); }),
+}));
+beforeEach(() => { deferred.length = 0; vi.clearAllMocks(); });
 
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -19,6 +26,7 @@ vi.mock('@/lib/email/welcome-newsletter', () => ({
 }));
 
 import { POST } from '@/app/api/newsletter/subscribe/route';
+import { sendWelcomeNewsletterEmail } from '@/lib/email/welcome-newsletter';
 
 describe('POST /api/newsletter/subscribe', () => {
   it('rejects malformed email', async () => {
@@ -48,5 +56,9 @@ describe('POST /api/newsletter/subscribe', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.ok).toBe(true);
+    expect(sendWelcomeNewsletterEmail).not.toHaveBeenCalled();
+    expect(deferred).toHaveLength(1);
+    await deferred[0]();
+    expect(sendWelcomeNewsletterEmail).toHaveBeenCalledWith({ to: 'camille@ex.fr' });
   });
 });

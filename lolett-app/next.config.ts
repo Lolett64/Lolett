@@ -36,7 +36,7 @@ function buildCsp(scriptSrc: string): string {
     "font-src 'self' https://fonts.gstatic.com data: https://widget.mondialrelay.com",
     "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://qczdwrudgmozyxkdidmr.supabase.co https://*.tile.openstreetmap.org https://www.googletagmanager.com https://widget.mondialrelay.com",
     "media-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co",
-    "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://*.ingest.sentry.io https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://unpkg.com https://api.stripe.com https://m.stripe.com https://m.stripe.network https://www.google-analytics.com https://stats.propulseo-site.com",
+    "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://errors.propulseo-site.com https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://unpkg.com https://api.stripe.com https://m.stripe.com https://m.stripe.network https://www.google-analytics.com https://stats.propulseo-site.com",
     "frame-src 'self' https://js.stripe.com https://www.googletagmanager.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
@@ -123,9 +123,12 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sentryUrl: 'https://errors.propulseo-site.com',
+  org: 'propulseo',
+  project: 'lolett',
+  authToken: process.env.GLITCHTIP_AUTH_TOKEN,
+  sourcemaps: { disable: !process.env.GLITCHTIP_AUTH_TOKEN },
+  telemetry: false,
   silent: !process.env.CI,
   widenClientFileUpload: true,
   disableLogger: true,
