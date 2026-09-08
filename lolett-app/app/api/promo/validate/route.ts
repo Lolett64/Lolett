@@ -3,12 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import { promoLimit, getClientIp, checkLimit } from '@/lib/security/ratelimit';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
-
 export async function POST(req: Request) {
   const limit = await checkLimit(promoLimit, getClientIp(req));
   if (!limit.ok) {
@@ -21,6 +15,13 @@ export async function POST(req: Request) {
   const { code, subtotal } = await req.json();
 
   if (!code) return NextResponse.json({ error: 'Code manquant' }, { status: 400 });
+
+  // La clé privilégiée est disponible au runtime, pas pendant le build Docker.
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
 
   const { data: promo, error } = await supabase
     .from('promo_codes')
