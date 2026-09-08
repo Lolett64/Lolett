@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
+import { glitchtipOptions } from './lib/monitoring/glitchtip';
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  tracesSampleRate: 0.1,
-  enabled: process.env.NODE_ENV === 'production',
+  ...glitchtipOptions,
+  dsn: process.env.GLITCHTIP_DSN ?? glitchtipOptions.dsn,
 });
