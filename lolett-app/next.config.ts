@@ -9,6 +9,7 @@ const baseScriptSrc = [
   'https://widget.mondialrelay.com',
   'https://www.googletagmanager.com',
   'https://js.stripe.com',
+  'https://stats.propulseo-site.com',
 ];
 
 // 'unsafe-eval' requis uniquement par le plugin jQuery du widget Mondial Relay
@@ -35,7 +36,7 @@ function buildCsp(scriptSrc: string): string {
     "font-src 'self' https://fonts.gstatic.com data: https://widget.mondialrelay.com",
     "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://qczdwrudgmozyxkdidmr.supabase.co https://*.tile.openstreetmap.org https://www.googletagmanager.com https://widget.mondialrelay.com",
     "media-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co",
-    "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://*.ingest.sentry.io https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://unpkg.com https://api.stripe.com https://m.stripe.com https://m.stripe.network https://www.google-analytics.com",
+    "connect-src 'self' https://qczdwrudgmozyxkdidmr.supabase.co https://*.ingest.sentry.io https://api-adresse.data.gouv.fr https://widget.mondialrelay.com https://unpkg.com https://api.stripe.com https://m.stripe.com https://m.stripe.network https://www.google-analytics.com https://stats.propulseo-site.com",
     "frame-src 'self' https://js.stripe.com https://www.googletagmanager.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",

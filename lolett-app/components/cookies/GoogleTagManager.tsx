@@ -31,6 +31,7 @@ export function GoogleTagManager() {
 
   return (
     <>
+      <Script id="umami-bootstrap" src="/umami.js" strategy="afterInteractive" />
       <Script
         id="gtm-script"
         strategy="afterInteractive"
