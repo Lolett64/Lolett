@@ -243,7 +243,7 @@ export function RefundDialog({ orderId, orderTotal, alreadyRefunded, status, ord
               <TabsContent value="items" className="flex flex-col gap-4 pt-3">
                 {refundableItems.length === 0 ? (
                   <p className="text-sm text-[#1a1510]/60 italic">
-                    Aucun article éligible (produit supprimé ?). Utiliser "Geste commercial".
+                    Aucun article éligible (produit supprimé ?). Utiliser &quot;Geste commercial&quot;.
                   </p>
                 ) : (
                   <>
