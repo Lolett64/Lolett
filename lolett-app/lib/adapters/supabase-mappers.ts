@@ -111,6 +111,7 @@ export function mapOrder(row: DbOrder): Order {
       productId: item.product_id ?? '',
       productName: item.product_name,
       size: item.size as Size,
+      color: item.color ?? undefined,
       quantity: item.quantity,
       price: Number(item.price),
     })),

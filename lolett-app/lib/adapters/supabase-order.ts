@@ -84,6 +84,7 @@ export class SupabaseOrderRepository implements OrderRepository {
         productId: item.productId,
         productName: item.productName,
         size: item.size,
+        color: item.color,
         quantity: item.quantity,
         price: item.price,
       })),

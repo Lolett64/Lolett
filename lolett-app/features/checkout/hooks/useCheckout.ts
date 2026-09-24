@@ -166,6 +166,7 @@ export function useCheckout() {
         productId: cp.productId,
         productName: cp.product.name,
         size: cp.size,
+        color: cp.color,
         quantity: cp.quantity,
         price: cp.product.price,
       }));

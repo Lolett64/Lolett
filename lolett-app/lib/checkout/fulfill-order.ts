@@ -141,6 +141,7 @@ export async function fulfillOrder(params: FulfillOrderParams): Promise<string> 
         items: items.map((i) => ({
           productName: i.productName,
           size: i.size,
+          color: i.color,
           quantity: i.quantity,
           price: i.price,
         })),

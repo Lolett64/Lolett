@@ -6,7 +6,7 @@ import type { ShippingCarrier, ShippingMethod, PickupPoint } from '@/types';
 interface OrderShippedData {
   to: string;
   orderNumber: string;
-  items: { productName: string; size: string; quantity: number; price: number }[];
+  items: { productName: string; size: string; color?: string; quantity: number; price: number }[];
   customer: { firstName: string; lastName: string; address: string; city: string; postalCode: string; country?: string };
   subtotal: number;
   shipping: number;

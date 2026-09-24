@@ -13,6 +13,7 @@ import { decrementStockForOrder } from '@/lib/orders/decrement-stock';
 import { sendOrderConfirmation } from '@/lib/email/order-confirmation';
 import { sendNewOrderAlertToAdmin } from '@/lib/email/order-new-admin';
 import { generateInvoicePdf } from '@/lib/invoice/generate-invoice';
+import { encodeItemsMetadata } from '@/lib/checkout/items-metadata';
 import { computePromoDiscount, type PromoType } from '@/lib/promo/discount';
 import type { Size, ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
 import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
       shippingCountry: rawCountry,
       pickupPoint: rawPickup,
     } = body as {
-      items: Array<{ productId: string; productName: string; size: string; quantity: number }>;
+      items: Array<{ productId: string; productName: string; size: string; color?: unknown; quantity: number }>;
       customer: {
         firstName: string;
         lastName: string;
@@ -67,6 +68,10 @@ export async function POST(req: NextRequest) {
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Items requis' }, { status: 400 });
+    }
+    // Même plafond que /api/checkout ; protège aussi la limite de clés metadata Stripe.
+    if (items.length > 50) {
+      return NextResponse.json({ error: "Trop d'articles dans le panier" }, { status: 400 });
     }
 
     // Validation pays + mode (sécurité serveur — ne jamais faire confiance au client).
@@ -148,7 +153,13 @@ export async function POST(req: NextRequest) {
     const verifiedItems = items.map((item) => {
       const dbProduct = priceMap.get(item.productId);
       if (!dbProduct) throw new Error(`Product ${item.productId} not found`);
-      return { ...item, productName: dbProduct.name, price: dbProduct.price };
+      // Couleur choisie (fiche produit multi-couleurs) : valeur navigateur,
+      // on ne garde qu'un nom court, sinon on l'ignore. Pas de trim : le stock
+      // (decrement_stock_for_order) compare le nom exact, espaces compris.
+      const color = typeof item.color === 'string' && item.color.trim() && item.color.length <= 50
+        ? item.color
+        : undefined;
+      return { ...item, color, productName: dbProduct.name, price: dbProduct.price };
     });
 
     const subtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -259,6 +270,7 @@ export async function POST(req: NextRequest) {
           productId: i.productId,
           productName: i.productName,
           size: i.size as Size,
+          color: i.color,
           quantity: i.quantity,
           price: i.price,
         })),
@@ -381,6 +393,7 @@ export async function POST(req: NextRequest) {
           items: verifiedItems.map((i) => ({
             productName: i.productName,
             size: i.size,
+            color: i.color,
             quantity: i.quantity,
             price: i.price,
           })),
@@ -412,6 +425,7 @@ export async function POST(req: NextRequest) {
             items: verifiedItems.map((i) => ({
               productName: i.productName,
               size: i.size,
+              color: i.color,
               quantity: i.quantity,
               price: i.price,
             })),
@@ -518,11 +532,12 @@ export async function POST(req: NextRequest) {
       }),
       metadata: {
         customer: JSON.stringify(customer),
-        items: JSON.stringify(
+        ...encodeItemsMetadata(
           verifiedItems.map((i) => ({
             productId: i.productId,
             productName: i.productName,
             size: i.size,
+            color: i.color,
             quantity: i.quantity,
             price: i.price,
           }))

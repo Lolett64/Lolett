@@ -114,9 +114,10 @@ export async function POST(request: NextRequest) {
     await sendOrderConfirmation({
       to: customer.email,
       orderNumber: order.orderNumber,
-      items: verifiedItems.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
+      items: verifiedItems.map((i: { productName: string; size: string; color?: string; quantity: number; price: number }) => ({
         productName: i.productName,
         size: i.size,
+        color: i.color,
         quantity: i.quantity,
         price: i.price,
       })),

@@ -31,6 +31,7 @@ export interface OrderRepository {
     items: {
       productId: string;
       size: Size;
+      color?: string;
       quantity: number;
       price: number;
       productName: string;
