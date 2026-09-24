@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { fulfillOrder } from '@/lib/checkout/fulfill-order';
 import { VALID_SHIPPING_METHODS } from '@/lib/constants';
 import type { ShippingMethod, ShippingCarrier, ShippingCountryCode, PickupPoint } from '@/types';
+import { decodeItemsMetadata } from '@/lib/checkout/items-metadata';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -41,11 +42,12 @@ export async function GET(req: NextRequest) {
 
     // Order doesn't exist yet — create it via fulfillOrder helper
     const metadata = session.metadata;
-    if (!metadata?.items || !metadata?.customer) {
+    const itemsJson = decodeItemsMetadata(metadata);
+    if (!itemsJson || !metadata?.customer) {
       return NextResponse.json({ error: 'Missing session metadata' }, { status: 500 });
     }
 
-    const items = JSON.parse(metadata.items);
+    const items = JSON.parse(itemsJson);
     const customer = JSON.parse(metadata.customer);
     const total = parseFloat(metadata.total || '0');
     const shipping = parseFloat(metadata.shipping || '0');

@@ -255,7 +255,7 @@ export async function PATCH(
       } else {
         const { data: orderItems } = await supabase
           .from('order_items')
-          .select('product_name, size, quantity, price')
+          .select('product_name, size, color, quantity, price')
           .eq('order_id', id);
 
         // after() : envoi post-réponse pour ne pas bloquer l'admin, mais garde
@@ -266,9 +266,10 @@ export async function PATCH(
             await sendOrderShipped({
               to: customer.email,
               orderNumber,
-              items: (orderItems ?? []).map((i: { product_name: string; size: string; quantity: number; price: number }) => ({
+              items: (orderItems ?? []).map((i: { product_name: string; size: string; color: string | null; quantity: number; price: number }) => ({
                 productName: i.product_name,
                 size: i.size,
+                color: i.color ?? undefined,
                 quantity: i.quantity,
                 price: i.price,
               })),

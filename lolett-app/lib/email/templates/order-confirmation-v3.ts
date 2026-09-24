@@ -6,12 +6,14 @@
 interface OrderItem {
   productName: string;
   size: string;
+  color?: string;
   quantity: number;
   price: number;
 }
 
 import type { ShippingMethod, PickupPoint } from '@/types';
 import { getEmailSiteUrl } from '@/lib/email/site-url';
+import { escapeHtml } from '@/lib/utils/escape-html';
 
 interface OrderEmailData {
   firstName: string;
@@ -65,7 +67,7 @@ export function renderOrderConfirmationV3(data: OrderEmailData, overrides?: Emai
             <tr>
               <td>
                 <p style="margin: 0; font-size: 15px; font-weight: 400; color: #2C2420; font-family: 'Cormorant Garamond', Georgia, serif;">${item.productName}</p>
-                <p style="margin: 5px 0 0; font-size: 11px; color: #B5A99A; letter-spacing: 0.04em;">Taille ${item.size} &middot; Qté ${item.quantity}</p>
+                <p style="margin: 5px 0 0; font-size: 11px; color: #B5A99A; letter-spacing: 0.04em;">Taille ${item.size}${item.color ? ` &middot; Couleur ${escapeHtml(item.color)}` : ''} &middot; Qté ${item.quantity}</p>
               </td>
               <td style="text-align: right; vertical-align: top; font-size: 14px; font-weight: 500; color: #2C2420; font-family: 'DM Sans', Helvetica, Arial, sans-serif; padding-top: 2px;">
                 ${(item.price * item.quantity).toFixed(2)}&nbsp;&euro;

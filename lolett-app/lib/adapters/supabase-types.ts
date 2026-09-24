@@ -87,6 +87,7 @@ export type DbOrder = {
     product_id: string | null;
     product_name: string;
     size: string;
+    color?: string | null;
     quantity: number;
     price: number;
   }[];

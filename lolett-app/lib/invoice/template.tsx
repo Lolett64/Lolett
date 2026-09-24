@@ -36,6 +36,12 @@ const styles = StyleSheet.create({
   retourMention: { marginTop: 8, fontSize: 9, color: '#666' },
 });
 
+// "(L · Rose)" — taille + couleur choisie, ou "(L)" pour un produit sans couleur.
+function formatVariant(size?: string, color?: string): string {
+  const parts = [size, color].filter(Boolean);
+  return parts.length > 0 ? `(${parts.join(' · ')})` : '';
+}
+
 interface InvoiceTemplateProps {
   invoiceNumber: string;
   invoiceDate: string;
@@ -123,7 +129,7 @@ export function InvoiceTemplate({ invoiceNumber, invoiceDate, order }: InvoiceTe
           </View>
           {order.items.map((item, idx) => (
             <View key={idx} style={styles.tableRow}>
-              <Text style={styles.cellName}>{item.productName} {item.size ? `(${item.size})` : ''}</Text>
+              <Text style={styles.cellName}>{item.productName} {formatVariant(item.size, item.color)}</Text>
               <Text style={styles.cellQty}>{item.quantity}</Text>
               <Text style={styles.cellPrice}>{item.price.toFixed(2)} €</Text>
               <Text style={styles.cellTotal}>{(item.price * item.quantity).toFixed(2)} €</Text>

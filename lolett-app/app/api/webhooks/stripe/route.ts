@@ -16,6 +16,7 @@ import { sendDisputeAlertToAdmin, sendDisputeClosedToAdmin } from '@/lib/email/d
 import { SHIPPING_COUNTRIES, VALID_SHIPPING_METHODS } from '@/lib/constants';
 import type { ShippingMethod, ShippingCountryCode, PickupPoint } from '@/types';
 import type { RedeemGiftCardResult } from '@/lib/types/gift-card';
+import { decodeItemsMetadata } from '@/lib/checkout/items-metadata';
 
 const VALID_COUNTRY_CODES = SHIPPING_COUNTRIES.map((c) => c.code) as ShippingCountryCode[];
 
@@ -212,14 +213,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    if (!metadata?.items || !metadata?.customer) {
+    const itemsJson = decodeItemsMetadata(metadata);
+    if (!itemsJson || !metadata?.customer) {
       console.error('[Stripe webhook] Missing metadata');
       await markEventProcessed(event);
       return NextResponse.json({ received: true });
     }
 
     try {
-      const items = WebhookItemSchema.parse(JSON.parse(metadata.items));
+      const items = WebhookItemSchema.parse(JSON.parse(itemsJson));
       const customer = WebhookCustomerSchema.parse(JSON.parse(metadata.customer));
       const grossTotal = parseFloat(metadata.total || '0');
       const shipping = parseFloat(metadata.shipping || '0');
@@ -479,9 +481,10 @@ export async function POST(req: NextRequest) {
         await sendOrderConfirmation({
           to: customer.email,
           orderNumber: order.orderNumber,
-          items: items.map((i: { productName: string; size: string; quantity: number; price: number }) => ({
+          items: items.map((i: { productName: string; size: string; color?: string; quantity: number; price: number }) => ({
             productName: i.productName,
             size: i.size,
+            color: i.color,
             quantity: i.quantity,
             price: i.price,
           })),
