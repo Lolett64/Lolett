@@ -78,12 +78,20 @@ export function ProductForm({ initialData, productId, mode }: ProductFormProps) 
   }
 
   function addColor() {
-    if (!newColor.name.trim()) return;
+    const name = newColor.name.trim();
+    if (!name) return;
+    // Un doublon (« Rose » / « rose ») mélangerait le stock des deux couleurs.
+    if (form.colors.some((c) => c.name.trim().toLowerCase() === name.toLowerCase())) {
+      setError(`La couleur « ${name} » existe déjà sur ce produit.`);
+      return;
+    }
+    setError('');
+    const color = { ...newColor, name };
     setForm((f) => {
-      const newColors = [...f.colors, newColor];
+      const newColors = [...f.colors, color];
       const newVariants = [...f.variants];
       f.sizes.forEach((size) => {
-        newVariants.push({ colorName: newColor.name, colorHex: newColor.hex, size, stock: 0 });
+        newVariants.push({ colorName: color.name, colorHex: color.hex, size, stock: 0 });
       });
       const totalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
       return { ...f, colors: newColors, variants: newVariants, stock: totalStock.toString() };

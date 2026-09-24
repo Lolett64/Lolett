@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkAdminCookieFromRequest } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { normalizeProductColors } from '@/lib/admin/product-colors';
 
 const VariantSchema = z.object({
   colorName: z.string(),
@@ -84,8 +85,15 @@ export async function PUT(
     return NextResponse.json({ error: 'Données invalides', details: parsed.error.flatten() }, { status: 400 });
   }
 
-  // Extraire les variantes du body
-  const { variants, ...productData } = parsed.data;
+  // Extraire les variantes du body, en alignant leurs noms de couleur sur
+  // products.colors (sinon le stock baisse sur la mauvaise couleur à la commande).
+  const { variants: rawVariants, ...rawProductData } = parsed.data;
+  const normalized = normalizeProductColors(rawProductData.colors, rawVariants);
+  if (normalized.error) {
+    return NextResponse.json({ error: normalized.error }, { status: 400 });
+  }
+  const variants = normalized.variants;
+  const productData = normalized.colors ? { ...rawProductData, colors: normalized.colors } : rawProductData;
 
   // Mettre à jour le produit
   const { data, error } = await supabase
