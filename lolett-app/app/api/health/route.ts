@@ -29,11 +29,12 @@ async function checkSupabase(): Promise<ServiceStatus> {
   }
 }
 
-async function checkResend(signal: AbortSignal): Promise<ServiceStatus> {
-  if (!process.env.RESEND_API_KEY) return 'down';
+// Brevo est le fournisseur d'e-mails principal (voir lib/email-provider.ts).
+async function checkBrevo(signal: AbortSignal): Promise<ServiceStatus> {
+  if (!process.env.BREVO_API_KEY) return 'down';
   try {
-    const res = await fetch('https://api.resend.com/domains', {
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+    const res = await fetch('https://api.brevo.com/v3/account', {
+      headers: { 'api-key': process.env.BREVO_API_KEY },
       signal,
     });
     return res.ok ? 'ok' : 'down';
@@ -47,14 +48,14 @@ export async function GET() {
   const timeout = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const [stripe, supabase, resend] = await Promise.all([
+    const [stripe, supabase, brevo] = await Promise.all([
       checkStripe(controller.signal),
       checkSupabase(),
-      checkResend(controller.signal),
+      checkBrevo(controller.signal),
     ]);
 
-    const status = { stripe, supabase, resend };
-    const allOk = stripe === 'ok' && supabase === 'ok' && resend === 'ok';
+    const status = { stripe, supabase, brevo };
+    const allOk = stripe === 'ok' && supabase === 'ok' && brevo === 'ok';
 
     return NextResponse.json(
       { status: allOk ? 'ok' : 'degraded', services: status, checkedAt: new Date().toISOString() },
