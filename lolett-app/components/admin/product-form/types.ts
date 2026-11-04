@@ -42,28 +42,6 @@ export interface ProductFormProps {
   mode: 'create' | 'edit';
 }
 
-export const CATEGORIES_BY_GENDER: Record<string, { slug: string; label: string }[]> = {
-  homme: [
-    { slug: 'hauts', label: 'Hauts' },
-    { slug: 'bas', label: 'Bas' },
-    { slug: 'vestes', label: 'Vestes' },
-    { slug: 'accessoires', label: 'Accessoires' },
-  ],
-  femme: [
-    { slug: 'hauts', label: 'Hauts' },
-    { slug: 'bas', label: 'Bas' },
-    { slug: 'robes', label: 'Robes & Combinaisons' },
-    { slug: 'bijoux', label: 'Bijoux' },
-    { slug: 'chaussures', label: 'Chaussures' },
-    { slug: 'sacs', label: 'Sacs' },
-  ],
-  both: [
-    { slug: 'hauts', label: 'Hauts' },
-    { slug: 'bas', label: 'Bas' },
-    { slug: 'accessoires', label: 'Accessoires' },
-  ],
-};
-
 /* ── Shared styles ─────────────────────────────────────── */
 export const card = 'w-full rounded-xl border border-[var(--border)] bg-white p-6 shadow-sm';
 export const fieldLabel = 'block text-sm font-medium text-[#4a4a56] mb-1.5';

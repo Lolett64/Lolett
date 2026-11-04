@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
+import { categoryOptionsForGender } from '@/lib/category-options';
+import { useCategoryRows } from './useCategoryRows';
 import {
   ProductFormData,
-  CATEGORIES_BY_GENDER,
   card,
   fieldLabel,
   inputBase,
@@ -16,7 +17,8 @@ interface ProductFormInfoSectionProps {
 }
 
 export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductFormInfoSectionProps) {
-  const categories = CATEGORIES_BY_GENDER[form.gender] ?? [];
+  const { rows, loading: categoriesLoading } = useCategoryRows();
+  const categories = categoryOptionsForGender(rows, form.gender, form.category_slug);
 
   return (
     <div className={card}>
@@ -251,7 +253,7 @@ export function ProductFormInfoSection({ form, setForm, onNameChange }: ProductF
               disabled={!form.gender}
               className={selectBase}
             >
-              <option value="">Choisir...</option>
+              <option value="">{categoriesLoading ? 'Chargement...' : 'Choisir...'}</option>
               {categories.map((cat) => (
                 <option key={cat.slug} value={cat.slug}>{cat.label}</option>
               ))}
