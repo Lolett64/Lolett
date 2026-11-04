@@ -20,7 +20,16 @@ function slugify(text: string) {
     .replace(/^-|-$/g, '');
 }
 
-const EMPTY_FORM = { gender: '', slug: '', label: '', seo_title: '', seo_description: '' };
+// `gender` sert à la modification (une seule catégorie), `genders` à la création :
+// cocher Homme et Femme crée la catégorie des deux côtés.
+const EMPTY_FORM = {
+  gender: '',
+  genders: [] as string[],
+  slug: '',
+  label: '',
+  seo_title: '',
+  seo_description: '',
+};
 
 export function useCategoryForm() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -32,6 +41,7 @@ export function useCategoryForm() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [slugManual, setSlugManual] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchCategories() {
     const res = await fetch('/api/admin/categories');
@@ -54,11 +64,13 @@ export function useCategoryForm() {
     setShowForm(false);
     setEditingId(null);
     setSlugManual(false);
+    setError(null);
   }
 
   function startEdit(cat: Category) {
     setForm({
       gender: cat.gender,
+      genders: [],
       slug: cat.slug,
       label: cat.label,
       seo_title: cat.seo_title ?? '',
@@ -89,9 +101,23 @@ export function useCategoryForm() {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
+  function toggleGender(gender: string) {
+    setForm((f) => ({
+      ...f,
+      genders: f.genders.includes(gender)
+        ? f.genders.filter((g) => g !== gender)
+        : [...f.genders, gender],
+    }));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!editingId && form.genders.length === 0) {
+      setError('Cochez Homme, Femme, ou les deux.');
+      return;
+    }
     setSaving(true);
+    setError(null);
 
     try {
       const url = editingId
@@ -108,7 +134,12 @@ export function useCategoryForm() {
       if (res.ok) {
         await fetchCategories();
         resetForm();
+      } else {
+        const data: { error?: string } = await res.json().catch(() => ({}));
+        setError(data.error ?? 'Enregistrement impossible, réessayez.');
       }
+    } catch {
+      setError('Enregistrement impossible, réessayez.');
     } finally {
       setSaving(false);
     }
@@ -137,6 +168,7 @@ export function useCategoryForm() {
     editingId,
     deleting,
     saving,
+    error,
     form,
     homme,
     femme,
@@ -145,6 +177,7 @@ export function useCategoryForm() {
     startCreate,
     handleLabelChange,
     setFormField,
+    toggleGender,
     handleSubmit,
     handleDelete,
   };

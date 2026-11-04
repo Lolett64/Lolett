@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { categoryGendersFromBody } from '@/lib/category-options';
 
 export async function GET() {
   const supabase = createAdminClient();
@@ -33,20 +34,35 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { gender, slug, label, seo_title, seo_description } = body;
+  const { slug, label, seo_title, seo_description } = body;
+  // Homme et Femme cochés = une ligne par genre, insérées ensemble (tout ou rien).
+  const genders = categoryGendersFromBody(body);
 
-  if (!gender || !slug || !label) {
-    return NextResponse.json({ error: 'gender, slug et label sont requis' }, { status: 400 });
+  if (genders.length === 0 || !slug || !label) {
+    return NextResponse.json({ error: 'Genre, label et slug sont requis' }, { status: 400 });
   }
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('categories')
-    .insert({ gender, slug, label, seo_title: seo_title || null, seo_description: seo_description || null })
-    .select()
-    .single();
+    .insert(
+      genders.map((gender) => ({
+        gender,
+        slug,
+        label,
+        seo_title: seo_title || null,
+        seo_description: seo_description || null,
+      })),
+    )
+    .select();
 
   if (error) {
+    if (error.code === '23505') {
+      return NextResponse.json(
+        { error: `Une catégorie « ${slug} » existe déjà pour ce genre. Choisissez un autre slug.` },
+        { status: 409 },
+      );
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

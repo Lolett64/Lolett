@@ -4,15 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useCategoryForm } from '@/components/admin/categories/useCategoryForm';
+import { CategoryGenderField } from '@/components/admin/categories/CategoryGenderField';
 
 export default function AdminCategoriesPage() {
   const {
@@ -23,6 +17,7 @@ export default function AdminCategoriesPage() {
     editingId,
     deleting,
     saving,
+    error,
     form,
     homme,
     femme,
@@ -31,6 +26,7 @@ export default function AdminCategoriesPage() {
     startCreate,
     handleLabelChange,
     setFormField,
+    toggleGender,
     handleSubmit,
     handleDelete,
   } = useCategoryForm();
@@ -69,22 +65,13 @@ export default function AdminCategoriesPage() {
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label className="text-[#1a1510]">Genre *</Label>
-                <Select
-                  value={form.gender}
-                  onValueChange={(v) => setFormField('gender', v)}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Choisir..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="homme">Homme</SelectItem>
-                    <SelectItem value="femme">Femme</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <CategoryGenderField
+                editing={editingId !== null}
+                gender={form.gender}
+                genders={form.genders}
+                onGenderChange={(v) => setFormField('gender', v)}
+                onToggleGender={toggleGender}
+              />
               <div className="flex flex-col gap-2">
                 <Label htmlFor="cat-label" className="text-[#1a1510]">Label *</Label>
                 <Input
@@ -129,6 +116,9 @@ export default function AdminCategoriesPage() {
                 />
               </div>
             </div>
+            {error && (
+              <p role="alert" className="text-sm text-red-600">{error}</p>
+            )}
             <div className="flex items-center gap-3">
               <Button type="submit" disabled={saving} className="gap-2 bg-[#1B0B94] text-white hover:bg-[#130970]">
                 <Check className="size-4" />
