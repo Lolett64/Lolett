@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { categoryGendersFromBody } from '@/lib/category-options';
+import {
+  CATEGORY_FIELDS_REQUIRED,
+  categoryGendersFromBody,
+  categorySlugFromBody,
+  duplicateCategorySlugMessage,
+} from '@/lib/category-options';
 
 export async function GET() {
   const supabase = createAdminClient();
@@ -34,12 +39,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { slug, label, seo_title, seo_description } = body;
+  const { label, seo_title, seo_description } = body;
+  const slug = categorySlugFromBody(body);
   // Homme et Femme cochés = une ligne par genre, insérées ensemble (tout ou rien).
   const genders = categoryGendersFromBody(body);
 
   if (genders.length === 0 || !slug || !label) {
-    return NextResponse.json({ error: 'Genre, label et slug sont requis' }, { status: 400 });
+    return NextResponse.json({ error: CATEGORY_FIELDS_REQUIRED }, { status: 400 });
   }
 
   const supabase = createAdminClient();
@@ -58,10 +64,7 @@ export async function POST(request: Request) {
 
   if (error) {
     if (error.code === '23505') {
-      return NextResponse.json(
-        { error: `Une catégorie « ${slug} » existe déjà pour ce genre. Choisissez un autre slug.` },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: duplicateCategorySlugMessage(slug) }, { status: 409 });
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

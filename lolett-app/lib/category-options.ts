@@ -1,4 +1,5 @@
 import { isShopGender, type ShopGender } from '@/lib/gender';
+import { slugify } from '@/lib/admin/utils';
 
 /** Ligne de la table `categories` utile au choix d'une catégorie. */
 export interface CategoryRow {
@@ -60,4 +61,23 @@ export function categoryGendersFromBody(body: unknown): ShopGender[] {
     }
   }
   return result;
+}
+
+/**
+ * Slug d'une catégorie = morceau de son adresse (/shop/femme/<slug>).
+ * Toujours nettoyé : « Pulls, gilets & sweat-shirt » devient `pulls-gilets-sweat-shirt`.
+ * Slug vide : on le tire du nom de la catégorie.
+ */
+export function categorySlugFromBody(body: unknown): string {
+  if (typeof body !== 'object' || body === null) return '';
+  const { slug, label } = body as { slug?: unknown; label?: unknown };
+  const fromSlug = typeof slug === 'string' ? slugify(slug) : '';
+  return fromSlug || (typeof label === 'string' ? slugify(label) : '');
+}
+
+/** Messages d'erreur communs à la création et à la modification d'une catégorie. */
+export const CATEGORY_FIELDS_REQUIRED = 'Genre, label et slug sont requis';
+
+export function duplicateCategorySlugMessage(slug: string): string {
+  return `Une catégorie « ${slug} » existe déjà pour ce genre. Choisissez un autre slug.`;
 }

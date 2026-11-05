@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
+import { slugify, slugifyWhileTyping } from '@/lib/admin/utils';
 
 export interface Category {
   id: string;
@@ -9,15 +10,6 @@ export interface Category {
   label: string;
   seo_title: string | null;
   seo_description: string | null;
-}
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
 }
 
 // `gender` sert à la modification (une seule catégorie), `genders` à la création :
@@ -97,6 +89,8 @@ export function useCategoryForm() {
   function setFormField(field: string, value: string) {
     if (field === 'slug') {
       setSlugManual(value !== '');
+      setForm((f) => ({ ...f, slug: slugifyWhileTyping(value) }));
+      return;
     }
     setForm((f) => ({ ...f, [field]: value }));
   }
@@ -159,8 +153,14 @@ export function useCategoryForm() {
 
   const homme = categories.filter((c) => c.gender === 'homme');
   const femme = categories.filter((c) => c.gender === 'femme');
+  // Adresse(s) qu'aura la page, telles que le serveur les enregistrera.
+  const previewGenders = editingId ? [form.gender] : form.genders;
+  const addressPreview = (previewGenders.length ? previewGenders : ['genre']).map(
+    (g) => `/shop/${g || 'genre'}/${slugify(form.slug) || '…'}`,
+  );
 
   return {
+    addressPreview,
     categories,
     productCounts,
     loading,
