@@ -4,6 +4,7 @@ import {
   CATEGORY_FIELDS_REQUIRED,
   categoryGendersFromBody,
   categorySlugFromBody,
+  countProductsByCategory,
   duplicateCategorySlugMessage,
 } from '@/lib/category-options';
 
@@ -19,20 +20,9 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Count products per category_slug
-  const { data: products } = await supabase
-    .from('products')
-    .select('category_slug');
-
-  const productCounts: Record<string, number> = {};
-  if (products) {
-    for (const p of products) {
-      const slug = p.category_slug;
-      if (slug) {
-        productCounts[slug] = (productCounts[slug] || 0) + 1;
-      }
-    }
-  }
+  // Compteur par genre + slug : un même slug peut exister côté Homme et côté Femme.
+  const { data: products } = await supabase.from('products').select('gender, category_slug');
+  const productCounts = countProductsByCategory(products ?? []);
 
   return NextResponse.json({ categories: data, productCounts });
 }

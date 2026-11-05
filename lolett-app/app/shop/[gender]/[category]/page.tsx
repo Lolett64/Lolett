@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { ShopContentV4 } from '@/components/product/ShopContentV4';
 import { productRepository, categoryRepository } from '@/lib/adapters';
+import { legacyCategorySlug } from '@/lib/legacy-category-slugs';
 
 export const revalidate = 60;
 
@@ -35,7 +36,12 @@ export default async function CategoryPage({ params }: PageProps) {
   if (gender !== 'homme' && gender !== 'femme') notFound();
 
   const category = await categoryRepository.findBySlug(gender, categorySlug);
-  if (!category) notFound();
+  if (!category) {
+    // Ancienne adresse encore connue de Google : redirection permanente (301/308).
+    const current = legacyCategorySlug(gender, categorySlug);
+    if (current) permanentRedirect(`/shop/${gender}/${current}`);
+    notFound();
+  }
 
   const products = await productRepository.findByCategory(gender, categorySlug);
   const categories = await categoryRepository.findByGender(gender);

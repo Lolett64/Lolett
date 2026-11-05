@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useCategoryForm } from '@/components/admin/categories/useCategoryForm';
 import { CategoryGenderField } from '@/components/admin/categories/CategoryGenderField';
+import { categoryCountKey } from '@/lib/category-options';
 
 export default function AdminCategoriesPage() {
   const {
@@ -161,7 +162,7 @@ export default function AdminCategoriesPage() {
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-[#1a1510] text-sm">{cat.label}</span>
-                        <span className="text-xs text-[#1a1510]/40">({productCounts[cat.slug] ?? 0} produits)</span>
+                        <span className="text-xs text-[#1a1510]/40">({productCounts[categoryCountKey(cat.gender, cat.slug)] ?? 0} produits)</span>
                         <Badge variant="outline" className="text-xs font-mono text-[#1a1510]/50 border-gray-200">{cat.slug}</Badge>
                       </div>
                       {cat.seo_title && (
