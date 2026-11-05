@@ -24,7 +24,7 @@ interface CategoryGenderFieldProps {
 
 /**
  * Création : cases Homme / Femme (cocher les deux crée la catégorie des deux côtés).
- * Modification : une catégorie existante n'a qu'un genre, d'où une liste simple.
+ * Modification : le genre est figé (ses produits sont rangés de ce côté-là).
  */
 export function CategoryGenderField({
   editing,
@@ -37,7 +37,7 @@ export function CategoryGenderField({
     return (
       <div className="flex flex-col gap-2">
         <Label className="text-[#1a1510]">Genre *</Label>
-        <Select value={gender} onValueChange={onGenderChange} required>
+        <Select value={gender} onValueChange={onGenderChange} required disabled>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Choisir..." />
           </SelectTrigger>
@@ -47,6 +47,9 @@ export function CategoryGenderField({
             ))}
           </SelectContent>
         </Select>
+        <p className="text-xs text-[#1a1510]/50">
+          Pour l&apos;autre genre, créez une nouvelle catégorie.
+        </p>
       </div>
     );
   }

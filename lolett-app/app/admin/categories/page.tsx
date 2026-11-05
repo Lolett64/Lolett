@@ -10,6 +10,7 @@ import { CategoryGenderField } from '@/components/admin/categories/CategoryGende
 
 export default function AdminCategoriesPage() {
   const {
+    addressPreview,
     categories,
     productCounts,
     loading,
@@ -94,9 +95,9 @@ export default function AdminCategoriesPage() {
                 />
                 <p className="text-xs text-[#1a1510]/50">
                   Adresse de la page :{' '}
-                  <span className="font-mono">
-                    /shop/{(editingId ? form.gender : form.genders[0]) || 'genre'}/{form.slug || '…'}
-                  </span>
+                  {addressPreview.map((path) => (
+                    <span key={path} className="mr-2 font-mono">{path}</span>
+                  ))}
                 </p>
               </div>
             </div>

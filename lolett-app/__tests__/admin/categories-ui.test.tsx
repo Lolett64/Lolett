@@ -73,6 +73,15 @@ describe('Page Catégories — cocher Homme et Femme', () => {
 
     expect(slug).toHaveValue('pulls-gilets-sweats');
     expect(screen.getByText('/shop/femme/pulls-gilets-sweats')).toBeInTheDocument();
+
+    // tiret final pendant la frappe : l'aperçu montre l'adresse réellement enregistrée
+    await user.type(slug, ' ');
+    expect(slug).toHaveValue('pulls-gilets-sweats-');
+    expect(screen.getByText('/shop/femme/pulls-gilets-sweats')).toBeInTheDocument();
+
+    // Homme et Femme cochés : les deux adresses
+    await user.click(screen.getByRole('checkbox', { name: 'Homme' }));
+    expect(screen.getByText('/shop/homme/pulls-gilets-sweats')).toBeInTheDocument();
   });
 
   it('bloque la création si aucune case n’est cochée', async () => {
