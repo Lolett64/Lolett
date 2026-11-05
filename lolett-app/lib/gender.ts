@@ -48,3 +48,12 @@ export function genderLabel(gender: string): string {
 export function shopHrefForGender(gender: string): string {
   return isShopGender(gender) ? `/shop/${gender}` : '/shop';
 }
+
+/**
+ * Produits qui suivent une catégorie quand son slug change : ceux de son genre,
+ * plus les unisexes, sauf si l'autre boutique garde une catégorie à l'ancien slug
+ * (les unisexes y restent alors rangés).
+ */
+export function gendersFollowingCategory(categoryGender: ShopGender, otherShopKeepsSlug: boolean): string[] {
+  return otherShopKeepsSlug ? [categoryGender] : [categoryGender, UNISEX];
+}

@@ -74,3 +74,10 @@ export function categorySlugFromBody(body: unknown): string {
   const fromSlug = typeof slug === 'string' ? slugify(slug) : '';
   return fromSlug || (typeof label === 'string' ? slugify(label) : '');
 }
+
+/** Messages d'erreur communs à la création et à la modification d'une catégorie. */
+export const CATEGORY_FIELDS_REQUIRED = 'Genre, label et slug sont requis';
+
+export function duplicateCategorySlugMessage(slug: string): string {
+  return `Une catégorie « ${slug} » existe déjà pour ce genre. Choisissez un autre slug.`;
+}

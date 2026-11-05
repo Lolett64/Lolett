@@ -21,7 +21,7 @@ vi.mock('@/lib/supabase/admin', () => ({
       const query: Query = { table, calls: [] };
       state.queries.push(query);
       const builder: Record<string, unknown> = {};
-      for (const method of ['select', 'insert', 'update', 'eq', 'limit', 'single', 'maybeSingle']) {
+      for (const method of ['select', 'insert', 'update', 'eq', 'neq', 'in', 'limit', 'single', 'maybeSingle']) {
         builder[method] = (...args: unknown[]) => {
           query.calls.push({ method, args });
           return builder;
@@ -71,62 +71,122 @@ describe('slug de catégorie toujours propre (adresse de la page)', () => {
     expect(rows[0].slug).toBe('vestes-blazers');
   });
 
-  it('PUT : nettoie le slug avant de l’enregistrer', async () => {
-    state.respond = (q) =>
-      has(q, 'single') && !has(q, 'update')
-        ? { data: { gender: 'femme', slug: 'chemises-blouses' }, error: null }
-        : { data: {}, error: null };
-    const res = await PUT(
-      req('PUT', { gender: 'femme', slug: 'Chemises & Blouses', label: 'Chemises & blouses' }),
-      ctx,
-    );
-    expect(res.status).toBe(200);
-    const update = state.queries.find((q) => q.table === 'categories' && has(q, 'update'))!;
-    expect((arg(update, 'update') as { slug: string }).slug).toBe('chemises-blouses');
-    // slug inchangé une fois nettoyé : aucun produit à déplacer
-    expect(state.queries.some((q) => q.table === 'products')).toBe(false);
-  });
 });
 
-describe('renommer le slug déplace les produits avec', () => {
-  function setup(otherCategoryKeepsOldSlug: boolean) {
-    state.respond = (q) => {
-      if (q.table === 'categories' && has(q, 'single') && !has(q, 'update')) {
-        return { data: { gender: 'femme', slug: 'hauts' }, error: null };
+/**
+ * Base simulée pour PUT : catégorie femme « hauts », 2 produits femme dessus,
+ * 1 produit unisexe. `fail` force une erreur sur une étape.
+ */
+function db(opts: { other?: boolean; taken?: boolean; fail?: 'before' | 'others' | 'move' | 'update' } = {}) {
+  state.respond = (q) => {
+    const isCat = q.table === 'categories';
+    if (isCat && has(q, 'maybeSingle')) {
+      return opts.fail === 'before'
+        ? { data: null, error: { message: 'timeout' } }
+        : { data: { gender: 'femme', slug: 'hauts' }, error: null };
+    }
+    if (isCat && has(q, 'neq') && !has(q, 'update')) {
+      const slugEq = eqs(q).find(([k]) => k === 'slug')?.[1];
+      if (slugEq === 'hauts') {
+        return opts.fail === 'others'
+          ? { data: null, error: { message: 'timeout' } }
+          : { data: opts.other ? [{ id: 'cat-homme' }] : [], error: null };
       }
-      if (q.table === 'categories' && has(q, 'limit')) {
-        return { data: otherCategoryKeepsOldSlug ? [{ id: 'cat-homme' }] : [], error: null };
-      }
-      return { data: {}, error: null };
-    };
-  }
-  const body = { gender: 'femme', slug: 'tops', label: 'Tops' };
+      return { data: opts.taken ? [{ id: 'cat-2' }] : [], error: null };
+    }
+    if (q.table === 'products' && has(q, 'select')) {
+      const genders = (q.calls.find((c) => c.method === 'in' && c.args[0] === 'gender')?.args[1] ?? []) as string[];
+      const rows = [
+        { id: 'p1', gender: 'femme' },
+        { id: 'p2', gender: 'femme' },
+        { id: 'p3', gender: 'both' },
+      ].filter((p) => genders.includes(p.gender));
+      return { data: rows, error: null };
+    }
+    if (q.table === 'products' && has(q, 'update')) {
+      const back = (arg(q, 'update') as { category_slug: string }).category_slug === 'hauts';
+      return opts.fail === 'move' && !back ? { data: null, error: { message: 'boom' } } : { data: {}, error: null };
+    }
+    if (isCat && has(q, 'update')) {
+      return opts.fail === 'update' ? { data: null, error: { message: 'boom' } } : { data: {}, error: null };
+    }
+    return { data: [], error: null };
+  };
+}
+const productMoves = () =>
+  state.queries
+    .filter((q) => q.table === 'products' && has(q, 'update'))
+    .map((q) => ({ to: (arg(q, 'update') as { category_slug: string }).category_slug, ids: q.calls.find((c) => c.method === 'in')?.args[1] }));
+const categoryUpdated = () => state.queries.some((q) => q.table === 'categories' && has(q, 'update'));
+const body = { gender: 'femme', slug: 'Tops', label: 'Tops' };
 
-  it('les produits Femme de l’ancien slug passent au nouveau', async () => {
-    setup(true);
-    await PUT(req('PUT', body), ctx);
-    const moves = state.queries.filter((q) => q.table === 'products' && has(q, 'update'));
-    expect(moves).toHaveLength(1);
-    expect(arg(moves[0], 'update')).toEqual({ category_slug: 'tops' });
-    expect(eqs(moves[0])).toEqual([['category_slug', 'hauts'], ['gender', 'femme']]);
+describe('PUT : renommer le slug déplace les produits avec', () => {
+  it('nettoie le slug ; slug identique une fois nettoyé = aucun produit touché', async () => {
+    db();
+    const res = await PUT(req('PUT', { gender: 'femme', slug: 'Hauts ', label: 'Hauts' }), ctx);
+    expect(res.status).toBe(200);
+    const update = state.queries.find((q) => q.table === 'categories' && has(q, 'update'))!;
+    expect((arg(update, 'update') as { slug: string }).slug).toBe('hauts');
+    expect(state.queries.some((q) => q.table === 'products')).toBe(false);
   });
 
-  it('les produits unisexes suivent aussi si plus aucune catégorie ne garde l’ancien slug', async () => {
-    setup(false);
-    await PUT(req('PUT', body), ctx);
-    const moves = state.queries.filter((q) => q.table === 'products' && has(q, 'update'));
-    expect(moves.map((m) => eqs(m)[1])).toEqual([['gender', 'femme'], ['gender', 'both']]);
+  it('les produits femme ET unisexes suivent si plus aucune catégorie ne garde l’ancien slug', async () => {
+    db({ other: false });
+    const res = await PUT(req('PUT', body), ctx);
+    expect(res.status).toBe(200);
+    expect(productMoves()).toEqual([{ to: 'tops', ids: ['p1', 'p2', 'p3'] }]);
   });
 
-  it('slug déjà pris pour ce genre : message clair (409), aucun produit déplacé', async () => {
-    state.respond = (q) => {
-      if (q.table === 'categories' && has(q, 'update')) {
-        return { data: null, error: { code: '23505', message: 'duplicate key' } };
-      }
-      return { data: { gender: 'femme', slug: 'hauts' }, error: null };
-    };
+  it('les unisexes restent si la catégorie homme garde l’ancien slug', async () => {
+    db({ other: true });
+    await PUT(req('PUT', body), ctx);
+    expect(productMoves()).toEqual([{ to: 'tops', ids: ['p1', 'p2'] }]);
+  });
+
+  it('slug déjà pris pour ce genre : 409, rien n’est touché', async () => {
+    db({ taken: true });
     const res = await PUT(req('PUT', body), ctx);
     expect(res.status).toBe(409);
-    expect(state.queries.some((q) => q.table === 'products')).toBe(false);
+    expect(productMoves()).toEqual([]);
+    expect(categoryUpdated()).toBe(false);
+  });
+
+  it('changer le genre d’une catégorie existante est refusé', async () => {
+    db();
+    const res = await PUT(req('PUT', { ...body, gender: 'homme' }), ctx);
+    expect(res.status).toBe(400);
+    expect(categoryUpdated()).toBe(false);
+  });
+
+  it('lecture de la catégorie en échec : 500, rien n’est touché', async () => {
+    db({ fail: 'before' });
+    const res = await PUT(req('PUT', body), ctx);
+    expect(res.status).toBe(500);
+    expect(categoryUpdated()).toBe(false);
+  });
+
+  it('vérification « autre catégorie » en échec : 500, aucun produit déplacé', async () => {
+    db({ fail: 'others' });
+    const res = await PUT(req('PUT', body), ctx);
+    expect(res.status).toBe(500);
+    expect(productMoves()).toEqual([]);
+    expect(categoryUpdated()).toBe(false);
+  });
+
+  it('déplacement des produits en échec : 500, catégorie non renommée', async () => {
+    db({ fail: 'move' });
+    const res = await PUT(req('PUT', body), ctx);
+    expect(res.status).toBe(500);
+    expect(categoryUpdated()).toBe(false);
+  });
+
+  it('renommage de la catégorie en échec : les produits reviennent à l’ancien slug', async () => {
+    db({ fail: 'update' });
+    const res = await PUT(req('PUT', body), ctx);
+    expect(res.status).toBe(500);
+    expect(productMoves()).toEqual([
+      { to: 'tops', ids: ['p1', 'p2', 'p3'] },
+      { to: 'hauts', ids: ['p1', 'p2', 'p3'] },
+    ]);
   });
 });
