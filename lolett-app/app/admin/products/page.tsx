@@ -8,26 +8,11 @@ import { ProductCategoryAccordion } from '@/components/admin/ProductCategoryAcco
 import { CategoryTable } from '@/components/admin/CategoryTable';
 import { ProductsSkeleton } from '@/components/admin/ProductsSkeleton';
 import type { Product } from '@/components/admin/ProductRow';
+import { categoryLabelFor, type CategoryRow } from '@/lib/category-options';
 
 interface SearchParams {
   gender?: string; category?: string; search?: string; sort?: string; order?: string;
 }
-
-const CATEGORY_LABELS: Record<string, string> = {
-  hauts: 'Hauts',
-  bas: 'Bas',
-  robes: 'Robes',
-  vestes: 'Vestes & Manteaux',
-  chaussures: 'Chaussures',
-  accessoires: 'Accessoires',
-  sacs: 'Sacs',
-  bijoux: 'Bijoux',
-  mailles: 'Mailles',
-  chemises: 'Chemises',
-  pantalons: 'Pantalons',
-  pulls: 'Pulls',
-  t_shirts: 'T-shirts',
-};
 
 const GENDER_CONFIG = {
   femme: { label: 'Femme', emoji: '👗' },
@@ -50,13 +35,19 @@ async function getProducts(params: SearchParams): Promise<Product[]> {
   return (data ?? []) as Product[];
 }
 
+/** Noms des catégories créées dans l'admin, pour titrer les groupes de produits. */
+async function getCategoryRows(): Promise<CategoryRow[]> {
+  const { data } = await createAdminClient().from('categories').select('gender, slug, label');
+  return (data ?? []) as CategoryRow[];
+}
+
 interface GenderGroup {
   gender: string; label: string; emoji: string;
   categories: { category: string; label: string; products: Product[] }[];
   totalCount: number;
 }
 
-function groupByGenderThenCategory(products: Product[]): GenderGroup[] {
+function groupByGenderThenCategory(products: Product[], categoryRows: CategoryRow[]): GenderGroup[] {
   const genderMap = new Map<string, Product[]>();
 
   for (const p of products) {
@@ -92,7 +83,7 @@ function groupByGenderThenCategory(products: Product[]): GenderGroup[] {
       totalCount: prods.length,
       categories: Array.from(catMap.entries()).map(([cat, catProds]) => ({
         category: cat,
-        label: CATEGORY_LABELS[cat] || cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' '),
+        label: categoryLabelFor(categoryRows, gender, cat) ?? (cat === 'autres' ? 'Sans catégorie' : cat),
         products: catProds,
       })),
     };
@@ -100,8 +91,8 @@ function groupByGenderThenCategory(products: Product[]): GenderGroup[] {
 }
 
 async function ProductsContent({ searchParams }: { searchParams: SearchParams }) {
-  const products = await getProducts(searchParams);
-  const genderGroups = groupByGenderThenCategory(products);
+  const [products, categoryRows] = await Promise.all([getProducts(searchParams), getCategoryRows()]);
+  const genderGroups = groupByGenderThenCategory(products, categoryRows);
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
   const lowStockCount = products.filter((p) => p.stock < 3).length;
 

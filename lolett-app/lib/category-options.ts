@@ -1,4 +1,4 @@
-import { isShopGender, type ShopGender } from '@/lib/gender';
+import { UNISEX, isShopGender, type ShopGender } from '@/lib/gender';
 import { slugify } from '@/lib/admin/utils';
 
 /** Ligne de la table `categories` utile au choix d'une catégorie. */
@@ -80,4 +80,32 @@ export const CATEGORY_FIELDS_REQUIRED = 'Genre, label et slug sont requis';
 
 export function duplicateCategorySlugMessage(slug: string): string {
   return `Une catégorie « ${slug} » existe déjà pour ce genre. Choisissez un autre slug.`;
+}
+
+/** Clé du compteur de produits d'une catégorie : un même slug peut exister côté Homme et côté Femme. */
+export function categoryCountKey(gender: string, slug: string): string {
+  return `${gender}:${slug}`;
+}
+
+/** Nombre de produits par catégorie ; un produit unisexe compte dans les deux boutiques. */
+export function countProductsByCategory(
+  products: { gender: string; category_slug: string | null }[],
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const p of products) {
+    if (!p.category_slug) continue;
+    const genders: ShopGender[] = p.gender === UNISEX ? ['homme', 'femme'] : isShopGender(p.gender) ? [p.gender] : [];
+    for (const g of genders) {
+      const key = categoryCountKey(g, p.category_slug);
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
+/** Nom de la catégorie d'un produit ; pour un unisexe, celui de l'une des deux boutiques. */
+export function categoryLabelFor(categories: CategoryRow[], productGender: string, slug: string): string | undefined {
+  const sameSlug = categories.filter((c) => c.slug === slug);
+  return (sameSlug.find((c) => c.gender === productGender) ?? (isShopGender(productGender) ? undefined : sameSlug[0]))
+    ?.label;
 }
