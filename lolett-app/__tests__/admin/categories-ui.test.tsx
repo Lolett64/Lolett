@@ -60,6 +60,21 @@ describe('Page Catégories — cocher Homme et Femme', () => {
     expect(body.slug).toBe('pulls-gilets');
   });
 
+  it('un slug tapé comme un nom est nettoyé et l’adresse est affichée', async () => {
+    const user = userEvent.setup();
+    render(<AdminCategoriesPage />);
+
+    await user.click(await screen.findByRole('button', { name: /nouvelle catégorie/i }));
+    await user.click(screen.getByRole('checkbox', { name: 'Femme' }));
+    await user.type(screen.getByLabelText('Label *'), 'Pulls');
+    const slug = screen.getByLabelText('Slug');
+    await user.clear(slug);
+    await user.type(slug, 'Pulls, Gilets & Sweats');
+
+    expect(slug).toHaveValue('pulls-gilets-sweats');
+    expect(screen.getByText('/shop/femme/pulls-gilets-sweats')).toBeInTheDocument();
+  });
+
   it('bloque la création si aucune case n’est cochée', async () => {
     const user = userEvent.setup();
     render(<AdminCategoriesPage />);

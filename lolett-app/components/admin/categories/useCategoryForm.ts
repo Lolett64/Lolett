@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
+import { slugify } from '@/lib/admin/utils';
 
 export interface Category {
   id: string;
@@ -11,13 +12,17 @@ export interface Category {
   seo_description: string | null;
 }
 
-function slugify(text: string) {
+/**
+ * Nettoyage pendant la frappe : comme `slugify`, mais garde le tiret final
+ * pour pouvoir continuer \u00e0 taper (\u00ab pulls-| \u00bb). Le serveur retire le reste.
+ */
+function cleanSlugWhileTyping(text: string) {
   return text
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/^-+/, '');
 }
 
 // `gender` sert à la modification (une seule catégorie), `genders` à la création :
@@ -97,6 +102,8 @@ export function useCategoryForm() {
   function setFormField(field: string, value: string) {
     if (field === 'slug') {
       setSlugManual(value !== '');
+      setForm((f) => ({ ...f, slug: cleanSlugWhileTyping(value) }));
+      return;
     }
     setForm((f) => ({ ...f, [field]: value }));
   }

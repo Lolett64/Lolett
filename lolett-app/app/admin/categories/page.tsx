@@ -92,6 +92,12 @@ export default function AdminCategoriesPage() {
                   placeholder="chemises"
                   className="text-[#1a1510]"
                 />
+                <p className="text-xs text-[#1a1510]/50">
+                  Adresse de la page :{' '}
+                  <span className="font-mono">
+                    /shop/{(editingId ? form.gender : form.genders[0]) || 'genre'}/{form.slug || '…'}
+                  </span>
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
