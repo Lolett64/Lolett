@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { categoryGendersFromBody } from '@/lib/category-options';
+import { categoryGendersFromBody, categorySlugFromBody } from '@/lib/category-options';
 
 export async function GET() {
   const supabase = createAdminClient();
@@ -34,7 +34,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { slug, label, seo_title, seo_description } = body;
+  const { label, seo_title, seo_description } = body;
+  const slug = categorySlugFromBody(body);
   // Homme et Femme cochés = une ligne par genre, insérées ensemble (tout ou rien).
   const genders = categoryGendersFromBody(body);
 
